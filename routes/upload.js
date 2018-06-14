@@ -29,8 +29,7 @@ router.post("/", function(req, res, next){
   function callPy(path) {
 
     var spawn = require('child_process').spawn;  
-    var py    = spawn('python', ['python-scripts/script.py']);
-    var dataString = '';
+    var py = spawn('python', ['python-scripts/script.py', path]);
     
     py.stdout.on('data', function(path){
       console.log("here"+path);
