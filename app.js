@@ -7,14 +7,30 @@ var logger = require('morgan');
 //for file upload handling
 var multer = require('multer');
 
+//using the session variable to track unique user sessions
+var session = require('express-session');
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var upload = require('./routes/upload');
+var calc = require('./routes/calc');
 var app = express();
 
+
+
+app.set('file_path','Hello World!');
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+
+
+app.use(session({
+  genid: function(req) {
+    return genuuid() // use UUIDs for session IDs
+  },
+  secret: 'mouse dog'
+}));
+
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -27,6 +43,7 @@ app.use(multer({dest: "./uploads/"}).any());
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/upload',upload);
+app.use('/calc',calc);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
@@ -44,7 +61,9 @@ app.use(function(err, req, res, next) {
 });
 
 
-
+function genuuid(){
+  return new Date();
+}
 
 
 module.exports = app;

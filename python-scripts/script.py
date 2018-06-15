@@ -2,17 +2,17 @@
 
 import sys, json, numpy as np, pandas as pd
 
-#Read data from stdin
-def read_in():
-    lines = sys.stdin.readlines()
-    #Since our input would only be having one line, parse our JSON data from that
-    return json.loads(lines[0])
 
 def main():
     #get our data as an array from read_in()    
-    path = sys.argv[1]
+    sessId = sys.argv[1]
+    with open('data/data.json', 'r') as f:
+        datastore = json.loads(f.read())
     
-    print(path)
+    file = datastore['path']
+    
+    data = pd.read_csv(file, encoding = "ISO-8859-1")
+    print(data.head(5))
 
     
 
