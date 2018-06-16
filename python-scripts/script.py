@@ -11,8 +11,18 @@ def main():
     
     file = datastore['path']
     
-    data = pd.read_csv(file, encoding = "ISO-8859-1")
-    print(data.head(5))
+    data = pd.read_csv(file)
+    df1 = data['A'].value_counts()
+
+    dict_temp ={}
+
+    dict_temp['A'] = df1.index
+
+    dict_temp['B'] = df1.values
+
+    file_name = 'user_data/'+file.split('\\')[1] +"data.json"
+    
+    pd.DataFrame(dict_temp).to_json(file_name, orient='index')
 
     
 

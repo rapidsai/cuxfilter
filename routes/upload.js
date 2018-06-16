@@ -21,7 +21,7 @@ router.post("/", function(req, res, next){
                   }
                   let data = JSON.stringify(db);
                   fs.writeFileSync('data/data.json',data);        
-                  res.send("ok");
+                  res.redirect("/calc");
 
                   // callPy(req.files[0].path, function(val){
                   //   console.log(val);
