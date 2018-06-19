@@ -16,17 +16,15 @@ router.post("/", function(req, res, next){
           console.log(req.files[0].path);
           fs.exists(req.files[0].path, function(exists) {
               if(exists) {
-                  let db = {
-                    path : req.files[0].path
-                  }
-                  let data = JSON.stringify(db);
-                  fs.writeFileSync('data/data.json',data);        
-                  res.redirect("/calc");
-
-                  // callPy(req.files[0].path, function(val){
-                  //   console.log(val);
-                  // });
+                  let sessId = req.session.id;
+                  let db ={
+                            sessId: sessId,
+                            path : req.files[0].path
+                          };
                   
+                  let data = JSON.stringify(db);
+                  fs.writeFileSync('../data/data.json',data);        
+                  res.redirect('../calc');
               } else {
                   res.end("oh snap, that didn't work!");
               }
@@ -35,6 +33,22 @@ router.post("/", function(req, res, next){
         res.send("fail");
       }
   });
+
+function calc(){
+   
+}
+  
+function callPy(sessId, callback) {
+
+    var spawn = require('child_process').spawn;  
+    var py = spawn('python', ['../python-scripts/script.py', sessId]);
+    py.stdout.on('data', function(val){
+        callback(val);
+    });
+
+    py.stdin.write(JSON.stringify(sessId));
+    py.stdin.end();
+  }
 
   
   module.exports = router;

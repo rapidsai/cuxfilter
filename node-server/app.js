@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var cors = require('cors');
 
 //for file upload handling
 var multer = require('multer');
@@ -23,12 +24,16 @@ app.set('file_path','Hello World!');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+//enable cors
+app.use(cors({origin: '*'}));
 
 app.use(session({
   genid: function(req) {
     return genuuid() // use UUIDs for session IDs
   },
-  secret: 'mouse dog'
+  secret: 'mouse dog',
+  resave: true,
+  saveUninitialized: true
 }));
 
 

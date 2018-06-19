@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  style.
+    .hid {
+      display:none;
+    }
+  h1= title
+  span#hid-val.hid #{val}
+  span#hid-col.hid #{cols}
+  div#cols
+  div#myDiv
+  script(src="https://cdn.plot.ly/plotly-latest.min.js")
+  script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js")
+  script(src="javascripts/test.js")
+  
