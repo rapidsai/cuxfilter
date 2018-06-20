@@ -33,22 +33,5 @@ router.post("/", function(req, res, next){
         res.send("fail");
       }
   });
-
-function calc(){
-   
-}
-  
-function callPy(sessId, callback) {
-
-    var spawn = require('child_process').spawn;  
-    var py = spawn('python', ['../python-scripts/script.py', sessId]);
-    py.stdout.on('data', function(val){
-        callback(val);
-    });
-
-    py.stdin.write(JSON.stringify(sessId));
-    py.stdin.end();
-  }
-
   
   module.exports = router;

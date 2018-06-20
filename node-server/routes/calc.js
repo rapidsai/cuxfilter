@@ -7,27 +7,26 @@ var fs = require("fs");
 
 router.get('/', function(req, res) {
     
-    var sessId = req.session.id;
-
-    getHist(sessId, function(val){
-        var value = JSON.parse(val);
-        getColumns(sessId, function(cols){
-            res.render('dashboard',{title:"File Uploaded Successfully",val: JSON.stringify(value),cols:cols});
-        });
+    var sessId = req.session.id;   
+    getColumns(sessId, function(cols){
+        res.render('dashboard',{title:"File Uploaded Successfully",val: JSON.stringify({hello:"World"}),cols:cols});
     });
 
 }); 
 
-// router.get('/getColumns', function(req,res){
+router.post('/getHist', function(req,res){
 
-//     var sessId = req.session.id;
+    var sessId = req.session.id;
+    var colName = req.body.col;
+    console.log(sessId);
+    console.log(colName);
+    getHist(sessId,colName, function(val){
+        console.log(val);
+        var value = JSON.parse(val);
+        res.send(JSON.stringify(value));
+    });
 
-//     getColumns(sessId, function(val){
-//         var value = JSON.parse(val);
-//         res.send(JSON.stringify(value));
-//     });
-
-// });
+});
 
 function getColumns(sessId,callback){
     var spawn = require('child_process').spawn;  
@@ -40,12 +39,16 @@ function getColumns(sessId,callback){
     py.stdin.end();
 }
 
-function getHist(sessId, callback) {
-
+function getHist(sessId,colName, callback) {
+    let chunks = [];
+    
     var spawn = require('child_process').spawn;  
-    var py = spawn('python', ['../python-scripts/script.py', sessId, 'hist']);
+    var py = spawn('python', ['../python-scripts/script.py', sessId, colName,'hist']);
     py.stdout.on('data', function(val){
-        callback(val);
+        chunks.push(val);
+    }).on('end', function() {
+        let data = Buffer.concat(chunks);
+        callback(data);
     });
 
     py.stdin.write(JSON.stringify(sessId));

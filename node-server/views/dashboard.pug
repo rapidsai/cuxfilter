@@ -8,9 +8,15 @@ block content
   h1= title
   span#hid-val.hid #{val}
   span#hid-col.hid #{cols}
-  div#cols
+  div#cols-x histogram for:<br>
+  .btn-group
+    button.btn.btn-danger.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+      | Action
+    .dropdown-menu
+      a#hist.dropdown-item(href='#') Histogram
+      a#bar.dropdown-item(href='#') Bar Chart
+
   div#myDiv
   script(src="https://cdn.plot.ly/plotly-latest.min.js")
-  script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js")
   script(src="javascripts/test.js")
   
