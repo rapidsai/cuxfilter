@@ -8,3 +8,6 @@ CPU Baseline: Webserver loads data, receive & performs a filtering & histogrammi
 2. python-scripts: Includes scripts to generate random data: python .\generate-random-dataset.py 1000000 -> generates a two columns 1M row data set and stores it as a csv file.
 Also includes scripts that uses pandas functions on the user uploaded data, and returns histograms
 
+Sample UI:
+
+![sample image](sample-ui.png)
