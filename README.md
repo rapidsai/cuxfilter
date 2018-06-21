@@ -11,3 +11,7 @@ Also includes scripts that uses pandas functions on the user uploaded data, and 
 Sample UI:
 
 ![sample image](sample-ui.png)
+
+Profiling:
+
+https://docs.google.com/spreadsheets/d/1jFcFx_DzgHRF_NucQKYLr7o-vU4heBfQREwM8H0GKsM/edit?usp=sharing

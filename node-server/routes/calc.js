@@ -4,18 +4,19 @@ var util = require("util");
 var fs = require("fs"); 
 
 
-
 router.get('/', function(req, res) {
-    
     var sessId = req.session.id;   
-    getColumns(sessId, function(cols){
-        res.render('dashboard',{title:"File Uploaded Successfully",val: JSON.stringify({hello:"World"}),cols:cols});
-    });
-
+    res.render('dashboard',{title:"File Uploaded Successfully",val: JSON.stringify({hello:"World"}),cols:''});
 }); 
 
-router.post('/getHist', function(req,res){
+router.post('/getColumns', function(req,res){
+    var sessId = req.session.id;
+    getColumns(sessId, function(cols){
+        res.send(cols);
+    });
+});
 
+router.post('/getHist', function(req,res){
     var sessId = req.session.id;
     var colName = req.body.col;
     console.log(sessId);
@@ -53,6 +54,6 @@ function getHist(sessId,colName, callback) {
 
     py.stdin.write(JSON.stringify(sessId));
     py.stdin.end();
-  }
+}
 
-  module.exports = router;
+module.exports = router;
