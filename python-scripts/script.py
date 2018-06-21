@@ -1,7 +1,7 @@
 ## compute_input.py
 
 import sys, json, numpy as np, pandas as pd
-import line_profiler
+# import line_profiler
 import numpy as np
 
 import numba
@@ -124,7 +124,7 @@ def columns(data):
     print(list(data.columns))
     sys.stdout.flush()
 
-@profile
+# @profile
 def main():
     #get our data as an array from read_in()    
     sessId = sys.argv[1]
@@ -141,7 +141,7 @@ def main():
     data = pd.read_csv(file)
     if type == 'hist':
         histNumba(data,colName)
-        histPandas(data,colName)
+        # histPandas(data,colName)
     elif type == 'columns':
         columns(data)
 
