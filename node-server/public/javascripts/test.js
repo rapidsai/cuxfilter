@@ -4,10 +4,16 @@ var cols = document.getElementById("hid-col").innerHTML;
 var curr_col ='';
 var X=0,Y=0;
 var type='bar';
-
+var processing = 'pandas';
+var load_type = 'csv';
 
 function getCols(){
-    $.post("/calc/getColumns", function(data,status){
+    var data = {
+        processing: processing,
+        load_type: load_type
+    };
+
+    $.post("/calc/getColumns",data, function(data,status){
         console.log(typeof data);
         genCols(data);
     });
@@ -18,19 +24,31 @@ function genPlot(X,Y,type){
     var d = [{
         x: X,
         y: Y,
+        mode: 'markers',
         type: type
     }
     ]
    Plotly.newPlot('myDiv', d);
 }
 
+$('input[type=radio][name=processing]').change(function() {
+    processing = $(this).val();
+});
+
+$('input[type=radio][name=load_type]').change(function() {
+    load_type = $(this).val();
+});
+
 function initiateListeners(){
     $('input[type=radio][name=X]').change(function(){
         console.log("");
         if(curr_col !== $(this).val()){
-            var data = JSON.stringify({ col: $(this).val()});
-        
-            $.post("/calc/getHist", { col: $(this).val()},function(data,status){
+            var data = {
+                col: $(this).val(),
+                processing: processing,
+                load_type: load_type
+            };
+            $.post("/calc/getHist", data,function(data,status){
                 data = JSON.parse(data);
                 X = data['A'];
                 Y = data['B'];
@@ -52,6 +70,13 @@ function initiateListeners(){
     $("#bar").on("click",function(){
         if(type !== "bar"){
             type = 'bar';
+            genPlot(X,Y,type);
+        }
+    });
+
+    $("#scatter").on("click",function(){
+        if(type !== "scatter"){
+            type = 'scatter';
             genPlot(X,Y,type);
         }
     });

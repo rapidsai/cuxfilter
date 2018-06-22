@@ -23,7 +23,8 @@ router.post("/", function(req, res, next){
                           };
                   
                   let data = JSON.stringify(db);
-                  fs.writeFileSync('../data/data.json',data);        
+                  fs.writeFileSync('../data/data.json',data);
+                  convertToArrow(sessId);        
                   res.redirect('../calc');
               } else {
                   res.end("oh snap, that didn't work!");
@@ -34,4 +35,10 @@ router.post("/", function(req, res, next){
       }
   });
   
+  function convertToArrow(sessId){
+    var spawn = require('child_process').spawn;  
+    var py = spawn('python', ['../python-scripts/convertToArrow.py', sessId]);
+    py.stdin.write(JSON.stringify(sessId));
+    py.stdin.end();
+  }
   module.exports = router;

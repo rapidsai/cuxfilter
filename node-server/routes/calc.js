@@ -11,17 +11,22 @@ router.get('/', function(req, res) {
 
 router.post('/getColumns', function(req,res){
     var sessId = req.session.id;
-    getColumns(sessId, function(cols){
+    console.log(req.body);
+    var processing = req.body.processing;
+    var load_type = req.body.load_type;
+    getColumns(sessId,processing,load_type, function(cols){
         res.send(cols);
     });
 });
 
 router.post('/getHist', function(req,res){
     var sessId = req.session.id;
+    console.log(req.body);
     var colName = req.body.col;
-    console.log(sessId);
-    console.log(colName);
-    getHist(sessId,colName, function(val){
+    var processing = req.body.processing;
+    var load_type = req.body.load_type;
+
+    getHist(sessId,colName,processing,load_type, function(val){
         console.log(val);
         var value = JSON.parse(val);
         res.send(JSON.stringify(value));
@@ -29,9 +34,9 @@ router.post('/getHist', function(req,res){
 
 });
 
-function getColumns(sessId,callback){
+function getColumns(sessId,processing,load_type,callback){
     var spawn = require('child_process').spawn;  
-    var py = spawn('python', ['../python-scripts/script.py', sessId, 'columns']);
+    var py = spawn('python', ['../python-scripts/script.py', sessId, 'columns', processing,load_type]);
     py.stdout.on('data', function(val){
         callback(val);
     });
@@ -40,11 +45,11 @@ function getColumns(sessId,callback){
     py.stdin.end();
 }
 
-function getHist(sessId,colName, callback) {
+function getHist(sessId,colName,processing,load_type, callback) {
     let chunks = [];
     
     var spawn = require('child_process').spawn;  
-    var py = spawn('python', ['../python-scripts/script.py', sessId, colName,'hist']);
+    var py = spawn('python', ['../python-scripts/script.py', sessId, colName,'hist',processing,load_type]);
     py.stdout.on('data', function(val){
         chunks.push(val);
     }).on('end', function() {

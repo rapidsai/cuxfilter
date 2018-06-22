@@ -8,6 +8,29 @@ block content
   h1= title
   span#hid-val.hid #{val}
   span#hid-col.hid #{cols}
+
+  h3 File type:
+  label.radio-inline
+    input(type='radio', name='load_type', value = 'csv')
+    | csv
+  br
+  label.radio-inline
+    input(type='radio', name='load_type', value = 'arrow')
+    | arrow
+
+  br
+
+  h3 Histogram Processing: 
+  label.radio-inline
+    input(type='radio', name='processing', value = 'pandas')
+    | pandas
+  br
+  label.radio-inline
+    input(type='radio', name='processing', value = 'numba')
+    | numba
+
+  br
+
   button.btn.btn-danger(onclick='getCols()') Get Columns
   div#cols-x histogram for:<br>
   .btn-group
@@ -16,6 +39,7 @@ block content
     .dropdown-menu
       a#hist.dropdown-item(href='#') Histogram
       a#bar.dropdown-item(href='#') Bar Chart
+      a#scatter.dropdown-item(href='#') Scatter plot
 
   div#myDiv
   script(src="https://cdn.plot.ly/plotly-latest.min.js")

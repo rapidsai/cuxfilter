@@ -6,6 +6,7 @@ import numpy as np
 
 import numba
 from numba import cuda
+import pyarrow as pa
 
 @numba.jit(nopython=True)
 def compute_bin(x, n, xmin, xmax):
@@ -124,24 +125,45 @@ def columns(data):
     print(list(data.columns))
     sys.stdout.flush()
 
+def readArrowToDF(source):
+    source = source+".arrow"
+    reader = pa.RecordBatchStreamReader(source)
+    pa_df = reader.read_all()
+    return pa_df.to_pandas()
+
+def readDirect(source):
+    df = pd.read_csv(source)
+    return df
+
 # @profile
 def main():
     #get our data as an array from read_in()    
     sessId = sys.argv[1]
-    if(len(sys.argv)==4):
+    if(len(sys.argv)==6):
         colName = sys.argv[2]
         type = sys.argv[3]
     else:
         type = sys.argv[2]
+    processing = sys.argv[-2]
+    load_type = sys.argv[-1]
 
     with open('../data/data.json', 'r') as f:
         datastore = json.loads(f.read())
     
     file = datastore['path']
-    data = pd.read_csv(file)
+    
+    
+    if load_type == 'csv':
+        data = readDirect(file)
+    else: #if load_type == 'arrow'
+        data = readArrowToDF(file)
+    
+    
     if type == 'hist':
-        histNumba(data,colName)
-        # histPandas(data,colName)
+        if processing == 'numba':
+            histNumba(data,colName)
+        elif processing == 'pandas':
+            histPandas(data,colName)
     elif type == 'columns':
         columns(data)
 
