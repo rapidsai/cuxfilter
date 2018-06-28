@@ -3,7 +3,7 @@ var data = '';
 var cols = document.getElementById("hid-col").innerHTML;
 var curr_col ='';
 var X=0,Y=0;
-var type='bar';
+var type='histogram';
 var processing = 'pandas';
 var load_type = 'csv';
 
@@ -39,8 +39,8 @@ $('input[type=radio][name=load_type]').change(function() {
     load_type = $(this).val();
 });
 
-function initiateListeners(){
-    $('input[type=radio][name=X]').change(function(){
+function initiateListeners(val){
+    $('input[type=radio][name=X][value='+val+']').change(function(){
         console.log("");
         if(curr_col !== $(this).val()){
             var data = {
@@ -59,29 +59,28 @@ function initiateListeners(){
         }
         
     });
-    
-    $("#hist").on("click",function(){
-        if(type !== "histogram"){
-            type = 'histogram';
-            genPlot(X,Y,type);
-        }
-    });
-    
-    $("#bar").on("click",function(){
-        if(type !== "bar"){
-            type = 'bar';
-            genPlot(X,Y,type);
-        }
-    });
-
-    $("#scatter").on("click",function(){
-        if(type !== "scatter"){
-            type = 'scatter';
-            genPlot(X,Y,type);
-        }
-    });
 }
 
+$("#hist").on("click",function(){
+    if(type !== "histogram"){
+        type = 'histogram';
+        genPlot(X,Y,type);
+    }
+});
+
+$("#bar").on("click",function(){
+    if(type !== "bar"){
+        type = 'bar';
+        genPlot(X,Y,type);
+    }
+});
+
+$("#scatter").on("click",function(){
+    if(type !== "scatter"){
+        type = 'scatter';
+        genPlot(X,Y,type);
+    }
+});
 
 function genCheckBox(val,text){
     if(val){
@@ -98,7 +97,10 @@ function genCols(cols){
     Y = data[a[1]];
     console.log(type);
     for(var i=0; i< a.length; i++){
-        genCheckBox(false, a[i]);
+        if(jQuery(':radio[name=X][value='+a[i]+']').length===0){
+            genCheckBox(false, a[i]);
+            initiateListeners(a[i]);
+        }
     }
-    initiateListeners();
+    
 }

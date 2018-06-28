@@ -7,7 +7,14 @@ var cors = require('cors');
 
 //for file upload handling
 var multer = require('multer');
-
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname.split(".")[0])
+  }
+})
 //using the session variable to track unique user sessions
 var session = require('express-session');
 
@@ -43,7 +50,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(multer({dest: "./uploads/"}).any());
+app.use(multer({dest: "./uploads/",storage: storage}).any());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

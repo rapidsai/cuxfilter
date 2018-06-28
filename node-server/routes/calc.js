@@ -11,7 +11,6 @@ router.get('/', function(req, res) {
 
 router.post('/getColumns', function(req,res){
     var sessId = req.session.id;
-    console.log(req.body);
     var processing = req.body.processing;
     var load_type = req.body.load_type;
     getColumns(sessId,processing,load_type, function(cols){
@@ -21,15 +20,12 @@ router.post('/getColumns', function(req,res){
 
 router.post('/getHist', function(req,res){
     var sessId = req.session.id;
-    console.log(req.body);
     var colName = req.body.col;
     var processing = req.body.processing;
     var load_type = req.body.load_type;
 
     getHist(sessId,colName,processing,load_type, function(val){
-        console.log(val);
-        var value = JSON.parse(val);
-        res.send(JSON.stringify(value));
+        res.send(val);
     });
 
 });

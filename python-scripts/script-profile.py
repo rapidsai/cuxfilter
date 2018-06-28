@@ -1,7 +1,7 @@
 ## compute_input.py
 
 import sys, json, numpy as np, pandas as pd
-# import line_profiler
+import line_profiler
 import numpy as np
 
 import numba
@@ -137,7 +137,7 @@ def readDirect(source):
     df = pd.read_csv(source)
     return df
 
-# @profile
+@profile
 def main():
     #get our data as an array from read_in()    
     sessId = sys.argv[1]

@@ -1,0 +1,241 @@
+<!DOCTYPE html> <html> <head>
+    <title>Earthquakes</title>
+    <style>
+    body {
+    background: url('http://d3gl.org/img/darkcreampaper.png');
+    font: 20pt "Trebuchet MS","Helvetica Neue",sans-serif;
+    color: #fff;
+}
+ul {
+    list-style-type: none;
+    float: left;
+    margin: 20px 20px 0 10px;
+}
+li {
+    text-align: center;
+    width: 50px;
+    height: 50px;
+    margin: 5px;
+}
+.center {
+    width: 950px;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+}
+#globe {
+}
+.date-picker {
+}
+#checkbox {
+    background: url('http://d3gl.org/img/checkbox-checked.png');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+#prev {
+    background: url('http://d3gl.org/img/btn-prev.png');
+}
+#next {
+    background: url('http://d3gl.org/img/btn-next.png');
+}
+#date {
+    font-size: 14pt;
+    color: #fff;
+}
+#speech-bubble {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 200px;
+    height: 100px;
+    background: url('http://d3gl.org/img/speech-bubble.png');
+    background-repeat: no-repeat;
+    font-family: "Trebuchet MS","Helvetica Neue",sans-serif;
+    color: #222;
+    padding: 25px 25px 70px 55px;
+    text-align: center;
+}
+.label {
+    font-size: 11pt;
+}
+.value {
+    font-size: 13pt;
+    font-weight: bold;
+}
+    </style>
+</head>
+<body>
+
+<div class="center">
+  <ul id="controls">
+    <li>Show<br>All</li><li id="checkbox" />
+    <li class="date-picker" id="prev"/>
+    <li id="date" month="11" day="2">Dec<br>2</li>
+    <li class="date-picker" id="next" />
+  </ul>
+  <div id="speech-bubble"></div>
+</div>
+
+<script type="text/javascript" src="http://d3gl.org/js/d3gl.min.js"></script>
+<script type="text/javascript">
+
+// viewmodel
+var months = [
+    'January', 'February', 'March', 'April', 'May', 'June', 'July',
+    'August', 'September', 'October', 'November', 'December'
+];
+var displayAll = true;
+
+// view
+function makeBars(data, colorScale, heightScale) {
+    var globe = d3.gl.globe()
+        .width(600).height(500)
+        .texture("http://d3gl.org/img/oldmap.png")
+        .zoom(3)
+        .transparency(0.9)
+        .atmosphere("#ffffff");
+    
+    var mouseoverBar = null;
+    var month = 11;
+    var bars = globe.bars()
+        .data(function(d) { return d['all']; })
+        .id(function(d) { return d['id']; })
+        .latitude(function(d){ return d['lat']; })
+        .longitude(function(d){ return d['lon']; })
+        .width(0.008)
+        .on("mousemove", function(evt) {
+            if(evt.bar) {
+                mouseoverBar = evt.bar;
+                var bubble = $("#speech-bubble");
+                bubble.html(
+                    '<div class="label">Region: </div>' +
+                    '<div class="value">' + evt.bar['region'] + '</div>' +
+                    '<span class="label">Magnitude: </span>' +
+                    '<span class="value">' + evt.bar['magnitude'] + '</span><br>' +
+                    '<span class="label">Depth: </span>' +
+                    '<span class="value">' + evt.bar['depth'] + ' km</span>'
+                );
+            }
+            else mouseoverBar = null;
+        })
+        .height(function(d){ return 0; })
+        .color(function(d){
+            if(d==mouseoverBar) {
+                return "#111111";
+            }
+            return colorScale(d['magnitude']);
+        })
+        .transition()
+            .ease("sin")
+            .duration(10) // 30 frames
+            .height(function(d){
+                return heightScale(d['magnitude']);
+            });
+
+    d3.select("div.center").append("div")
+        .attr("id", "globe")
+        .datum(data).call(globe);
+    return bars;
+}
+
+// view (animation)
+function switchTimePeriod(bars, month, day, heightScale) {
+    var dataFn = function(data) {
+        return data[months[month]+day];
+    };
+    if(month==0 && day==0) {
+       dataFn = function(data) {
+           return data['all'];
+       }
+    }
+    bars.transition()
+            .duration(10)
+            .height(function(d) { return 0; })
+            .data(dataFn)
+        .transition()
+            .duration(10)
+            .height(function(d) {
+                return heightScale(d['magnitude']);
+            });
+}
+
+// view (controls)
+function initControls(bars, heightScale) {
+    $(".date-picker").click(function(evt) {
+        evt.preventDefault();
+        var display = $("#date");
+        var month = parseInt(display.attr("month"));
+        var day = parseInt(display.attr("day"));
+        var date = new Date();
+        date.setFullYear(2012, month, day);
+        if($(this).attr("id")=="next") {
+            if(month==11 && day==2) return;
+            date.setDate(date.getDate() + 1); 
+        } else {
+            if(month==10 && day==2) return;
+            date.setDate(date.getDate() - 1);
+        }
+        month = parseInt(date.getMonth());
+        day = parseInt(date.getDate());
+        display.attr("month", month);
+        display.attr("day", day);
+        display.html(months[month].substring(0,3) + "<br>" + day);
+        if(displayAll) {
+            $("#checkbox").trigger("click");
+        } else {
+            switchTimePeriod(bars, month, day, heightScale);
+        }
+    })
+    .on("mouseover", function(evt) {
+        $(this).css("background-color", "#0040FF"); 
+    })
+    .on("mouseout", function(evt) {
+        $(this).css("background-color", "transparent");
+    })
+
+    $("#checkbox").click(function(evt) {
+        var checkbox = $(this);
+        if(displayAll) {
+            checkbox.css("background", "url('http://d3gl.org/img/checkbox-unchecked.png')")
+            displayAll = false;
+            switchTimePeriod(bars, $("#date").attr("month"), $("#date").attr("day"), heightScale);
+        } else {
+            checkbox.css("background", "url('http://d3gl.org/img/checkbox-checked.png')"); 
+            displayAll = true;
+            switchTimePeriod(bars, 0, 0, heightScale);
+        }
+        checkbox.css("background-repeat", "no-repeat")
+            .css("background-position", "center");
+    });
+}
+
+// controller, entry point
+$(function(){
+    var colorScale = d3.scale.quantile()
+        .domain([0, 3, 4, 5, 6, 7, 8, 10])
+        .range([
+            "#ddff00", // minor
+            "#fff000", // light
+            "#ffcc00", // moderate
+            "#ff5500", // strong
+            "#ff2200", // major
+            "#ff0000", // great
+        ]);
+
+    var heightScale = d3.scale.linear()
+        .domain([0, 10])
+        .range([0, 0.4]);
+
+    var data, bars;
+    $.getJSON('http://d3gl.org/data/recent_earthquakes.json', function(d) {
+        data = d;
+        bars = makeBars(d, colorScale, heightScale);
+        initControls(bars, heightScale); 
+    });
+});
+
+</script>
+
+
+</body>
+</html>
