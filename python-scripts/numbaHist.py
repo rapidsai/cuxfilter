@@ -1,12 +1,6 @@
-## compute_input.py
-
-import sys, json, numpy as np, pandas as pd
-import line_profiler
-import numpy as np
-
-import numba
 from numba import cuda
-import pyarrow as pa
+import numpy as np
+import numba
 
 @numba.jit(nopython=True)
 def compute_bin(x, n, xmin, xmax):
@@ -99,78 +93,3 @@ def numba_gpu_histogram(a, bins):
     histogram[64, 64](a_gpu, a_min, a_max, histogram_out)
 
     return histogram_out.copy_to_host(), bin_edges
-
-
-def histNumba(data,colName):
-    bins = data.shape[0] > 64 and 64 or data.shape[0]
-    df1 = numba_gpu_histogram(np.asarray(data[colName]),bins)
-    dict_temp ={}
-    
-    dict_temp['A'] = list(df1[1].astype(str))
-    dict_temp['B'] = list(df1[0].astype(str))
-    
-    print(json.dumps(dict_temp))
-    sys.stdout.flush()
-
-def histPandas(data,colName):
-    bins = data.shape[0] > 64 and 64 or data.shape[0]
-    df1 = np.histogram(data[colName],bins=bins)
-    dict_temp ={}
-    
-    dict_temp['A'] = list(df1[1].astype(str))
-    dict_temp['B'] = list(df1[0].astype(str))
-    
-    print(json.dumps(dict_temp))
-    sys.stdout.flush()
-
-def columns(data):
-    print(list(data.columns))
-    sys.stdout.flush()
-
-def readArrowToDF(source):
-    source = source+".arrow"
-    reader = pa.RecordBatchStreamReader(source)
-    pa_df = reader.read_all()
-    return pa_df.to_pandas()
-
-def readDirect(source):
-    df = pd.read_csv(source)
-    return df
-
-@profile
-def main():
-    #get our data as an array from read_in()    
-    sessId = sys.argv[1]
-    if(len(sys.argv)==6):
-        colName = sys.argv[2]
-        type = sys.argv[3]
-    else:
-        type = sys.argv[2]
-    processing = sys.argv[-2]
-    load_type = sys.argv[-1]
-
-    with open('../data/data.json', 'r') as f:
-        datastore = json.loads(f.read())
-    
-    file = datastore['path']
-    
-    
-    if load_type == 'csv':
-        data = readDirect(file)
-    elif load_type == 'arrow':
-        data = readArrowToDF(file)
-    
-    
-    if type == 'hist':
-        if processing == 'numba':
-            histNumba(data,colName)
-        elif processing == 'pandas':
-            histPandas(data,colName)
-    elif type == 'columns':
-        columns(data)
-
-    
-
-#start process
-if __name__ == '__main__':
-    main()
