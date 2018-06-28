@@ -6,7 +6,8 @@ from numbaHist import numba_gpu_histogram
 
 def histNumbaGPU(data,colName):
     '''
-        desc: Calculate histogram leveraging gpu via pycuda(using numba jit)
+        description:
+            Calculate histogram leveraging gpu via pycuda(using numba jit)
         input:
             data: pandas df, colName: column name
         Output:
@@ -23,8 +24,9 @@ def histNumbaGPU(data,colName):
     sys.stdout.flush()
 
 def histNumpyCPU(data,colName):
-     '''
-        desc: Calculate histogram numpy
+    '''
+        description:
+            Calculate histogram numpy
         input:
             data: pandas df, colName: column name
         Output:
@@ -41,8 +43,9 @@ def histNumpyCPU(data,colName):
     sys.stdout.flush()
 
 def getColumns(data):
-     '''
-        desc: column names in a data frame
+    '''
+        description:
+        Column names in a data frame
         input:
             data: pandas df
         Output:
@@ -52,8 +55,9 @@ def getColumns(data):
     sys.stdout.flush()
 
 def readArrowToDF(source):
-     '''
-        desc: read arrow file from disk using apache pyarrow
+    '''
+        description:
+            Read arrow file from disk using apache pyarrow
         input:
             source: file path
         return:
@@ -66,7 +70,8 @@ def readArrowToDF(source):
 
 def readCSV(source):
     '''
-        desc: read csv file from disk using pandas
+        description:
+            Read csv file from disk using pandas
         input:
             source: file path
         return:
@@ -77,13 +82,16 @@ def readCSV(source):
 
 def readData(load_type,file):
     '''
-        desc: read file as per the load type
+        description:
+            Read file as per the load type
         input:
             load_type: csv or arrow
             file: file path
         return:
             pandas dataframe
     '''
+    #file is in the uploads/ folder, so append that to the path
+    file = str("uploads\\"+file)
     if load_type == 'csv':
         data = readCSV(file)
     elif load_type == 'arrow':
@@ -92,20 +100,36 @@ def readData(load_type,file):
 
 def getHist(processing,data,colName):
     '''
-        desc:get Histogram as per the specified processing type
+        description:
+            Get Histogram as per the specified processing type
         input:
-            processing: numbaGPU or numpyVersionCPU
+            processing: numba or numpy
             data: pandas df
             colName: column name
     '''
     if processing == 'numba':
         histNumbaGPU(data,colName)
-    elif processing == 'pandas':
+    elif processing == 'numpy':
         histNumpyCPU(data,colName)
 
 def main():
-    
-    sessId,file, type, processing, load_type = sys.argv[1:6]
+    '''
+        description:
+            1. get Histogram as per the specified processing type and file load type
+            2. get Columns names as per the specified file load type
+        
+        input:
+            command line args:
+                python script.py sessID file type processing load_type columnName
+            args:
+                sessID: sessionID to uniquely identify and serve multiple sessions(yet to be implemented)
+                file: file path
+                type: hist or columns
+                processing: pandas or numba
+                load_type: csv or arrow
+                columnName: (only when type=hist) columnName when type of request is hist
+    '''
+    file, type, processing, load_type = list(sys.argv)[2:6]
     data = readData(load_type,file)
     
     if type == 'hist':

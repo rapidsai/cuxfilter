@@ -1,36 +1,22 @@
 var data = '';
-
 var cols = document.getElementById("hid-col").innerHTML;
 var curr_col ='';
 var X=0,Y=0;
 var type='histogram';
-var processing = 'pandas';
+var processing = 'numpy';
 var load_type = 'csv';
 
-function getCols(){
-    var data = {
-        processing: processing,
-        load_type: load_type
-    };
-
-    $.post("/calc/getColumns",data, function(data,status){
-        console.log(typeof data);
-        genCols(data);
-    });
-}
-
-function genPlot(X,Y,type){
- 
-    var d = [{
-        x: X,
-        y: Y,
-        mode: 'markers',
-        type: type
+$.urlParam = function(name){
+    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    if (results==null){
+       return null;
     }
-    ]
-   Plotly.newPlot('myDiv', d);
+    else{
+       return decodeURI(results[1]) || 0;
+    }
 }
 
+//static listeners
 $('input[type=radio][name=processing]').change(function() {
     processing = $(this).val();
 });
@@ -38,28 +24,6 @@ $('input[type=radio][name=processing]').change(function() {
 $('input[type=radio][name=load_type]').change(function() {
     load_type = $(this).val();
 });
-
-function initiateListeners(val){
-    $('input[type=radio][name=X][value='+val+']').change(function(){
-        console.log("");
-        if(curr_col !== $(this).val()){
-            var data = {
-                col: $(this).val(),
-                processing: processing,
-                load_type: load_type
-            };
-            $.post("/calc/getHist", data,function(data,status){
-                data = JSON.parse(data);
-                X = data['A'];
-                Y = data['B'];
-                console.log(X);
-                genPlot(X,Y,type);
-                curr_col = $(this).val()
-            });
-        }
-        
-    });
-}
 
 $("#hist").on("click",function(){
     if(type !== "histogram"){
@@ -81,6 +45,57 @@ $("#scatter").on("click",function(){
         genPlot(X,Y,type);
     }
 });
+
+
+function getCols(){
+    var data = {
+        processing: processing,
+        load_type: load_type,
+        file: $.urlParam('file')
+    };
+
+    $.post("/calc/getColumns",data, function(data,status){
+        console.log(typeof data);
+        genCols(data);
+    });
+}
+
+function genPlot(X,Y,type){
+ 
+    var d = [{
+        x: X,
+        y: Y,
+        mode: 'markers',
+        type: type
+    }
+    ]
+   Plotly.newPlot('myDiv', d);
+}
+
+function initiateListeners(val){
+    $('input[type=radio][name=X][value='+val+']').change(function(){
+        console.log("");
+        if(curr_col !== $(this).val()){
+            var data = {
+                file: $.urlParam('file'),
+                col: $(this).val(),
+                processing: processing,
+                load_type: load_type
+            };
+            $.post("/calc/getHist", data,function(data,status){
+                data = JSON.parse(data);
+                X = data['A'];
+                Y = data['B'];
+                console.log(X);
+                genPlot(X,Y,type);
+                curr_col = $(this).val()
+            });
+        }
+        
+    });
+}
+
+
 
 function genCheckBox(val,text){
     if(val){

@@ -11,29 +11,37 @@ router.get('/', function(req, res) {
 
 router.post('/getColumns', function(req,res){
     var sessId = req.session.id;
+    // console.log(req.body);
+    var file = req.body.file;
     var processing = req.body.processing;
     var load_type = req.body.load_type;
-    getColumns(sessId,processing,load_type, function(cols){
+    // console.log('here1');
+    getColumns(sessId,file,processing,load_type, function(cols){
+        // console.log('here4');
         res.send(cols);
     });
 });
 
 router.post('/getHist', function(req,res){
     var sessId = req.session.id;
+    var file = req.body.file;
     var colName = req.body.col;
     var processing = req.body.processing;
     var load_type = req.body.load_type;
-
-    getHist(sessId,colName,processing,load_type, function(val){
+    console.log(req.body);
+    getHist(sessId,file, colName, processing,load_type, function(val){
         res.send(val);
     });
 
 });
 
-function getColumns(sessId,processing,load_type,callback){
+function getColumns(sessId,file,processing,load_type,callback){
+    // console.log('here2');
     var spawn = require('child_process').spawn;  
-    var py = spawn('python', ['../python-scripts/script.py', sessId, 'columns', processing,load_type]);
+    var py = spawn('python', ['../python-scripts/script.py', sessId,file,'columns', processing,load_type]);
     py.stdout.on('data', function(val){
+        // console.log('here3');
+        // console.log(val);
         callback(val);
     });
 
@@ -41,15 +49,16 @@ function getColumns(sessId,processing,load_type,callback){
     py.stdin.end();
 }
 
-function getHist(sessId,colName,processing,load_type, callback) {
+function getHist(sessId,file,colName,processing,load_type, callback) {
     let chunks = [];
     
     var spawn = require('child_process').spawn;  
-    var py = spawn('python', ['../python-scripts/script.py', sessId, colName,'hist',processing,load_type]);
+    var py = spawn('python', ['../python-scripts/script.py', sessId, file,'hist',processing,load_type,colName]);
     py.stdout.on('data', function(val){
         chunks.push(val);
     }).on('end', function() {
         let data = Buffer.concat(chunks);
+        console.log(data);
         callback(data);
     });
 
