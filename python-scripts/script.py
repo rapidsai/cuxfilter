@@ -129,7 +129,7 @@ def main():
                 load_type: csv or arrow
                 columnName: (only when type=hist) columnName when type of request is hist
     '''
-    file, type, processing, load_type = list(sys.argv)[2:6]
+    file, type, processing, load_type = sys.argv[2:6] or ''
     data = readData(load_type,file)
     
     if type == 'hist':
