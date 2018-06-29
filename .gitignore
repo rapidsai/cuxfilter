@@ -3,5 +3,5 @@ node_modules
 bin
 package-lock.json
 uploads
-*csv
+data
 *arrow
