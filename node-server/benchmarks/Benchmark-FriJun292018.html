@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Api Benchmark :: report</title>
+    <!--[if lt IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/excanvas.min.js"></script><![endif]-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasTextRenderer.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.highlighter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.cursor.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.6.1/lodash.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.0/styles/dark.min.css" type="text/css" />
+
+    <style type="text/css">
+      .jqplot-target {
+        color: #F1F1F1;
+      }
+      table.jqplot-table-legend, table.jqplot-cursor-legend {
+        background-color: rgba(101, 0, 253, 0.89)
+      }
+
+      body {
+        background: #3D3D3D;
+        color: #F1F1F1;
+      }
+
+      a {
+        color: #6699FF;
+      }
+
+      #report-details, #charts {
+        width: 100%;
+        float: left;
+        font-family: "Trebuchet MS",Arial,Helvetica,sans-serif;
+      }
+
+      #report-details {
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .buttons {
+        width: 100%;
+        border-bottom: 1px solid rgb(75, 72, 72);
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        text-align: right;
+      }
+
+      .button {
+        margin-right: 10px;
+        padding: 6px;
+        text-decoration: none;
+      }
+
+      .button.selected {
+        background-color: rgb(56, 56, 56);
+      }
+
+      .chart {
+        width: 60%;
+        height: 450px;
+        float: left;
+      }
+
+      .distchart {
+        width: 96%;
+        height: 450px;
+        float: left;
+      }
+
+      .panel {
+        height: 450px;
+        overflow-y: auto;
+      }
+
+      .route {
+        width: 90%;
+        margin: 3%;
+        padding: 2%;
+        float: left;
+        background-color: #000000;
+        border-radius: 15px;
+      }
+      .stats-details {
+        font-family: "Trebuchet MS",Arial,Helvetica,sans-serif;
+        font-size: 15px;
+        float: left;
+        width: 36%;
+        padding: 2%;
+      }
+
+      .green {
+        color: green;
+      }
+
+      .red {
+        color: red;
+      }
+
+      .hide {
+        display:none;
+      }
+
+      pre code {
+        overflow-x: auto;
+      }
+
+    </style>
+  </head>
+  <body>
+    <script><!--
+    var data={"benchmark":{"server1":{"numpy with csv for 100M dataset -ReadSchema":{"name":"server1/numpy with csv for 100M dataset -ReadSchema","href":"http://localhost:3000/calc/getColumns","stats":{"sample":[18.532140666,16.974620761,15.887249378,15.832503861,16.306312898,18.413973144,16.93091356,16.256330177,15.222532211,15.681050375,16.250254236,15.349361411,15.357303046,15.336422492,15.688979668,15.775082336,15.397724211,16.319400622,15.222093556,15.400815603],"mean":16.1067532106,"singleMean":16.1067532106,"variance":0.9289282082395244,"deviation":0.9638092177601978,"sem":0.21551429282527,"moe":0.45107141488329006,"rme":2.800511120928058,"p75":16.316128691,"p95":18.5262322899,"p99":18.532140666,"p999":18.532140666},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T20:45:32.364Z","end":"2018-06-29T20:50:54.504Z"},"request":{"data":{"file":"data-100000k","processing":"numpy","load_type":"csv"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"12","etag":"W/\"c-3ggYUmKQxioX0p9FTJ6oguYidME\"","date":"Fri, 29 Jun 2018 20:45:50 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.0620857591176036},"numpy with csv for 100M dataset -Histogram-A":{"name":"server1/numpy with csv for 100M dataset -Histogram-A","href":"http://localhost:3000/calc/getHist","stats":{"sample":[17.421760333,17.282247861,17.173728993,17.256464875,17.171819573,17.388070975,18.033074042,18.781526407,18.944388104,20.14286339,18.165461187,18.833676312,18.21283384,19.138433464,18.703056835,19.205806188,17.49294026,17.028950542,18.650782104,18.430456215],"mean":18.172917075,"singleMean":18.172917075,"variance":0.7612567144568061,"deviation":0.8725002661643182,"sem":0.1950969905530075,"moe":0.4083380012274447,"rme":2.246959029979752,"p75":18.820638835750003,"p95":20.0960105299,"p99":20.14286339,"p999":20.14286339},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T20:50:54.507Z","end":"2018-06-29T20:56:57.971Z"},"request":{"data":{"file":"data-100000k","processing":"numpy","load_type":"csv","col":"A"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1493","etag":"W/\"5d5-FluYpWcpsgOLSbr9fsYWgbMkfJI\"","date":"Fri, 29 Jun 2018 20:51:11 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.05502693903642324},"numpy with csv for 100M dataset -Histogram-B":{"name":"server1/numpy with csv for 100M dataset -Histogram-B","href":"http://localhost:3000/calc/getHist","stats":{"sample":[18.406609449,19.211507648,18.99987059,19.722435242,17.695836301,17.297789446,17.384737688,17.20329203,16.945501668,16.974273434,17.21497775,16.97454248,17.237043449,17.339426434,19.825312242,18.149786667,19.789908108,19.737894666,19.32361545,20.945880731],"mean":18.319012073649997,"singleMean":18.319012073649997,"variance":1.5801012962086656,"deviation":1.257020801820187,"sem":0.2810783962001229,"moe":0.5882970832468573,"rme":3.2114017987523558,"p75":19.622730294,"p95":20.889852306549997,"p99":20.945880731,"p999":20.945880731},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T20:56:57.972Z","end":"2018-06-29T21:03:04.355Z"},"request":{"data":{"file":"data-100000k","processing":"numpy","load_type":"csv","col":"B"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1493","etag":"W/\"5d5-9IPSHDuqdLTm2NS26BehhCosTlE\"","date":"Fri, 29 Jun 2018 20:57:16 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.05458809656217196},"numpy with csv for 10M dataset -ReadSchema":{"name":"server1/numpy with csv for 10M dataset -ReadSchema","href":"http://localhost:3000/calc/getColumns","stats":{"sample":[2.394780919,2.836111483,3.238486357,2.862693851,2.703561077,3.97312884,3.120676742,4.176991756,2.626580957,2.425417321,2.945611332,2.651020473,2.739452174,3.616421715,2.689421145,3.437963074,2.861124001,2.695304555,2.651924229,2.657328434],"mean":2.9652000217500007,"singleMean":2.9652000217500007,"variance":0.24002925437113534,"deviation":0.4899278052643423,"sem":0.10955118766383487,"moe":0.22929063578040637,"rme":7.732720696699702,"p75":3.20903395325,"p95":4.1667986102,"p99":4.176991756,"p999":4.176991756},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:03:04.355Z","end":"2018-06-29T21:04:03.659Z"},"request":{"data":{"file":"data-10000k","processing":"numpy","load_type":"csv"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"12","etag":"W/\"c-3ggYUmKQxioX0p9FTJ6oguYidME\"","date":"Fri, 29 Jun 2018 21:03:06 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.3372453772645733},"numpy with csv for 10M dataset -Histogram-A":{"name":"server1/numpy with csv for 10M dataset -Histogram-A","href":"http://localhost:3000/calc/getHist","stats":{"sample":[2.95389571,2.966707687,2.957064324,2.921855188,2.924736771,2.871795243,2.939172196,2.847660387,2.856254363,2.8577473429999998,2.903615379,2.908904278,2.95264251,2.902819523,2.853239137,2.902044825,3.005888348,2.8900258819999998,2.88593059,2.879748162],"mean":2.9090873922999996,"singleMean":2.9090873922999996,"variance":0.0018841855893478327,"deviation":0.04340720665221194,"sem":0.009706146478772697,"moe":0.020314964580071256,"rme":0.6983277516461862,"p75":2.9492749314999998,"p95":3.00392931495,"p99":3.005888348,"p999":3.005888348},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:04:03.660Z","end":"2018-06-29T21:05:01.842Z"},"request":{"data":{"file":"data-10000k","processing":"numpy","load_type":"csv","col":"A"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1429","etag":"W/\"595-7z9kJS31TuARP4sVE1B/iZIaLHA\"","date":"Fri, 29 Jun 2018 21:04:06 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.3437504155588032},"numpy with csv for 10M dataset -Histogram-B":{"name":"server1/numpy with csv for 10M dataset -Histogram-B","href":"http://localhost:3000/calc/getHist","stats":{"sample":[2.854909836,2.908129227,2.8647355020000003,2.895962186,2.911245302,2.8839284320000003,2.849125158,2.951732406,2.915535237,2.891485363,2.951095228,2.853927798,2.946849369,2.853772647,2.822926437,2.909050615,2.864868791,3.130089142,2.878055248,2.977948758],"mean":2.9057686341,"singleMean":2.9057686341,"variance":0.0044461518344649275,"deviation":0.06667947086221461,"sem":0.014909982955162838,"moe":0.03120659432515582,"rme":1.073953168842756,"p75":2.939020836,"p95":3.1224821228,"p99":3.130089142,"p999":3.130089142},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:05:01.842Z","end":"2018-06-29T21:05:59.958Z"},"request":{"data":{"file":"data-10000k","processing":"numpy","load_type":"csv","col":"B"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1429","etag":"W/\"595-qWBxln6HYfWd/V72UhvpA7HlL18\"","date":"Fri, 29 Jun 2018 21:05:04 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.34414302235378375},"numpy with csv for 1M dataset -ReadSchema":{"name":"server1/numpy with csv for 1M dataset -ReadSchema","href":"http://localhost:3000/calc/getColumns","stats":{"sample":[1.279358872,1.306038563,1.275638412,1.266929484,1.268062441,1.280379698,1.264606445,1.288619293,1.298843064,1.279708668,1.24942594,1.288732484,1.2952061750000001,1.250589222,1.285573743,1.270659464,1.331011234,1.248827902,1.31832232,1.263791547],"mean":1.28051624855,"singleMean":1.28051624855,"variance":0.000484353772436567,"deviation":0.02200803881395539,"sem":0.004921147083945809,"moe":0.01029996084669858,"rme":0.8043600273219338,"p75":1.2935877522500001,"p95":1.3303767883,"p99":1.331011234,"p999":1.331011234},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:05:59.958Z","end":"2018-06-29T21:06:25.570Z"},"request":{"data":{"file":"data-1000k","processing":"numpy","load_type":"csv"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"17","etag":"W/\"11-shl9CmJyiyCDXNRcMZFgMA19xak\"","date":"Fri, 29 Jun 2018 21:06:01 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.7809350339227291},"numpy with csv for 1M dataset -Histogram-A":{"name":"server1/numpy with csv for 1M dataset -Histogram-A","href":"http://localhost:3000/calc/getHist","stats":{"sample":[1.391155314,1.6094377880000001,1.430913912,1.371446858,1.348887142,1.3557698679999999,1.358113359,1.348440376,1.363401553,1.353604448,1.452068097,1.341745242,1.36615549,1.366923842,1.368015544,1.374092541,1.36908644,1.364904053,1.392272404,1.554167225],"mean":1.3940300747999999,"singleMean":1.3940300747999999,"variance":0.004922488755609256,"deviation":0.0701604500812905,"sem":0.01568835357137462,"moe":0.03283572402488708,"rme":2.3554530578974773,"p75":1.3919931315,"p95":1.6066742598500001,"p99":1.6094377880000001,"p999":1.6094377880000001},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:06:25.570Z","end":"2018-06-29T21:06:53.451Z"},"request":{"data":{"file":"data-1000k","processing":"numpy","load_type":"csv","col":"A"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1365","etag":"W/\"555-CIDc81pVxIdas9qGeNhqh2QIFfA\"","date":"Fri, 29 Jun 2018 21:06:26 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.7173446384529897},"numpy with csv for 1M dataset -Histogram-B":{"name":"server1/numpy with csv for 1M dataset -Histogram-B","href":"http://localhost:3000/calc/getHist","stats":{"sample":[1.469542374,1.356958892,1.49198079,1.492415919,1.350802203,1.377468846,1.353220449,1.364401221,1.378842289,1.365664295,1.333005282,1.352475369,1.359898658,1.435085016,1.534095573,1.352390389,1.390486753,1.3617975,1.387185907,1.590255435],"mean":1.404898658,"singleMean":1.404898658,"variance":0.005208720813599382,"deviation":0.07217146814080605,"sem":0.016138030879880267,"moe":0.0337768986315894,"rme":2.404223140171111,"p75":1.4609280345,"p95":1.5874474419,"p99":1.590255435,"p999":1.590255435},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:06:53.451Z","end":"2018-06-29T21:07:21.550Z"},"request":{"data":{"file":"data-1000k","processing":"numpy","load_type":"csv","col":"B"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1365","etag":"W/\"555-3/3RwSdUf9i70qpa2Bo8SwlAv7c\"","date":"Fri, 29 Jun 2018 21:06:54 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.7117951136942434},"numba with csv for 100M dataset -ReadSchema":{"name":"server1/numba with csv for 100M dataset -ReadSchema","href":"http://localhost:3000/calc/getColumns","stats":{"sample":[15.358588334,14.983756003,16.058054472,15.036549433,14.975444826,15.187117147,14.965453078,15.040681397,14.703568835,14.968270838,14.956314661,14.690214885,14.874532253,14.779191026,15.127571811,14.971731771,15.348533115,14.898353632,14.820499023,14.906837592],"mean":15.032563206599999,"singleMean":15.032563206599999,"variance":0.08989234523383155,"deviation":0.299820521702287,"sem":0.06704190675757647,"moe":0.14031871084360756,"rme":0.9334317036631589,"p75":15.1058492075,"p95":16.0230811651,"p99":16.058054472,"p999":16.058054472},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:07:21.550Z","end":"2018-06-29T21:12:22.204Z"},"request":{"data":{"file":"data-100000k","processing":"numba","load_type":"csv"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"12","etag":"W/\"c-3ggYUmKQxioX0p9FTJ6oguYidME\"","date":"Fri, 29 Jun 2018 21:07:36 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.06652225480488605},"numba with csv for 100M dataset -Histogram-A":{"name":"server1/numba with csv for 100M dataset -Histogram-A","href":"http://localhost:3000/calc/getHist","stats":{"sample":[16.900004584,16.73590344,16.368983476,16.807343244,16.70047568,16.876390544,17.186140751,16.442884899,16.873961367,16.748247495,16.315012306,16.505213439,16.977873651,17.662518248,19.935904145,17.535453148,16.117601571,17.153039204,16.607970197,16.78661643],"mean":16.96187689095,"singleMean":16.96187689095,"variance":0.6355902592877781,"deviation":0.7972391481154059,"sem":0.17826809295100707,"moe":0.3731151185464578,"rme":2.1997277833417903,"p75":17.10924781575,"p95":19.822234850149997,"p99":19.935904145,"p999":19.935904145},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:12:22.204Z","end":"2018-06-29T21:18:01.440Z"},"request":{"data":{"file":"data-100000k","processing":"numba","load_type":"csv","col":"A"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1493","etag":"W/\"5d5-FluYpWcpsgOLSbr9fsYWgbMkfJI\"","date":"Fri, 29 Jun 2018 21:12:39 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.05895573977037585},"numba with csv for 100M dataset -Histogram-B":{"name":"server1/numba with csv for 100M dataset -Histogram-B","href":"http://localhost:3000/calc/getHist","stats":{"sample":[16.637619978,16.429057737,16.410428641,16.531916755,16.72272615,16.787587185,16.445415276,16.325592925,16.64813501,16.60667292,16.351178093,16.33451695,16.74867663,16.486013456,16.142345748,16.527037949,16.685928828,17.001212296,16.372955352,16.391921902],"mean":16.529346989049998,"singleMean":16.529346989049998,"variance":0.04045489536534829,"deviation":0.20113402339074385,"sem":0.0449749348889736,"moe":0.09413253872262174,"rme":0.5694873414235943,"p75":16.676480373500002,"p95":16.990531040449998,"p99":17.001212296,"p999":17.001212296},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:18:01.441Z","end":"2018-06-29T21:23:32.026Z"},"request":{"data":{"file":"data-100000k","processing":"numba","load_type":"csv","col":"B"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1493","etag":"W/\"5d5-9IPSHDuqdLTm2NS26BehhCosTlE\"","date":"Fri, 29 Jun 2018 21:18:18 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.060498457722646774},"numba with csv for 10M dataset -ReadSchema":{"name":"server1/numba with csv for 10M dataset -ReadSchema","href":"http://localhost:3000/calc/getColumns","stats":{"sample":[2.288454622,2.297447407,2.347588101,2.303359027,2.771439453,2.319108303,2.342090806,2.389848163,2.421143959,2.332143134,2.296829623,2.409765016,2.292378189,2.289979337,2.306851344,2.341589032,2.309960014,2.3988596380000002,2.366591677,2.358919794],"mean":2.35921733195,"singleMean":2.35921733195,"variance":0.01116986604347788,"deviation":0.1056875869886236,"sem":0.023632462888448464,"moe":0.04946274482552263,"rme":2.0965743238516916,"p75":2.3840340415,"p95":2.7539246782999998,"p99":2.771439453,"p999":2.771439453},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:23:32.027Z","end":"2018-06-29T21:24:19.211Z"},"request":{"data":{"file":"data-10000k","processing":"numba","load_type":"csv"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"12","etag":"W/\"c-3ggYUmKQxioX0p9FTJ6oguYidME\"","date":"Fri, 29 Jun 2018 21:23:34 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.4238693851801498},"numba with csv for 10M dataset -Histogram-A":{"name":"server1/numba with csv for 10M dataset -Histogram-A","href":"http://localhost:3000/calc/getHist","stats":{"sample":[4.207882748,3.043423698,3.098487274,3.115911127,3.070149932,3.099499989,3.062131074,3.202154135,3.129507324,3.158230428,3.208631706,3.075549554,3.114966113,3.112384254,3.130728083,3.128201232,3.176908891,3.100464044,3.11029641,3.10043795],"mean":3.1722972982999997,"singleMean":3.1722972982999997,"variance":0.061256933815873015,"deviation":0.24750138144235279,"sem":0.05534299134302058,"moe":0.11583288088094207,"rme":3.651387937158843,"p75":3.15135484175,"p95":4.157920195899999,"p99":4.207882748,"p999":4.207882748},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:24:19.212Z","end":"2018-06-29T21:25:22.658Z"},"request":{"data":{"file":"data-10000k","processing":"numba","load_type":"csv","col":"A"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1429","etag":"W/\"595-7z9kJS31TuARP4sVE1B/iZIaLHA\"","date":"Fri, 29 Jun 2018 21:24:23 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.31522896688651764},"numba with csv for 10M dataset -Histogram-B":{"name":"server1/numba with csv for 10M dataset -Histogram-B","href":"http://localhost:3000/calc/getHist","stats":{"sample":[3.120476809,3.154841781,3.109294273,3.12997031,3.128037617,3.115885738,3.212415637,3.143238926,3.12809333,3.337411582,3.118662595,3.193569681,3.081692842,3.118709846,3.125882776,3.205492358,3.098542988,3.137910535,3.106266,3.144696996],"mean":3.145554631,"singleMean":3.145554631,"variance":0.0031931386454353296,"deviation":0.05650786357167761,"sem":0.01263554242095552,"moe":0.0264461902870599,"rme":0.84074808386502,"p75":3.15230558475,"p95":3.33116178475,"p99":3.337411582,"p999":3.337411582},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:25:22.658Z","end":"2018-06-29T21:26:25.571Z"},"request":{"data":{"file":"data-10000k","processing":"numba","load_type":"csv","col":"B"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1429","etag":"W/\"595-qWBxln6HYfWd/V72UhvpA7HlL18\"","date":"Fri, 29 Jun 2018 21:25:25 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.317908959566247},"numba with csv for 1M dataset -ReadSchema":{"name":"server1/numba with csv for 1M dataset -ReadSchema","href":"http://localhost:3000/calc/getColumns","stats":{"sample":[1.168108281,1.164528163,1.163451977,1.156432787,1.148155462,1.137697906,1.147607495,1.149074028,1.135121336,1.137274414,1.1316991889999999,1.120636544,1.129634972,1.142670155,1.147230901,1.131757371,1.217418211,1.14227875,1.136843868,1.129864525],"mean":1.1468743167499997,"singleMean":1.1468743167499997,"variance":0.00043684026776922067,"deviation":0.02090072409676805,"sem":0.004673543985934126,"moe":0.009781727562560124,"rme":0.8529031838710522,"p75":1.15459309725,"p95":1.2149527145,"p99":1.217418211,"p999":1.217418211},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:26:25.572Z","end":"2018-06-29T21:26:48.510Z"},"request":{"data":{"file":"data-1000k","processing":"numba","load_type":"csv"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"17","etag":"W/\"11-shl9CmJyiyCDXNRcMZFgMA19xak\"","date":"Fri, 29 Jun 2018 21:26:26 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.8719351243593887},"numba with csv for 1M dataset -Histogram-A":{"name":"server1/numba with csv for 1M dataset -Histogram-A","href":"http://localhost:3000/calc/getHist","stats":{"sample":[2.303196471,1.9728897650000001,1.928665628,1.8678579229999999,1.851352638,1.8551266960000001,1.8577935349999999,1.8571352,1.846123331,1.836170723,1.900137873,1.9360462489999999,1.86764988,1.8937121380000002,1.905428182,1.855249406,1.907646142,1.858104896,1.865029232,1.858865491],"mean":1.90120906995,"singleMean":1.90120906995,"variance":0.010201468396046376,"deviation":0.10100231876569159,"sem":0.022584805064518904,"moe":0.04726999700003807,"rme":2.4863124075713157,"p75":1.907091652,"p95":2.2866811357,"p99":2.303196471,"p999":2.303196471},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:26:48.510Z","end":"2018-06-29T21:27:26.536Z"},"request":{"data":{"file":"data-1000k","processing":"numba","load_type":"csv","col":"A"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1365","etag":"W/\"555-CIDc81pVxIdas9qGeNhqh2QIFfA\"","date":"Fri, 29 Jun 2018 21:26:50 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.5259810800430796},"numba with csv for 1M dataset -Histogram-B":{"name":"server1/numba with csv for 1M dataset -Histogram-B","href":"http://localhost:3000/calc/getHist","stats":{"sample":[1.8659499149999998,1.8513385329999998,1.883583926,1.915073661,1.920444721,1.865810631,1.874829158,1.886144982,1.880227367,1.956563256,1.8685405899999998,1.8661357440000002,1.878143402,2.015018653,1.86894892,1.8867948540000001,1.8905202509999999,1.88572572,1.861615902,1.881899476],"mean":1.8901654831,"singleMean":1.8901654831,"variance":0.0014299528477781272,"deviation":0.03781471734362333,"sem":0.008455627853028204,"moe":0.01769762909638803,"rme":0.9363005120251542,"p75":1.8895889017499998,"p95":2.0120958831499998,"p99":2.015018653,"p999":2.015018653},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:27:26.536Z","end":"2018-06-29T21:28:04.339Z"},"request":{"data":{"file":"data-1000k","processing":"numba","load_type":"csv","col":"B"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1365","etag":"W/\"555-3/3RwSdUf9i70qpa2Bo8SwlAv7c\"","date":"Fri, 29 Jun 2018 21:27:28 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.5290542065977906},"numpy with arrow for 100M dataset -ReadSchema":{"name":"server1/numpy with arrow for 100M dataset -ReadSchema","href":"http://localhost:3000/calc/getColumns","stats":{"sample":[2.261573235,2.414054952,2.563954103,2.461313356,2.462013653,2.434536697,2.42994069,2.460420531,2.4316618119999998,2.427309111,2.420467288,2.412771074,2.413948109,2.414897706,2.386978921,2.365286995,2.610120806,2.441397209,2.383583221,2.663441046],"mean":2.4429835257500003,"singleMean":2.4429835257500003,"variance":0.0074889556260611416,"deviation":0.0865387521637627,"sem":0.01935065325261804,"moe":0.04050091725772956,"rme":1.657846515575487,"p75":2.46109014975,"p95":2.660775034,"p99":2.663441046,"p999":2.663441046},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:28:04.340Z","end":"2018-06-29T21:28:53.200Z"},"request":{"data":{"file":"data-100000k","processing":"numpy","load_type":"arrow"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"12","etag":"W/\"c-3ggYUmKQxioX0p9FTJ6oguYidME\"","date":"Fri, 29 Jun 2018 21:28:06 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.4093355478903601},"numpy with arrow for 100M dataset -Histogram-A":{"name":"server1/numpy with arrow for 100M dataset -Histogram-A","href":"http://localhost:3000/calc/getHist","stats":{"sample":[4.770755376,4.51579441,4.609320719,4.473255076,4.580514398,3.991895104,4.537001135,4.512237918,4.541846795,4.491671192,4.280652976,4.194890935,4.605976149,4.558625711,4.224191979,4.589901408,4.476694148,4.5033629059999996,4.5040138370000005,4.399630458],"mean":4.4681116315,"singleMean":4.4681116315,"variance":0.030765734009431788,"deviation":0.17540163627923142,"sem":0.03922099820850547,"moe":0.08208954925040195,"rme":1.8372313858873637,"p75":4.57504222625,"p95":4.76268364315,"p99":4.770755376,"p999":4.770755376},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:28:53.200Z","end":"2018-06-29T21:30:22.571Z"},"request":{"data":{"file":"data-100000k","processing":"numpy","load_type":"arrow","col":"A"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1493","etag":"W/\"5d5-FluYpWcpsgOLSbr9fsYWgbMkfJI\"","date":"Fri, 29 Jun 2018 21:28:57 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.2238081951556541},"numpy with arrow for 100M dataset -Histogram-B":{"name":"server1/numpy with arrow for 100M dataset -Histogram-B","href":"http://localhost:3000/calc/getHist","stats":{"sample":[4.547910393,4.645253073,4.643652546,4.942338342,4.766642807,4.717537747,4.378183248,4.948224927,4.459907826,4.654253263,4.544174065,4.762860639,4.232280655,4.390914123,4.677664549,3.934083937,4.48597361,4.299593786,4.444290782,4.586047307],"mean":4.55308938125,"singleMean":4.55308938125,"variance":0.05790547683163207,"deviation":0.2406355685089635,"sem":0.05380774889903501,"moe":0.11261961844568028,"rme":2.473476995849394,"p75":4.7075694475,"p95":4.94793059775,"p99":4.948224927,"p999":4.948224927},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:30:22.571Z","end":"2018-06-29T21:31:53.623Z"},"request":{"data":{"file":"data-100000k","processing":"numpy","load_type":"arrow","col":"B"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1493","etag":"W/\"5d5-9IPSHDuqdLTm2NS26BehhCosTlE\"","date":"Fri, 29 Jun 2018 21:30:27 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.21963109358627636},"numpy with arrow for 10M dataset -ReadSchema":{"name":"server1/numpy with arrow for 10M dataset -ReadSchema","href":"http://localhost:3000/calc/getColumns","stats":{"sample":[1.046953038,1.209519242,1.032906549,1.052459502,1.057978659,1.069556479,1.152477133,1.07408443,1.027460736,1.054314619,1.044930429,1.061147274,1.049626578,1.040355931,1.082570858,1.05729952,1.05557064,1.085264145,1.043385262,1.041491357],"mean":1.0669676190500001,"singleMean":1.0669676190500001,"variance":0.00183148815276681,"deviation":0.04279588943773467,"sem":0.009569451794033998,"moe":0.020028862604913156,"rme":1.8771762373394543,"p75":1.07295244225,"p95":1.20666713655,"p99":1.209519242,"p999":1.209519242},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:31:53.624Z","end":"2018-06-29T21:32:14.963Z"},"request":{"data":{"file":"data-10000k","processing":"numpy","load_type":"arrow"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"12","etag":"W/\"c-3ggYUmKQxioX0p9FTJ6oguYidME\"","date":"Fri, 29 Jun 2018 21:31:54 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.9372355656775917},"numpy with arrow for 10M dataset -Histogram-A":{"name":"server1/numpy with arrow for 10M dataset -Histogram-A","href":"http://localhost:3000/calc/getHist","stats":{"sample":[1.346762626,1.338509277,1.305860138,1.338144671,1.275708584,1.331584237,1.298494326,1.318271543,1.311509764,1.30056595,1.316368118,1.291820701,1.335222889,1.3377543250000001,1.299857896,1.30178142,1.3109533340000001,1.315095524,1.342505836,1.354087886],"mean":1.31854295225,"singleMean":1.31854295225,"variance":0.0004433125326503875,"deviation":0.021054988308008806,"sem":0.004708038512217097,"moe":0.009853924606070385,"rme":0.7473343655021144,"p75":1.3380470845,"p95":1.353721623,"p99":1.354087886,"p999":1.354087886},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:32:14.963Z","end":"2018-06-29T21:32:41.335Z"},"request":{"data":{"file":"data-10000k","processing":"numpy","load_type":"arrow","col":"A"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1429","etag":"W/\"595-7z9kJS31TuARP4sVE1B/iZIaLHA\"","date":"Fri, 29 Jun 2018 21:32:16 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.758412911990141},"numpy with arrow for 10M dataset -Histogram-B":{"name":"server1/numpy with arrow for 10M dataset -Histogram-B","href":"http://localhost:3000/calc/getHist","stats":{"sample":[1.283338506,1.278169496,1.3249215429999999,1.394990726,1.3580876179999999,1.3136452109999999,1.321676764,1.3458800260000001,1.486679549,1.2959533699999999,1.311979449,1.327752703,1.309359154,1.3375589749999999,1.305912326,1.278784459,1.2893569679999999,1.317214398,1.291968801,1.288793134],"mean":1.3231011588,"singleMean":1.3231011588,"variance":0.002327517190542255,"deviation":0.04824434879384584,"sem":0.01078776434332493,"moe":0.022578790770579078,"rme":1.7065052524825195,"p75":1.335107407,"p95":1.48209510785,"p99":1.486679549,"p999":1.486679549},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:32:41.335Z","end":"2018-06-29T21:33:07.809Z"},"request":{"data":{"file":"data-10000k","processing":"numpy","load_type":"arrow","col":"B"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1429","etag":"W/\"595-qWBxln6HYfWd/V72UhvpA7HlL18\"","date":"Fri, 29 Jun 2018 21:32:42 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.7558001089704738},"numpy with arrow for 1M dataset -ReadSchema":{"name":"server1/numpy with arrow for 1M dataset -ReadSchema","href":"http://localhost:3000/calc/getColumns","stats":{"sample":[0.945622263,0.907712434,0.920805447,0.927591204,0.900171019,0.920143586,0.90430122,0.913468198,0.915529596,0.931017582,0.912073951,0.917292679,0.919670021,0.926091173,0.90788839,0.908035784,0.910640916,0.919134044,0.940002257,0.922374945],"mean":0.9184783354500002,"singleMean":0.9184783354500002,"variance":0.00013339036949601822,"deviation":0.011549474858019226,"sem":0.002582541088695572,"moe":0.005405258498639832,"rme":0.5885014692253546,"p75":0.925162116,"p95":0.9453412627,"p99":0.945622263,"p999":0.945622263},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:33:07.809Z","end":"2018-06-29T21:33:26.179Z"},"request":{"data":{"file":"data-1000k","processing":"numpy","load_type":"arrow"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"17","etag":"W/\"11-shl9CmJyiyCDXNRcMZFgMA19xak\"","date":"Fri, 29 Jun 2018 21:33:08 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":1.0887573080426105},"numpy with arrow for 1M dataset -Histogram-A":{"name":"server1/numpy with arrow for 1M dataset -Histogram-A","href":"http://localhost:3000/calc/getHist","stats":{"sample":[0.996718548,0.990775545,0.981631134,0.994875068,0.976200131,0.984735221,0.990370741,0.971603066,0.99463141,0.973626029,0.99515434,0.994667024,0.983952059,0.991468437,1.007090418,1.009554504,0.989188065,0.981446363,0.968787422,1.058849975],"mean":0.991766275,"singleMean":0.991766275,"variance":0.000365742396074203,"deviation":0.019124392698180066,"sem":0.004276344210153125,"moe":0.00895038843185049,"rme":0.9024695291086087,"p75":0.995084522,"p95":1.05638520145,"p99":1.058849975,"p999":1.058849975},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:33:26.180Z","end":"2018-06-29T21:33:46.015Z"},"request":{"data":{"file":"data-1000k","processing":"numpy","load_type":"arrow","col":"A"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1365","etag":"W/\"555-CIDc81pVxIdas9qGeNhqh2QIFfA\"","date":"Fri, 29 Jun 2018 21:33:27 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":1.0083020820606146},"numpy with arrow for 1M dataset -Histogram-B":{"name":"server1/numpy with arrow for 1M dataset -Histogram-B","href":"http://localhost:3000/calc/getHist","stats":{"sample":[1.034001425,0.99014824,0.972384465,1.004591423,0.990294928,1.035939759,1.119101251,1.021363287,0.988276903,0.9799689,0.98532409,0.983600146,0.989587932,1.048814503,0.99770658,1.00263722,0.956011058,0.988463438,0.992540745,1.003993032],"mean":1.00423746625,"singleMean":1.00423746625,"variance":0.0012300674992916183,"deviation":0.035072318133987354,"sem":0.00784240874760943,"moe":0.016414161508746535,"rme":1.634490054433033,"p75":1.017170321,"p95":1.1155869136,"p99":1.119101251,"p999":1.119101251},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:33:46.016Z","end":"2018-06-29T21:34:06.101Z"},"request":{"data":{"file":"data-1000k","processing":"numpy","load_type":"arrow","col":"B"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1365","etag":"W/\"555-3/3RwSdUf9i70qpa2Bo8SwlAv7c\"","date":"Fri, 29 Jun 2018 21:33:47 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.9957804141028282},"numba with arrow for 100M dataset -ReadSchema":{"name":"server1/numba with arrow for 100M dataset -ReadSchema","href":"http://localhost:3000/calc/getColumns","stats":{"sample":[2.1814520059999998,2.3868378740000002,2.383030671,2.407628864,2.508880301,2.372772344,2.36749896,2.352476075,2.380091257,2.3881199889999998,2.402556472,2.3724006859999998,2.422629181,2.371316742,2.380097957,2.476556979,2.451361806,2.372694415,2.413427294,2.542365142],"mean":2.39670975075,"singleMean":2.39670975075,"variance":0.005089820747870213,"deviation":0.07134297966773054,"sem":0.015952775225443083,"moe":0.03338915854685237,"rme":1.393124826083089,"p75":2.42032870925,"p95":2.54069089995,"p99":2.542365142,"p999":2.542365142},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:34:06.101Z","end":"2018-06-29T21:34:54.035Z"},"request":{"data":{"file":"data-100000k","processing":"numba","load_type":"arrow"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"12","etag":"W/\"c-3ggYUmKQxioX0p9FTJ6oguYidME\"","date":"Fri, 29 Jun 2018 21:34:08 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.4172386746818512},"numba with arrow for 100M dataset -Histogram-A":{"name":"server1/numba with arrow for 100M dataset -Histogram-A","href":"http://localhost:3000/calc/getHist","stats":{"sample":[4.456879553,4.195409635,3.862197719,3.845312313,3.880857141,3.899668541,3.865277122,3.878576063,3.876125377,3.866537374,3.896668124,3.897035551,3.899981312,4.111994965,4.616744713,4.1458726200000005,5.601769431,4.242936733,4.754521252,4.202682708],"mean":4.1498524123500005,"singleMean":4.1498524123500005,"variance":0.19008337512448903,"deviation":0.43598552169136195,"sem":0.09748932637075944,"moe":0.2040451600939995,"rme":4.916925707689246,"p75":4.23287322675,"p95":5.559407022049999,"p99":5.601769431,"p999":5.601769431},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:34:54.035Z","end":"2018-06-29T21:36:17.034Z"},"request":{"data":{"file":"data-100000k","processing":"numba","load_type":"arrow","col":"A"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1493","etag":"W/\"5d5-FluYpWcpsgOLSbr9fsYWgbMkfJI\"","date":"Fri, 29 Jun 2018 21:34:58 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.24097242519372267},"numba with arrow for 100M dataset -Histogram-B":{"name":"server1/numba with arrow for 100M dataset -Histogram-B","href":"http://localhost:3000/calc/getHist","stats":{"sample":[4.532526781,4.687930281,4.575296727,4.073988519,3.927801011,3.904911952,3.891920844,4.040950443,4.070749734,3.975163085,4.1110228,4.111117301,3.9814548260000002,4.084161513,4.074550942,4.052775447,4.123014944,4.13901634,4.290595006,4.059773832],"mean":4.135436116400001,"singleMean":4.135436116400001,"variance":0.04855628349020484,"deviation":0.22035490348572878,"sem":0.04927285433694949,"moe":0.10312808412723527,"rme":2.493765620468847,"p75":4.135015991,"p95":4.6822986033,"p99":4.687930281,"p999":4.687930281},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:36:17.034Z","end":"2018-06-29T21:37:39.734Z"},"request":{"data":{"file":"data-100000k","processing":"numba","load_type":"arrow","col":"B"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1493","etag":"W/\"5d5-9IPSHDuqdLTm2NS26BehhCosTlE\"","date":"Fri, 29 Jun 2018 21:36:21 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.24181246472029283},"numba with arrow for 10M dataset -ReadSchema":{"name":"server1/numba with arrow for 10M dataset -ReadSchema","href":"http://localhost:3000/calc/getColumns","stats":{"sample":[1.225654281,1.122450051,1.101250027,1.078683258,1.146381447,1.091281903,1.176321784,1.124512155,1.238119636,1.957531541,1.179393781,1.276021002,2.004754685,1.7328113429999998,2.242690607,1.823910943,1.595531993,1.575230787,1.504325198,1.669373823],"mean":1.4433115122500002,"singleMean":1.4433115122500002,"variance":0.1298816901847112,"deviation":0.36039102400685735,"sem":0.08058588281600916,"moe":0.16866625273390717,"rme":11.686060237333713,"p75":1.7169519629999999,"p95":2.2307938109,"p99":2.242690607,"p999":2.242690607},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:37:39.734Z","end":"2018-06-29T21:38:08.601Z"},"request":{"data":{"file":"data-10000k","processing":"numba","load_type":"arrow"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"12","etag":"W/\"c-3ggYUmKQxioX0p9FTJ6oguYidME\"","date":"Fri, 29 Jun 2018 21:37:40 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.6928511215441528},"numba with arrow for 10M dataset -Histogram-A":{"name":"server1/numba with arrow for 10M dataset -Histogram-A","href":"http://localhost:3000/calc/getHist","stats":{"sample":[2.71881422,3.213690346,2.6110051690000002,2.297962227,2.48441575,2.062365918,1.9521382680000001,1.9365667119999999,1.910308398,1.948048266,1.954198255,1.927672658,1.910616586,1.9532066970000002,1.931811321,1.933198516,1.950758126,2.322896817,1.956849933,1.932004203],"mean":2.1454264192999997,"singleMean":2.1454264192999997,"variance":0.12759310290863804,"deviation":0.3572017677848726,"sem":0.07987274344500696,"moe":0.16717365203039955,"rme":7.792094407271456,"p75":2.3166631695,"p95":3.1889465396999994,"p99":3.213690346,"p999":3.213690346},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:38:08.601Z","end":"2018-06-29T21:38:51.519Z"},"request":{"data":{"file":"data-10000k","processing":"numba","load_type":"arrow","col":"A"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1429","etag":"W/\"595-7z9kJS31TuARP4sVE1B/iZIaLHA\"","date":"Fri, 29 Jun 2018 21:38:11 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.4661078054246557},"numba with arrow for 10M dataset -Histogram-B":{"name":"server1/numba with arrow for 10M dataset -Histogram-B","href":"http://localhost:3000/calc/getHist","stats":{"sample":[2.18765806,1.9719246529999999,1.957833381,1.9206326649999999,1.934397766,1.930782739,2.027827105,1.981707653,2.05672405,2.089639061,2.004849186,1.997732321,1.905710276,1.934565964,1.917699951,1.914867733,1.936808606,1.928173022,1.941806244,1.9113627229999999],"mean":1.9726351579500006,"singleMean":1.9726351579500006,"variance":0.005167245682489466,"deviation":0.07188355641236364,"sem":0.0160736518602486,"moe":0.03364215334350032,"rme":1.7054422460188672,"p75":2.00306996975,"p95":2.18275711005,"p99":2.18765806,"p999":2.18765806},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:38:51.519Z","end":"2018-06-29T21:39:30.972Z"},"request":{"data":{"file":"data-10000k","processing":"numba","load_type":"arrow","col":"B"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1429","etag":"W/\"595-qWBxln6HYfWd/V72UhvpA7HlL18\"","date":"Fri, 29 Jun 2018 21:38:53 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.5069361133354323},"numba with arrow for 1M dataset -ReadSchema":{"name":"server1/numba with arrow for 1M dataset -ReadSchema","href":"http://localhost:3000/calc/getColumns","stats":{"sample":[0.984402703,0.991246994,0.957705029,0.975273807,0.989721573,0.983504587,0.955278673,0.974230766,0.957756511,0.988727547,0.957737469,0.96535646,0.956690551,0.954508911,0.971028301,0.942365142,0.956839708,1.071997292,0.951997222,0.954849538],"mean":0.9720609391999998,"singleMean":0.9720609391999998,"variance":0.000765448700489496,"deviation":0.027666743583036585,"sem":0.00618647193677259,"moe":0.012948285763665031,"rme":1.3320446529125416,"p75":0.984178174,"p95":1.0679597771,"p99":1.071997292,"p999":1.071997292},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:39:30.972Z","end":"2018-06-29T21:39:50.414Z"},"request":{"data":{"file":"data-1000k","processing":"numba","load_type":"arrow"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"17","etag":"W/\"11-shl9CmJyiyCDXNRcMZFgMA19xak\"","date":"Fri, 29 Jun 2018 21:39:31 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":1.0287420877367974},"numba with arrow for 1M dataset -Histogram-A":{"name":"server1/numba with arrow for 1M dataset -Histogram-A","href":"http://localhost:3000/calc/getHist","stats":{"sample":[1.8146452320000002,1.763911437,1.703303314,1.707639442,1.700239074,1.727623293,1.715963667,1.714119128,1.708840103,1.744795024,1.704526542,1.7668727130000002,1.834130482,1.714919568,1.77075996,1.740422576,1.694496005,1.707476534,1.705075213,1.717727103],"mean":1.7328743205000001,"singleMean":1.7328743205000001,"variance":0.0015135934007975665,"deviation":0.03890492771870379,"sem":0.008699406303873749,"moe":0.018207857394007758,"rme":1.050731560772053,"p75":1.75913233375,"p95":1.8331562195,"p99":1.834130482,"p999":1.834130482},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:39:50.414Z","end":"2018-06-29T21:40:25.076Z"},"request":{"data":{"file":"data-1000k","processing":"numba","load_type":"arrow","col":"A"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1365","etag":"W/\"555-CIDc81pVxIdas9qGeNhqh2QIFfA\"","date":"Fri, 29 Jun 2018 21:39:52 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.5770758953317873},"numba with arrow for 1M dataset -Histogram-B":{"name":"server1/numba with arrow for 1M dataset -Histogram-B","href":"http://localhost:3000/calc/getHist","stats":{"sample":[1.797277798,1.713234413,1.712101808,1.727958984,1.68970218,1.732310627,1.702647447,1.716206619,1.705218376,1.716147732,1.725559426,1.7063947050000001,1.779523544,2.070302969,1.684857225,1.825211041,1.7488349539999999,1.726233277,1.734950317,1.717866034],"mean":1.7466269738000002,"singleMean":1.7466269738000002,"variance":0.007023988189570458,"deviation":0.0838092368988673,"sem":0.018740315084825092,"moe":0.039223479472538916,"rme":2.245670086452601,"p75":1.7453637947499998,"p95":2.0580483726,"p99":2.070302969,"p999":2.070302969},"errors":{},"options":{"method":"post","concurrencyLevel":1,"start":"2018-06-29T21:40:25.076Z","end":"2018-06-29T21:41:00.009Z"},"request":{"data":{"file":"data-1000k","processing":"numba","load_type":"arrow","col":"B"}},"response":{"header":{"x-powered-by":"Express","access-control-allow-origin":"*","content-type":"application/octet-stream","content-length":"1365","etag":"W/\"555-3/3RwSdUf9i70qpa2Bo8SwlAv7c\"","date":"Fri, 29 Jun 2018 21:40:26 GMT","connection":"close"},"statusCode":200,"type":"application/octet-stream"},"hz":0.5725320947176133}}},"info":{"date":"2018-06-29T21:41:00.044Z","apiName":"server1"}};
+    // --></script>
+    <div id="report">
+      <div id="report-details"><h1>Api Benchmark report</h1></div>
+      <div id="charts"></div>
+    </div>
+    <div style="text-align: center">
+    Generated by <a href="https://github.com/matteofigus/api-benchmark" target="_blank">api-benchmark</a><br /><br />
+    <iframe src="http://ghbtns.com/github-btn.html?user=matteofigus&repo=api-benchmark&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+    </div>
+    <script>
+
+      var selectors = {
+        charts: '#charts',
+        reportDetails: '#report-details',
+        panel: '.panel',
+        panels: {
+          stats: '.stats',
+          distribution: '.distribution',
+          response: '.response',
+          request: '.request'
+        },
+        button: '.button',
+        buttons: {
+          stats: '.button-stats',
+          distribution: '.button-distribution',
+          response: '.button-response',
+          request: '.button-request'
+        }
+      };
+
+      var formatNumber = function(number) {
+        number = String(number).split('.');
+        return number[0].replace(/(?=(?:\d{3})+$)(?!\b)/g, ',') +
+          (number[1] ? '.' + number[1] : '');
+      };
+
+      var formatDate = function(date){
+        return date.replace(/T/g, ' ').replace(/Z/g, ' ');
+      };
+
+      var fixNumber = function(number, digits){
+        return formatNumber(number.toFixed(digits));
+      };
+
+      var decodeHtml = function(text){
+        return $('<div/>').text(text).html();
+      };
+
+      var templates = {
+        reportDetails: function(info){
+          var formattedDate = formatDate(info.date);
+          return 'Benchmarked ' + info.apiName + ' on ' + formattedDate;
+        },
+        route: function(routeData, i){
+          var errorsCount = 0,
+              errorsDesc = '(',
+              duration = (new Date(routeData.options.end) - new Date(routeData.options.start))/1e3;
+
+          for(var errorType in routeData.errors){
+            errorsCount += routeData.errors[errorType].length;
+            errorsDesc += routeData.errors[errorType].length + ' ' + errorType + ',';
+          }
+
+          if(errorsCount == 0)
+            errorsDesc = '';
+          else
+            errorsDesc = errorsDesc.substr(0, errorsDesc.length - 1) + ')';
+
+          var template = '<div class="route"><div class="buttons">' +
+            '<a href="#stats" class="button button-stats selected">Stats</a>' +
+            '<a href="#distribution" class="button button-distribution">Distribution</a>' +
+            '<a href="#request" class="button button-request">Request details</a>' +
+            '<a href="#response" class="button button-response">Response details</a>' +
+            '</div><div class="stats panel"><div class="chart" id="chart' + i + '"></div>' +
+            '<div class="stats-details"><ul><li>' + routeData.stats.sample.length + ' run' +
+            (routeData.stats.sample.length > 1 ? 's' : '') + ' sampled with concurrency: ' +
+            routeData.options.concurrencyLevel + '</li>';
+
+          if(routeData.options.expectedStatusCode)
+            template += '<li>Expected status code: ' + routeData.options.expectedStatusCode + '</li>';
+
+          if(routeData.options.maxMean)
+            template += '<li>Expected max mean: ' + routeData.options.maxMean + '</li>';
+
+          if(routeData.options.maxSingleMean)
+            template += '<li>(*) Expected max mean across all concurrent requests: ' + routeData.options.maxSingleMean + '</li>';
+
+          template += '</ul><ul><li>Started: ' + formatDate(routeData.options.start) + '</li>' +
+            '<li>Ended: ' + formatDate(routeData.options.end) + ' (' + duration + ' seconds)</li>' +
+            '<li>' + fixNumber(routeData.hz, 2) + ' ops/sec \xb1 ' + fixNumber(routeData.stats.rme, 2) + '%</li>' +
+
+            '<li class="' + (!errorsCount ? 'green' : 'red') + '">' + errorsCount + ' error' +
+            (errorsCount == 1 ? '' : 's') + ' ' + errorsDesc + '</li>' +
+
+            '<li>Sample arithmetic mean: ' + fixNumber(routeData.stats.mean, 6) + '</li>';
+
+          if(routeData.options.concurrencyLevel > 1)
+            template += '<li>Mean across all the concurrent requests: ' + fixNumber(routeData.stats.singleMean, 6) + '</li>';
+
+          template += '<li>Sample standard deviation: ' + fixNumber(routeData.stats.deviation, 6) + '</li>' +
+            '<li>Margin of error: ' + fixNumber(routeData.stats.moe, 6) + '</li>' +
+            '<li>The standard error of the mean: ' + fixNumber(routeData.stats.sem, 6) + '</li>' +
+            '<li>The sample variance: ' + fixNumber(routeData.stats.variance, 6) + '</li>' +
+            '</ul><ul><li>75% Percentile: ' + fixNumber(routeData.stats.p75, 6) + '</li>' +
+            '<li>95% Percentile: ' + fixNumber(routeData.stats.p95, 6) + '</li>' +
+            '<li>99% Percentile: ' + fixNumber(routeData.stats.p99, 6) + '</li>' +
+            '<li>99.9% Percentile: ' + fixNumber(routeData.stats.p999, 6) + '</li>' +
+            '</ul></div></div><div class="distribution panel"><div class="distchart" id="distchart' + i + '">' +
+            '</div></div><div class="request panel hide">Request: ' + routeData.options.method.toUpperCase() +
+            ' <a href="' + routeData.href + '" target="_blank">' +
+            routeData.href + '</a><br />Concurrency level: ' + routeData.options.concurrencyLevel + '<br />';
+
+          if(routeData.options.delay)
+            template += 'Delay between bench cycles: ' + routeData.options.delay + '<br />';
+
+          var requestHeaders = 'none',
+              requestData = 'none',
+              requestQuery = 'none';
+
+          if(!!routeData.request.headers)
+            requestHeaders = '<br /><pre><code>' + JSON.stringify(routeData.request.headers, undefined, 2) + '</pre></code>';
+
+          if(!!routeData.request.data)
+            requestData = '<br /><pre><code>' + JSON.stringify(routeData.request.data, undefined, 2) + '</pre></code>';
+
+          if(!!routeData.request.query)
+            requestQuery = '<br /><pre><code>' + JSON.stringify(routeData.request.query, undefined, 2) + '</pre></code>';
+
+          template += '<br />Headers sent: ' + requestHeaders + '<br />Data sent: ' + requestData + '<br />Query sent: ' + requestQuery + '<br /></div><div class="response panel hide">Data here refers to the first sampled response.<br /><br />';
+
+          var responseHeader = JSON.stringify(routeData.response.header, undefined, 2),
+              responseBody = '';
+
+          try {
+            responseBody = JSON.stringify(JSON.parse(decodeHtml(routeData.response.body)), undefined, 2);
+          } catch(e){
+            responseBody = decodeHtml(routeData.response.body);
+          }
+
+          template += 'Response status: ' + routeData.response.statusCode + '<br />Response headers:<br />' +
+            '<pre><code>' + responseHeader + '</code></pre>' +
+            '<br />Response body:<br /><pre><code>' + responseBody + '</code></pre><br /></div></div>';
+
+          return template;
+        }
+      };
+
+      var bindButtons = function(){
+        var bindButton = function(panelName){
+          $(selectors.buttons[panelName]).click(function(){
+            var $sender = $(this),
+                $panelsContainer = $sender.parent().parent();
+
+            $panelsContainer.find(selectors.button).removeClass('selected');
+            $sender.addClass('selected');
+
+            $panelsContainer.find(selectors.panel).addClass('hide');
+            $panelsContainer.find(selectors.panels[panelName]).removeClass('hide');
+
+            return false;
+          });
+        };
+
+        bindButton('stats');
+        bindButton('distribution');
+        bindButton('response');
+        bindButton('request');
+      };
+
+      $(function(){
+        $(selectors.reportDetails).append(templates.reportDetails(data.info));
+
+        var counter = 0;
+        for(serviceName in data.benchmark){
+          for(routeName in data.benchmark[serviceName]){
+            $(selectors.charts).append(templates.route(data.benchmark[serviceName][routeName], counter));
+
+            var samples = data.benchmark[serviceName][routeName]['stats']['sample'],
+                meanArray = [],
+                mean = data.benchmark[serviceName][routeName]['stats']['mean'],
+                singleMeanArray = [],
+                singleMean = data.benchmark[serviceName][routeName]['stats']['singleMean'],
+                maxMeanArray = [],
+                maxMean = data.benchmark[serviceName][routeName].options.maxMean !== undefined,
+                maxSingleMeanArray = [],
+                maxSingleMean = data.benchmark[serviceName][routeName].options.maxSingleMean !== undefined,
+                errorsArray = [],
+                areThereSomeErrors = false;
+
+            for(var i = 0; i < samples.length; i++){
+              meanArray.push(mean);
+              singleMeanArray.push(singleMean);
+
+              errorsArray.push(null);
+
+              if(maxMean)
+                maxMeanArray.push(data.benchmark[serviceName][routeName].options.maxMean);
+
+              if(maxSingleMean)
+                maxSingleMeanArray.push(data.benchmark[serviceName][routeName].options.maxSingleMean);
+            }
+
+            for(var errorType in data.benchmark[serviceName][routeName].errors){
+              var errorsOfType = data.benchmark[serviceName][routeName]['errors'][errorType];
+              for(var i = 0; i < errorsOfType.length; i++){
+                if(errorsOfType[i].pos !== undefined){
+                  errorsArray[errorsOfType[i].pos] = data.benchmark[serviceName][routeName]['stats']['sample'][errorsOfType[i].pos];
+                  areThereSomeErrors = true;
+                }
+              }
+            }
+
+            var getSeriesOptions = function(label, color){
+              return {
+                showMarker: false,
+                pointLabels: { show: true },
+                label: label,
+                color: color
+              };
+            };
+
+            var lines = [samples],
+                series = [getSeriesOptions('Samples', '#6699FF')];
+
+            if(maxMean){
+              lines.push(maxMeanArray);
+              series.push(getSeriesOptions('Max Mean', '#F90'));
+            }
+
+            lines.push(meanArray);
+            series.push(getSeriesOptions('Mean', '#66FF00'));
+
+            if(maxSingleMean){
+              lines.push(maxSingleMeanArray);
+              series.push(getSeriesOptions('Max Single Mean (*)', '#EBFF00'));
+
+              lines.push(singleMeanArray);
+              series.push(getSeriesOptions('Single mean', '#FC6333'));
+            }
+
+            if(areThereSomeErrors > 0){
+              lines.push(errorsArray);
+              series.push({
+                showLine:false,
+                markerOptions: { size: 7, style:'x' },
+                label: 'Errors',
+                color: '#FF0000'
+              });
+            }
+
+            var options = {
+              title: {
+                text: data.benchmark[serviceName][routeName]['name'],
+                color: '#F1F1F1'
+              },
+              animate: true,
+              grid: {
+                background: '#000000', textColor: '#F1F1F1'
+              },
+              seriesDefaults:{
+                rendererOptions: {
+                  showDataLabels: true
+                }
+              },
+              highlighter: {
+                show: true,
+                sizeAdjust: 7.5
+              },
+              cursor:{
+                show: true,
+                zoom:true,
+              },
+              legend: {
+                show:true,
+                location: 'se',
+                background: 'rgba(101, 0, 253, 0.89)'
+              },
+              axesDefaults: {
+                labelRenderer: $.jqplot.CanvasAxisLabelRenderer
+              },
+              axes: {
+                xaxis: {
+                  label: 'Samples',
+                  pad: 0
+                },
+                yaxis: {
+                  label: 'Response time (seconds)',
+                  tickOptions: {
+                    formatString:'%.6f'
+                  }
+                }
+              },
+              series: series
+            };
+
+            $.jqplot('chart' + counter, lines, options);
+            counter++;
+          }
+        }
+        hljs.initHighlightingOnLoad();
+        bindButtons();
+      });
+
+      $(function(){
+        var counter = 0;
+        for(serviceName in data.benchmark){
+          for(routeName in data.benchmark[serviceName]){
+            var samples = data.benchmark[serviceName][routeName]['stats']['sample'];
+            var sortedSamples = _.orderBy(samples);
+            var totalDelta = sortedSamples[sortedSamples.length - 1] - sortedSamples[0];
+
+            var bucketCount = ~~Math.min(totalDelta*1000, sortedSamples.length);
+            var delta = totalDelta/bucketCount;
+
+            var buckets = [[sortedSamples[0] + delta/2.0, 0]];
+
+            for (var i = 0; i < samples.length; i++) {
+              var s = sortedSamples[i];
+              while(s > (sortedSamples[0] + buckets.length * delta)) {
+                buckets.push([(sortedSamples[0] + buckets.length * delta + delta/2.0), 0]);
+              }
+              buckets[buckets.length - 1][1]++;
+            }
+
+            buckets = _.map(buckets, function(b){
+              return [b[0], 100*b[1]/samples.length];
+            });
+
+
+            var lines = [buckets],
+                series = [{
+                  showMarker: false,
+                  pointLabels: { show: true },
+                  label: 'Samples',
+                  color: '#6699FF',
+                  rendererOptions: {
+                    smooth: true
+                  }
+                }];
+
+            var options = {
+              title: {
+                text: data.benchmark[serviceName][routeName]['name'],
+                color: '#F1F1F1'
+              },
+              animate: true,
+              grid: {
+                background: '#000000', textColor: '#F1F1F1'
+              },
+              seriesDefaults:{
+                rendererOptions: {
+                  showDataLabels: true
+                }
+              },
+              highlighter: {
+                show: true,
+                sizeAdjust: 7.5
+              },
+              legend: {
+                show:true,
+                location: 'se',
+                background: 'rgba(101, 0, 253, 0.89)'
+              },
+              cursor:{
+                show: true,
+                zoom:true,
+              },
+              axesDefaults: {
+                labelRenderer: $.jqplot.CanvasAxisLabelRenderer
+              },
+              axes: {
+                xaxis: {
+                  label: 'Response time (seconds)',
+                  tickOptions: {
+                    formatString:'%.3f'
+                  }
+                },
+                yaxis: {
+                  label: 'Percent of responses',
+                  tickOptions: {
+                    formatString: '%.1f%'
+                  }
+                }
+              },
+              series: series
+            };
+
+            $.jqplot('distchart' + counter, lines, options);
+            counter++;
+          }
+        }
+        $(".distribution.panel").addClass('hide');
+      });
+    </script>
+  </body>
+</html>

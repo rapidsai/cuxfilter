@@ -49,6 +49,8 @@ load_types.forEach(function(load_type){
     });
 });
 // console.log(routes);
+
+//temp_route: routes for testing if the script is executing properly
 var temp_route = {
   
   '1-col': { method: 'post',
@@ -69,7 +71,7 @@ var temp_route = {
 };
 var options = {
   maxTime:10000,
-  minSamples: 2
+  minSamples: 20
 }
 
 function logBenchmarks(final_results){
@@ -85,9 +87,10 @@ function logBenchmarks(final_results){
   
 }
 
-apiBenchmark.measure(service, temp_route , options, function(err, results) {
+apiBenchmark.measure(service, routes , options, function(err, results) {
   apiBenchmark.getHtml(results, function(error, html) {
-    fs.writeFileSync('benchmark.html',html);
+    var htmlfilename = "Benchmark-"+new Date().toDateString().replace(/ /g,'')+".html";
+    fs.writeFileSync(htmlfilename,html);
   });
   var res = results.server1;
   var final_res = {};
