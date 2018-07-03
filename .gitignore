@@ -1,6 +1,5 @@
 node_modules
 .idea
-bin
 package-lock.json
 uploads
 data
