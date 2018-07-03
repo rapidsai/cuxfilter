@@ -23,7 +23,8 @@ router.post("/", function(req, res, next){
                           };
                   
                   let data = JSON.stringify(db);
-                  console.log("entering the arrow conversion stage");
+                  fs.writeFileSync('../data/data.json',data);
+		  console.log("entering the arrow conversion stage");
                   convertToArrow(sessId, function(res){
                     console.log("arrow file conversion complete");
                   });        
@@ -39,7 +40,7 @@ router.post("/", function(req, res, next){
   
   function convertToArrow(sessId,callback){
     var spawn = require('child_process').spawn;  
-    var py = spawn('python', ['../python-scripts/convertToArrow.py', sessId]);
+    var py = spawn('python3', ['../python-scripts/convertToArrow.py', sessId]);
     py.stdin.write(JSON.stringify(sessId));
     py.stdout.on('end', function(){
       callback("success");

@@ -15,12 +15,13 @@ def histNumbaGPU(data,colName):
     '''
     bins = data.shape[0] > 64 and 64 or data.shape[0]
     df1 = numba_gpu_histogram(np.asarray(data[colName]),bins)
-    dict_temp ={}
     
+    dict_temp ={}
     dict_temp['A'] = list(df1[1].astype(str))
     dict_temp['B'] = list(df1[0].astype(str))
-    
+        
     print(json.dumps(dict_temp))
+    
     sys.stdout.flush()
 
 def histNumpyCPU(data,colName):
@@ -91,7 +92,7 @@ def readData(load_type,file):
             pandas dataframe
     '''
     #file is in the uploads/ folder, so append that to the path
-    file = str("uploads\\"+file)
+    file = str("uploads/"+file)
     if load_type == 'csv':
         data = readCSV(file)
     elif load_type == 'arrow':
@@ -125,7 +126,7 @@ def main():
                 sessID: sessionID to uniquely identify and serve multiple sessions(yet to be implemented)
                 file: file path
                 type: hist or columns
-                processing: pandas or numba
+                processing: numpy or numba
                 load_type: csv or arrow
                 columnName: (only when type=hist) columnName when type of request is hist
     '''

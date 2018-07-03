@@ -1,5 +1,5 @@
-from numba import cuda
 import numpy as np
+from numba import cuda
 import numba
 
 @numba.jit(nopython=True)
@@ -77,7 +77,6 @@ def get_bin_edges(a, nbins, a_min, a_max):
 def numba_gpu_histogram(a, bins):
     # Move data to GPU so we can do two operations on it
     a_gpu = cuda.to_device(a)
-
     ### Find min and max value in array
     dtype_min, dtype_max = dtype_min_max(a.dtype)
     # Put them in the array in reverse order so that they will be replaced by the first element in the array
