@@ -1,7 +1,7 @@
 # server.py
-import socket,sys
+import socket,sys,json
 import numpy as np, pandas as pd, pyarrow as pa
-
+from numbaHist import numba_gpu_histogram
 
 
 def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
@@ -25,16 +25,23 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
                 elif 'read' in input_from_client:
                     data_df_final = readData("arrow",input_from_client.split(":::")[1])
                     res = "data read successfully"
-                else:
-                    print(globals())
-                    print(locals())
+                elif 'columns' in input_from_client:
                     if 'data_df_final' in locals():
                         res = str(getColumns(data_df_final))
                     else:
                         res = "first read some data :-P"
+                elif 'hist' in input_from_client:
+                    # print("calculating histogram")
+                    args_hist = input_from_client.split(":::")
+                    # print(args_hist)
+                    if 'data_df_final' in locals():
+                        # print("inside if condition, definitely works")
+                        res = str(getHist(data_df_final,args_hist[2],args_hist[3]));
+                    else:
+                        res = "first read some data :-P"
                 print("Result of processing {} is: {}".format(input_from_client, res))
-            except:
-                res= "some error"
+            except Exception as e:
+                res= str(e)
                 print("some error occured")
             vysl = res.encode("utf8")  # encode the result string
             conn.sendall(vysl)  # send it to client
@@ -87,6 +94,55 @@ def start_server():
         print("thread is alive?: ",t.is_alive())
     soc.close()
 
+def histNumbaGPU(data,colName):
+    '''
+        description:
+            Calculate histogram leveraging gpu via pycuda(using numba jit)
+        input:
+            data: pandas df, colName: column name
+        Output:
+            json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
+    '''
+    bins = data.shape[0] > 64 and 64 or data.shape[0]
+    df1 = numba_gpu_histogram(np.asarray(data[colName]),bins)
+    dict_temp ={}
+    
+    dict_temp['A'] = list(df1[1].astype(str))
+    dict_temp['B'] = list(df1[0].astype(str))
+    
+    return str(json.dumps(dict_temp))
+
+def histNumpyCPU(data,colName):
+    '''
+        description:
+            Calculate histogram numpy
+        input:
+            data: pandas df, colName: column name
+        Output:
+            json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
+    '''
+    bins = data.shape[0] > 64 and 64 or data.shape[0]
+    df1 = np.histogram(data[colName],bins=bins)
+    dict_temp ={}
+    
+    dict_temp['A'] = list(df1[1].astype(str))
+    dict_temp['B'] = list(df1[0].astype(str))
+    print(str(json.dumps(dict_temp)))
+    return json.dumps(dict_temp)
+
+def getHist(data, processing,colName):
+    '''
+        description:
+            Get Histogram as per the specified processing type
+        input:
+            processing: numba or numpy
+            data: pandas df
+            colName: column name
+    '''
+    if processing == 'numba':
+        return histNumbaGPU(data,colName)
+    elif processing == 'numpy':
+        return histNumpyCPU(data,colName)
 
 def getColumns(data):
     '''

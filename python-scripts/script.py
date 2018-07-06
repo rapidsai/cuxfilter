@@ -98,7 +98,7 @@ def readData(load_type,file):
         data = readArrowToDF(file)
     return data
 
-def getHist(processing,data,colName):
+def getHist(data, processing,colName):
     '''
         description:
             Get Histogram as per the specified processing type
@@ -133,7 +133,7 @@ def main():
     data = readData(load_type,file)
     
     if type == 'hist':
-        getHist(processing,data,sys.argv[-1])
+        getHist(data, processing,sys.argv[-1])
     elif type == 'columns':
         getColumns(data)
 

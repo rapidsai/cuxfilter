@@ -60,6 +60,50 @@ function getCols(){
     });
 }
 
+function getColsSocket(){
+    var data = {
+        processing: processing,
+        load_type: load_type,
+    };
+
+    $.post("/socket-calc/getColumns",data, function(data,status){
+        console.log(typeof data);
+        genCols(data);
+    });
+}
+
+function getHist(val){
+    var data = {
+        file: $.urlParam('file'),
+        col: val,
+        processing: processing,
+        load_type: load_type
+    };
+    $.post("/calc/getHist", data,function(data,status){
+        data = JSON.parse(data);
+        X = data['A'];
+        Y = data['B'];
+        console.log(X);
+        genPlot(X,Y,type);
+        curr_col = $(this).val()
+    });
+}
+
+function getHistSocket(val){
+    var data = {
+        col: val,
+        processing: processing,
+    };
+    $.post("/socket-calc/getHist", data,function(data,status){
+        data = JSON.parse(data);
+        X = data['A'];
+        Y = data['B'];
+        console.log(X);
+        genPlot(X,Y,type);
+        curr_col = $(this).val()
+    });
+}
+
 function genPlot(X,Y,type){
  
     var d = [{
@@ -76,26 +120,12 @@ function initiateListeners(val){
     $('input[type=radio][name=X][value='+val+']').change(function(){
         console.log("");
         if(curr_col !== $(this).val()){
-            var data = {
-                file: $.urlParam('file'),
-                col: $(this).val(),
-                processing: processing,
-                load_type: load_type
-            };
-            $.post("/calc/getHist", data,function(data,status){
-                data = JSON.parse(data);
-                X = data['A'];
-                Y = data['B'];
-                console.log(X);
-                genPlot(X,Y,type);
-                curr_col = $(this).val()
-            });
+            // getHist($(this).val());
+            getHistSocket($(this).val());
         }
         
     });
 }
-
-
 
 function genCheckBox(val,text){
     if(val){
@@ -118,4 +148,18 @@ function genCols(cols){
         }
     }
     
+}
+
+function persistentConnStart(){
+    var data = {
+        file: $.urlParam('file'),
+    };
+    $.get("/socket-calc/startConnection", data,function(data,status){
+        $("#persistentConnStatus").text("Connected"+data);
+    });
+}
+function persistentConnEnd(){
+    $.get("/socket-calc/stopConnection", data,function(data,status){
+        $("#persistentConnStatus").text("Connection Ended");
+    });   
 }
