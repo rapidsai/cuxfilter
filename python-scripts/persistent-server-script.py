@@ -56,7 +56,7 @@ def start_server():
     print('Socket created')
 
     try:
-        soc.bind(("localhost", 3001))
+        soc.bind(("0.0.0.0", 3001))
         print('Socket bind complete')
     except (ConnectionResetError,socket.error) as msg:
         print('Bind failed. Error : ' + str(sys.exc_info()))
@@ -193,7 +193,7 @@ def readData(load_type,file):
             pandas dataframe
     '''
     #file is in the uploads/ folder, so append that to the path
-    file = str("uploads\\"+file)
+    file = str("uploads/"+file)
     if load_type == 'csv':
         data = readCSV(file)
     elif load_type == 'arrow':
