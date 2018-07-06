@@ -56,7 +56,7 @@ def start_server():
     print('Socket created')
 
     try:
-        soc.bind(("127.0.0.1", 12345))
+        soc.bind(("localhost", 3001))
         print('Socket bind complete')
     except (ConnectionResetError,socket.error) as msg:
         print('Bind failed. Error : ' + str(sys.exc_info()))

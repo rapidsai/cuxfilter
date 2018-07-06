@@ -5,8 +5,8 @@ var fs = require("fs");
 var spawn = require('child_process').spawn;
 var net = require('net');
 
-var HOST = '127.0.0.1';
-var PORT = 12345;
+var HOST = 'localhost';
+var PORT = 3001;
 
 var pyClient;
 
