@@ -3,8 +3,19 @@ var cols = document.getElementById("hid-col").innerHTML;
 var curr_col ='';
 var X=0,Y=0;
 var type='histogram';
-var processing = 'numpy';
-var load_type = 'csv';
+var processing = 'numba';
+var load_type = 'arrow';
+var current_chart_col = '';
+var responseTime,totalTime;
+var persistentConnStatus = false;
+var url = '';
+
+$.get('/socket-calc/getStatus',{}, function(data,status){
+    if(data === 'active'){
+        persistentConnStatus = true;
+        $("#persistentConnStatus").text("Socket connection already established");
+    }
+});
 
 $.urlParam = function(name){
     var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
@@ -46,61 +57,56 @@ $("#scatter").on("click",function(){
     }
 });
 
-
 function getCols(){
-    var data = {
-        processing: processing,
-        load_type: load_type,
-        file: $.urlParam('file')
-    };
+    var data = {};
 
-    $.post("/calc/getColumns",data, function(data,status){
+    url = '/socket-calc/getColumns';
+    
+    if(!persistentConnStatus){
+        url = '/calc/getColumns';
+        data.processing = processing,
+        data.load_type = load_type,
+        data.file = $.urlParam('file');
+    }
+
+    responseTime = Date.now();
+
+    $.post(url,data, function(data,status){
         console.log(typeof data);
         genCols(data);
+        $('.genChart').show();
+    
+        totalTime = Date.now() - responseTime;
+        $('#restime').text(totalTime);
     });
 }
 
-function getColsSocket(){
+function getHist(){
     var data = {
+        col: current_chart_col,
         processing: processing,
-        load_type: load_type,
     };
+    url = '/socket-calc/getHist';
+    
+    if(!persistentConnStatus){
+        url = '/calc/getHist';
+        data.file = $.urlParam('file');
+        data.load_type = load_type;
+    }
 
-    $.post("/socket-calc/getColumns",data, function(data,status){
-        console.log(typeof data);
-        genCols(data);
-    });
-}
-
-function getHist(val){
-    var data = {
-        file: $.urlParam('file'),
-        col: val,
-        processing: processing,
-        load_type: load_type
-    };
-    $.post("/calc/getHist", data,function(data,status){
+    responseTime = Date.now();
+    
+    $.post(url, data,function(data,status){
         data = JSON.parse(data);
         X = data['A'];
         Y = data['B'];
         console.log(X);
-        genPlot(X,Y,type);
-        curr_col = $(this).val()
-    });
-}
+        
+        totalTime = Date.now() - responseTime;
+        $('#restime').text(totalTime);
 
-function getHistSocket(val){
-    var data = {
-        col: val,
-        processing: processing,
-    };
-    $.post("/socket-calc/getHist", data,function(data,status){
-        data = JSON.parse(data);
-        X = data['A'];
-        Y = data['B'];
-        console.log(X);
         genPlot(X,Y,type);
-        curr_col = $(this).val()
+        curr_col = $(this).val();
     });
 }
 
@@ -121,7 +127,7 @@ function initiateListeners(val){
         console.log("");
         if(curr_col !== $(this).val()){
             // getHist($(this).val());
-            getHistSocket($(this).val());
+            current_chart_col = $(this).val();
         }
         
     });
@@ -156,10 +162,12 @@ function persistentConnStart(){
     };
     $.get("/socket-calc/startConnection", data,function(data,status){
         $("#persistentConnStatus").text("Connected"+data);
+        persistentConnStatus = true;
     });
 }
 function persistentConnEnd(){
     $.get("/socket-calc/stopConnection", data,function(data,status){
         $("#persistentConnStatus").text("Connection Ended");
+        persistentConnStatus = false;
     });   
 }

@@ -91,7 +91,7 @@ def readData(load_type,file):
             pandas dataframe
     '''
     #file is in the uploads/ folder, so append that to the path
-    file = str("uploads\\"+file)
+    file = str("uploads/"+file)
     if load_type == 'csv':
         data = readCSV(file)
     elif load_type == 'arrow':

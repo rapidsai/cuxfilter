@@ -6,8 +6,8 @@ block content
     display:none;
     }
     #config{
-    background-color: #607D8B;
-    color: white;
+    background-color: #dfe6e9;
+    color: black;
     }
     .containers{
     height:100%;
@@ -15,6 +15,9 @@ block content
     body{
     padding: 2px;
     height: 100%;
+    }
+    .genChart{
+      display:none;
     }
   .containers
     .row
@@ -34,7 +37,7 @@ block content
           | csv
         br
         label.radio-inline
-          input(type='radio', name='load_type', value='arrow')
+          input(type='radio', name='load_type', value='arrow', checked)
           | arrow
         br
         h3 Histogram Processing:
@@ -43,20 +46,24 @@ block content
           | numpy
         br
         label.radio-inline
-          input(type='radio', name='processing', value='numba')
+          input(type='radio', name='processing', value='numba', checked)
           | numba
         br
-        button.btn.btn-danger(onclick='getColsSocket()') Get Columns
-        #cols-x
+        button.btn.btn-danger(onclick='getCols()') Get Columns
+        #cols-x.genChart
           | histogram for:
           br
+        button.btn.btn-danger.genChart(onclick='getHist()') Generate chart
+        h5.genChart Response time:
+        span#restime.genChart
+        span.genChart ms
+      .col-8
         .btn-group
           button.btn.btn-danger.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Action
           .dropdown-menu
             a#hist.dropdown-item(href='#') Histogram
             a#bar.dropdown-item(href='#') Bar Chart
             a#scatter.dropdown-item(href='#') Scatter plot
-      .col-8
         #myDiv
   script(src='https://cdn.plot.ly/plotly-latest.min.js')
   script(src='javascripts/test.js')

@@ -15,6 +15,16 @@ router.get('/', function(req, res) {
     res.render('dashboard',{title:"Socket-Calc api home page",val: JSON.stringify({hello:"World"}),cols:''});
 }); 
 
+router.get('/getStatus', function(req,res){
+    var sessId = req.session.id;
+    console.log("status:"+pyClient.readable);
+    if(!pyClient.readable){
+        res.end("inactive");
+    }else{
+        res.end("active");
+    }
+});
+
 router.get('/startConnection', function(req,res){
     console.log(req);
     var sessId = req.session.id;
