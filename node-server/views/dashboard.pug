@@ -3,45 +3,68 @@ extends layout
 block content
   style.
     .hid {
+    display:none;
+    }
+    #config{
+    background-color: #dfe6e9;
+    color: black;
+    }
+    .containers{
+    height:100%;
+    }
+    body{
+    padding: 2px;
+    height: 100%;
+    }
+    .genChart{
       display:none;
     }
-  h1= title
-  span#hid-val.hid #{val}
-  span#hid-col.hid #{cols}
-
-  h3 File type:
-  label.radio-inline
-    input(type='radio', name='load_type', value = 'csv')
-    | csv
-  br
-  label.radio-inline
-    input(type='radio', name='load_type', value = 'arrow')
-    | arrow
-
-  br
-
-  h3 Histogram Processing: 
-  label.radio-inline
-    input(type='radio', name='processing', value = 'numpy')
-    | numpy
-  br
-  label.radio-inline
-    input(type='radio', name='processing', value = 'numba')
-    | numba
-
-  br
-
-  button.btn.btn-danger(onclick='getCols()') Get Columns
-  div#cols-x histogram for:<br>
-  .btn-group
-    button.btn.btn-danger.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
-      | Action
-    .dropdown-menu
-      a#hist.dropdown-item(href='#') Histogram
-      a#bar.dropdown-item(href='#') Bar Chart
-      a#scatter.dropdown-item(href='#') Scatter plot
-
-  div#myDiv
-  script(src="https://cdn.plot.ly/plotly-latest.min.js")
-  script(src="javascripts/test.js")
-  
+  .containers
+    .row
+      #config.col-4
+        h1
+        span#hid-val.hid
+        span#hid-col.hid
+        h3  Persistent Connection(uses arrow format for loading)
+        button.btn.btn-danger(onclick='persistentConnStart()') Create Connection & Load File
+        button.btn.btn-danger(onclick='persistentConnEnd()') End connection
+        br
+        span#persistentConnStatus
+        br
+        h3 File type:
+        label.radio-inline
+          input(type='radio', name='load_type', value='csv')
+          | csv
+        br
+        label.radio-inline
+          input(type='radio', name='load_type', value='arrow', checked)
+          | arrow
+        br
+        h3 Histogram Processing:
+        label.radio-inline
+          input(type='radio', name='processing', value='numpy')
+          | numpy
+        br
+        label.radio-inline
+          input(type='radio', name='processing', value='numba', checked)
+          | numba
+        br
+        button.btn.btn-danger(onclick='getCols()') Get Columns
+        #cols-x.genChart
+          | histogram for:
+          br
+        button.btn.btn-danger.genChart(onclick='getHist()') Generate chart
+        h5.genChart Response time:
+        span#restime.genChart
+        span.genChart ms
+      .col-8
+        .btn-group
+          button.btn.btn-danger.dropdown-toggle(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false') Action
+          .dropdown-menu
+            a#hist.dropdown-item(href='#') Histogram
+            a#bar.dropdown-item(href='#') Bar Chart
+            a#scatter.dropdown-item(href='#') Scatter plot
+        #myDiv
+  script(src='https://cdn.plot.ly/plotly-latest.min.js')
+  script(src='javascripts/test.js')
+   

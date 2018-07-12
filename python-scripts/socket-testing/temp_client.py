@@ -1,25 +1,19 @@
-import socket
+import socket,sys
 
 
 def client_program():
-    host = socket.gethostname()  # as both code is running on same pc
-    port = 5000  # socket server port number
+    soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  
+    soc.connect(("127.0.0.1", 12345))
+    for _ in range(2):
+        try:
+            clients_input = input("What you want to proceed my dear client?\n")  
+            soc.send(clients_input.encode("utf8")) # we must encode the string to bytes  
+            result_bytes = soc.recv(4096) # the number means how the response can be in bytes  
+            result_string = result_bytes.decode("utf8") # the return will be in bytes, so decode
 
-    client_socket = socket.socket()  # instantiate
-    client_socket.connect((host, port))  # connect to the server
-
-    message = input(" -> ")  # take input
-
-    while message.lower().strip() != 'bye':
-        client_socket.send(message.encode())  # send message
-        data = client_socket.recv(1024).decode()  # receive response
-
-        print('Received from server: ' + data)  # show in terminal
-
-        message = input(" -> ")  # again take input
-
-    client_socket.close()  # close the connection
-
+            print("Result from server is {}".format(result_string))  
+        except:
+            break
 
 if __name__ == '__main__':
     client_program()

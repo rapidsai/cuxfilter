@@ -11,7 +11,7 @@ def histNumbaGPU(data,colName):
         input:
             data: pandas df, colName: column name
         Output:
-            json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_of_values_per_bin__]}
+            json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
     '''
     bins = data.shape[0] > 64 and 64 or data.shape[0]
     df1 = numba_gpu_histogram(np.asarray(data[colName]),bins)
@@ -31,7 +31,7 @@ def histNumpyCPU(data,colName):
         input:
             data: pandas df, colName: column name
         Output:
-            json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_of_values_per_bin__]}
+            json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
     '''
     bins = data.shape[0] > 64 and 64 or data.shape[0]
     df1 = np.histogram(data[colName],bins=bins)
@@ -99,7 +99,7 @@ def readData(load_type,file):
         data = readArrowToDF(file)
     return data
 
-def getHist(processing,data,colName):
+def getHist(data, processing,colName):
     '''
         description:
             Get Histogram as per the specified processing type
@@ -134,7 +134,7 @@ def main():
     data = readData(load_type,file)
     
     if type == 'hist':
-        getHist(processing,data,sys.argv[-1])
+        getHist(data, processing,sys.argv[-1])
     elif type == 'columns':
         getColumns(data)
 

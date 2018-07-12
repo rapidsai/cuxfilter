@@ -15,3 +15,5 @@ Sample UI:
 Profiling:
 
 https://docs.google.com/spreadsheets/d/1jFcFx_DzgHRF_NucQKYLr7o-vU4heBfQREwM8H0GKsM/edit?usp=sharing
+
+Branch -> socket-version: persistent connection between node and python process to avoid unnecessary loading of arrow file every time a request is made.
