@@ -2,7 +2,7 @@ from numba import cuda
 import numpy as np
 import numba
 
-@numba.jit(nopython=True)
+@numba.jit(nopython=True,parallel=True,cache=True)
 def compute_bin(x, n, xmin, xmax):
     # special case to mirror NumPy behavior for last bin
     if x == xmax:
@@ -63,7 +63,7 @@ def dtype_min_max(dtype):
     return info.min, info.max
 
 
-@numba.jit(nopython=True)
+@numba.jit(nopython=True,parallel=True,cache=True)
 def get_bin_edges(a, nbins, a_min, a_max):
     bin_edges = np.empty((nbins+1,), dtype=np.float64)
     delta = (a_max - a_min) / nbins

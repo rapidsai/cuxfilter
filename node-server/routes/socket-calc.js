@@ -62,7 +62,6 @@ router.post('/getColumns', function(req,res){
 });
 
 router.post('/getHist', function(req,res){
-    console.log("here in getHist");
     console.log(req.body);
     var sessId = req.session.id;
     var processing = req.body.processing;

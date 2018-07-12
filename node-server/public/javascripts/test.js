@@ -95,7 +95,6 @@ function getHist(){
     }
 
     responseTime = Date.now();
-    
     $.post(url, data,function(data,status){
         data = JSON.parse(data);
         X = data['A'];
@@ -106,7 +105,6 @@ function getHist(){
         $('#restime').text(totalTime);
 
         genPlot(X,Y,type);
-        curr_col = $(this).val();
     });
 }
 
@@ -124,12 +122,7 @@ function genPlot(X,Y,type){
 
 function initiateListeners(val){
     $('input[type=radio][name=X][value='+val+']').change(function(){
-        console.log("");
-        if(curr_col !== $(this).val()){
-            // getHist($(this).val());
-            current_chart_col = $(this).val();
-        }
-        
+        current_chart_col = $(this).val();        
     });
 }
 

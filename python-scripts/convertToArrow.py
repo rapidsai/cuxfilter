@@ -1,7 +1,7 @@
-import pandas as pd, pyarrow as pa, json, sys
+import pandas as pd, pyarrow as pa, json, sys, numpy as np
 
 def csvToArrow(path):
-    data = pd.read_csv(path)
+    data = pd.read_csv(path,dtype=np.float32)
     pa_df = pa.RecordBatch.from_pandas(data)
     path = path+".arrow"
     file = open(path, 'wb')

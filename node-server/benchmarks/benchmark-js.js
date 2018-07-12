@@ -2,17 +2,20 @@ var apiBenchmark = require('api-benchmark');
 var fs = require("fs"); 
 
 var service = {
-  server1: 'http://localhost:3000/calc/'
+  // server1: 'http://localhost:3000/calc/'
+  socket_server: 'http://localhost:3000/socket-calc'
 };
 
-var datasets = [100000,10000,1000]
-var types = ['ReadSchema','Histogram-A','Histogram-B']
-var processing_types = ['numpy','numba']
-var load_types = ['csv','arrow']
+var datasets = [100000];//[100000,10000,1000]
+var types = ['ReadSchema','Histogram-A','Histogram-B'];
+var processing_types = ['numpy','numba'];
+var load_types = ['arrow'];//['csv','arrow']
+var socket_conn = ['startConnection','stopConnection'];
+var routes = {};
+var temp_form = {};
+var temp_route_name = '';
 
-var routes = {}
-var temp_form = {}
-var temp_route_name = ''
+
 load_types.forEach(function(load_type){
       processing_types.forEach(function(processing){
           datasets.forEach(function(datasetSize){
@@ -48,11 +51,10 @@ load_types.forEach(function(load_type){
           });  
     });
 });
-// console.log(routes);
+console.log(routes);
 
 //temp_route: routes for testing if the script is executing properly
 var temp_route = {
-  
   '1-col': { method: 'post',
   route: 'getColumns',
   data:{ file: 'data-1000k',
@@ -87,24 +89,24 @@ function logBenchmarks(final_results){
   
 }
 
-apiBenchmark.measure(service, routes , options, function(err, results) {
-  apiBenchmark.getHtml(results, function(error, html) {
-    var htmlfilename = "Benchmark-"+new Date().toDateString().replace(/ /g,'')+".html";
-    fs.writeFileSync(htmlfilename,html);
-  });
-  var res = results.server1;
-  var final_res = {};
-  var key,val = '';
-  for (var prop in res){
-      console.log(prop+":"+res[prop].stats.mean);
-      key = prop.split("-")[0].trim();
-      val = res[prop].stats.mean;
-      if(key in final_res){
-        final_res[key].push(val);
-      }else{
-        final_res[key] = [val];
-      }
-    }
-  console.log(final_res);
-  logBenchmarks(final_res);
-  });
+// apiBenchmark.measure(service, routes , options, function(err, results) {
+//   apiBenchmark.getHtml(results, function(error, html) {
+//     var htmlfilename = "Benchmark-"+new Date().toDateString().replace(/ /g,'')+".html";
+//     fs.writeFileSync(htmlfilename,html);
+//   });
+//   var res = results.server1;
+//   var final_res = {};
+//   var key,val = '';
+//   for (var prop in res){
+//       console.log(prop+":"+res[prop].stats.mean);
+//       key = prop.split("-")[0].trim();
+//       val = res[prop].stats.mean;
+//       if(key in final_res){
+//         final_res[key].push(val);
+//       }else{
+//         final_res[key] = [val];
+//       }
+//     }
+//   console.log(final_res);
+//   logBenchmarks(final_res);
+//   });
