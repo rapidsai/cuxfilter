@@ -9,7 +9,22 @@ var current_chart_col = '';
 var responseTime,totalTime;
 var persistentConnStatus = false;
 var url = '';
+var timeStr = {
+    front_end: '',
+    node_server_request_time:'',
+    py_script_compute_time:''
+}
 
+function displayTimings(totalTimeFE,totalTimePyScript,totalTimeNodeServer){
+    timeStr.front_end = totalTimeFE+"ms";
+    timeStr.node_server_request_time = totalTimeNodeServer+"ms";
+    timeStr.py_script_compute_time = totalTimePyScript*1000 + "ms";
+    console.log(timeStr);
+    var obj = timeStr;
+    var str = "Front end: "+timeStr.front_end+"\nNodeServer: "+timeStr.node_server_request_time+"\nPyScriptCompute: "+timeStr.py_script_compute_time;
+    $('#restime').text(str);
+    
+}
 $.get('/socket-calc/getStatus',{}, function(data,status){
     if(data === 'active'){
         persistentConnStatus = true;
@@ -72,12 +87,15 @@ function getCols(){
     responseTime = Date.now();
 
     $.post(url,data, function(data,status){
-        console.log(typeof data);
-        genCols(data);
+        console.log(data);
+        data = JSON.parse(data);
+        pyData = data.pyData.split(":::");
+        var coldata = pyData[0];
+        genCols(coldata);
         $('.genChart').show();
     
         totalTime = Date.now() - responseTime;
-        $('#restime').text(totalTime);
+        displayTimings(totalTime,pyData[1],data.nodeServerTime);
     });
 }
 
@@ -95,17 +113,23 @@ function getHist(){
     }
 
     responseTime = Date.now();
-    $.post(url, data,function(data,status){
-        data = JSON.parse(data);
-        X = data['A'];
-        Y = data['B'];
-        console.log(X);
-        
-        totalTime = Date.now() - responseTime;
-        $('#restime').text(totalTime);
-
-        genPlot(X,Y,type);
-    });
+    $.post({
+        url: url,
+        data:data,
+        responseTime: Date.now(),
+        complete: function(data){
+            data = data.responseText;
+            data = JSON.parse(data);
+            pyData = data.pyData.split(":::");
+            console.log(pyData);
+            X = JSON.parse(pyData[0])['A'];
+            Y = JSON.parse(pyData[0])['B'];
+            console.log(X);
+            totalTime = Date.now() - responseTime;
+            genPlot(X,Y,type);
+            displayTimings(totalTime,pyData[1],data.nodeServerTime);
+            }
+        });
 }
 
 function genPlot(X,Y,type){
@@ -154,12 +178,15 @@ function persistentConnStart(){
         file: $.urlParam('file'),
     };
     $.get("/socket-calc/startConnection", data,function(data,status){
-        $("#persistentConnStatus").text("Connected"+data);
+        data = JSON.parse(data);
+        console.log(data);
+        $("#persistentConnStatus").text("Connected"+data.pyData);
         persistentConnStatus = true;
     });
 }
 function persistentConnEnd(){
     $.get("/socket-calc/stopConnection", data,function(data,status){
+        console.log(data);
         $("#persistentConnStatus").text("Connection Ended");
         persistentConnStatus = false;
     });   

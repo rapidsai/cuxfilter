@@ -2,12 +2,13 @@
 import socket,sys,json
 import numpy as np, pandas as pd, pyarrow as pa
 from numbaHist import numba_gpu_histogram
-
+import time
 
 def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
 
     try:
         while True:
+
             # the input is in bytes, so decode it
             input_from_client_bytes = conn.recv(MAX_BUFFER_SIZE)
 
@@ -18,7 +19,10 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
                 print("The length of input is probably too long: {}".format(siz))
 
             # decode input and strip the end of line
+            start_time = time.perf_counter()
+
             input_from_client = input_from_client_bytes.decode("utf8").rstrip()
+            
             try:
                 if input_from_client == "exit":
                     sys.exit()
@@ -43,6 +47,12 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
             except Exception as e:
                 res= str(e)
                 print("some error occured")
+            
+            
+            elapsed = time.perf_counter() - start_time
+            
+            
+            res = res+":::"+str(elapsed)
             vysl = res.encode("utf8")  # encode the result string
             conn.sendall(vysl)  # send it to client
     except ConnectionAbortedError:

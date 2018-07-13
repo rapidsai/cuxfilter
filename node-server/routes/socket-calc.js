@@ -7,7 +7,7 @@ var net = require('net');
 
 var HOST = '0.0.0.0';
 var PORT = 3001;
-
+var startTime, endTime;
 var pyClient;
 
 router.get('/', function(req, res) {
@@ -33,14 +33,26 @@ router.get('/startConnection', function(req,res){
     pyClient = new net.Socket();
     pyClient.connect(PORT, HOST, function() {
         console.log('CONNECTED TO: ' + HOST + ':' + PORT);
+        startTime = Date.now();
+        console.log(startTime);
         pyClient.write('read:::'+file);
     });
     pyClient.on('error',function(err){
         console.log(err);
-        res.end("  -> something went wrong, try connection again");
+        var response = {
+            pyData: "  -> something went wrong, try connection again",
+            nodeServerTime: Date.now() - startTime
+        }
+        res.end(JSON.stringify(response));
     });
     pyClient.on('data', function(val){
-        res.end(val);
+        console.log("received data from pyscript");
+        var response = {
+            pyData: Buffer.from(val).toString('utf8'),
+            nodeServerTime: Date.now() - startTime
+        }
+        console.log(response);
+        res.end(JSON.stringify(response));
     });
 });
 
@@ -48,11 +60,17 @@ router.get('/stopConnection', function(req,res){
     var sessId = req.session.id;
     console.log("destroying connection");
     if(!pyClient.readable){
-        res.end("already destroyed");
+        var response = {
+            pyData: "already destroyed"
+        }
+        res.end(JSON.stringify(response));
     }
     pyClient.on('close',function(){
         if(!pyClient.readable){
-            res.end("session destroyed");
+            var response = {
+                pyData: "session destroyed"
+            }
+            res.end(JSON.stringify(response));
         }
     });
     pyClient.destroy();
@@ -61,10 +79,14 @@ router.get('/stopConnection', function(req,res){
 router.post('/getColumns', function(req,res){
     // console.log("here in getColumns");
     var sessId = req.session.id;
-
+    startTime = Date.now();
     getColumns(sessId, function(cols){
         console.log(cols);
-        res.end(cols);
+        var response = {
+            pyData: Buffer.from(cols).toString('utf8'),
+            nodeServerTime: Date.now() - startTime
+        }
+        res.end(JSON.stringify(response));
     });
 });
 
@@ -73,9 +95,15 @@ router.post('/getHist', function(req,res){
     var sessId = req.session.id;
     var processing = req.body.processing;
     var columnName = req.body.col;
+    startTime = Date.now();
     getHist(sessId,processing,columnName, function(hist){
         console.log(hist);
-        res.end(hist);
+        var response = {
+            pyData: Buffer.from(hist).toString('utf8'),
+            nodeServerTime: Date.now() - startTime
+        }
+        res.end(JSON.stringify(response));
+        // res
     });
 });
 
