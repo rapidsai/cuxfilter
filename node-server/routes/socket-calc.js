@@ -26,7 +26,7 @@ router.get('/getStatus', function(req,res){
 });
 
 router.get('/startConnection', function(req,res){
-    console.log(req);
+    // console.log(req);
     var sessId = req.session.id;
     var file = req.query.file;
     var pyServer = spawn('python', ['../python-scripts/persistent-server-script.py']);
@@ -34,6 +34,10 @@ router.get('/startConnection', function(req,res){
     pyClient.connect(PORT, HOST, function() {
         console.log('CONNECTED TO: ' + HOST + ':' + PORT);
         pyClient.write('read:::'+file);
+    });
+    pyClient.on('error',function(err){
+        console.log(err);
+        res.end("  -> something went wrong, try connection again");
     });
     pyClient.on('data', function(val){
         res.end(val);
@@ -43,6 +47,9 @@ router.get('/startConnection', function(req,res){
 router.get('/stopConnection', function(req,res){
     var sessId = req.session.id;
     console.log("destroying connection");
+    if(!pyClient.readable){
+        res.end("already destroyed");
+    }
     pyClient.on('close',function(){
         if(!pyClient.readable){
             res.end("session destroyed");
