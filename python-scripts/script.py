@@ -1,4 +1,4 @@
-import sys, json, numpy as np, pandas as pd, pyarrow as pa
+import sys, json, numpy as np, pandas as pd, pyarrow as pa, time
 
 #Custom package
 from numbaHist import numba_gpu_histogram

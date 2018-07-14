@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var util = require("util");
 var fs = require("fs"); 
+var startTime, endTime;
 
 
 router.get('/', function(req, res) {
@@ -18,7 +19,11 @@ router.post('/getColumns', function(req,res){
     // console.log('here1');
     getColumns(sessId,file,processing,load_type, function(cols){
         // console.log('here4');
-        res.send(cols);
+        var response = {
+            pyData: Buffer.from(cols).toString('utf8'),
+            nodeServerTime: Date.now() - startTime
+        }
+        res.end(JSON.stringify(response));
     });
 });
 
@@ -29,8 +34,12 @@ router.post('/getHist', function(req,res){
     var processing = req.body.processing;
     var load_type = req.body.load_type;
     console.log(req.body);
-    getHist(sessId,file, colName, processing,load_type, function(val){
-        res.send(val);
+    getHist(sessId,file, colName, processing,load_type, function(hist){
+        var response = {
+            pyData: Buffer.from(hist).toString('utf8'),
+            nodeServerTime: Date.now() - startTime
+        }
+        res.end(JSON.stringify(response));
     });
 
 });

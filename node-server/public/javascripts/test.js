@@ -87,15 +87,22 @@ function getCols(){
     responseTime = Date.now();
 
     $.post(url,data, function(data,status){
+        totalTime = Date.now() - responseTime;
         console.log(data);
         data = JSON.parse(data);
+        //if(url.includes("socket")){
         pyData = data.pyData.split(":::");
         var coldata = pyData[0];
         genCols(coldata);
         $('.genChart').show();
     
-        totalTime = Date.now() - responseTime;
         displayTimings(totalTime,pyData[1],data.nodeServerTime);
+        // }else{
+        //     genCols(data);
+        //     $('.genChart').show();
+        //     displayTimings(totalTime,"not available",data.nodeServerTime);
+        // }
+        
     });
 }
 
@@ -112,22 +119,29 @@ function getHist(){
         data.load_type = load_type;
     }
 
-    responseTime = Date.now();
     $.post({
         url: url,
         data:data,
         responseTime: Date.now(),
         complete: function(data){
-            data = data.responseText;
-            data = JSON.parse(data);
-            pyData = data.pyData.split(":::");
-            console.log(pyData);
-            X = JSON.parse(pyData[0])['A'];
-            Y = JSON.parse(pyData[0])['B'];
-            console.log(X);
-            totalTime = Date.now() - responseTime;
-            genPlot(X,Y,type);
-            displayTimings(totalTime,pyData[1],data.nodeServerTime);
+                totalTime = Date.now() - responseTime;
+                data = data.responseText;
+                data = JSON.parse(data);
+                //if(url.includes("socket")){
+                pyData = data.pyData.split(":::");
+                console.log(pyData);
+                X = JSON.parse(pyData[0])['A'];
+                Y = JSON.parse(pyData[0])['B'];
+                console.log(X);
+                genPlot(X,Y,type);
+                displayTimings(totalTime,pyData[1],data.nodeServerTime);
+                // }else{
+                //     X = data['A'];
+                //     Y = data['B'];
+                //     console.log(X);
+                //     genPlot(X,Y,type);
+                //     displayTimings(totalTime,"not available",data.nodeServerTime);
+                // }
             }
         });
 }
