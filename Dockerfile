@@ -1,31 +1,33 @@
 FROM pygdf
-FROM node:8
 
 WORKDIR /usr/src/app
 
-# Install conda
-ADD https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh /miniconda.sh
-RUN sh /miniconda.sh -b -p /conda && /conda/bin/conda update -n base conda
-ENV PATH=${PATH}:/conda/bin
-
-
 # Python packages from conda
-RUN conda install -y \
-	pandas \
-	pyarrow \
-	numba \
-	cudatoolkit
+#RUN conda install -n gdf -y \
+#	pandas \
+#	pyarrow \
+#	numba \
+#	cudatoolkit
+RUN source activate gdf && conda install -c conda-forge pyarrow
+
+RUN apt-get update -yq && apt-get upgrade -yq && \
+    apt-get install -yq curl
+
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - && \
+    apt-get install -yq nodejs build-essential
+
+# fix npm - not the latest version installed by apt-get
+RUN npm install -g npm
 
 COPY . .
 
 WORKDIR /usr/src/app/node-server
 RUN pwd
 
-
 RUN mkdir uploads 
 RUN npm install
 
 EXPOSE 3000
-EXPOSE 3001
 
+#RUN source activate gdf
 #CMD ["npm","start"]
