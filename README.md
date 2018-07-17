@@ -17,3 +17,15 @@ Profiling:
 https://docs.google.com/spreadsheets/d/1jFcFx_DzgHRF_NucQKYLr7o-vU4heBfQREwM8H0GKsM/edit?usp=sharing
 
 Branch -> socket-version: persistent connection between node and python process to avoid unnecessary loading of arrow file every time a request is made.
+
+
+To build using Docker:
+
+while in the directory, run the following commands:
+(you should already have pygdf image in your local system)
+
+- sudo docker build -t athorve/viz .
+- sudo docker run --runtime=nvidia -it -p 3000:3000 athorve/viz bash
+
+root@<image-code>: source activate gdf
+root@<image-code>: npm start
