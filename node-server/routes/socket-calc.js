@@ -19,10 +19,10 @@ router.get('/', function(req, res) {
 
 router.get('/getStatus', function(req,res){
     var sessId = req.session.id;
-    console.log(sessId);
-    // console.log(pyClient[sessId]);
-    console.log("status:"+pyClient[sessId].readable);
-    if(!pyClient[sessId].readable){
+    var file = req.query.file;
+    console.log(sessId+file);
+    console.log("status:"+pyClient[sessId+file].readable);
+    if(!pyClient[sessId+file].readable){
         res.end("inactive");
     }else{
         res.end("active");
@@ -31,18 +31,22 @@ router.get('/getStatus', function(req,res){
 
 router.get('/startConnection', function(req,res){
     // console.log(req);
+    tryAgain=0;
     var sessId = req.session.id;
     var file = req.query.file;
-    pyServer[sessId] = spawn('python3', ['../python-scripts/persistent-server-script.py']);
-    pyClient[sessId] = new net.Socket();
-    pyClient[sessId].connect(PORT, HOST, function() {
+    pyServer[sessId+file] = spawn('python3', ['../python-scripts/persistent-server-script.py']);
+
+    pyClient[sessId+file] = new net.Socket();
+    setTimeout(function(){
+        pyClient[sessId+file].connect(PORT, HOST, function() {
         console.log('CONNECTED TO: ' + HOST + ':' + PORT);
-    });
-    pyClient[sessId].on('error',function(err){
+        });
+    },1000);
+    pyClient[sessId+file].on('error',function(err){
         console.log(err);
         if(tryAgain === 0){
             setTimeout(function(){
-                pyClient[sessId].connect(PORT, HOST, function() {
+                pyClient[sessId+file].connect(PORT, HOST, function() {
                 console.log('CONNECTED TO: ' + HOST + ':' + PORT);
              });
            },1000);
@@ -56,7 +60,7 @@ router.get('/startConnection', function(req,res){
         }
 
     });
-    pyClient[sessId].on('data', function(val){
+    pyClient[sessId+file].on('data', function(val){
         console.log("received data from pyscript");
         var response = {
             pyData: Buffer.from(val).toString('utf8'),
@@ -65,38 +69,40 @@ router.get('/startConnection', function(req,res){
         console.log(response);
         res.end(JSON.stringify(response));
     });
-    pyClient[sessId].on("connect", function(){
+    pyClient[sessId+file].on("connect", function(){
         startTime = Date.now();
         console.log(startTime);
-        pyClient[sessId].write('read:::'+file);
+        pyClient[sessId+file].write('read:::'+file);
     });
 });
 
 router.get('/stopConnection', function(req,res){
     var sessId = req.session.id;
+    var file = req.query.file;
     console.log("destroying connection");
-    if(!pyClient[sessId].readable){
+    if(!pyClient[sessId+file].readable){
         var response = {
             pyData: "already destroyed"
         }
         res.end(JSON.stringify(response));
     }
-    pyClient[sessId].on('close',function(){
-        if(!pyClient[sessId].readable){
+    pyClient[sessId+file].on('close',function(){
+        if(!pyClient[sessId+file].readable){
             var response = {
                 pyData: "session destroyed"
             }
             res.end(JSON.stringify(response));
         }
     });
-    pyClient[sessId].destroy();
+    pyClient[sessId+file].destroy();
 });
 
 router.post('/getColumns', function(req,res){
     // console.log("here in getColumns");
     var sessId = req.session.id;
+    var file = req.body.file;
     startTime = Date.now();
-    getColumns(sessId, function(cols){
+    getColumns(sessId,file, function(cols){
         console.log(cols);
         var response = {
             pyData: Buffer.from(cols).toString('utf8'),
@@ -111,8 +117,10 @@ router.post('/getHist', function(req,res){
     var sessId = req.session.id;
     var processing = req.body.processing;
     var columnName = req.body.col;
+    var bins = req.body.bins;
+    var file = req.body.file;
     startTime = Date.now();
-    getHist(sessId,processing,columnName, function(hist){
+    getHist(sessId,file, processing,columnName,bins, function(hist){
         console.log(hist);
         var response = {
             pyData: Buffer.from(hist).toString('utf8'),
@@ -124,18 +132,18 @@ router.post('/getHist', function(req,res){
 });
 
 
-function getColumns(sessId,callback){
-    pyClient[sessId].on("data", function(cols){
+function getColumns(sessId,file, callback){
+    pyClient[sessId+file].on("data", function(cols){
         callback(cols);
     });
-    pyClient[sessId].write("columns:::"+sessId);
+    pyClient[sessId+file].write("columns:::"+sessId);
 }
 
-function getHist(sessId,processing,columnName,callback){
-    pyClient[sessId].on("data", function(cols){
+function getHist(sessId, file, processing,columnName,bins, callback){
+    pyClient[sessId+file].on("data", function(cols){
         callback(cols);
     });
-    pyClient[sessId].write("hist:::"+sessId+":::"+processing+":::"+columnName);
+    pyClient[sessId+file].write("hist:::"+sessId+":::"+processing+":::"+columnName+":::"+bins);
 }
 
 

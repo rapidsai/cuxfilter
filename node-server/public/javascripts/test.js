@@ -25,12 +25,6 @@ function displayTimings(totalTimeFE,totalTimePyScript,totalTimeNodeServer){
     $('#restime').text(str);
     
 }
-$.get('/socket-calc/getStatus',{}, function(data,status){
-    if(data === 'active'){
-        persistentConnStatus = true;
-        $("#persistentConnStatus").text("Socket connection already established");
-    }
-});
 
 $.urlParam = function(name){
     var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
@@ -41,6 +35,13 @@ $.urlParam = function(name){
        return decodeURI(results[1]) || 0;
     }
 }
+
+$.get('/socket-calc/getStatus',{file: $.urlParam('file')}, function(data,status){
+    if(data === 'active'){
+        persistentConnStatus = true;
+        $("#persistentConnStatus").text("Socket connection already established");
+    }
+});
 
 //static listeners
 $('input[type=radio][name=processing]').change(function() {
@@ -73,15 +74,16 @@ $("#scatter").on("click",function(){
 });
 
 function getCols(){
-    var data = {};
+    var data = {
+        file: $.urlParam('file')
+    };
 
     url = '/socket-calc/getColumns';
     
     if(!persistentConnStatus){
         url = '/calc/getColumns';
         data.processing = processing,
-        data.load_type = load_type,
-        data.file = $.urlParam('file');
+        data.load_type = load_type
     }
 
     responseTime = Date.now();
@@ -110,12 +112,13 @@ function getHist(){
     var data = {
         col: current_chart_col,
         processing: processing,
+        bins:1024,
+        file: $.urlParam('file')
     };
     url = '/socket-calc/getHist';
     
     if(!persistentConnStatus){
         url = '/calc/getHist';
-        data.file = $.urlParam('file');
         data.load_type = load_type;
     }
 
@@ -189,7 +192,7 @@ function genCols(cols){
 
 function persistentConnStart(){
     var data = {
-        file: $.urlParam('file'),
+        file: $.urlParam('file')
     };
     $.get("/socket-calc/startConnection", data,function(data,status){
         data = JSON.parse(data);
@@ -199,6 +202,9 @@ function persistentConnStart(){
     });
 }
 function persistentConnEnd(){
+    var data = {
+        file: $.urlParam('file')
+    };
     $.get("/socket-calc/stopConnection", data,function(data,status){
         console.log(data);
         $("#persistentConnStatus").text("Connection Ended");
