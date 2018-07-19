@@ -23,12 +23,11 @@ def histogram(x, xmin, xmax, histogram_out):
 
     start = cuda.grid(1)
     stride = cuda.gridsize(1)
-
     for i in range(start, x.shape[0], stride):
         # note that calling a numba.jit function from CUDA automatically
         # compiles an equivalent CUDA device function!
         bin_number = compute_bin(x[i], nbins, xmin, xmax)
-
+        # counter[0] = counter[0] + 1
         if bin_number >= 0 and bin_number < histogram_out.shape[0]:
             cuda.atomic.add(histogram_out, bin_number, 1)
 
@@ -64,7 +63,7 @@ def dtype_min_max(dtype):
 
 
 @numba.jit(nopython=True,parallel=True,cache=True)
-def get_bin_edges(a, nbins, a_min, a_max):
+def get_bin_edges(nbins, a_min, a_max):
     bin_edges = np.empty((nbins+1,), dtype=np.float64)
     delta = (a_max - a_min) / nbins
     for i in range(bin_edges.shape[0]):
@@ -77,18 +76,26 @@ def get_bin_edges(a, nbins, a_min, a_max):
 def numba_gpu_histogram(a, bins):
     # Move data to GPU so we can do two operations on it
     a_gpu = cuda.to_device(a)
+
+    # a_gpu = a
+    # index_gpu = cuda.to_device(np.array(index))
     ### Find min and max value in array
     dtype_min, dtype_max = dtype_min_max(a.dtype)
     # Put them in the array in reverse order so that they will be replaced by the first element in the array
     min_max_array_gpu = cuda.to_device(np.array([dtype_max, dtype_min], dtype=a.dtype))
     min_max[64, 64](a_gpu, min_max_array_gpu)
     a_min, a_max = min_max_array_gpu.copy_to_host()
-
+    # print(a_min, a_max)
     # SPEEDTIP: Skip this step if you don't need to reproduce the NumPy histogram edge array
-    bin_edges = get_bin_edges(a, bins, a_min, a_max) # Doing this on CPU for now
+    bin_edges = get_bin_edges(bins, a_min, a_max) # Doing this on CPU for now
 
+    # counter = cuda.to_device(np.array([0]))
     ### Bin the data into a histogram 
+    # print(bins)
     histogram_out = cuda.to_device(np.zeros(shape=(bins,), dtype=np.int32))
     histogram[64, 64](a_gpu, a_min, a_max, histogram_out)
-
+    # print(counter.copy_to_host())
+    # sol = histogram_out.copy_to_host()
+    # print(sol)
+    # print(len(sol))
     return histogram_out.copy_to_host(), bin_edges

@@ -1,7 +1,8 @@
 # server.py
 import socket,sys,json
 import numpy as np, pandas as pd, pyarrow as pa
-from numbaHist import numba_gpu_histogram
+from numbaHistinMem import numba_gpu_histogram
+from numba import cuda
 import time
 
 def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
@@ -28,6 +29,10 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
                     sys.exit()
                 elif 'read' in input_from_client:
                     data_df_final = readData("arrow",input_from_client.split(":::")[1])
+                    # numba_gpu_histogram(data_df_final[data_df_final.columns[0]],64)
+                    data_gpu = cuda.to_device(np.asarray(data_df_final).transpose())
+                    #calling to precompile jit functions
+                    histNumbaGPU(data_gpu,0)
                     res = "data read successfully"
                 elif 'columns' in input_from_client:
                     if 'data_df_final' in locals():
@@ -40,7 +45,8 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
                     # print(args_hist)
                     if 'data_df_final' in locals():
                         # print("inside if condition, definitely works")
-                        res = str(getHist(data_df_final,args_hist[2],args_hist[3]));
+                        res = str(getHist(data_gpu,args_hist[2],data_df_final.columns.get_loc(args_hist[3])))
+                        # res = str(getHist(data_df_final,args_hist[2],args_hist[3]))
                     else:
                         res = "first read some data :-P"
                 print("Result of processing {} is: {}".format(input_from_client, res))
@@ -113,8 +119,9 @@ def histNumbaGPU(data,colName):
         Output:
             json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
     '''
-    bins = data.shape[0] > 64 and 64 or data.shape[0]
-    df1 = numba_gpu_histogram(np.asarray(data[colName]),bins)
+    bins = 64#data.transpose().shape[0] > 64 and 64 or data.transpose().shape[0]
+    df1 = numba_gpu_histogram(data,colName,bins)
+    # df1 = numba_gpu_histogram(data[colName],bins)
     dict_temp ={}
     
     dict_temp['A'] = list(df1[1].astype(str))
@@ -209,6 +216,7 @@ def readData(load_type,file):
     elif load_type == 'arrow':
         data = readArrowToDF(file)
     data_df_final = data
+
     return data
 
 if __name__ == '__main__':

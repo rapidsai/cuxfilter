@@ -8,18 +8,21 @@ var net = require('net');
 var HOST = '127.0.0.1';
 var PORT = 3001;
 var startTime, endTime;
-var pyClient;
+var pyClient = {}, pyServer = {};
 var tryAgain = 0;
 
 router.get('/', function(req, res) {
     var sessId = req.session.id;   
+    console.log(sessId);
     res.render('dashboard',{title:"Socket-Calc api home page",val: JSON.stringify({hello:"World"}),cols:''});
 }); 
 
 router.get('/getStatus', function(req,res){
     var sessId = req.session.id;
-    console.log("status:"+pyClient.readable);
-    if(!pyClient.readable){
+    console.log(sessId);
+    // console.log(pyClient[sessId]);
+    console.log("status:"+pyClient[sessId].readable);
+    if(!pyClient[sessId].readable){
         res.end("inactive");
     }else{
         res.end("active");
@@ -30,23 +33,17 @@ router.get('/startConnection', function(req,res){
     // console.log(req);
     var sessId = req.session.id;
     var file = req.query.file;
-    var pyServer = spawn('python3', ['../python-scripts/persistent-server-script.py']);
-    pyClient = new net.Socket();
-    pyClient.connect(PORT, HOST, function() {
+    pyServer[sessId] = spawn('python3', ['../python-scripts/persistent-server-script.py']);
+    pyClient[sessId] = new net.Socket();
+    pyClient[sessId].connect(PORT, HOST, function() {
         console.log('CONNECTED TO: ' + HOST + ':' + PORT);
-        startTime = Date.now();
-        console.log(startTime);
-        pyClient.write('read:::'+file);
     });
-    pyClient.on('error',function(err){
+    pyClient[sessId].on('error',function(err){
         console.log(err);
         if(tryAgain === 0){
             setTimeout(function(){
-              pyClient.connect(PORT, HOST, function() {
-              console.log('CONNECTED TO: ' + HOST + ':' + PORT);
-              startTime = Date.now();
-              console.log(startTime);
-              pyClient.write('read:::'+file);
+                pyClient[sessId].connect(PORT, HOST, function() {
+                console.log('CONNECTED TO: ' + HOST + ':' + PORT);
              });
            },1000);
            tryAgain=1;
@@ -59,7 +56,7 @@ router.get('/startConnection', function(req,res){
         }
 
     });
-    pyClient.on('data', function(val){
+    pyClient[sessId].on('data', function(val){
         console.log("received data from pyscript");
         var response = {
             pyData: Buffer.from(val).toString('utf8'),
@@ -68,26 +65,31 @@ router.get('/startConnection', function(req,res){
         console.log(response);
         res.end(JSON.stringify(response));
     });
+    pyClient[sessId].on("connect", function(){
+        startTime = Date.now();
+        console.log(startTime);
+        pyClient[sessId].write('read:::'+file);
+    });
 });
 
 router.get('/stopConnection', function(req,res){
     var sessId = req.session.id;
     console.log("destroying connection");
-    if(!pyClient.readable){
+    if(!pyClient[sessId].readable){
         var response = {
             pyData: "already destroyed"
         }
         res.end(JSON.stringify(response));
     }
-    pyClient.on('close',function(){
-        if(!pyClient.readable){
+    pyClient[sessId].on('close',function(){
+        if(!pyClient[sessId].readable){
             var response = {
                 pyData: "session destroyed"
             }
             res.end(JSON.stringify(response));
         }
     });
-    pyClient.destroy();
+    pyClient[sessId].destroy();
 });
 
 router.post('/getColumns', function(req,res){
@@ -123,17 +125,17 @@ router.post('/getHist', function(req,res){
 
 
 function getColumns(sessId,callback){
-    pyClient.on("data", function(cols){
+    pyClient[sessId].on("data", function(cols){
         callback(cols);
     });
-    pyClient.write("columns:::"+sessId);
+    pyClient[sessId].write("columns:::"+sessId);
 }
 
 function getHist(sessId,processing,columnName,callback){
-    pyClient.on("data", function(cols){
+    pyClient[sessId].on("data", function(cols){
         callback(cols);
     });
-    pyClient.write("hist:::"+sessId+":::"+processing+":::"+columnName);
+    pyClient[sessId].write("hist:::"+sessId+":::"+processing+":::"+columnName);
 }
 
 

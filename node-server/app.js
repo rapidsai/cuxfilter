@@ -39,10 +39,14 @@ app.set('view engine', 'pug');
 //enable cors
 app.use(cors({origin: '*'}));
 
+// app.use(express.bodyParser());
+// app.use(express.cookieParser());
+// app.use(express.session({
+//   key: 'mouse-dog-key',
+//   secret: 'mouse dog',
+//   store
+// }));
 app.use(session({
-  genid: function(req) {
-    return genuuid() // use UUIDs for session IDs
-  },
   secret: 'mouse dog',
   resave: true,
   saveUninitialized: true
@@ -81,8 +85,8 @@ app.use(function(err, req, res, next) {
 });
 
 
-function genuuid(){
-  return new Date();
+function genuuid(req){
+  return req;
 }
 
 

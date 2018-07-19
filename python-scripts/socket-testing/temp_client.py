@@ -3,8 +3,8 @@ import socket,sys
 
 def client_program():
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  
-    soc.connect(("127.0.0.1", 12345))
-    for _ in range(2):
+    soc.connect(("127.0.0.1", 3001))
+    for _ in range(200):
         try:
             clients_input = input("What you want to proceed my dear client?\n")  
             soc.send(clients_input.encode("utf8")) # we must encode the string to bytes  
