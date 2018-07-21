@@ -4,7 +4,7 @@ import sys, json, numpy as np, pandas as pd, pyarrow as pa, time
 from numbaHist import numba_gpu_histogram
 
 
-def histNumbaGPU(data,colName):
+def histNumbaGPU(data,colName,bins):
     '''
         description:
             Calculate histogram leveraging gpu via pycuda(using numba jit)
@@ -13,7 +13,7 @@ def histNumbaGPU(data,colName):
         Output:
             json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
     '''
-    bins = data.shape[0] > 64 and 64 or data.shape[0]
+    # bins = data.shape[0] > 64 and 64 or data.shape[0]
     df1 = numba_gpu_histogram(np.asarray(data[colName]),bins)
     
     dict_temp ={}
@@ -24,7 +24,7 @@ def histNumbaGPU(data,colName):
     
     sys.stdout.flush()
 
-def histNumpyCPU(data,colName):
+def histNumpyCPU(data,colName,bins):
     '''
         description:
             Calculate histogram numpy
@@ -33,7 +33,7 @@ def histNumpyCPU(data,colName):
         Output:
             json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
     '''
-    bins = data.shape[0] > 64 and 64 or data.shape[0]
+    # bins = data.shape[0] > 64 and 64 or data.shape[0]
     df1 = np.histogram(data[colName],bins=bins)
     dict_temp ={}
     
@@ -99,7 +99,7 @@ def readData(load_type,file):
         data = readArrowToDF(file)
     return data
 
-def getHist(data, processing,colName):
+def getHist(data, processing,colName,bins):
     '''
         description:
             Get Histogram as per the specified processing type
@@ -109,9 +109,9 @@ def getHist(data, processing,colName):
             colName: column name
     '''
     if processing == 'numba':
-        histNumbaGPU(data,colName)
+        histNumbaGPU(data,colName,bins)
     elif processing == 'numpy':
-        histNumpyCPU(data,colName)
+        histNumpyCPU(data,colName,bins)
 
 def main():
     '''
@@ -134,7 +134,7 @@ def main():
     data = readData(load_type,file)
     
     if type == 'hist':
-        getHist(data, processing,sys.argv[-1])
+        getHist(data, processing,sys.argv[6],int(sys.argv[7]))
     elif type == 'columns':
         getColumns(data)
 

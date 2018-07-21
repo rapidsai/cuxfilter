@@ -10,7 +10,11 @@ var PORT = 3001;
 var startTime, endTime;
 var pyClient = {}, pyServer = {};
 var tryAgain = 0;
-
+var getHistEvent = {};
+var response = {
+    pyData:'',
+    nodeServerTime:''
+};
 router.get('/', function(req, res) {
     var sessId = req.session.id;   
     console.log(sessId);
@@ -21,21 +25,33 @@ router.get('/getStatus', function(req,res){
     var sessId = req.session.id;
     var file = req.query.file;
     console.log(sessId+file);
-    console.log("status:"+pyClient[sessId+file].readable);
-    if(!pyClient[sessId+file].readable){
-        res.end("inactive");
+    if(pyClient[sessId+file]){
+        console.log("status:"+pyClient[sessId+file].readable);
+        if(!pyClient[sessId+file].readable){
+            res.end("inactive");
+        }else{
+            res.end("active");
+        }
     }else{
-        res.end("active");
+        res.end("inactive");
     }
+    
 });
 
 router.get('/startConnection', function(req,res){
     // console.log(req);
     tryAgain=0;
     var sessId = req.session.id;
+    console.log(sessId);
     var file = req.query.file;
     pyServer[sessId+file] = spawn('python3', ['../python-scripts/persistent-server-script.py']);
-
+    pyServer[sessId+file].stdout.on('data', function(data) {
+        console.log('PyServer stdout ');
+        //Here is where the output goes
+    });
+    
+    
+    getHistEvent[sessId+file] = 0;
     pyClient[sessId+file] = new net.Socket();
     setTimeout(function(){
         pyClient[sessId+file].connect(PORT, HOST, function() {
@@ -60,22 +76,30 @@ router.get('/startConnection', function(req,res){
         }
 
     });
-    pyClient[sessId+file].on('data', function(val){
+    load_data(sessId,file, function(val){
+        console.log("i should not reach here");
         console.log("received data from pyscript");
         var response = {
             pyData: Buffer.from(val).toString('utf8'),
             nodeServerTime: Date.now() - startTime
         }
-        console.log(response);
+        // console.log(response);
+        pyClient[sessId+file].removeAllListeners(['data']);
         res.end(JSON.stringify(response));
+    });
+    
+});
+
+function load_data(sessId,file,callback){
+    pyClient[sessId+file].on("data", function(val){
+        callback(val);
     });
     pyClient[sessId+file].on("connect", function(){
         startTime = Date.now();
         console.log(startTime);
         pyClient[sessId+file].write('read:::'+file);
     });
-});
-
+}
 router.get('/stopConnection', function(req,res){
     var sessId = req.session.id;
     var file = req.query.file;
@@ -103,7 +127,7 @@ router.post('/getColumns', function(req,res){
     var file = req.body.file;
     startTime = Date.now();
     getColumns(sessId,file, function(cols){
-        console.log(cols);
+        // console.log(cols);
         var response = {
             pyData: Buffer.from(cols).toString('utf8'),
             nodeServerTime: Date.now() - startTime
@@ -113,37 +137,53 @@ router.post('/getColumns', function(req,res){
 });
 
 router.post('/getHist', function(req,res){
-    console.log(req.body);
+    console.log("starting the getHist request");
     var sessId = req.session.id;
     var processing = req.body.processing;
     var columnName = req.body.col;
     var bins = req.body.bins;
     var file = req.body.file;
     startTime = Date.now();
+    console.log("calling pyscript now");
     getHist(sessId,file, processing,columnName,bins, function(hist){
-        console.log(hist);
-        var response = {
-            pyData: Buffer.from(hist).toString('utf8'),
-            nodeServerTime: Date.now() - startTime
-        }
+        console.log("received the response from pyscript");
+        response.pyData= Buffer.from(hist).toString('utf8');
+        response.nodeServerTime = Date.now() - startTime;
+        console.log("sending response to client");
         res.end(JSON.stringify(response));
-        // res
     });
 });
 
 
 function getColumns(sessId,file, callback){
     pyClient[sessId+file].on("data", function(cols){
+        pyClient[sessId+file].removeAllListeners(['data']);
         callback(cols);
     });
     pyClient[sessId+file].write("columns:::"+sessId);
 }
 
 function getHist(sessId, file, processing,columnName,bins, callback){
+    console.log("inside the getHist function");
+    try{
+        console.log(pyClient[sessId+file]._events.data.toString());
+        console.log(process.memoryUsage());
+    }catch(e){
+        // console.log(e);
+    }
+    pyClient[sessId+file].removeAllListeners(['data']);
+
     pyClient[sessId+file].on("data", function(cols){
+        console.log("inside the on data callback function");
+        getHistEvent[sessId+file] =1;
         callback(cols);
     });
-    pyClient[sessId+file].write("hist:::"+sessId+":::"+processing+":::"+columnName+":::"+bins);
+    
+    console.log("set up the callback function");
+    console.log(pyClient[sessId+file].readable);
+    var query = "hist:::"+sessId+":::"+processing+":::"+columnName+":::"+bins;
+    console.log(query);
+    pyClient[sessId+file].write(query);
 }
 
 

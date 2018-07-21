@@ -33,8 +33,9 @@ router.post('/getHist', function(req,res){
     var colName = req.body.col;
     var processing = req.body.processing;
     var load_type = req.body.load_type;
+    var bins = req.body.bins;
     console.log(req.body);
-    getHist(sessId,file, colName, processing,load_type, function(hist){
+    getHist(sessId,file, colName,bins, processing,load_type, function(hist){
         var response = {
             pyData: Buffer.from(hist).toString('utf8'),
             nodeServerTime: Date.now() - startTime
@@ -58,11 +59,11 @@ function getColumns(sessId,file,processing,load_type,callback){
     py.stdin.end();
 }
 
-function getHist(sessId,file,colName,processing,load_type, callback) {
+function getHist(sessId,file,colName,bins, processing,load_type, callback) {
     let chunks = [];
     
     var spawn = require('child_process').spawn;  
-    var py = spawn('python3', ['../python-scripts/script.py', sessId, file,'hist',processing,load_type,colName]);
+    var py = spawn('python3', ['../python-scripts/script.py', sessId, file,'hist',processing,load_type,colName,bins]);
     py.stdout.on('data', function(val){
         chunks.push(val);
 	console.log(val);

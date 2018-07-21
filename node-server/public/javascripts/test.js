@@ -16,7 +16,7 @@ var timeStr = {
 }
 
 function displayTimings(totalTimeFE,totalTimePyScript,totalTimeNodeServer){
-    timeStr.front_end = totalTimeFE+"ms";
+    timeStr.front_end = "-ms";//totalTimeFE+"ms";
     timeStr.node_server_request_time = totalTimeNodeServer+"ms";
     timeStr.py_script_compute_time = totalTimePyScript*1000 + "ms";
     console.log(timeStr);

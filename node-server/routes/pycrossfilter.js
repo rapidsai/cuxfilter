@@ -1,13 +1,11 @@
 var express = require('express');
 var router = express.Router();
-// var util = require("util");
-// var fs = require("fs"); 
 var spawn = require('child_process').spawn;
 var net = require('net');
 var HOST = '127.0.0.1';
 var PORT = 3001;
 var startTime, endTime;
-var pyClient;
+var pyClient = {}, pyServer = {};
 var tryAgain = 0;
 var isConnectionEstablished = false;
 var isDataLoaded = false;
@@ -21,6 +19,7 @@ module.exports = function(io) {
 
         //initialize the socket connection with the python script. this is executed when user initializes a pycrossfilter instance
         socket.on('init', function(callback){
+            console.log(socket.id);
             if(isConnectionEstablished){
                 callback(false,'connection already established');
             }else{
@@ -38,7 +37,7 @@ module.exports = function(io) {
 
             if(isDataLoaded && dataLoaded === file){
                 console.log('data already loaded');
-                callback(false,'data already loaded');
+                callback(true,'data already loaded');
             }else{
                 loadData(file, function(result){
                     callback(false, result);
@@ -48,6 +47,7 @@ module.exports = function(io) {
     
         //get size of the dataset
         socket.on('size', function(callback){
+            console.log("getsize"+socket.id);
             console.log("user requesting size of the dataset");
             getSize(function(result){
                 callback(false,result);
@@ -55,9 +55,9 @@ module.exports = function(io) {
         });
 
         //getHist
-        socket.on('getHist', function(name, callback){
+        socket.on('getHist', function(name,bins, callback){
             console.log("user requested histogram for "+name);
-            getHist(name, function(result){
+            getHist(name,bins, function(result){
                 var response = {
                     pyData: Buffer.from(result).toString('utf8'),
                     nodeServerTime: Date.now() - startTime
@@ -121,9 +121,9 @@ function getSize(callback){
     pyClient.write("size");
 }
 
-function getHist(columnName,callback){
+function getHist(columnName,bins,callback){
     pyClient.on("data", function(cols){
         callback(cols);
     });
-    pyClient.write("hist:::10:::numba:::"+columnName);
+    pyClient.write("hist:::10:::numba:::"+columnName+":::"+bins);
 }

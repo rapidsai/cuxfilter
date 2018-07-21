@@ -22,45 +22,45 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
             # decode input and strip the end of line
             start_time = time.perf_counter()
 
-            input_from_client = input_from_client_bytes.decode("utf8").rstrip()
-            
-            try:
-                if input_from_client == "exit":
-                    sys.exit()
-                elif 'read' in input_from_client:
-                    data_df_final = readData("arrow",input_from_client.split(":::")[1])
-                    # numba_gpu_histogram(data_df_final[data_df_final.columns[0]],64)
-                    data_gpu = cuda.to_device(np.asarray(data_df_final).transpose())
-                    #calling to precompile jit functions
-                    histNumbaGPU(data_gpu,0,64)
-                    res = "data read successfully"
-                elif 'columns' in input_from_client:
-                    if 'data_df_final' in locals():
-                        res = str(getColumns(data_df_final))
-                    else:
-                        res = "first read some data :-P"
-                elif 'hist' in input_from_client:
-                    # print("calculating histogram")
-                    args_hist = input_from_client.split(":::")
-                    # print(args_hist)
-                    if 'data_df_final' in locals():
-                        # print("inside if condition, definitely works")
-                        res = str(getHist(data_gpu,args_hist[2],data_df_final.columns.get_loc(args_hist[3]), args_hist[4]))
-                        # res = str(getHist(data_df_final,args_hist[2],args_hist[3]))
-                    else:
-                        res = "first read some data :-P"
-                print("Result of processing {} is: {}".format(input_from_client, res))
-            except Exception as e:
-                res= str(e)
-                print("some error occured")
-            
-            
-            elapsed = time.perf_counter() - start_time
-            
-            
-            res = res+":::"+str(elapsed)
-            vysl = res.encode("utf8")  # encode the result string
-            conn.sendall(vysl)  # send it to client
+            input_from_client_all = input_from_client_bytes.decode("utf8").rstrip()
+            input_from_client_all = input_from_client_all.split("////")
+            for input_from_client in input_from_client_all:
+                try:
+                    if input_from_client == "exit":
+                        sys.exit()
+                    elif 'read' in input_from_client:
+                        data_df_final = readData("arrow",input_from_client.split(":::")[1])
+                        # numba_gpu_histogram(data_df_final[data_df_final.columns[0]],64)
+                        data_gpu = cuda.to_device(np.asarray(data_df_final).transpose())
+                        #calling to precompile jit functions
+                        histNumbaGPU(data_gpu,0,64)
+                        res = "data read successfully"
+                    elif 'columns' in input_from_client:
+                        if 'data_df_final' in locals():
+                            res = str(getColumns(data_df_final))
+                        else:
+                            res = "first read some data :-P"
+                    elif 'hist' in input_from_client:
+                        # print("calculating histogram")
+                        args_hist = input_from_client.split(":::")
+                        # print(args_hist)
+                        if 'data_df_final' in locals():
+                            # print("inside if condition, definitely works")
+                            res = str(getHist(data_gpu,args_hist[2],data_df_final.columns.get_loc(args_hist[3]), args_hist[4]))
+                            # res = str(getHist(data_df_final,args_hist[2],args_hist[3]))
+                        else:
+                            res = "first read some data :-P"
+                    print("Result of processing {} is: {}".format(input_from_client, res))
+                except Exception as e:
+                    res= str(e)
+                    print("some error occured", res)
+                    
+                elapsed = time.perf_counter() - start_time
+                
+                
+                res = res+":::"+str(elapsed)
+                vysl = res.encode("utf8")  # encode the result string
+                conn.sendall(vysl)  # send it to client
     except ConnectionAbortedError:
         conn.close()  # close connection
     print('Connection ' + ip + ':' + port + " ended")
