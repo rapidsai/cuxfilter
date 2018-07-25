@@ -100,11 +100,20 @@ module.exports = function(io) {
 
 
 function initConnection(session_id,socket_id,file, callback){
-    pyServer[session_id+file] = spawn('python3', ['../python-scripts/pycrossfilter.py']);
-    pyServer[session_id+file].stdout.on('data', function(data) {
-        console.log('PyServer stdout ');
-        //Here is where the output goes
-    });
+    var server_file = file.split(":::")[0];
+    var server_key = session_id+server_file;
+    var threadCount = 'threadCount';
+    if(!(server_key in pyServer) || (server_key in pyServer && pyServer[threadCount+server_key]>3)){
+        pyServer[threadCount+server_key] = 1;
+        pyServer[server_key] = spawn('python3', ['../python-scripts/pycrossfilter.py',3]);
+        pyServer[server_key].stdout.on('data', function(data) {
+            console.log('PyServer stdout ');
+            //Here is where the output goes
+        });
+    }else{
+        pyServer[threadCount+server_key]= pyServer[threadCount+server_key] + 1;
+    }
+    
     pyClient[session_id+file] = new net.Socket();
     pyClient[session_id+file].connect(PORT, HOST, function() {
         console.log('CONNECTED TO: ' + HOST + ':' + PORT);

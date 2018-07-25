@@ -47,9 +47,7 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
                     args_hist = input_from_client.split(":::")
                     # print(args_hist)
                     if 'data_df_final' in locals():
-                        # print("inside if condition, definitely works")
                         res = str(getHist(data_gpu,args_hist[2],data_df_final.columns.get_loc(args_hist[3]), args_hist[4]))
-                        # res = str(getHist(data_df_final,args_hist[2],args_hist[3]))
                     else:
                         res = "first read some data :-P"
                 
@@ -77,6 +75,7 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
     print('Connection ' + ip + ':' + port + " ended")
 
 def start_server():
+    num_connections = int(sys.argv[1])
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # this is for easy starting/killing the app
     soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -101,24 +100,25 @@ def start_server():
     # a = True
     threads = []
     # while True:
-    try:
-        conn, addr = soc.accept()
-        ip, port = str(addr[0]), str(addr[1])
-        print('Accepting connection from ' + ip + ':' + port)
+    for _ in range(num_connections):
         try:
-            threads.append(Thread(target=client_thread, args=(conn, ip, port)))
-            threads[-1].start()
-        except:
-            print("Terible error!")
-            import traceback
-            traceback.print_exc()
+            conn, addr = soc.accept()
+            ip, port = str(addr[0]), str(addr[1])
+            print('Accepting connection from ' + ip + ':' + port)
+            try:
+                threads.append(Thread(target=client_thread, args=(conn, ip, port)))
+                threads[-1].start()
+            except:
+                print("Terible error!")
+                import traceback
+                traceback.print_exc()
+                # break
+        except KeyboardInterrupt:
+            if soc:  # <---
+                soc.close()
             # break
-    except KeyboardInterrupt:
-        if soc:  # <---
-            soc.close()
-        # break
-    for t in threads:
-        print("thread is alive?: ",t.is_alive())
+        for t in threads:
+            print("thread is alive?: ",t.is_alive())
     soc.close()
 
 def histNumbaGPU(data,colName,bins):
@@ -135,28 +135,10 @@ def histNumbaGPU(data,colName,bins):
     # df1 = numba_gpu_histogram(data[colName],bins)
     dict_temp ={}
     
-    dict_temp['A'] = list(df1[1].astype(str))
-    dict_temp['B'] = list(df1[0].astype(str))
+    dict_temp['X'] = list(df1[1].astype(str))
+    dict_temp['Y'] = list(df1[0].astype(str))
     
     return str(json.dumps(dict_temp))
-
-def histNumpyCPU(data,colName,bins):
-    '''
-        description:
-            Calculate histogram numpy
-        input:
-            data: pandas df, colName: column name
-        Output:
-            json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
-    '''
-    # bins = data.shape[0] > 64 and 64 or data.shape[0]
-    df1 = np.histogram(data[colName],bins=bins)
-    dict_temp ={}
-    
-    dict_temp['A'] = list(df1[1].astype(str))
-    dict_temp['B'] = list(df1[0].astype(str))
-    print(str(json.dumps(dict_temp)))
-    return json.dumps(dict_temp)
 
 def getHist(data, processing,colName,bins):
     '''
@@ -198,17 +180,17 @@ def readArrowToDF(source):
     pa_df = reader.read_all()
     return pa_df.to_pandas()
 
-def readCSV(source):
-    '''
-        description:
-            Read csv file from disk using pandas
-        input:
-            source: file path
-        return:
-            pandas dataframe
-    '''
-    df = pd.read_csv(source)
-    return df
+# def readCSV(source):
+#     '''
+#         description:
+#             Read csv file from disk using pandas
+#         input:
+#             source: file path
+#         return:
+#             pandas dataframe
+#     '''
+#     df = pd.read_csv(source)
+#     return df
 
 def readData(load_type,file):
     '''
@@ -222,11 +204,11 @@ def readData(load_type,file):
     '''
     #file is in the uploads/ folder, so append that to the path
     file = str("uploads/"+file)
-    if load_type == 'csv':
-        data = readCSV(file)
-    elif load_type == 'arrow':
-        data = readArrowToDF(file)
-    data_df_final = data
+    # if load_type == 'csv':
+    #     data = readCSV(file)
+    # elif load_type == 'arrow':
+    #     data = readArrowToDF(file)
+    data = readArrowToDF(file)
     return data
 
 
