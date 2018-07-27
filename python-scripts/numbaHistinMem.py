@@ -17,23 +17,23 @@ def compute_bin(x, n, xmin, xmax):
         return bin
 
 @cuda.jit
-def histogram(x,index, x_range, histogram_out):
+def histogram(x, x_range, histogram_out):
     nbins = histogram_out.shape[0]
     xmin, xmax = x_range
     bin_width = (xmax - xmin) / nbins
     start = cuda.grid(1)
     stride = cuda.gridsize(1)
-    for i in range(start, x[index[0]].shape[0], stride):
+    for i in range(start, x.shape[0], stride):
         # note that calling a numba.jit function from CUDA automatically
         # compiles an equivalent CUDA device function!
-        bin_number = compute_bin(x[index[0]][i], nbins, xmin, xmax)
+        bin_number = compute_bin(x[i], nbins, xmin, xmax)
         # counter[0] = counter[0] + 1
         if bin_number >= 0 and bin_number < histogram_out.shape[0]:
             cuda.atomic.add(histogram_out, bin_number, 1)
 
 @cuda.jit
-def min_max(x,index, min_max_array):
-    nelements = x[index[0]].shape[0]
+def min_max(x, min_max_array):
+    nelements = x.shape[0]
 
     start = cuda.grid(1)
     stride = cuda.gridsize(1)
@@ -43,8 +43,8 @@ def min_max(x,index, min_max_array):
     local_min = min_max_array[0]
     local_max = min_max_array[1]
 
-    for i in range(start, x[index[0]].shape[0], stride):
-        element = x[index[0]][i]
+    for i in range(start, x.shape[0], stride):
+        element = x[i]
         local_min = min(element, local_min)
         local_max = max(element, local_max)
 
@@ -73,18 +73,18 @@ def get_bin_edges(a_range, bin_edges):
     bin_edges[-1] = a_max  # Avoid roundoff error on last point
 
 
-def numba_gpu_histogram(a,index, bins):
+def numba_gpu_histogram(a, bins):
     # Move data to GPU so we can do two operations on it
     # a_gpu = cuda.to_device(a)
     print("in mem version")
     a_gpu = a
-    index_gpu = cuda.to_device(np.array(index))
+    # index_gpu = cuda.to_device(np.array(index))
     ### Find min and max value in array
     dtype_min, dtype_max = dtype_min_max(a.dtype)
     # Put them in the array in reverse order so that they will be replaced by the first element in the array
     min_max_array_gpu = cuda.to_device(np.array([dtype_max, dtype_min], dtype=np.float32))
-    min_max[64, 64](a_gpu,index_gpu, min_max_array_gpu)
-
+    # min_max[64, 64](a_gpu,index_gpu, min_max_array_gpu)
+    min_max[64, 64](a_gpu, min_max_array_gpu)
     bin_edges = cuda.to_device(np.zeros(shape=(bins,), dtype=np.float64))
     
     get_bin_edges[64,64](min_max_array_gpu,bin_edges)
@@ -92,6 +92,6 @@ def numba_gpu_histogram(a,index, bins):
     # counter = cuda.to_device(np.array([0]))
     ### Bin the data into a histogram 
     histogram_out = cuda.to_device(np.zeros(shape=(bins,), dtype=np.int32))
-    histogram[64, 64](a_gpu,index_gpu, min_max_array_gpu, histogram_out)
-
+    # histogram[64, 64](a_gpu,index_gpu, min_max_array_gpu, histogram_out)
+    histogram[64, 64](a_gpu, min_max_array_gpu, histogram_out)
     return histogram_out.copy_to_host(), bin_edges.copy_to_host()

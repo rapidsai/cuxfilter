@@ -28,7 +28,7 @@ router.post("/", function(req, res, next){
                   convertToArrow(sessId, function(res){
                     console.log("arrow file conversion complete");
                   });        
-                  res.redirect('../calc');
+                  res.redirect('../calc?file='+db.path.split('/').pop());
               } else {
                   res.end("oh snap, that didn't work!");
               }

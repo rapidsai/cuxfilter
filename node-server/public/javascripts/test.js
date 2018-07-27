@@ -2,7 +2,7 @@ var data = '';
 var cols = document.getElementById("hid-col").innerHTML;
 var curr_col ='';
 var X=0,Y=0;
-var type='histogram';
+var type='bar';
 var processing = 'numba';
 var load_type = 'arrow';
 var current_chart_col = '';
