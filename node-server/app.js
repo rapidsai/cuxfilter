@@ -6,17 +6,16 @@ var logger = require('morgan');
 var cors = require('cors');
 //using the session variable to track unique user sessions
 var session = require('express-session');
+var sharedSession = require("express-socket.io-session");
 //for file upload handling
 var multer = require('multer');
+var connect = require('connect');
 
 var sessionMiddleware = session({
   secret: 'mouse dog',
   resave: true,
-  saveUninitialized: true
-});
+  saveUninitialized: true});
 
-
-var sharedSession = require('express-socket.io-session');
 
 
 const storage = multer.diskStorage({
@@ -41,15 +40,14 @@ var app = express();
 app.io = require('socket.io')({
   path: '/pycrossfilter'
 });
-var pycrossfilter = require('./routes/pycrossfilter')(app.io);
 
 
 app.set('file_path','Hello World!');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-//enable cors
-let whitelist = ['http://localhost:8080', 'http://0.0.0.0:3000'];
+// enable cors
+let whitelist = ['http://localhost:8080'];
 let corsOptions = {
     origin: (origin, callback)=>{
         if (whitelist.indexOf(origin) !== -1) {
@@ -59,8 +57,8 @@ let corsOptions = {
         }
     },credentials: true
 }
-app.use(cors('corsOptions'));
-
+app.use(cors());
+app.use(cors(corsOptions));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -69,9 +67,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(multer({dest: "./uploads/",storage: storage}).any());
 
 app.use(sessionMiddleware);
-app.io.use(sharedSession(sessionMiddleware,{
-  autoSave:true
-}));
+
+
+// app.io.use(function(socket,next){
+//   session({
+//     secret: 'mouse dog',
+//     resave: true,
+//     saveUninitialized: true
+//   })(socket.handshake,{},next);
+// });
+
+
+var pycrossfilter = require('./routes/pycrossfilter')(app.io);
+
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

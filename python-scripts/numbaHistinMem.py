@@ -2,7 +2,7 @@ import numpy as np
 from numba import cuda
 import numba
 
-@numba.jit(nopython=True,parallel=True,cache=True)
+@numba.jit(nopython=True,parallel=True)
 def compute_bin(x, n, xmin, xmax):
     # special case to mirror NumPy behavior for last bin
     if x == xmax:

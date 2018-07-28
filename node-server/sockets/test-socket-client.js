@@ -28,7 +28,7 @@ client.connect(PORT, HOST, function() {
     //client.destroy();
 });
 
-setTimeout(function(){client.write("top:::10:::numba:::mean_travel_time:::25");},2000);
+setTimeout(function(){client.write("filterOrder:::top:::10:::numba:::mean_travel_time:::25");},2000);
 
 setTimeout(function(){client.write("exit");client.destroy();console.log("test successful if you see no errors upto this point")},8000);
 
