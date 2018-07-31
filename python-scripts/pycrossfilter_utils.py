@@ -104,7 +104,7 @@ def process_input_from_client(input_from_client):
             data_gpu: pointer to dataset stored in gpu_mem, global in the context of this thread of server serving the socket-client
     '''
     global data_gpu, back_up_dimension
-    res = input_from_client
+    res = ''
     # print(input_from_client)
     try:
         args = input_from_client.split(":::")
