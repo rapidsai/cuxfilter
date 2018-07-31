@@ -12,8 +12,7 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
             # the input is in bytes, so decode it
             input_from_client_bytes = conn.recv(MAX_BUFFER_SIZE)
 
-            # MAX_BUFFER_SIZE is how big the message can be
-            # this tests if it's sufficiently big
+            # MAX_BUFFER_SIZE is how big the message can be. This tests if it's sufficiently big
             siz = sys.getsizeof(input_from_client_bytes)
             if  siz >= MAX_BUFFER_SIZE:
                 print("The length of input is probably too long: {}".format(siz))

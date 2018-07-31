@@ -5,19 +5,18 @@ import json
 import os
 
 data_gpu = None
+back_up_dimension = None
 
-def hist_numba_GPU(data,colName,bins):
+def hist_numba_GPU(data,bins):
     '''
         description:
             Calculate histogram leveraging gpu via pycuda(using numba jit)
         input:
-            data: pandas df, colName: column name
+            data: pygdf row as a series -> gpu mem pointer, bins: column name
         Output:
             json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
     '''
-    # bins = 500#data.transpose().shape[0] > 500 and 500 or data.transpose().shape[0]
     df1 = numba_gpu_histogram(data,int(bins))
-    # df1 = numba_gpu_histogram(data[colName],bins)
     dict_temp ={}
     
     dict_temp['X'] = list(df1[1].astype(str))
@@ -25,19 +24,6 @@ def hist_numba_GPU(data,colName,bins):
     
     return str(json.dumps(dict_temp))
 
-def get_hist(data, processing,colName,bins):
-    '''
-        description:
-            Get Histogram as per the specified processing type
-        input:
-            processing: numba or numpy
-            data: pandas df
-            colName: column name
-    '''
-    if processing == 'numba':
-        return hist_numba_GPU(data,colName,bins)
-    # elif processing == 'numpy':
-    #     return histNumpyCPU(data,colName,bins)
 
 def get_columns(data):
     '''
@@ -49,7 +35,6 @@ def get_columns(data):
             list of column names
     '''
     return list(data.columns)
-    # sys.stdout.flush()
 
 def read_arrow_to_DF(source):
     '''
@@ -78,10 +63,6 @@ def read_data(load_type,file):
     '''
     #file is in the uploads/ folder, so append that to the path
     file = str("uploads/"+file)
-    # if load_type == 'csv':
-    #     data = readCSV(file)
-    # elif load_type == 'arrow':
-    #     data = read_arrow_to_DF(file)
     data = read_arrow_to_DF(file)
     return data
 
@@ -122,45 +103,56 @@ def process_input_from_client(input_from_client):
         global:
             data_gpu: pointer to dataset stored in gpu_mem, global in the context of this thread of server serving the socket-client
     '''
-    global data_gpu
+    global data_gpu, back_up_dimension
     res = input_from_client
+    # print(input_from_client)
     try:
-        if input_from_client == "exit":
+        args = input_from_client.split(":::")
+        # print(args)
+        if  "exit" == args[0]:
             os._exit(1)
         
-        elif 'read' in input_from_client:
+        elif 'read' == args[0]:
             #calling to precompile jit functions
-            data_gpu = read_data("arrow",input_from_client.split(":::")[1])
-            # hist_numba_GPU(data_gpu,0,64)
-
+            data_gpu = read_data("arrow",args[1])
+            if len(args)==3:
+                back_up_dimension = data_gpu
+                res = "backed up and "
             #warm up function for the cuda-jit
-            hist_numba_GPU(data_gpu[data_gpu.columns[0]].to_gpu_array(),0,64)
-            res = "data read successfully"
+            hist_numba_GPU(data_gpu[data_gpu.columns[0]].to_gpu_array(),64)
+            res = res+ "data read successfully"
         
+        elif 'reset' == args[0]:
+            #reseting the cumulative filters on the current dimension
+            data_gpu = back_up_dimension
+            res = str(len(data_gpu))
+
         elif data_gpu is not None:
-            if 'columns' in input_from_client:
+            if 'schema' == args[0]:
                 res = str(get_columns(data_gpu))
             
-            elif 'hist' in input_from_client:
-                args_hist = input_from_client.split(":::")
-                res = str(get_hist(data_gpu[str(args_hist[3])].to_gpu_array(),args_hist[2],0, args_hist[4]))
-                
-            elif 'filterOrder' in input_from_client:
-                args_hist = input_from_client.split(":::")
-                if 'top' == args_hist[1]:
-                    temp_df = data_gpu.nlargest(int(args_hist[5]),[args_hist[4]]).to_pandas().to_dict()
-                elif 'bottom' == args_hist[1]:
-                        temp_df = data_gpu.nsmallest(int(args_hist[5]),[args_hist[4]]).to_pandas().to_dict()                               
+            elif 'hist' == args[0]:
+                res = str(numba_gpu_histogram(data_gpu[str(args[1])].to_gpu_array(),args))
+            
+            elif 'filter' == args[0]:
+                query = args[1]+args[2]+args[3]
+                data_gpu = data_gpu.query(query)
+                res = str(len(data_gpu))
+
+            elif 'filterOrder' == args[0]:
+                if 'top' == args[1]:
+                    temp_df = data_gpu.nlargest(int(args[-1]),[args[-2]]).to_pandas().to_dict()
+                elif 'bottom' == args[1]:
+                        temp_df = data_gpu.nsmallest(int(args[-1]),[args[-2]]).to_pandas().to_dict()                               
                 print(temp_df)
                 res = str(df_to_dict(temp_df))
                 
-            elif 'get_max_min' in input_from_client:
-                args_hist = input_from_client.split(":::")
-                max_min_tuple = float(data_gpu[args_hist[2]].max()), float(data_gpu[args_hist[2]].max())
+            elif 'get_max_min' == args[0]:
+                max_min_tuple = float(data_gpu[args[1]].max()), float(data_gpu[args[1]].min())
                 res = str(max_min_tuple)
 
-            elif input_from_client == "size":
-                    res = str(get_size(data_gpu))
+            elif "size" == args[0]:
+                res = str(get_size(data_gpu))
         else:
             res = "first read some data :-P"
         
