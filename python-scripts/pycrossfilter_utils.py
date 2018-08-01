@@ -6,6 +6,7 @@ import os
 
 data_gpu = None
 back_up_dimension = None
+dimensions_filters = {}
 
 def hist_numba_GPU(data,bins):
     '''
@@ -91,6 +92,21 @@ def get_size(data):
     '''
     return (len(data),len(data.columns))
 
+def reset_filters():
+    '''
+        description:
+            reset filters on the data_gpu dataframe by executing all filters in the dimension_filters dictionary
+    '''
+    global data_gpu, dimensions_filters
+    print("inside reset filters")
+    print(dimensions_filters)
+    temp_list = []
+    for key in dimensions_filters.keys():
+        temp_list = temp_list + dimensions_filters[key]
+    query = ' and '.join(temp_list)
+    print(query)
+    if(len(query) >0):
+        data_gpu = data_gpu.query(query)
 
 def process_input_from_client(input_from_client):
     '''
@@ -103,9 +119,9 @@ def process_input_from_client(input_from_client):
         global:
             data_gpu: pointer to dataset stored in gpu_mem, global in the context of this thread of server serving the socket-client
     '''
-    global data_gpu, back_up_dimension
+    global data_gpu, back_up_dimension, dimensions_filters
     res = ''
-    # print(input_from_client)
+    print(dimensions_filters)
     try:
         args = input_from_client.split(":::")
         # print(args)
@@ -113,46 +129,55 @@ def process_input_from_client(input_from_client):
             os._exit(1)
         
         elif 'read' == args[0]:
-            #calling to precompile jit functions
             data_gpu = read_data("arrow",args[1])
-            if len(args)==3:
-                back_up_dimension = data_gpu
-                res = "backed up and "
+            back_up_dimension = data_gpu
             #warm up function for the cuda-jit
             hist_numba_GPU(data_gpu[data_gpu.columns[0]].to_gpu_array(),64)
-            res = res+ "data read successfully"
-        
-        elif 'reset' == args[0]:
-            #reseting the cumulative filters on the current dimension
-            data_gpu = back_up_dimension
-            res = str(len(data_gpu))
+            res = "data read successfully"
+    
+        elif 'schema' == args[0]:
+            res = str(get_columns(data_gpu))
 
-        elif data_gpu is not None:
-            if 'schema' == args[0]:
-                res = str(get_columns(data_gpu))
-            
-            elif 'hist' == args[0]:
-                res = str(numba_gpu_histogram(data_gpu[str(args[1])].to_gpu_array(),args))
-            
-            elif 'filter' == args[0]:
-                query = args[1]+args[2]+args[3]
-                data_gpu = data_gpu.query(query)
+        elif "size" == args[0]:
+            res = str(get_size(data_gpu))
+
+        elif 'dimension' in args[0]:
+            if 'dimension_load' == args[0]:
+                if args[1] not in dimensions_filters:
+                    dimensions_filters[args[1]] = []
+                    res = 'dimension loaded successfully'
+                else:
+                    res = 'dimension already exists'
+
+            elif 'dimension_reset' == args[0]:
+                #reseting the cumulative filters on the current dimension
+                data_gpu = back_up_dimension
+                dimensions_filters[args[1]] = []
+                reset_filters()
                 res = str(len(data_gpu))
 
-            elif 'filterOrder' == args[0]:
-                if 'top' == args[1]:
-                    temp_df = data_gpu.nlargest(int(args[-1]),[args[-2]]).to_pandas().to_dict()
-                elif 'bottom' == args[1]:
-                        temp_df = data_gpu.nsmallest(int(args[-1]),[args[-2]]).to_pandas().to_dict()                               
-                print(temp_df)
-                res = str(df_to_dict(temp_df))
-                
-            elif 'get_max_min' == args[0]:
+            elif 'dimension_get_max_min' == args[0]:
                 max_min_tuple = float(data_gpu[args[1]].max()), float(data_gpu[args[1]].min())
                 res = str(max_min_tuple)
+            
+            elif 'dimension_hist' == args[0]:
+                res = str(numba_gpu_histogram(data_gpu[str(args[1])].to_gpu_array(),args))
 
-            elif "size" == args[0]:
-                res = str(get_size(data_gpu))
+            elif 'dimension_filterOrder' == args[0]:
+                n_rows = min(int(args[-1]), len(data_gpu)) - 1
+                if 'top' == args[1]:
+                    temp_df = data_gpu.nlargest(n_rows,[args[-2]]).to_pandas().to_dict()
+                elif 'bottom' == args[1]:
+                    temp_df = data_gpu.nsmallest(n_rows,[args[-2]]).to_pandas().to_dict()                               
+                print(temp_df)
+                res = str(df_to_dict(temp_df))
+
+            elif 'dimension_filter' == args[0]:
+                query = args[1]+args[2]+args[3]
+                if args[1] in dimensions_filters:
+                    dimensions_filters[args[1]].append(query)
+                data_gpu = data_gpu.query(query)
+                res = str(len(data_gpu))
         else:
             res = "first read some data :-P"
         

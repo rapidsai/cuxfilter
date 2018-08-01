@@ -24,15 +24,18 @@ client.connect(PORT, HOST, function() {
     console.log('CONNECTED TO: ' + HOST + ':' + PORT);
     // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
     client.write('read:::uber-dataset:::mean_travel_time///');
-    
+    client.write('dimension_load:::mean_travel_time///');
+    client.write('dimension_load:::hod///');
     //client.destroy();
 });
 
-setTimeout(function(){console.log("query 1");client.write("filterOrder:::top:::mean_travel_time:::25///");},2000);
+setTimeout(function(){console.log("query 1");client.write("dimension_filterOrder:::top:::mean_travel_time:::25///");},2000);
 
-setTimeout(function(){console.log("query 2");client.write("filter:::mean_travel_time:::>:::9999///");},3000);
+setTimeout(function(){console.log("query 2");client.write("dimension_filter:::mean_travel_time:::>:::9999///");},3000);
 
-setTimeout(function(){console.log("query 3");client.write("reset:::uber-dataset:::mean_travel_time///");},4000);
+setTimeout(function(){console.log("query 3");client.write("dimension_filter:::hod:::<:::10///");},3500);
+
+setTimeout(function(){console.log("query 4");client.write("dimension_reset:::mean_travel_time///");},4000);
 
 setTimeout(function(){console.log("exiting...");client.write("exit");client.destroy();console.log("test successful if you see no errors upto this point")},8000);
 

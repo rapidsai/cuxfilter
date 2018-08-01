@@ -81,15 +81,32 @@ module.exports = function(io) {
             }
 
         });
-    
+        
+        //load dimension
+        socket.on('dimension_load', function(column_name,parent_dataset, callback){
+            try{
+                console.log("user requesting loading a new dimension:"+column_name);
+                var query_args = ["dimension_load",column_name];
+                process_client_input(socket.session_id,parent_dataset, create_query(query_args), function(error,message){
+                    if(!error){
+                        callback(error,message);
+                    }
+                });
+            }catch(ex){
+                console.log(ex);
+                callback(true,-1);
+                clearGPUMem();
+            }
+        });
         
         //query the dataframe -> return results
-        socket.on('filter', function(columnName,dataset,comparison,value,callback){
+        socket.on('dimension_filter', function(column_name,parent_dataset,comparison,value,callback){
             try{
                 console.log("user requesting filtering of the dataset");
-                var query_args = ["filter",columnName,comparison,value];
-                process_client_input(socket.session_id,dataset, create_query(query_args), function(error,message){
+                var query_args = ["dimension_filter",column_name,comparison,value];
+                process_client_input(socket.session_id,parent_dataset, create_query(query_args), function(error,message){
                     if(!error){
+                        socket.emit("update_size", parent_dataset, JSON.parse(message)['data']);
                         callback(error,message);
                     }
                 });
@@ -101,13 +118,14 @@ module.exports = function(io) {
         });
 
         //reset all filters on a dimension
-        socket.on('filterAll', function(dataset, callback){
+        socket.on('dimension_filterAll', function(column_name,parent_dataset, callback){
             try{
                 console.log("user requesting resetting filters on the current dimension");
-                var query_args = ["reset",dataset];
+                var query_args = ["dimension_reset",column_name];
                 console.log("query:"+create_query(query_args));
-                process_client_input(socket.session_id,dataset, create_query(query_args), function(error,message){
+                process_client_input(socket.session_id,parent_dataset, create_query(query_args), function(error,message){
                     if(!error){
+                        socket.emit("update_size", parent_dataset, JSON.parse(message)['data']);
                         callback(error,message);
                     }
                 });
@@ -136,12 +154,12 @@ module.exports = function(io) {
         });
 
         //get top/bottom n rows as per the top n values of columnName
-        socket.on('filterOrder', function(sortOrder, columnName,dataset,n,callback){
+        socket.on('dimension_filterOrder', function(sortOrder, column_name,parent_dataset,n,callback){
             try{
-                console.log("user has requested top n rows as per the column "+columnName);
-                var query_args = ["filterOrder",sortOrder,columnName,n];
+                console.log("user has requested top n rows as per the column "+column_name);
+                var query_args = ["dimension_filterOrder",sortOrder,column_name,n];
 
-                process_client_input(socket.session_id,dataset, create_query(query_args), function(error,message){
+                process_client_input(socket.session_id,parent_dataset, create_query(query_args), function(error,message){
                     if(!error){
                         callback(error,message);
                     }
@@ -154,10 +172,10 @@ module.exports = function(io) {
         });
 
         //getHist
-        socket.on('getHist', function(name,dataset,bins, callback){
+        socket.on('dimension_getHist', function(name,dataset,bins, callback){
             try{
                 console.log("user requested histogram for "+name);
-                var query_args = ["hist",name,bins];
+                var query_args = ["dimension_hist",name,bins];
                 process_client_input(socket.session_id,dataset, create_query(query_args), function(error,message){
                     if(!error){
                         callback(error,message);
@@ -172,11 +190,11 @@ module.exports = function(io) {
         });
 
         //get Max and Min for a dimension
-        socket.on('getMaxMin', function(columnName,dataset,callback){
+        socket.on('dimension_getMaxMin', function(column_name,parent_dataset,callback){
             try{
-                console.log("user requested max-min values for "+columnName+" for data="+dataset);
-                var query_args = ['get_max_min',columnName];
-                process_client_input(socket.session_id,dataset, create_query(query_args), function(error,message){
+                console.log("user requested max-min values for "+column_name+" for data="+parent_dataset);
+                var query_args = ['dimension_get_max_min',column_name];
+                process_client_input(socket.session_id,parent_dataset, create_query(query_args), function(error,message){
                     if(!error){
                         callback(error,message);
                     }
