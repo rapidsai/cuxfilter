@@ -48,7 +48,7 @@ router.post('/getHist', function(req,res){
 function getColumns(sessId,file,processing,load_type,callback){
     // console.log('here2');
     var spawn = require('child_process').spawn;  
-    var py = spawn('python3', ['../python-scripts/script.py', sessId,file,'columns', processing,load_type]);
+    var py = spawn('python3', ['../python_scripts/script.py', sessId,file,'columns', processing,load_type]);
     py.stdout.on('data', function(val){
         // console.log('here3');
         // console.log(val);
@@ -63,7 +63,7 @@ function getHist(sessId,file,colName,bins, processing,load_type, callback) {
     let chunks = [];
     
     var spawn = require('child_process').spawn;  
-    var py = spawn('python3', ['../python-scripts/script.py', sessId, file,'hist',processing,load_type,colName,bins]);
+    var py = spawn('python3', ['../python_scripts/script.py', sessId, file,'hist',processing,load_type,colName,bins]);
     py.stdout.on('data', function(val){
         chunks.push(val);
 	console.log(val);

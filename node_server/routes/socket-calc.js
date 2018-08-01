@@ -44,7 +44,7 @@ router.get('/startConnection', function(req,res){
     var sessId = req.session.id;
     console.log(sessId);
     var file = req.query.file;
-    pyServer[sessId+file] = spawn('python3', ['../python-scripts/persistent-server-script.py']);
+    pyServer[sessId+file] = spawn('python3', ['../python_scripts/persistent-server-script.py']);
     pyServer[sessId+file].stdout.on('data', function(data) {
         console.log('PyServer stdout '+data);
         //Here is where the output goes

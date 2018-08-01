@@ -21,7 +21,7 @@ RUN npm install -g npm
 
 COPY . .
 
-WORKDIR /usr/src/app/node-server
+WORKDIR /usr/src/app/node_server
 RUN pwd
 
 RUN mkdir uploads 

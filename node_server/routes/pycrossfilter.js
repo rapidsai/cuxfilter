@@ -348,7 +348,7 @@ function initConnection(session_id,dataset, callback){
         console.log('CONNECTED TO: ' + HOST + ':' + PORT);
     });
     pyClient[session_id+dataset].on('error',function(err){
-        console.log("failed. Trying again... ");
+        console.log("failed. Trying again... "+err);
         if(tryAgain === 0){
             setTimeout(function(){
               pyClient[session_id+dataset].connect(PORT, HOST, function() {
