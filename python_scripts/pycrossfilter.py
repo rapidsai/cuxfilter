@@ -37,7 +37,7 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
 def append_time_to_response(res,start_time):
     elapsed = time.perf_counter() - start_time
     #appending
-    res = res+":::"+str(elapsed)
+    res = res+":::"+str(elapsed)+"////"
     # encode the result string
     res = res.encode("utf8")            
     return res

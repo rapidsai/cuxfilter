@@ -6,17 +6,17 @@ var spawn = require('child_process').spawn;
 var HOST = '127.0.0.1';
 var PORT = 3001;
 
-// var pyServer = spawn('python3', ['../python-scripts/pycrossfilter.py',1]);
-// pyServer.stdout.on('data', function(data) {
-//     console.log('PyServer stdout ');
-//     console.log(Buffer.from(data).toString('utf8'));
-//     //Here is where the output goes
-// });
-// pyServer.stderr.on('data', function(data) {
-//     console.log('PyServer stderr ');
-//     console.log(Buffer.from(data).toString('utf8'));
-//     //Here is where the output goes
-// });
+var pyServer = spawn('python3', ['../python_scripts/pycrossfilter.py',1]);
+pyServer.stdout.on('data', function(data) {
+    console.log('PyServer stdout ');
+    console.log(Buffer.from(data).toString('utf8'));
+    //Here is where the output goes
+});
+pyServer.stderr.on('data', function(data) {
+    console.log('PyServer stderr ');
+    console.log(Buffer.from(data).toString('utf8'));
+    //Here is where the output goes
+});
 
 var client = new net.Socket();
 client.connect(PORT, HOST, function() {
@@ -31,7 +31,7 @@ client.connect(PORT, HOST, function() {
 
 setTimeout(function(){console.log("query 1");client.write("dimension_filterOrder:::top:::mean_travel_time:::25///");},2000);
 
-setTimeout(function(){console.log("query 2");client.write("dimension_filter:::mean_travel_time:::>:::9999///");},3000);
+setTimeout(function(){console.log("query 2");client.write("dimension_filter_range:::mean_travel_time:::100:::200///");},3000);
 
 setTimeout(function(){console.log("query 3");client.write("dimension_filter:::hod:::<:::10///");},3500);
 

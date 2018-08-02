@@ -161,7 +161,7 @@ def process_input_from_client(input_from_client):
                 res = str(max_min_tuple)
             
             elif 'dimension_hist' == args[0]:
-                res = str(numba_gpu_histogram(data_gpu[str(args[1])].to_gpu_array(),args))
+                res = str(hist_numba_GPU(data_gpu[str(args[1])].to_gpu_array(),int(args[2])))
 
             elif 'dimension_filterOrder' == args[0]:
                 n_rows = min(int(args[-1]), len(data_gpu)) - 1
@@ -178,10 +178,19 @@ def process_input_from_client(input_from_client):
                     dimensions_filters[args[1]].append(query)
                 data_gpu = data_gpu.query(query)
                 res = str(len(data_gpu))
+            
+            elif 'dimension_filter_range' == args[0]:
+                query = args[1]+">"+args[2]+" and "+args[1]+"<"+args[3]
+                print(str(query))
+                if args[1] in dimensions_filters:
+                    dimensions_filters[args[1]].append(query)
+                data_gpu = data_gpu.query(query)
+                res = str(len(data_gpu))
+
         else:
             res = "first read some data :-P"
         
-        print("Result of processing {} is: {}".format(input_from_client, res))
+        # print("Result of processing {} is: {}".format(input_from_client, res))
         
     except Exception as e:
         res= str(e)

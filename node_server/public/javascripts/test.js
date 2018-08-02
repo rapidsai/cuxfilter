@@ -182,7 +182,7 @@ function persistentConnStart(){
     $.get("/socket-calc/startConnection", data,function(data,status){
         data = JSON.parse(data);
         console.log(data);
-        $("#persistentConnStatus").text("Connected"+data.pyData);
+        $("#persistentConnStatus").html("Connected"+data.pyData);
         persistentConnStatus = true;
     });
 }
@@ -192,7 +192,7 @@ function persistentConnEnd(){
     };
     $.get("/socket-calc/stopConnection", data,function(data,status){
         console.log(data);
-        $("#persistentConnStatus").text("Connection Ended");
+        $("#persistentConnStatus").html("Connection Ended");
         persistentConnStatus = false;
     });   
 }

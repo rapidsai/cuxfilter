@@ -37,7 +37,7 @@ def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):
                         # histNumbaGPU(data_gpu,0,64)
                         histNumbaGPU(data_gpu[data_gpu.columns[0]].to_gpu_array(),0,64)
                         
-                        res = "data read successfully"
+                        res = "data read successfully:::Dataset Size: "+str(len(data_gpu)/1000000)+" Million rows \n"
                     elif 'columns' in input_from_client:
                         if 'data_gpu' in locals():
                             res = str(getColumns(data_gpu))

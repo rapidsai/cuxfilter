@@ -7,7 +7,6 @@ var PORT = 3001;
 var startTime, endTime;
 var pyClient = {};
 var pyServer = {};
-var tryAgain = 0;
 var isConnectionEstablished = {}; // key -> session_id; value: socket.id
 var isDataLoaded = {};
 var dataLoaded = {};
@@ -117,6 +116,24 @@ module.exports = function(io) {
             }
         });
 
+         //query the dataframe as per a range-> return results
+         socket.on('dimension_filter_range', function(column_name,parent_dataset,range_min,range_max,callback){
+            try{
+                console.log("user requesting filtering of the dataset as per a range of rows");
+                var query_args = ["dimension_filter_range",column_name,range_min,range_max];
+                process_client_input(socket.session_id,parent_dataset, create_query(query_args), function(error,message){
+                    if(!error){
+                        socket.emit("update_size", parent_dataset, JSON.parse(message)['data']);
+                        callback(error,message);
+                    }
+                });
+            }catch(ex){
+                console.log(ex);
+                callback(true,-1);
+                clearGPUMem();
+            }
+        });
+
         //reset all filters on a dimension
         socket.on('dimension_filterAll', function(column_name,parent_dataset, callback){
             try{
@@ -211,28 +228,33 @@ module.exports = function(io) {
         });
         //onClose
         socket.on('endSession', function (dataset,callback) {
-            try{
-                for(var key in pyClient){
-                    if(key.includes(socket.session_id+dataset)){
-                        pyClient[key].write("exit");
-                        pyClient[key].destroy();
-                        isDataLoaded[key] = false;
-                        isConnectionEstablished[key] = false;
-                    }
-                }
-                callback(false,"session ended");
-
-            }catch(ex){
-                console.log(ex);
-                callback(true,-1);
-                clearGPUMem();
-            }
+            endSession(socket.session_id,dataset, function(error, message){
+                callback(error,message);
+            });
         });
     });
 
     return router;
 };
 
+function endSession(session_id,dataset,callback){
+    try{
+        for(var key in pyClient){
+            if(key.includes(session_id+dataset)){
+                pyClient[key].write("exit");
+                pyClient[key].destroy();
+                isDataLoaded[key] = false;
+                isConnectionEstablished[key] = false;
+            }
+        }
+        callback(false,"session ended");
+
+    }catch(ex){
+        console.log(ex);
+        callback(true,-1);
+        clearGPUMem();
+    }
+}
 
 //Utility functions:
 function parseCookie(cookie){
@@ -326,17 +348,18 @@ function create_query(list_of_args){
     
 }
 function initConnection(session_id,dataset, callback){
+    var tryAgain = 0;
     var server_dataset = dataset.split(":::")[0];
     var server_key = session_id+server_dataset;
     var threadCount = 'threadCount';
     console.log("server key"+server_key);
     if(!(server_key in pyServer) || (server_key in pyServer && pyServer[threadCount+server_key]>1)){
         pyServer[threadCount+server_key] = 1;
-        pyServer[server_key] = spawn('python3', ['../python-scripts/pycrossfilter.py',1]);
+        pyServer[server_key] = spawn('python3', ['../python_scripts/pycrossfilter.py',1]);
         console.log("server successfully spawned");
         pyServer[server_key].stdout.on('data', function(data) {
-            console.log('PyServer stdout ');
-            console.log(Buffer.from(data).toString('utf8'));
+            // console.log('PyServer stdout ');
+            // console.log(Buffer.from(data).toString('utf8'));
             //Here is where the output goes
         });
     }else{
@@ -349,12 +372,13 @@ function initConnection(session_id,dataset, callback){
     });
     pyClient[session_id+dataset].on('error',function(err){
         console.log("failed. Trying again... "+err);
-        if(tryAgain === 0){
+        if(tryAgain < 1){
             setTimeout(function(){
-              pyClient[session_id+dataset].connect(PORT, HOST, function() {
-              });
+                  pyClient[session_id+dataset].connect(PORT, HOST, function() {
+                    });
            },1000);
-           tryAgain=1;
+           
+           tryAgain= tryAgain+ 1;
          }else{
             callback(true,"something went wrong, try connection again");
         }
@@ -378,7 +402,7 @@ function loadData(dataset,session_id, callback){
                 pythonScriptTime: pyresponse[1],
                 nodeServerTime: Date.now() - startTime
             }
-            console.log(response);
+            // console.log(response);
             isDataLoaded[session_id+dataset] = true;
             dataLoaded[session_id+dataset] = dataset;
             pyClient[session_id+dataset].removeAllListeners(['data']);
@@ -397,9 +421,24 @@ function loadData(dataset,session_id, callback){
 
 function utils(session_id,dataset, query,callback){
     try{
+        let chunks = [];
+        pyClient[session_id+dataset].on('data', function(val){
+            // console.log(Buffer.from(val).toString('utf8'));
+            if(Buffer.from(val).toString('utf8').substring(val.length - 4) === '////'){
+                chunks.push(val);
+                console.log('reached end');
+                let data = Buffer.concat(chunks);
+                pyClient[session_id+dataset].removeAllListeners(['data']);
+                var res_str = Buffer.from(data).toString('utf8');
+                callback(res_str.substring(0,res_str.length - 4));
+            }else{
+                chunks.push(val);
+                // console.log(val);       
+            }
+        })
+
         pyClient[session_id+dataset].on("data", function(result){
-            pyClient[session_id+dataset].removeAllListeners(['data']);
-            callback(Buffer.from(result).toString('utf8'));
+            
         });
         pyClient[session_id+dataset].write(query);
     }catch(ex){
