@@ -6,3 +6,4 @@ data
 *arrow
 __pycache__
 Scrap-book.ipynb
+*.csv

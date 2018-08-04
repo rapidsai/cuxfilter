@@ -116,6 +116,42 @@ module.exports = function(io) {
             }
         });
 
+        //query the dataframe -> return results
+        socket.on('groupby_load', function(column_name,parent_dataset,type,callback){
+            try{
+                console.log("user requesting groupby for the dimension:"+column_name);
+                var query_args = ["groupby_load",column_name,type];
+                process_client_input(socket.session_id,parent_dataset, create_query(query_args), function(error,message){
+                    if(!error){
+                        // socket.emit("update_size", parent_dataset, JSON.parse(message)['data']);
+                        callback(error,message);
+                    }
+                });
+            }catch(ex){
+                console.log(ex);
+                callback(true,-1);
+                clearGPUMem();
+            }
+        });
+
+        //get top/bottom n rows as per the top n values of columnName
+        socket.on('groupby_filterOrder', function(sortOrder, column_name,parent_dataset,n,type,callback){
+            try{
+                console.log("user has requested top n rows for the groupby operation for dimension: "+column_name);
+                var query_args = ["groupby_filterOrder",column_name,sortOrder,n,type];
+
+                process_client_input(socket.session_id,parent_dataset, create_query(query_args), function(error,message){
+                    if(!error){
+                        callback(error,message);
+                    }
+                });
+            }catch(ex){
+                console.log(ex);
+                callback(true,-1);
+                clearGPUMem();
+            }
+        });
+
          //query the dataframe as per a range-> return results
          socket.on('dimension_filter_range', function(column_name,parent_dataset,range_min,range_max,callback){
             try{
@@ -153,6 +189,24 @@ module.exports = function(io) {
             }
         });
 
+
+        socket.on('groupby_size', function(column_name,parent_dataset,type, callback){
+            try{
+                console.log("user requesting size of the groupby");
+                var query_args = ["groupby_size",column_name,type];
+                process_client_input(socket.session_id,parent_dataset, create_query(query_args), function(error,message){
+                    if(!error){
+                        console.log("size: "+message);
+                        callback(error,message);
+                    }
+                });
+            }catch(ex){
+                console.log(ex);
+                callback(true,-1);
+                clearGPUMem();
+            }
+        });
+
         //get size of the dataset
         socket.on('size', function(dataset,callback){
             try{
@@ -174,7 +228,7 @@ module.exports = function(io) {
         socket.on('dimension_filterOrder', function(sortOrder, column_name,parent_dataset,n,callback){
             try{
                 console.log("user has requested top n rows as per the column "+column_name);
-                var query_args = ["dimension_filterOrder",sortOrder,column_name,n];
+                var query_args = ["dimension_filterOrder",column_name,sortOrder,n];
 
                 process_client_input(socket.session_id,parent_dataset, create_query(query_args), function(error,message){
                     if(!error){
@@ -358,8 +412,8 @@ function initConnection(session_id,dataset, callback){
         pyServer[server_key] = spawn('python3', ['../python_scripts/pycrossfilter.py',1]);
         console.log("server successfully spawned");
         pyServer[server_key].stdout.on('data', function(data) {
-            // console.log('PyServer stdout ');
-            // console.log(Buffer.from(data).toString('utf8'));
+            console.log('PyServer stdout ');
+            console.log(Buffer.from(data).toString('utf8'));
             //Here is where the output goes
         });
     }else{

@@ -10,6 +10,8 @@ var sharedSession = require("express-socket.io-session");
 //for file upload handling
 var multer = require('multer');
 var connect = require('connect');
+var maxSize = 1000000*9000 ;
+
 
 var sessionMiddleware = session({
   secret: 'mouse dog',
@@ -58,13 +60,13 @@ let corsOptions = {
     },credentials: true
 }
 app.use(cors());
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(multer({dest: "./uploads/",storage: storage}).any());
+app.use(multer({dest: "./uploads/",storage: storage, limits:{fileSize:maxSize}}).any());
 
 app.use(sessionMiddleware);
 
