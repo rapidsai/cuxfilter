@@ -26,7 +26,7 @@ def hist_numba_GPU(data,bins):
     
     return str(json.dumps(dict_temp))
 
-def groupby(data,column_name, type):
+def groupby(data,column_name, g_type):
     '''
         description:
             Calculate groupby on a given column on the pygdf 
@@ -39,9 +39,10 @@ def groupby(data,column_name, type):
     global group_by_backups
     print(column_name)
     print("inside groupby function")
-    group_appl = data.groupby(by=[column_name]).agg({column_name:[type,type]})
+    group_appl = data.groupby(by=[column_name]).agg({column_name:[g_type,g_type]})
     print(len(group_appl))
-    group_by_backups[column_name+type] = group_appl.loc[:,[column_name,column_name+'_'+type]]
+    key = column_name+"_"+g_type
+    group_by_backups[key] = group_appl.loc[:,[column_name,column_name+'_'+g_type]]
     return "groupby intialized successfully"
 
 def get_columns(data):
@@ -174,7 +175,7 @@ def process_input_from_client(input_from_client):
                 res = groupby(temp_df,dimension_name,groupby_agg_type)
             
             elif 'groupby_size' == main_command:
-                key = dimension_name+groupby_agg_type
+                key = dimension_name+"_"+groupby_agg_type
                 if(key not in group_by_backups):
                     res = "groupby not intialized"
                 else:
@@ -185,7 +186,10 @@ def process_input_from_client(input_from_client):
             
             elif 'groupby_filterOrder' == main_command:
                 sort_order = args[2]
-                key = dimension_name+groupby_agg_type
+                key = dimension_name+"_"+groupby_agg_type
+                # print(args)
+                # print(key)
+                # print(group_by_backups.keys())
                 if(key not in group_by_backups):
                     res = "groupby not intialized"
                 else:
@@ -199,9 +203,9 @@ def process_input_from_client(input_from_client):
                         num_rows = int(args[3])
                         n_rows = min(num_rows, len(group_by_backups[key])) - 1
                         if 'top' == sort_order:
-                            temp_df = group_by_backups[key].nlargest(n_rows,[dimension_name]).to_pandas().to_dict()
+                            temp_df = group_by_backups[key].nlargest(n_rows,[key]).to_pandas().to_dict()
                         elif 'bottom' == sort_order:
-                            temp_df = group_by_backups[key].nsmallest(n_rows,[dimension_name]).to_pandas().to_dict()
+                            temp_df = group_by_backups[key].nsmallest(n_rows,[key]).to_pandas().to_dict()
                     res = str(parse_dict(temp_df))
 
         elif 'dimension' in main_command:
