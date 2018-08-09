@@ -27,7 +27,11 @@ RUN pwd
 RUN mkdir uploads 
 RUN npm install
 
+COPY ./entrypoint.sh ./
+RUN pwd
+RUN ls
 EXPOSE 3000
-
-#RUN source activate gdf
+ENTRYPOINT ["bash","./entrypoint.sh"]
+#RUN echo "soure activate gdf" > ~/.bashrc
+#ENV PATH /opt/conda/envs/env/bin:$PATH
 #CMD ["npm","start"]
