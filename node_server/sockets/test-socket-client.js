@@ -19,26 +19,27 @@ var PORT = 3001;
 // });
 
 var client = new net.Socket();
+var temp_str = JSON.stringify({'mean_travel_time':['mean','sum','std']});
 client.connect(PORT, HOST, function() {
 
     console.log('CONNECTED TO: ' + HOST + ':' + PORT);
     // Write a message to the socket as soon as the client is connected, the server will receive it as message from the client 
-    client.write('read:::uber-dataset-final///');
+    client.write('read:::uber-dataset-v1///');
     client.write('dimension_load:::hod///');
-    client.write('groupby_load:::hod:::count///');
+    // client.write('groupby_load:::hod:::'+temp_str+'///');
     // client.write('dimension_load:::hod///');
     //client.destroy();
 });
 
-setTimeout(function(){console.log("query 1");client.write("groupby_filterOrder:::hod:::top:::25:::count///");},2000);
+setTimeout(function(){console.log("query 1");client.write("dimension_filterOrder:::hod:::top:::25:::sourceid:::"+temp_str+"///");client.write("dimension_hist:::hod:::640///");},2000);
 
-// setTimeout(function(){console.log("query 2");client.write("dimension_filter_range:::mean_travel_time:::100:::200///");},3000);
+// setTimeout(function(){console.log("query 2");client.write("dimension_hist:::hod:::64///");},2000);
 
 // setTimeout(function(){console.log("query 3");client.write("dimension_filter:::hod:::<:::10///");},3500);
 
 // setTimeout(function(){console.log("query 4");client.write("dimension_reset:::mean_travel_time///");},4000);
 
-setTimeout(function(){console.log("exiting...");client.write("exit");client.destroy();console.log("test successful if you see no errors upto this point")},20000);
+setTimeout(function(){console.log("exiting...");client.write("exit");client.destroy();console.log("test successful if you see no errors upto this point")},8000);
 
 // Add a 'data' event handler for the client socket
 // data is what the server sent to this socket

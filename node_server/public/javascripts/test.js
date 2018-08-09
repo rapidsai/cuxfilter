@@ -105,7 +105,7 @@ function getHist(){
     var data = {
         col: current_chart_col,
         processing: processing,
-        bins:1024,
+        bins:12,
         file: $.urlParam('file')
     };
     url = '/socket-calc/getHist';

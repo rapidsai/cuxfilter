@@ -12,6 +12,8 @@ var isDataLoaded = {};
 var dataLoaded = {};
 var serverOnTime = {};
 // var session = require('express-session');
+var callback_store = {};
+let chunks = [];
 
 module.exports = function(io) {
 
@@ -53,8 +55,15 @@ module.exports = function(io) {
                     callback(true,'data already loaded');
                 }else{
                     console.log("loading new data in gpu mem");
-                    loadData(dataset,socket.session_id, function(result){
-                        callback(false, result);
+                    // loadData(dataset,socket.session_id, function(result){
+                    //     callback(false, result);
+                    // });
+                    var query_args = ["read",dataset];
+                    process_client_input(socket.session_id,dataset,create_query(query_args),function(error,message){
+                        if(!error){
+                            console.log("schema: "+message);
+                            callback(error,message);
+                        }
                     });
                 }
             }catch(ex){
@@ -117,10 +126,10 @@ module.exports = function(io) {
         });
 
         //query the dataframe -> return results
-        socket.on('groupby_load', function(column_name,parent_dataset,type,callback){
+        socket.on('groupby_load', function(column_name,parent_dataset,agg,callback){
             try{
                 console.log("user requesting groupby for the dimension:"+column_name);
-                var query_args = ["groupby_load",column_name,type];
+                var query_args = ["groupby_load",column_name,agg];
                 process_client_input(socket.session_id,parent_dataset, create_query(query_args), function(error,message){
                     if(!error){
                         // socket.emit("update_size", parent_dataset, JSON.parse(message)['data']);
@@ -135,10 +144,10 @@ module.exports = function(io) {
         });
 
         //get top/bottom n rows as per the top n values of columnName
-        socket.on('groupby_filterOrder', function(sortOrder, column_name,parent_dataset,n,type,callback){
+        socket.on('groupby_filterOrder', function(sortOrder, column_name,parent_dataset,n,sort_column,agg,callback){
             try{
                 console.log("user has requested top n rows for the groupby operation for dimension: "+column_name);
-                var query_args = ["groupby_filterOrder",column_name,sortOrder,n,type];
+                var query_args = ["groupby_filterOrder",column_name,sortOrder,n,sort_column,agg];
 
                 process_client_input(socket.session_id,parent_dataset, create_query(query_args), function(error,message){
                     if(!error){
@@ -225,10 +234,10 @@ module.exports = function(io) {
         });
 
         //get top/bottom n rows as per the top n values of columnName
-        socket.on('dimension_filterOrder', function(sortOrder, column_name,parent_dataset,n,callback){
+        socket.on('dimension_filterOrder', function(sortOrder, column_name,parent_dataset,n,columns,callback){
             try{
                 console.log("user has requested top n rows as per the column "+column_name);
-                var query_args = ["dimension_filterOrder",column_name,sortOrder,n];
+                var query_args = ["dimension_filterOrder",column_name,sortOrder,n,columns];
 
                 process_client_input(socket.session_id,parent_dataset, create_query(query_args), function(error,message){
                     if(!error){
@@ -352,15 +361,15 @@ function process_client_input(session_id, dataset, query,callback){
     try{
         resetServerTime(dataset,session_id);
         if(isConnectionEstablished[session_id+dataset]){
-            utils(session_id,dataset, query,function(result){
-                var pyresponse = Buffer.from(result).toString('utf8').split(":::");
-                var response = {
-                    data: pyresponse[0],
-                    pythonScriptTime: pyresponse[1],
-                    nodeServerTime: Date.now() - startTime
-                }
-                callback(false,JSON.stringify(response));
-            });
+            callback_store[query.split(":::")[0]] = callback;
+            utils(session_id,dataset, query);//,function(result){
+                // var pyresponse = Buffer.from(result).toString('utf8').split(":::");
+                // var response = {
+                //     data: pyresponse[0],
+                //     pythonScriptTime: pyresponse[1],
+                //     nodeServerTime: Date.now() - startTime
+                // }
+            // });
         }else{
             var response = {
                 data: 'No connection established',
@@ -426,7 +435,7 @@ function initConnection(session_id,dataset, callback){
     });
     pyClient[session_id+dataset].on('error',function(err){
         console.log("failed. Trying again... "+err);
-        if(tryAgain < 1){
+        if(tryAgain < 3){
             setTimeout(function(){
                   pyClient[session_id+dataset].connect(PORT, HOST, function() {
                     });
@@ -434,66 +443,74 @@ function initConnection(session_id,dataset, callback){
            
            tryAgain= tryAgain+ 1;
          }else{
-            callback(true,"something went wrong, try connection again");
+            callback(true,err.toString());
         }
 
     });
     pyClient[session_id+dataset].on('connect', function(){
         isConnectionEstablished[session_id+dataset] = true;
-        callback(false,'user has connected to pycrossfilter');
-    });
-}
-
-
-function loadData(dataset,session_id, callback){
-    try{
-        console.log('inside loaddata');
-        pyClient[session_id+dataset].on('data', function(val){
-            console.log("received data from pyscript");
-            var pyresponse = Buffer.from(val).toString('utf8').split(":::");
-            var response = {
-                data: pyresponse[0],
-                pythonScriptTime: pyresponse[1],
-                nodeServerTime: Date.now() - startTime
-            }
-            // console.log(response);
-            isDataLoaded[session_id+dataset] = true;
-            dataLoaded[session_id+dataset] = dataset;
-            pyClient[session_id+dataset].removeAllListeners(['data']);
-            callback(JSON.stringify(response));
-        });
-        var temp = create_query(['read',dataset]);
-        console.log(temp);
-        pyClient[session_id+dataset].write(temp);
-    }catch(ex){
-        console.log(ex);
-        clearGPUMem();
-    }
-    
-}
-
-
-function utils(session_id,dataset, query,callback){
-    try{
-        let chunks = [];
+        pyClient[session_id+dataset].setNoDelay();
         pyClient[session_id+dataset].on('data', function(val){
             // console.log(Buffer.from(val).toString('utf8'));
             if(Buffer.from(val).toString('utf8').substring(val.length - 4) === '////'){
                 chunks.push(val);
                 console.log('reached end');
                 let data = Buffer.concat(chunks);
-                pyClient[session_id+dataset].removeAllListeners(['data']);
+                chunks = [];
+                // pyClient[session_id+dataset].removeAllListeners(['data']);
                 var res_str = Buffer.from(data).toString('utf8');
-                callback(res_str.substring(0,res_str.length - 4));
+                res_str = res_str.substring(0,res_str.length - 4);
+                var pyresponse = Buffer.from(res_str).toString('utf8').split(":::");
+                var identifier = pyresponse.shift();
+                var response = {
+                    data: pyresponse[0],
+                    pythonScriptTime: pyresponse[1],
+                    nodeServerTime: Date.now() - startTime
+                }
+                callback_store[identifier](false,JSON.stringify(response));
             }else{
                 chunks.push(val);
                 // console.log(val);       
             }
-        })
-
-        pyClient[session_id+dataset].on("data", function(result){
-            
         });
+        callback(false,'user has connected to pycrossfilter');
+
+    });
+}
+
+
+// function loadData(dataset,session_id, callback){
+//     try{
+//         console.log('inside loaddata');
+//         pyClient[session_id+dataset].on('data', function(val){
+//             console.log("received data from pyscript");
+//             var pyresponse = Buffer.from(val).toString('utf8').split(":::");
+//             var response = {
+//                 data: pyresponse[0],
+//                 pythonScriptTime: pyresponse[1],
+//                 nodeServerTime: Date.now() - startTime
+//             }
+//             // console.log(response);
+//             isDataLoaded[session_id+dataset] = true;
+//             dataLoaded[session_id+dataset] = dataset;
+//             pyClient[session_id+dataset].removeAllListeners(['data']);
+//             callback(JSON.stringify(response));
+//         });
+//         var temp = create_query(['read',dataset]);
+//         console.log(temp);
+//         pyClient[session_id+dataset].write(temp);
+//     }catch(ex){
+//         console.log(ex);
+//         clearGPUMem();
+//     }
+    
+// }
+
+
+function utils(session_id,dataset, query,callback){
+    try{
+        
+
         pyClient[session_id+dataset].write(query);
     }catch(ex){
         console.log(ex);
