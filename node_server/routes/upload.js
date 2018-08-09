@@ -40,7 +40,7 @@ router.post("/", function(req, res, next){
   
   function convertToArrow(sessId,callback){
     var spawn = require('child_process').spawn;  
-    var py = spawn('python3', ['../python-scripts/convertToArrow.py', sessId]);
+    var py = spawn('python3', ['../python_scripts/convertToArrow.py', sessId]);
     py.stdin.write(JSON.stringify(sessId));
     py.stdout.on('end', function(){
       callback("success");
