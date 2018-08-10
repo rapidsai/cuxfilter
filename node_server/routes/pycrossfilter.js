@@ -252,11 +252,11 @@ module.exports = function(io) {
         });
 
         //getHist
-        socket.on('dimension_getHist', function(name,dataset,bins, callback){
+        socket.on('dimension_getHist', function(column_name,parent_dataset,bins, callback){
             try{
-                console.log("user requested histogram for "+name);
-                var query_args = ["dimension_hist",name,bins];
-                process_client_input(socket.session_id,dataset, create_query(query_args), function(error,message){
+                console.log("user requested histogram for "+column_name);
+                var query_args = ["dimension_hist",column_name,bins];
+                process_client_input(socket.session_id,parent_dataset, create_query(query_args), function(error,message){
                     if(!error){
                         callback(error,message);
                     }
@@ -361,7 +361,11 @@ function process_client_input(session_id, dataset, query,callback){
     try{
         resetServerTime(dataset,session_id);
         if(isConnectionEstablished[session_id+dataset]){
-            callback_store[query.split(":::")[0]] = callback;
+            let identifier = query.split(":::")[0];
+            if(identifier.includes("dimension") || identifier.includes("group")){
+                identifier = identifier+query.split(":::")[1].split('///')[0];
+            }
+            callback_store[identifier] = callback;
             utils(session_id,dataset, query);//,function(result){
                 // var pyresponse = Buffer.from(result).toString('utf8').split(":::");
                 // var response = {
@@ -421,6 +425,11 @@ function initConnection(session_id,dataset, callback){
         pyServer[server_key] = spawn('python3', ['../python_scripts/pycrossfilter.py',1]);
         console.log("server successfully spawned");
         pyServer[server_key].stdout.on('data', function(data) {
+            console.log('PyServer stdout ');
+            console.log(Buffer.from(data).toString('utf8'));
+            //Here is where the output goes
+        });
+        pyServer[server_key].stderr.on('data', function(data) {
             console.log('PyServer stdout ');
             console.log(Buffer.from(data).toString('utf8'));
             //Here is where the output goes

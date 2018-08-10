@@ -146,10 +146,12 @@ def process_input_from_client(input_from_client):
     global data_gpu, back_up_dimension, dimensions_filters, group_by_backups
     res = ''
     main_command = ''
+    tcp_header = ''
     # print(dimensions_filters)
     try:
         args = input_from_client.split(":::")
         main_command = args[0]
+        tcp_header = args[0]
         if  "exit" == main_command:
             os._exit(1)
         
@@ -170,6 +172,7 @@ def process_input_from_client(input_from_client):
         elif 'groupby' in main_command:
             # print("groupby operations")
             dimension_name =args[1]
+            tcp_header = tcp_header+dimension_name
             groupby_agg = json.loads(args[-1])
             groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
 
@@ -215,6 +218,7 @@ def process_input_from_client(input_from_client):
 
         elif 'dimension' in main_command:
             dimension_name = args[1]
+            tcp_header = tcp_header+dimension_name
 
             if 'dimension_load' == main_command:
                 if dimension_name not in dimensions_filters:
@@ -290,4 +294,4 @@ def process_input_from_client(input_from_client):
         res= str("Exception raised: check your input", e)
         print("some error occured",e)
     
-    return main_command+":::"+res
+    return tcp_header+":::"+res

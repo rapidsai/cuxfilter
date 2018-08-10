@@ -49,7 +49,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 // enable cors
-let whitelist = ['http://localhost:3000','http://localhost:8080','10.110.45.29:3000'];
+let whitelist = ['http://localhost:3000','http://localhost:8080','http://localhost:9000','10.110.45.29:3000'];
 let corsOptions = {
     origin: (origin, callback)=>{
         if (whitelist.indexOf(origin) !== -1) {

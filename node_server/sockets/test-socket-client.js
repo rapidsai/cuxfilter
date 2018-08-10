@@ -31,7 +31,7 @@ client.connect(PORT, HOST, function() {
     //client.destroy();
 });
 
-setTimeout(function(){console.log("query 1");client.write("dimension_filterOrder:::hod:::top:::25:::///");},2000);
+setTimeout(function(){console.log("query 1");client.write("dimension_filterOrder:::hod:::all:::null:::///");},2000);
 
 // setTimeout(function(){console.log("query 2");client.write("dimension_hist:::hod:::64///");},2000);
 
@@ -39,7 +39,7 @@ setTimeout(function(){console.log("query 1");client.write("dimension_filterOrder
 
 // setTimeout(function(){console.log("query 4");client.write("dimension_reset:::mean_travel_time///");},4000);
 
-setTimeout(function(){console.log("exiting...");client.write("exit");client.destroy();console.log("test successful if you see no errors upto this point")},8000);
+// setTimeout(function(){console.log("exiting...");client.write("exit");client.destroy();console.log("test successful if you see no errors upto this point")},8000);
 
 // Add a 'data' event handler for the client socket
 // data is what the server sent to this socket
