@@ -467,7 +467,11 @@ function initConnection(session_id,dataset, callback){
                     pythonScriptTime: pyresponse[1],
                     nodeServerTime: Date.now() - startTime
                 }
-                callback_store[identifier](false,JSON.stringify(response));
+                // if(identifier === 'dimension_filterOrder'){
+                //     callback_store[identifier](false,data);
+                // }else{
+                    callback_store[identifier](false,JSON.stringify(response));
+                // }
             }else{
                 chunks.push(val);
                 // console.log(val);       

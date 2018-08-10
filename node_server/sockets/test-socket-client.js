@@ -31,7 +31,7 @@ client.connect(PORT, HOST, function() {
     //client.destroy();
 });
 
-setTimeout(function(){console.log("query 1");client.write("dimension_filterOrder:::hod:::top:::25:::sourceid:::"+temp_str+"///");client.write("dimension_hist:::hod:::640///");},2000);
+setTimeout(function(){console.log("query 1");client.write("dimension_filterOrder:::hod:::top:::25:::///");},2000);
 
 // setTimeout(function(){console.log("query 2");client.write("dimension_hist:::hod:::64///");},2000);
 

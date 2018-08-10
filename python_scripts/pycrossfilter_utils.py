@@ -245,11 +245,11 @@ def process_input_from_client(input_from_client):
                 columns = args[4].split(',')
                 print(columns)
 
-                if(len(columns) == 0):
-                    columns = data_gpu.columns
+                if(len(columns) == 0 or columns[0]==''):
+                    columns = list(data_gpu.columns)
                 elif dimension_name not in columns:
                     columns.append(dimension_name)
-                    
+                print(columns)  
                 if 'all' == sort_order:
                     temp_df = data_gpu.loc[:,columns].to_pandas().to_dict()
                 else:
