@@ -430,6 +430,7 @@ function initConnection(session_id,dataset, callback){
             //Here is where the output goes
         });
         pyServer[server_key].stderr.on('data', function(data) {
+            isConnectionEstablished[session_id+dataset] = false;
             console.log('PyServer stdout ');
             console.log(Buffer.from(data).toString('utf8'));
             //Here is where the output goes
