@@ -31,7 +31,7 @@ COPY ./entrypoint.sh ./
 RUN pwd
 RUN ls
 EXPOSE 3000
-ENTRYPOINT ["bash","./entrypoint.sh"]
+#ENTRYPOINT ["bash","./entrypoint.sh"]
 #RUN echo "soure activate gdf" > ~/.bashrc
 #ENV PATH /opt/conda/envs/env/bin:$PATH
 #CMD ["npm","start"]

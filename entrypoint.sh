@@ -1,2 +1,2 @@
 source activate gdf
-npm start
+#npm start

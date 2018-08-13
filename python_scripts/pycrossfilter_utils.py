@@ -214,7 +214,7 @@ def process_input_from_client(input_from_client):
                         sort_column = args[4]
                         num_rows = int(args[3])
                         # if len(group_by_backups[key]) == 0:
-                        max_rows = len(group_by_backups[key])-1
+                        max_rows = max(len(group_by_backups[key])-1,0)
                         n_rows = min(num_rows,max_rows)
                         print("number of rows processed",n_rows)
                         if 'top' == sort_order:
@@ -265,9 +265,8 @@ def process_input_from_client(input_from_client):
                     temp_df = data_gpu.loc[:,columns].to_pandas().to_dict()
                 else:
                     num_rows = int(args[3])
-                    max_rows = len(data_gpu)-1
+                    max_rows = max(len(data_gpu)-1,0)
                     n_rows = min(num_rows, max_rows)
-                    print("num rows left",n_rows)
                     if 'top' == sort_order:
                         temp_df = data_gpu.loc[:,columns].nlargest(n_rows,[dimension_name]).to_pandas().to_dict()
                     elif 'bottom' == sort_order:
