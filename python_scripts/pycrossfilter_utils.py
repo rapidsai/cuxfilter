@@ -3,6 +3,7 @@ from numbaHistinMem import numba_gpu_histogram
 from pygdf.dataframe import DataFrame
 import json
 import os
+import numpy as np
 
 data_gpu = None
 back_up_dimension = None
@@ -87,6 +88,10 @@ def read_data(load_type,file):
     data = read_arrow_to_DF(file)
     return data
 
+def default(o):
+    if isinstance(o, np.int64): return int(o)  
+    raise TypeError
+    
 def parse_dict(data):
     '''
         description:
@@ -99,7 +104,7 @@ def parse_dict(data):
     temp_dict = {}
     for i in data:
         temp_dict[i] = list(data[i].values())
-    return json.dumps(temp_dict)
+    return json.dumps(temp_dict,default=default)
 
 def get_size(data):
     '''
@@ -203,13 +208,15 @@ def process_input_from_client(input_from_client):
                     #removing the cumulative filters on the current dimension for the groupby
                     temp_df = reset_filters(back_up_dimension, omit=dimension_name)
                     groupby(temp_df,dimension_name,groupby_agg,groupby_agg_key)
-
                     if 'all' == sort_order:
                         temp_df = group_by_backups[key].to_pandas().to_dict()
                     else:
                         sort_column = args[4]
                         num_rows = int(args[3])
-                        n_rows = min(num_rows, len(group_by_backups[key])) - 1
+                        # if len(group_by_backups[key]) == 0:
+                        max_rows = len(group_by_backups[key])-1
+                        n_rows = min(num_rows,max_rows)
+                        print("number of rows processed",n_rows)
                         if 'top' == sort_order:
                             temp_df = group_by_backups[key].nlargest(n_rows,[sort_column]).to_pandas().to_dict()
                         elif 'bottom' == sort_order:
@@ -258,7 +265,9 @@ def process_input_from_client(input_from_client):
                     temp_df = data_gpu.loc[:,columns].to_pandas().to_dict()
                 else:
                     num_rows = int(args[3])
-                    n_rows = min(num_rows, len(data_gpu)) - 1
+                    max_rows = len(data_gpu)-1
+                    n_rows = min(num_rows, max_rows)
+                    print("num rows left",n_rows)
                     if 'top' == sort_order:
                         temp_df = data_gpu.loc[:,columns].nlargest(n_rows,[dimension_name]).to_pandas().to_dict()
                     elif 'bottom' == sort_order:

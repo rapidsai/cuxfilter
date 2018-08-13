@@ -425,15 +425,14 @@ function initConnection(session_id,dataset, callback){
         pyServer[server_key] = spawn('python3', ['../python_scripts/pycrossfilter.py',1]);
         console.log("server successfully spawned");
         pyServer[server_key].stdout.on('data', function(data) {
-            console.log('PyServer stdout ');
+            console.log('PyServer stdout: ');
             console.log(Buffer.from(data).toString('utf8'));
-            //Here is where the output goes
         });
         pyServer[server_key].stderr.on('data', function(data) {
             isConnectionEstablished[session_id+dataset] = false;
-            console.log('PyServer stdout ');
+            pyServer[threadCount+server_key] = 0;
+            console.log('PyServer stderr: ');
             console.log(Buffer.from(data).toString('utf8'));
-            //Here is where the output goes
         });
     }else{
         pyServer[threadCount+server_key]= pyServer[threadCount+server_key] + 1;
