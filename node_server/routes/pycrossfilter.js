@@ -4,7 +4,6 @@ var spawn = require('child_process').spawn;
 var net = require('net');
 var HOST = '127.0.0.1';
 var PORT = 3001;
-var startTime, endTime;
 var pyClient = {};
 var pyServer = {};
 var isConnectionEstablished = {}; // key -> session_id; value: socket.id
@@ -13,17 +12,18 @@ var dataLoaded = {};
 var serverOnTime = {};
 // var session = require('express-session');
 var callback_store = {};
+var startTimeStore = {};
 let chunks = [];
 
 module.exports = function(io) {
 
     //SOCKET.IO
     router.get('/', function(req, res) {
-        var sessId = req.session.id;   
+        var sessId = req.session.id;
         console.log("session id is : "+sessId);
         session_id = sessId;
         res.end("ok");
-    }); 
+    });
 
     io.on('connection',function(socket){
 
@@ -89,7 +89,7 @@ module.exports = function(io) {
             }
 
         });
-        
+
         //load dimension
         socket.on('dimension_load', function(column_name,parent_dataset, callback){
             try{
@@ -106,7 +106,7 @@ module.exports = function(io) {
                 clearGPUMem();
             }
         });
-        
+
         //query the dataframe -> return results
         socket.on('dimension_filter', function(column_name,parent_dataset,comparison,value,callback){
             try{
@@ -266,7 +266,7 @@ module.exports = function(io) {
                 callback(true,-1);
                 clearGPUMem();
             }
-            
+
         });
 
         //get Max and Min for a dimension
@@ -366,6 +366,7 @@ function process_client_input(session_id, dataset, query,callback){
                 identifier = identifier+query.split(":::")[1].split('///')[0];
             }
             callback_store[identifier] = callback;
+            startTimeStore[identifier] = Date.now();
             utils(session_id,dataset, query);//,function(result){
                 // var pyresponse = Buffer.from(result).toString('utf8').split(":::");
                 // var response = {
@@ -412,7 +413,7 @@ function create_query(list_of_args){
     }else{
         return "input has to be an array of arguments";
     }
-    
+
 }
 function initConnection(session_id,dataset, callback){
     var tryAgain = 0;
@@ -431,13 +432,14 @@ function initConnection(session_id,dataset, callback){
         pyServer[server_key].stderr.on('data', function(data) {
             isConnectionEstablished[session_id+dataset] = false;
             pyServer[threadCount+server_key] = 0;
+            pyClient[session_id+dataset].write("exit");
             console.log('PyServer stderr: ');
             console.log(Buffer.from(data).toString('utf8'));
         });
     }else{
         pyServer[threadCount+server_key]= pyServer[threadCount+server_key] + 1;
     }
-    
+
     pyClient[session_id+dataset] = new net.Socket();
     pyClient[session_id+dataset].connect(PORT, HOST, function() {
         console.log('CONNECTED TO: ' + HOST + ':' + PORT);
@@ -449,7 +451,7 @@ function initConnection(session_id,dataset, callback){
                   pyClient[session_id+dataset].connect(PORT, HOST, function() {
                     });
            },1000);
-           
+
            tryAgain= tryAgain+ 1;
          }else{
             callback(true,err.toString());
@@ -474,7 +476,7 @@ function initConnection(session_id,dataset, callback){
                 var response = {
                     data: pyresponse[0],
                     pythonScriptTime: pyresponse[1],
-                    nodeServerTime: Date.now() - startTime
+                    nodeServerTime: (Date.now() - startTimeStore[identifier])/1000
                 }
                 // if(identifier === 'dimension_filterOrder'){
                 //     callback_store[identifier](false,data);
@@ -483,7 +485,7 @@ function initConnection(session_id,dataset, callback){
                 // }
             }else{
                 chunks.push(val);
-                // console.log(val);       
+                // console.log(val);
             }
         });
         callback(false,'user has connected to pycrossfilter');
@@ -516,14 +518,12 @@ function initConnection(session_id,dataset, callback){
 //         console.log(ex);
 //         clearGPUMem();
 //     }
-    
+
 // }
 
 
 function utils(session_id,dataset, query,callback){
     try{
-        
-
         pyClient[session_id+dataset].write(query);
     }catch(ex){
         console.log(ex);

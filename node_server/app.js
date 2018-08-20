@@ -67,7 +67,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(multer({dest: "./uploads/",storage: storage, limits:{fileSize:maxSize}}).any());
-
+app.use(function (req, res, next) {
+    res.header('Cache-Control', 'private, no-cache, no-store');
+    next()
+});
 app.use(sessionMiddleware);
 
 

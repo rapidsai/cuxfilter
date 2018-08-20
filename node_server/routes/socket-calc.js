@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var util = require("util");
-var fs = require("fs"); 
+var fs = require("fs");
 var spawn = require('child_process').spawn;
 var net = require('net');
 
@@ -16,10 +16,10 @@ var response = {
     nodeServerTime:''
 };
 router.get('/', function(req, res) {
-    var sessId = req.session.id;   
+    var sessId = req.session.id;
     console.log(sessId);
     res.render('dashboard',{title:"Socket-Calc api home page",val: JSON.stringify({hello:"World"}),cols:''});
-}); 
+});
 
 router.get('/getStatus', function(req,res){
     var sessId = req.session.id;
@@ -35,7 +35,7 @@ router.get('/getStatus', function(req,res){
     }else{
         res.end("inactive");
     }
-    
+
 });
 
 router.get('/startConnection', function(req,res){
@@ -49,8 +49,8 @@ router.get('/startConnection', function(req,res){
         console.log('PyServer stdout '+data);
         //Here is where the output goes
     });
-    
-    
+
+
     getHistEvent[sessId+file] = 0;
     pyClient[sessId+file] = new net.Socket();
     setTimeout(function(){
@@ -87,7 +87,7 @@ router.get('/startConnection', function(req,res){
         pyClient[sessId+file].removeAllListeners(['data']);
         res.end(JSON.stringify(response));
     });
-    
+
 });
 
 function load_data(sessId,file,callback){
@@ -178,7 +178,7 @@ function getHist(sessId, file, processing,columnName,bins, callback){
         getHistEvent[sessId+file] =1;
         callback(cols);
     });
-    
+
     console.log("set up the callback function");
     console.log(pyClient[sessId+file].readable);
     var query = "hist:::"+sessId+":::"+processing+":::"+columnName+":::"+bins;

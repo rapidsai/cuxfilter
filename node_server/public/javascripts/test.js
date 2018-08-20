@@ -23,7 +23,7 @@ function displayTimings(totalTimeFE,totalTimePyScript,totalTimeNodeServer){
     var obj = timeStr;
     var str = "Front end: "+timeStr.front_end+"\nNodeServer: "+timeStr.node_server_request_time+"\nPyScriptCompute: "+timeStr.py_script_compute_time;
     $('#restime').text(str);
-    
+
 }
 
 $.urlParam = function(name){
@@ -79,7 +79,7 @@ function getCols(){
     };
 
     url = '/socket-calc/getColumns';
-    
+
     if(!persistentConnStatus){
         url = '/calc/getColumns';
         data.processing = processing,
@@ -96,7 +96,7 @@ function getCols(){
         var coldata = pyData[0];
         genCols(coldata);
         $('.genChart').show();
-    
+
         displayTimings(totalTime,pyData[1],data.nodeServerTime);
     });
 }
@@ -109,7 +109,7 @@ function getHist(){
         file: $.urlParam('file')
     };
     url = '/socket-calc/getHist';
-    
+
     if(!persistentConnStatus){
         url = '/calc/getHist';
         data.load_type = load_type;
@@ -134,8 +134,50 @@ function getHist(){
         });
 }
 
+function getAllHist(col){
+    var data = {
+        col: col,
+        processing: processing,
+        bins:12,
+        file: $.urlParam('file')
+    };
+    url = '/socket-calc/getHist';
+
+    if(!persistentConnStatus){
+        url = '/calc/getHist';
+        data.load_type = load_type;
+    }
+
+    $.post({
+        url: url,
+        data:data,
+        responseTime: Date.now(),
+        complete: function(data){
+                totalTime = Date.now() - responseTime;
+                data = data.responseText;
+                data = JSON.parse(data);
+                pyData = data.pyData.split(":::");
+                console.log(pyData);
+                X = JSON.parse(pyData[0])['A'];
+                Y = JSON.parse(pyData[0])['B'];
+                console.log(X);
+                genPlot(X,Y,type);
+                displayTimings(totalTime,pyData[1],data.nodeServerTime);
+            }
+        });
+}
+
+function test(){
+  getAllHist('sourceid');
+  getAllHist('dstid');
+  getAllHist('mean_travel_time');
+  getAllHist('standard_deviation_travel_time');
+  getAllHist('source_long');
+  getAllHist('source_lat');
+}
+
 function genPlot(X,Y,type){
- 
+
     var d = [{
         x: X,
         y: Y,
@@ -148,7 +190,7 @@ function genPlot(X,Y,type){
 
 function initiateListeners(val){
     $('input[type=radio][name=X][value='+val+']').change(function(){
-        current_chart_col = $(this).val();        
+        current_chart_col = $(this).val();
     });
 }
 
@@ -172,7 +214,7 @@ function genCols(cols){
             initiateListeners(a[i]);
         }
     }
-    
+
 }
 
 function persistentConnStart(){
@@ -194,5 +236,5 @@ function persistentConnEnd(){
         console.log(data);
         $("#persistentConnStatus").html("Connection Ended");
         persistentConnStatus = false;
-    });   
+    });
 }

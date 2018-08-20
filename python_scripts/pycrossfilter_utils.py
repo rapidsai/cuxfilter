@@ -4,6 +4,7 @@ from pygdf.dataframe import DataFrame
 import json
 import os
 import numpy as np
+import time
 
 data_gpu = None
 back_up_dimension = None
@@ -22,18 +23,18 @@ def hist_numba_GPU(data,bins):
     print("calculating histogram")
     df1 = numba_gpu_histogram(data,int(bins))
     dict_temp ={}
-    
+
     dict_temp['X'] = list(df1[1].astype(float))
     dict_temp['Y'] = list(df1[0].astype(float))
-    
+
     return str(json.dumps(dict_temp))
 
 def groupby(data,column_name, groupby_agg,groupby_agg_key):
     '''
         description:
-            Calculate groupby on a given column on the pygdf 
+            Calculate groupby on a given column on the pygdf
         input:
-            data: pygdf row as a series -> gpu mem pointer, 
+            data: pygdf row as a series -> gpu mem pointer,
             column_name: column name
         Output:
             json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
@@ -89,9 +90,9 @@ def read_data(load_type,file):
     return data
 
 def default(o):
-    if isinstance(o, np.int64): return int(o)  
+    if isinstance(o, np.int64): return int(o)
     raise TypeError
-    
+
 def parse_dict(data):
     '''
         description:
@@ -117,24 +118,28 @@ def get_size(data):
     '''
     return (len(data),len(data.columns))
 
-def reset_filters(data, omit=None):
+def reset_filters(data, omit=None, include_dim='all'):
     '''
         description:
-            reset filters on the data_gpu dataframe by executing all filters in the dimension_filters dictionary
+            reset filters on the data_gpu dataframe by executing all filters in the dimensions_filters dictionary
     '''
     global dimensions_filters
-    print("inside reset filters")
-    print(dimensions_filters)
+    # print("inside reset filters")
     temp_list = []
     for key in dimensions_filters.keys():
         if omit is not None and omit == key:
             continue
-        temp_list = temp_list + dimensions_filters[key]
+        if len(dimensions_filters[key])>0:
+            temp_list.append(dimensions_filters[key])
     query = ' and '.join(temp_list)
     if(len(query) >0):
-        return data.query(query)
+        # return data.query(query)
+        if include_dim == 'all':
+            return data.query(query)
+        else:
+            column_list = list(dimensions_filters.keys()) if include_dim == None else list(dimensions_filters.keys())+[include_dim]
+            return data.loc[:,column_list].query(query)
     else:
-        print(len(data))
         return data
 
 def process_input_from_client(input_from_client):
@@ -159,7 +164,7 @@ def process_input_from_client(input_from_client):
         tcp_header = args[0]
         if  "exit" == main_command:
             os._exit(1)
-        
+
         elif 'read' == main_command:
             dataset_name = args[1]
             data_gpu = read_data("arrow",dataset_name)
@@ -167,7 +172,7 @@ def process_input_from_client(input_from_client):
             #warm up function for the cuda-jit
             hist_numba_GPU(data_gpu[data_gpu.columns[4]].to_gpu_array(),640)
             res = "data read successfully"
-    
+
         elif 'schema' == main_command:
             res = str(get_columns(data_gpu))
 
@@ -185,23 +190,24 @@ def process_input_from_client(input_from_client):
                 #removing the cumulative filters on the current dimension for the groupby
                 temp_df = reset_filters(back_up_dimension, omit=dimension_name)
                 res = groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
-            
+
             elif 'groupby_size' == main_command:
                 key = dimension_name+"_"+groupby_agg_key
                 if(key not in group_by_backups):
                     res = "groupby not intialized"
                 else:
+                    include_dim = None if dimension_name in dimensions_filters else dimension_name
                     #removing the cumulative filters on the current dimension for the groupby
-                    temp_df = reset_filters(back_up_dimension, omit=dimension_name)
+                    temp_df = reset_filters(back_up_dimension, omit=dimension_name, include_dim=include_dim)
                     groupby(temp_df,dimension_name,groupby_agg,groupby_agg_key)
                     res = str(len(group_by_backups[key]))
-            
+
             elif 'groupby_filterOrder' == main_command:
                 sort_order = args[2]
                 key = dimension_name+"_"+groupby_agg_key
-                print(args)
-                print(key)
-                print(group_by_backups.keys())
+                # print(args)
+                # print(key)
+                # print(group_by_backups.keys())
                 if(key not in group_by_backups):
                     res = "groupby not intialized"
                 else:
@@ -216,7 +222,7 @@ def process_input_from_client(input_from_client):
                         # if len(group_by_backups[key]) == 0:
                         max_rows = max(len(group_by_backups[key])-1,0)
                         n_rows = min(num_rows,max_rows)
-                        print("number of rows processed",n_rows)
+                        # print("number of rows processed",n_rows)
                         if 'top' == sort_order:
                             temp_df = group_by_backups[key].nlargest(n_rows,[sort_column]).to_pandas().to_dict()
                         elif 'bottom' == sort_order:
@@ -229,7 +235,7 @@ def process_input_from_client(input_from_client):
 
             if 'dimension_load' == main_command:
                 if dimension_name not in dimensions_filters:
-                    dimensions_filters[dimension_name] = []
+                    dimensions_filters[dimension_name] = ''
                     res = 'dimension loaded successfully'
                 else:
                     res = 'dimension already exists'
@@ -237,30 +243,35 @@ def process_input_from_client(input_from_client):
             elif 'dimension_reset' == main_command:
                 #reseting the cumulative filters on the current dimension
                 data_gpu = back_up_dimension
-                dimensions_filters[dimension_name] = []
-                data_gpu = reset_filters(data_gpu)
+                dimensions_filters[dimension_name] = ''
+                data_gpu = reset_filters(data_gpu, include_dim='all')
                 res = str(len(data_gpu))
 
             elif 'dimension_get_max_min' == main_command:
                 max_min_tuple = float(data_gpu[dimension_name].max()), float(data_gpu[dimension_name].min())
                 res = str(max_min_tuple)
-            
+
             elif 'dimension_hist' == main_command:
                 num_of_bins = int(args[2])
-                temp_df = reset_filters(back_up_dimension, omit=dimension_name)
-                res = str(hist_numba_GPU(temp_df[str(dimension_name)].to_gpu_array(),num_of_bins))
+                # start = time.time()
+                include_dim = None if dimension_name in dimensions_filters else dimension_name
+                temp_df = reset_filters(back_up_dimension, omit=dimension_name, include_dim = include_dim)
+                # reset_filters_time = time.time() - start
+                res = str(hist_numba_GPU(temp_df[str(dimension_name)].to_gpu_array(),num_of_bins))#+":::"+str(reset_filters_time)
 
             elif 'dimension_filterOrder' == main_command:
                 sort_order = args[2]
-                print(args)
+                # print(args)
                 columns = args[4].split(',')
-                print(columns)
+                # print(columns)
 
                 if(len(columns) == 0 or columns[0]==''):
                     columns = list(data_gpu.columns)
                 elif dimension_name not in columns:
                     columns.append(dimension_name)
-                print(columns)  
+                print("requested columns",columns)
+                print("available columns",data_gpu.columns)
+
                 if 'all' == sort_order:
                     temp_df = data_gpu.loc[:,columns].to_pandas().to_dict()
                 else:
@@ -271,7 +282,7 @@ def process_input_from_client(input_from_client):
                         temp_df = data_gpu.loc[:,columns].nlargest(n_rows,[dimension_name]).to_pandas().to_dict()
                     elif 'bottom' == sort_order:
                         temp_df = data_gpu.loc[:,columns].nsmallest(n_rows,[dimension_name]).to_pandas().to_dict()
-                                             
+
                 res = str(parse_dict(temp_df))
 
             elif 'dimension_filter' == main_command:
@@ -279,27 +290,33 @@ def process_input_from_client(input_from_client):
                 value = args[3]
                 query = dimension_name+comparison_operation+value
                 if dimension_name in dimensions_filters:
-                    dimensions_filters[dimension_name].append(query)
+                    if len(dimensions_filters[dimension_name])>0:
+                        dimensions_filters[dimension_name] += ' and '+ query
+                    else:
+                        dimensions_filters[dimension_name] = query
                 data_gpu = data_gpu.query(query)
                 res = str(len(data_gpu))
-            
+
             elif 'dimension_filter_range' == main_command:
                 min_value = args[2]
                 max_value = args[3]
                 query = dimension_name+">"+min_value+" and "+dimension_name+"<"+max_value
-                print(str(query))
+                # print(str(query))
                 if dimension_name in dimensions_filters:
-                    dimensions_filters[dimension_name].append(query)
+                    if len(dimensions_filters[dimension_name])>0:
+                        dimensions_filters[dimension_name] += ' and '+ query
+                    else:
+                        dimensions_filters[dimension_name] = query
                 data_gpu = data_gpu.query(query)
                 res = str(len(data_gpu))
 
         else:
             res = "first read some data :-P"
-        
+
         # print("Result of processing {} is: {}".format(input_from_client, res))
-        
+
     except Exception as e:
         res= str("Exception raised: check your input", e)
         print("some error occured",e)
-    
+
     return tcp_header+":::"+res
