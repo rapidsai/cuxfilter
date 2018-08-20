@@ -52,7 +52,13 @@ module.exports = function(io) {
                 resetServerTime(dataset,socket.session_id);
                 if(isDataLoaded[socket.session_id+dataset] && dataLoaded[socket.session_id+dataset] === dataset){
                     console.log('data already loaded');
-                    callback(true,'data already loaded');
+                    var query_args = ["reset_all"];
+                    process_client_input(socket.session_id,dataset,create_query(query_args),function(error,message){
+                        if(!error){
+                            console.log("reset all filters");
+                            callback(true,'data already loaded ... cleared all filters');
+                        }
+                    });
                 }else{
                     console.log("loading new data in gpu mem");
                     // loadData(dataset,socket.session_id, function(result){
@@ -62,6 +68,8 @@ module.exports = function(io) {
                     process_client_input(socket.session_id,dataset,create_query(query_args),function(error,message){
                         if(!error){
                             console.log("schema: "+message);
+                            isDataLoaded[socket.session_id+dataset] = true
+                            dataLoaded[socket.session_id+dataset] = dataset
                             callback(error,message);
                         }
                     });

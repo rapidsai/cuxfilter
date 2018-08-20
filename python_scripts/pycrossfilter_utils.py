@@ -179,6 +179,10 @@ def process_input_from_client(input_from_client):
         elif "size" == main_command:
             res = str(get_size(data_gpu))
 
+        elif 'reset_all' == main_command:
+            data_gpu = back_up_dimension
+            dimensions_filters.clear()
+
         elif 'groupby' in main_command:
             # print("groupby operations")
             dimension_name =args[1]
