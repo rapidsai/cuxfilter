@@ -80,6 +80,16 @@ module.exports = function(io) {
             }
         });
 
+        socket.on("resetAllFilters", function(dataset,callback){
+          var query_args = ["reset_all"];
+          process_client_input(socket.session_id,dataset,create_query(query_args),function(error,message){
+              if(!error){
+                  console.log("reset all filters");
+                  callback(error,message);
+              }
+          });
+        });
+
         //get schema of the dataset
         socket.on('getSchema', function(dataset,callback){
             try{
@@ -429,6 +439,9 @@ function initConnection(session_id,dataset, callback){
     var server_key = session_id+server_dataset;
     var threadCount = 'threadCount';
     console.log("server key"+server_key);
+
+
+
     if(!(server_key in pyServer) || (server_key in pyServer && pyServer[threadCount+server_key]>1)){
         pyServer[threadCount+server_key] = 1;
         pyServer[server_key] = spawn('python3', ['../python_scripts/pycrossfilter.py',1]);

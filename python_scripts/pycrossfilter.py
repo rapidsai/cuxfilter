@@ -70,6 +70,7 @@ def start_server():
     # this will make an infinite loop needed for not reseting server for every client
     threads = []
     for _ in range(num_connections):
+    # while True:
         try:
             conn, addr = soc.accept()
             ip, port = str(addr[0]), str(addr[1])

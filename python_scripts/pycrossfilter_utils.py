@@ -5,6 +5,7 @@ import json
 import os
 import numpy as np
 import time
+import sys
 
 data_gpu = None
 back_up_dimension = None
@@ -118,10 +119,17 @@ def get_size(data):
     '''
     return (len(data),len(data.columns))
 
-def reset_filters(data, omit=None, include_dim='all'):
+def reset_filters(data, omit=None, include_dim=['all']):
     '''
         description:
             reset filters on the data_gpu dataframe by executing all filters in the dimensions_filters dictionary
+        input:
+            data: dataset
+            omit: column name, the filters associated to which, are to be omitted
+            include_dim: list of column_names, which are to be included along with dimensions_filters.keys(); ['all'] to include all columns
+
+        Output:
+            result dataframe after executing the filters using the dataframe.query() command
     '''
     global dimensions_filters
     # print("inside reset filters")
@@ -134,10 +142,10 @@ def reset_filters(data, omit=None, include_dim='all'):
     query = ' and '.join(temp_list)
     if(len(query) >0):
         # return data.query(query)
-        if include_dim == 'all':
+        if include_dim[0] == 'all':
             return data.query(query)
         else:
-            column_list = list(dimensions_filters.keys()) if include_dim == None else list(dimensions_filters.keys())+[include_dim]
+            column_list = list(set(list(dimensions_filters.keys())+include_dim))
             return data.loc[:,column_list].query(query)
     else:
         return data
@@ -163,7 +171,7 @@ def process_input_from_client(input_from_client):
         main_command = args[0]
         tcp_header = args[0]
         if  "exit" == main_command:
-            os._exit(1)
+            sys.exit()
 
         elif 'read' == main_command:
             dataset_name = args[1]
@@ -182,6 +190,7 @@ def process_input_from_client(input_from_client):
         elif 'reset_all' == main_command:
             data_gpu = back_up_dimension
             dimensions_filters.clear()
+            res = "cleared all filters"
 
         elif 'groupby' in main_command:
             # print("groupby operations")
@@ -192,7 +201,7 @@ def process_input_from_client(input_from_client):
 
             if 'groupby_load' == main_command:
                 #removing the cumulative filters on the current dimension for the groupby
-                temp_df = reset_filters(back_up_dimension, omit=dimension_name)
+                temp_df = reset_filters(back_up_dimension, omit=dimension_name, include_dim=list(groupby_agg.keys()))
                 res = groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
 
             elif 'groupby_size' == main_command:
@@ -200,9 +209,8 @@ def process_input_from_client(input_from_client):
                 if(key not in group_by_backups):
                     res = "groupby not intialized"
                 else:
-                    include_dim = None if dimension_name in dimensions_filters else dimension_name
                     #removing the cumulative filters on the current dimension for the groupby
-                    temp_df = reset_filters(back_up_dimension, omit=dimension_name, include_dim=include_dim)
+                    temp_df = reset_filters(back_up_dimension, omit=dimension_name, include_dim=list(groupby_agg.keys()))
                     groupby(temp_df,dimension_name,groupby_agg,groupby_agg_key)
                     res = str(len(group_by_backups[key]))
 
@@ -216,7 +224,7 @@ def process_input_from_client(input_from_client):
                     res = "groupby not intialized"
                 else:
                     #removing the cumulative filters on the current dimension for the groupby
-                    temp_df = reset_filters(back_up_dimension, omit=dimension_name)
+                    temp_df = reset_filters(back_up_dimension, omit=dimension_name,include_dim=list(groupby_agg.keys()))
                     groupby(temp_df,dimension_name,groupby_agg,groupby_agg_key)
                     if 'all' == sort_order:
                         temp_df = group_by_backups[key].to_pandas().to_dict()
@@ -248,7 +256,7 @@ def process_input_from_client(input_from_client):
                 #reseting the cumulative filters on the current dimension
                 data_gpu = back_up_dimension
                 dimensions_filters[dimension_name] = ''
-                data_gpu = reset_filters(data_gpu, include_dim='all')
+                data_gpu = reset_filters(data_gpu)
                 res = str(len(data_gpu))
 
             elif 'dimension_get_max_min' == main_command:
@@ -258,8 +266,7 @@ def process_input_from_client(input_from_client):
             elif 'dimension_hist' == main_command:
                 num_of_bins = int(args[2])
                 # start = time.time()
-                include_dim = None if dimension_name in dimensions_filters else dimension_name
-                temp_df = reset_filters(back_up_dimension, omit=dimension_name, include_dim = include_dim)
+                temp_df = reset_filters(back_up_dimension, omit=dimension_name, include_dim = [dimension_name])
                 # reset_filters_time = time.time() - start
                 res = str(hist_numba_GPU(temp_df[str(dimension_name)].to_gpu_array(),num_of_bins))#+":::"+str(reset_filters_time)
 
