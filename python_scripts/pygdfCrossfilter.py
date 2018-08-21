@@ -2,7 +2,7 @@
 import socket
 import sys
 import time
-from pycrossfilter_utils import process_input_from_client
+from pygdfCrossfilter_utils import process_input_from_client
 
 
 def client_thread(conn, ip, port, MAX_BUFFER_SIZE = 4096):

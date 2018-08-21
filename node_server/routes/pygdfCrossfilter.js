@@ -27,7 +27,7 @@ module.exports = function(io) {
 
     io.on('connection',function(socket){
 
-        //initialize the socket connection with the python script. this is executed when user initializes a pycrossfilter instance
+        //initialize the socket connection with the python script. this is executed when user initializes a pygdfCrossfilter instance
         socket.on('init', function(dataset, callback){
             try{
                 console.log("connection init requested");
@@ -444,7 +444,7 @@ function initConnection(session_id,dataset, callback){
 
     if(!(server_key in pyServer) || (server_key in pyServer && pyServer[threadCount+server_key]>1)){
         pyServer[threadCount+server_key] = 1;
-        pyServer[server_key] = spawn('python3', ['../python_scripts/pycrossfilter.py',1]);
+        pyServer[server_key] = spawn('python3', ['../python_scripts/pygdfCrossfilter.py',1]);
         console.log("server successfully spawned");
         pyServer[server_key].stdout.on('data', function(data) {
             console.log('PyServer stdout: ');
@@ -509,7 +509,7 @@ function initConnection(session_id,dataset, callback){
                 // console.log(val);
             }
         });
-        callback(false,'user has connected to pycrossfilter');
+        callback(false,'user has connected to pygdfCrossfilter');
 
     });
 }

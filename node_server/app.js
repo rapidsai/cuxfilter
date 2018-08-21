@@ -40,7 +40,7 @@ var app = express();
 
 
 app.io = require('socket.io')({
-  path: '/pycrossfilter'
+  path: '/pygdfCrossfilter'
 });
 
 
@@ -83,7 +83,7 @@ app.use(sessionMiddleware);
 // });
 
 
-var pycrossfilter = require('./routes/pycrossfilter')(app.io);
+var pygdfCrossfilter = require('./routes/pygdfCrossfilter')(app.io);
 
 
 app.use('/', indexRouter);
@@ -91,7 +91,7 @@ app.use('/users', usersRouter);
 app.use('/upload',upload);
 app.use('/calc',calc);
 app.use('/socket-calc',socket_calc);
-app.use('/pycrossfilter',pycrossfilter);
+app.use('/pygdfCrossfilter',pygdfCrossfilter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
