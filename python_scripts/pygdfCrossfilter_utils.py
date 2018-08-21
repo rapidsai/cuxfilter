@@ -190,7 +190,7 @@ def process_input_from_client(input_from_client):
         elif 'reset_all' == main_command:
             data_gpu = back_up_dimension
             dimensions_filters.clear()
-            res = "cleared all filters"
+            res = str(len(data_gpu))
 
         elif 'groupby' in main_command:
             # print("groupby operations")
