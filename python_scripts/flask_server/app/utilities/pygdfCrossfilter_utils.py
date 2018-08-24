@@ -112,7 +112,7 @@ class pygdfCrossfilter_utils:
                 temp_dict[i] = list(data[i].values())
             return json.dumps(temp_dict,default=self.default)
         except Exception as e:
-            return str("Exception raised on python server", e)
+            return str(e)
 
     def get_size(self):
         '''
@@ -124,9 +124,9 @@ class pygdfCrossfilter_utils:
                 shape tuple
         '''
         try:
-            return str(len(self.data_gpu),len(self.data_gpu.columns))
+            return str((len(self.data_gpu),len(self.data_gpu.columns)))
         except Exception as e:
-            return str("Exception raised on python server", e)
+            return str(e)
 
     def reset_filters(self, data, omit=None, include_dim=['all']):
         '''
@@ -161,7 +161,7 @@ class pygdfCrossfilter_utils:
                 return data
 
         except Exception as e:
-            return str("Exception raised on python server", e)
+            return str(e)
 
     def numba_jit_warm_func(self):
         '''
@@ -175,7 +175,7 @@ class pygdfCrossfilter_utils:
         try:
             self.hist_numba_GPU(self.data_gpu[self.data_gpu.columns[-1]].to_gpu_array(),640)
         except Exception as e:
-            return str("Exception raised on python server", e)
+            return str(e)
 
 
     def reset_all_filters(self):
@@ -193,7 +193,7 @@ class pygdfCrossfilter_utils:
             return str(len(self.data_gpu))
 
         except Exception as e:
-            return str("Exception raised on python server", e)
+            return str(e)
 
     def groupby_load(self, dimension_name, groupby_agg, groupby_agg_key):
         '''
@@ -211,7 +211,7 @@ class pygdfCrossfilter_utils:
             return self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
 
         except Exception as e:
-            return str("Exception raised on python server", e)
+            return str(e)
 
     def groupby_size(self, dimension_name, groupby_agg_key):
         '''
@@ -234,7 +234,7 @@ class pygdfCrossfilter_utils:
             return res
 
         except Exception as e:
-            return str("Exception raised on python server", e)
+            return str(e)
 
     def groupby_filterOrder(self, dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column):
         '''
@@ -273,7 +273,7 @@ class pygdfCrossfilter_utils:
             return res
 
         except Exception as e:
-            return str("Exception raised on python server", e)
+            return str(e)
 
     def dimension_load(self, dimension_name):
         '''
@@ -293,7 +293,7 @@ class pygdfCrossfilter_utils:
             return res
 
         except Exception as e:
-            return str("Exception raised on python server", e)
+            return str(e)
 
     def dimension_reset(self, dimension_name):
         '''
@@ -308,10 +308,10 @@ class pygdfCrossfilter_utils:
             self.data_gpu = self.back_up_dimension
             self.dimensions_filters[dimension_name] = ''
             self.data_gpu = self.reset_filters(self.data_gpu)
-            res = str(len(self.data_gpu))
+            return str(len(self.data_gpu))
 
         except Exception as e:
-            return str("Exception raised on python server", e)
+            return str(e)
 
 
     def dimension_get_max_min(self, dimension_name):
@@ -324,11 +324,11 @@ class pygdfCrossfilter_utils:
                 max_min_tuple
         '''
         try:
-            max_min_tuple = float(self.data_gpu[dimension_name].max()), float(self.data_gpu[dimension_name].min())
+            max_min_tuple = (float(self.data_gpu[dimension_name].max()), float(self.data_gpu[dimension_name].min()))
             return str(max_min_tuple)
 
         except Exception as e:
-            return str("Exception raised on python server", e)
+            return str(e)
 
     def dimension_hist(self, dimension_name, num_of_bins):
         '''
@@ -347,7 +347,7 @@ class pygdfCrossfilter_utils:
             return str(self.hist_numba_GPU(temp_df[str(dimension_name)].to_gpu_array(),num_of_bins))#+":::"+str(reset_filters_time)
 
         except Exception as e:
-            return str("Exception raised on python server", e)
+            return str(e)
 
 
     def dimension_filterOrder(self, dimension_name, sort_order, num_rows, columns):
@@ -365,6 +365,7 @@ class pygdfCrossfilter_utils:
         # print(args)
         # print(columns)
         try:
+            columns = columns.split(',')
             if(len(columns) == 0 or columns[0]==''):
                 columns = list(self.data_gpu.columns)
             elif dimension_name not in columns:
@@ -375,6 +376,7 @@ class pygdfCrossfilter_utils:
             if 'all' == sort_order:
                 temp_df = self.data_gpu.loc[:,columns].to_pandas().to_dict()
             else:
+                num_rows = int(num_rows)
                 max_rows = max(len(self.data_gpu)-1,0)
                 n_rows = min(num_rows, max_rows)
                 if 'top' == sort_order:
@@ -385,7 +387,8 @@ class pygdfCrossfilter_utils:
             return str(self.parse_dict(temp_df))
 
         except Exception as e:
-            return str("Exception raised on python server", e)
+            print(e)
+            return str(e)
 
 
 
@@ -411,7 +414,7 @@ class pygdfCrossfilter_utils:
             return str(len(self.data_gpu))
 
         except Exception as e:
-            return str("Exception raised on python server", e)
+            return str(e)
 
     def dimension_filter_range(self, dimension_name, min_value, max_value):
         '''
@@ -436,7 +439,7 @@ class pygdfCrossfilter_utils:
             return str(len(self.data_gpu))
 
         except Exception as e:
-            return str("Exception raised on python server", e)
+            return str(e)
 
 
     # def process_input_from_client(self, input_from_client):

@@ -2,6 +2,7 @@
 
 from flask import render_template,jsonify,request
 import logging
+import json
 from app import app
 import time
 from app.utilities.pygdfCrossfilter_utils import pygdfCrossfilter_utils as pygdf
@@ -22,7 +23,7 @@ def process_input_from_client():
 
     query = request.args.get('query')
 
-    app.logger.debug("query: ",query)
+    app.logger.debug("query: "+query)
 
     if session_id not in user_sessions:
         init_session(session_id)
@@ -31,7 +32,7 @@ def process_input_from_client():
 
 
 @app.route('/init_connection', methods=['GET'])
-def initConnection():
+def init_connection():
     '''
         description:
             initialize connection with node client for this user-dataset combination
@@ -44,7 +45,7 @@ def initConnection():
     #get basic get parameters
     start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
 
-    app.logger.debug("init connection for ",session_id)
+    app.logger.debug("init connection for "+session_id)
 
     if session_id not in user_sessions:
         init_session(session_id+dataset_name)
@@ -54,7 +55,7 @@ def initConnection():
     return append_time_to_response(response,start_time)
 
 
-@app.route('/read_data', method=['GET'])
+@app.route('/read_data', methods=['GET'])
 def read_data():
     '''
         description:
@@ -69,7 +70,7 @@ def read_data():
     start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
 
     # DEBUG: start
-    app.logger.debug("read data",dataset_name,"for",session_id)
+    app.logger.debug("read data"+dataset_name+" for "+session_id)
     # DEBUG: end
 
     #start function execution
@@ -80,7 +81,7 @@ def read_data():
     #return response
     return append_time_to_response(response,start_time)
 
-@app.route('/get_schema', method=['GET'])
+@app.route('/get_schema', methods=['GET'])
 def get_schema():
     '''
         description:
@@ -95,7 +96,7 @@ def get_schema():
     start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
 
     # DEBUG: start
-    app.logger.debug("get schema of",dataset_name,"for",session_id)
+    app.logger.debug("get schema of"+dataset_name+" for "+session_id)
     # DEBUG: end
 
     #start function execution
@@ -106,7 +107,7 @@ def get_schema():
     return append_time_to_response(response,start_time)
 
 
-@app.route('/get_size', method=['GET'])
+@app.route('/get_size', methods=['GET'])
 def get_size():
     '''
         description:
@@ -121,7 +122,7 @@ def get_size():
     start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
 
     # DEBUG: start
-    app.logger.debug("get size of",dataset_name,"for",session_id)
+    app.logger.debug("get size of"+dataset_name+" for "+session_id)
     # DEBUG: end
 
     #start function execution
@@ -132,7 +133,7 @@ def get_size():
     return append_time_to_response(response,start_time)
 
 
-@app.route('/groupby_load', method=['GET'])
+@app.route('/groupby_load', methods=['GET'])
 def groupby_load():
     '''
         description:
@@ -153,7 +154,7 @@ def groupby_load():
     groupby_agg = json.loads(request.args.get('groupby_agg'))
 
     # DEBUG: start
-    app.logger.debug("groupby load of",dataset_name,"for dimension_name:",dimension_name,"for",session_id)
+    app.logger.debug("groupby load of "+dataset_name+" for dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
     #start function execution
@@ -164,7 +165,7 @@ def groupby_load():
     #return response
     return append_time_to_response(response,start_time)
 
-@app.route('/groupby_size', method=['GET'])
+@app.route('/groupby_size', methods=['GET'])
 def groupby_size():
     '''
         description:
@@ -185,7 +186,7 @@ def groupby_size():
     groupby_agg = json.loads(request.args.get('groupby_agg'))
 
     # DEBUG: start
-    app.logger.debug("groupby size of",dataset_name,"for dimension_name:",dimension_name,"for",session_id)
+    app.logger.debug("groupby size of "+dataset_name+" for dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
     #start function execution
@@ -197,7 +198,7 @@ def groupby_size():
     return append_time_to_response(response,start_time)
 
 
-@app.route('/groupby_filterOrder', method=['GET'])
+@app.route('/groupby_filterOrder', methods=['GET'])
 def groupby_filterOrder():
     '''
         description:
@@ -220,11 +221,11 @@ def groupby_filterOrder():
     dimension_name = request.args.get('dimension_name')
     groupby_agg = json.loads(request.args.get('groupby_agg'))
     sort_order = request.args.get('sort_order')
-    num_rows = 0 if sort_order == 'all' else int(request.args.get('num_rows'))
+    num_rows = request.args.get('num_rows')
     sort_column = request.args.get('sort_column')
 
     # DEBUG: start
-    app.logger.debug("groupby filterOrder of",dataset_name,"for dimension_name:",dimension_name,"for",session_id)
+    app.logger.debug("groupby filterOrder of "+dataset_name+" for dimension_name "+dimension_name+" for "+session_id)
     # DEBUG: end
 
     #start function execution
@@ -236,7 +237,7 @@ def groupby_filterOrder():
     return append_time_to_response(response,start_time)
 
 
-@app.route('/dimension_load', method=['GET'])
+@app.route('/dimension_load', methods=['GET'])
 def dimension_load():
     '''
         description:
@@ -255,7 +256,7 @@ def dimension_load():
     dimension_name = request.args.get('dimension_name')
 
     # DEBUG: start
-    app.logger.debug("dataset:",dataset_name,"load dimension_name:",dimension_name,"for",session_id)
+    app.logger.debug("dataset: "+dataset_name+" load dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
     #start function execution
@@ -266,7 +267,7 @@ def dimension_load():
     return append_time_to_response(response,start_time)
 
 
-@app.route('/dimension_reset', method=['GET'])
+@app.route('/dimension_reset', methods=['GET'])
 def dimension_reset():
     '''
         description:
@@ -285,23 +286,28 @@ def dimension_reset():
     dimension_name = request.args.get('dimension_name')
 
     # DEBUG: start
-    app.logger.debug("dataset:",dataset_name,"reset dimension_name:",dimension_name,"for",session_id)
+    app.logger.debug("dataset: "+dataset_name+" reset dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
     #start function execution
     response = user_sessions[key].dimension_reset(dimension_name)
     #end function execution
-
+    # # DEBUG: start
+    # app.logger.debug("reset rows: ")
+    # app.logger.debug(response)
+    # # DEBUG: end
     #return response
     return append_time_to_response(response,start_time)
 
-@app.route('/dimension_get_max_min', method=['GET'])
+@app.route('/dimension_get_max_min', methods=['GET'])
 def dimension_get_max_min():
     '''
         description:
             get_max_min for a dimension
         Get parameters:
-            dimension_name (string)
+            1. session_id (string)
+            2. dataset (string)
+            3. dimension_name (string)
         Response:
             max_min_tuple
     '''
@@ -312,7 +318,7 @@ def dimension_get_max_min():
     dimension_name = request.args.get('dimension_name')
 
     # DEBUG: start
-    app.logger.debug("dataset:",dataset_name,"reset dimension_name:",dimension_name,"for",session_id)
+    app.logger.debug("dataset: "+dataset_name+" reset dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
     #start function execution
@@ -322,14 +328,16 @@ def dimension_get_max_min():
     #return response
     return append_time_to_response(response,start_time)
 
-@app.route('/dimension_hist', method=['GET'])
+@app.route('/dimension_hist', methods=['GET'])
 def dimension_hist():
     '''
         description:
             get histogram for a dimension
         Get parameters:
-            dimension_name (string)
-            num_of_bins (integer)
+            1. session_id (string)
+            2. dataset (string)
+            3. dimension_name (string)
+            4. num_of_bins (integer)
         Response:
             string(json) -> "{X:[__values_of_colName_with_max_64_bins__], Y:[__frequencies_per_bin__]}"
     '''
@@ -341,7 +349,7 @@ def dimension_hist():
     num_of_bins = request.args.get('num_of_bins')
 
     # DEBUG: start
-    app.logger.debug("dataset:",dataset_name,"get histogram dimension_name:",dimension_name,"for",session_id)
+    app.logger.debug("dataset: "+dataset_name+" get histogram dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
     #start function execution
@@ -351,16 +359,18 @@ def dimension_hist():
     #return response
     return append_time_to_response(response,start_time)
 
-@app.route('/dimension_filterOrder', method=['GET'])
+@app.route('/dimension_filterOrder', methods=['GET'])
 def dimension_filterOrder():
     '''
         description:
             get columns values by a filterOrder(all, top(n), bottom(n)) sorted by dimension_name
         Get parameters:
-            dimension_name (string)
-            sort_order (string): top/bottom/all
-            num_rows (integer): OPTIONAL -> if sort_order= top/bottom
-            columns (string): comma separated column names
+            1. session_id (string)
+            2. dataset (string)
+            3. dimension_name (string)
+            4. sort_order (string): top/bottom/all
+            5. num_rows (integer): OPTIONAL -> if sort_order= top/bottom
+            6. columns (string): comma separated column names
         Response:
             string(json) -> "{col_1:[__row_values__], col_2:[__row_values__],...}"
     '''
@@ -374,7 +384,7 @@ def dimension_filterOrder():
     columns = request.args.get('columns')
 
     # DEBUG: start
-    app.logger.debug("dataset:",dataset_name,"filterOrder dimension_name:",dimension_name,"for",session_id)
+    app.logger.debug("dataset:"+dataset_name+"filterOrder dimension_name:"+dimension_name+" for "+session_id)
     # DEBUG: end
 
     #start function execution
@@ -385,15 +395,17 @@ def dimension_filterOrder():
     return append_time_to_response(response,start_time)
 
 
-@app.route('/dimension_filter', method=['GET'])
+@app.route('/dimension_filter', methods=['GET'])
 def dimension_filter():
     '''
         description:
             get columns values by a filterOrder(all, top(n), bottom(n)) sorted by dimension_name
         Get parameters:
-            dimension_name (string)
-            comparison_operation (string)
-            value (float/int)
+            1. session_id (string)
+            2. dataset (string)
+            3. dimension_name (string)
+            4. comparison_operation (string)
+            5. value (float/int)
         Response:
             number_of_rows_left
     '''
@@ -406,7 +418,7 @@ def dimension_filter():
     value = request.args.get('value')
 
     # DEBUG: start
-    app.logger.debug("dataset:",dataset_name,"filter dimension_name:",dimension_name,"for",session_id)
+    app.logger.debug("dataset: "+dataset_name+" filter dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
     #start function execution
@@ -417,15 +429,17 @@ def dimension_filter():
     return append_time_to_response(response,start_time)
 
 
-@app.route('/dimension_filter_range', method=['GET'])
-def dimension_filterOrder():
+@app.route('/dimension_filter_range', methods=['GET'])
+def dimension_filter_range():
     '''
         description:
             cumulative filter_range dimension_name between range [min_value,max_value]
         Get parameters:
-            dimension_name (string)
-            min_value (integer)
-            max_value (integer)
+            1. session_id (string)
+            2. dataset (string)
+            3. dimension_name (string)
+            4. min_value (integer)
+            5. max_value (integer)
         Response:
             number_of_rows_left
     '''
@@ -438,7 +452,7 @@ def dimension_filterOrder():
     max_value = request.args.get('max_value')
 
     # DEBUG: start
-    app.logger.debug("dataset:",dataset_name,"filter_range dimension_name:",dimension_name,"for",session_id)
+    app.logger.debug("dataset:"+dataset_name+" filter_range dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
     #start function execution
@@ -448,7 +462,7 @@ def dimension_filterOrder():
     #return response
     return append_time_to_response(response,start_time)
 
-@app.route('/reset_all_filters', method=['GET'])
+@app.route('/reset_all_filters', methods=['GET'])
 def reset_all_filters():
     '''
         description:
@@ -463,7 +477,7 @@ def reset_all_filters():
     start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
 
     # DEBUG: start
-    app.logger.debug("reset all filters of",dataset_name,"for",session_id)
+    app.logger.debug("reset all filters of "+dataset_name+" for "+session_id)
     # DEBUG: end
 
     #start function execution
@@ -475,11 +489,11 @@ def reset_all_filters():
 
 
 @app.route('/end_connection', methods=['GET'])
-def endConnection():
+def end_connection():
     start_time = time.perf_counter()
     session_id = request.args.get('session_id')
     dataset_name = request.args.get('dataset')
-    app.logger.debug("end connection for ",session_id)
+    app.logger.debug("end connection for "+session_id)
     if session_id+dataset_name not in user_sessions:
         response = "Connection does not exist"
     else:
@@ -492,13 +506,14 @@ def endConnection():
 
 def append_time_to_response(res,start_time):
     elapsed = time.perf_counter() - start_time
-    #appending
-    if len(res.split(":::"))>2:
-        res = res+","+str(elapsed)+"////"
-    else:
-        res = res+":::"+str(elapsed)+"////"
-    # encode the result string
-    res = res.encode("utf8")
+    # #appending
+    # if len(res.split(":::"))>2:
+    #     res = res+","+str(elapsed)+"////"
+    # else:
+    #     res = res+":::"+str(elapsed)+"////"
+    # # encode the result string
+    # res = res.encode("utf8")
+    res = res+":::"+str(elapsed)
     return res
 
 
@@ -509,6 +524,7 @@ def parse_basic_get_parameters(get_params):
     session_id = get_params.get('session_id')
     dataset_name = get_params.get('dataset')
 
+    print(dataset_name)
     key = session_id+dataset_name
     #end get parameters
     return start_time,session_id,dataset_name,key

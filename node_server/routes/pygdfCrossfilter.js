@@ -15,6 +15,8 @@ const callback_store = {};
 const startTimeStore = {};
 let chunks = [];
 const got = require('got');
+const pyServerURL = 'http://127.0.0.1:3002';
+
 
 module.exports = function(io) {
 
@@ -50,40 +52,39 @@ module.exports = function(io) {
         socket.on('load_data', function(dataset, callback){
             try{
                 console.log("user tried to load data from "+dataset);
-                resetServerTime(dataset,socket.session_id);
-                if(isDataLoaded[socket.session_id+dataset] && dataLoaded[socket.session_id+dataset] === dataset && isConnectionEstablished[socket.session_id+dataset]){
-                    console.log('data already loaded');
-                    var query_args = ["reset_all"];
-                    process_client_input(socket.session_id,dataset,create_query(query_args))
-                      .then((message) => {
-                              console.log("reset_all: ");
-                              isDataLoaded[socket.session_id+dataset] = true
-                              dataLoaded[socket.session_id+dataset] = dataset
-                              callback(false,message);
+                // resetServerTime(dataset,socket.session_id);
 
-                      }).catch((error) => {
-                        console.log(error);
-                        callback(error,false);
-                      });
+                if(isDataLoaded[socket.session_id+dataset] && dataLoaded[socket.session_id+dataset] === dataset && isConnectionEstablished[socket.session_id+dataset]){
+                      console.log('data already loaded');
+
+                      let command = 'reset_all_filters';
+                      let query = {
+                          'session_id': socket.session_id,
+                          'dataset': dataset
+                      };
+
+                      pygdf_query(command,params(query),'reset_all',callback);
                 }else{
-                  if(isConnectionEstablished[socket.session_id+dataset]){
-                    console.log("loading new data in gpu mem");
-                    // loadData(dataset,socket.session_id, function(result){
-                    //     callback(false, result);
-                    // });
-                    var query_args = ["read",dataset];
-                    process_client_input(socket.session_id,dataset,create_query(query_args))
-                      .then((message) => {
-                              console.log("read: ");
-                              isDataLoaded[socket.session_id+dataset] = true
-                              dataLoaded[socket.session_id+dataset] = dataset
-                              callback(false,message);
-                      }).catch((error) => {
-                        console.log(error);
-                        callback(error,false);
+
+                      console.log("loading new data in gpu mem");
+                      let command = 'read_data';
+                      let query = {
+                          'session_id': socket.session_id,
+                          'dataset': dataset
+                      };
+                      console.log("params",params(query));
+
+                      pygdf_query(command,params(query),'read_data',(error, message) => {
+                          if(!error){
+                            isDataLoaded[socket.session_id+dataset] = true
+                            dataLoaded[socket.session_id+dataset] = dataset
+                            callback(false,message);
+                          }else{
+                            console.log(error);
+                            callback(error,false);
+                          }
                       });
-                  }
-                }
+                    }
             }catch(ex){
                 console.log(ex);
                 clearGPUMem();
@@ -91,34 +92,26 @@ module.exports = function(io) {
         });
 
         socket.on("resetAllFilters", function(dataset,callback){
-          var query_args = ["reset_all"];
-          process_client_input(socket.session_id,dataset,create_query(query_args))
-            .then((message) => {
-                    console.log("resetAllFilters: ");
-                    isDataLoaded[socket.session_id+dataset] = true
-                    dataLoaded[socket.session_id+dataset] = dataset
-                    callback(false,message);
-            }).catch((error) => {
-              console.log(error);
-              callback(error,false);
-            });
+            let command = 'reset_all_filters';
+            let query = {
+                'session_id': socket.session_id,
+                'dataset': dataset
+            };
+
+            pygdf_query(command,params(query),'reset_all',callback);
         });
 
         //get schema of the dataset
         socket.on('getSchema', function(dataset,callback){
             try{
-                console.log("user requesting schema of the dataset");
-                var query_args = ['schema']
-                process_client_input(socket.session_id,dataset,create_query(query_args))
-                  .then((message) => {
-                          console.log("schema: ");
-                          isDataLoaded[socket.session_id+dataset] = true
-                          dataLoaded[socket.session_id+dataset] = dataset
-                          callback(false,message);
-                  }).catch((error) => {
-                    console.log(error);
-                    callback(error,false);
-                  });
+                let command = 'get_schema';
+                let query = {
+                    'session_id': socket.session_id,
+                    'dataset': dataset
+                };
+
+                pygdf_query(command,params(query),"user requesting schema of the dataset",callback);
+
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
@@ -130,18 +123,15 @@ module.exports = function(io) {
         //load dimension
         socket.on('dimension_load', function(column_name,dataset, callback){
             try{
-                console.log("user requesting loading a new dimension:"+column_name);
-                var query_args = ["dimension_load",column_name];
-                process_client_input(socket.session_id,dataset,create_query(query_args))
-                  .then((message) => {
-                          console.log("dimension_load: ");
-                          isDataLoaded[socket.session_id+dataset] = true
-                          dataLoaded[socket.session_id+dataset] = dataset
-                          callback(false,message);
-                  }).catch((error) => {
-                    console.log(error);
-                    callback(error,false);
-                  });
+                let command = 'dimension_load';
+                let query = {
+                    'session_id': socket.session_id,
+                    'dataset': dataset,
+                    'dimension_name': column_name
+                };
+
+                pygdf_query(command,params(query),"user requesting loading a new dimension:"+column_name,callback);
+
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
@@ -152,18 +142,25 @@ module.exports = function(io) {
         //query the dataframe -> return results
         socket.on('dimension_filter', function(column_name,dataset,comparison,value,callback){
             try{
-                console.log("user requesting filtering of the dataset");
-                var query_args = ["dimension_filter",column_name,comparison,value];
-                process_client_input(socket.session_id,dataset,create_query(query_args))
-                  .then((message) => {
-                          console.log("dimension_filter: ");
-                          isDataLoaded[socket.session_id+dataset] = true
-                          dataLoaded[socket.session_id+dataset] = dataset
-                          callback(false,message);
-                  }).catch((error) => {
-                    console.log(error);
-                    callback(error,false);
-                  });
+                let command = 'dimension_filter';
+                let query = {
+                    'session_id': socket.session_id,
+                    'dataset': dataset,
+                    'dimension_name': column_name,
+                    'comparison_operation':comparison,
+                    'value': value
+                };
+
+                pygdf_query(command,params(query),"user requesting filtering of the dataset",(error, message) => {
+                    if(!error){
+                      socket.emit("update_size", dataset, JSON.parse(message)['data']);
+                      callback(false,message);
+                    }else{
+                      console.log(error);
+                      callback(error,false);
+                    }
+                });
+
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
@@ -174,18 +171,16 @@ module.exports = function(io) {
         //query the dataframe -> return results
         socket.on('groupby_load', function(column_name,dataset,agg,callback){
             try{
-                console.log("user requesting groupby for the dimension:"+column_name);
-                var query_args = ["groupby_load",column_name,agg];
-                process_client_input(socket.session_id,dataset,create_query(query_args))
-                  .then((message) => {
-                          console.log("groupby_load: ");
-                          isDataLoaded[socket.session_id+dataset] = true
-                          dataLoaded[socket.session_id+dataset] = dataset
-                          callback(false,message);
-                  }).catch((error) => {
-                    console.log(error);
-                    callback(error,false);
-                  });
+                let command = 'groupby_load';
+                let query = {
+                    'session_id': socket.session_id,
+                    'dataset': dataset,
+                    'dimension_name': column_name,
+                    'groupby_agg':agg
+                };
+
+                pygdf_query(command,params(query),"user requesting groupby for the dimension:"+column_name,callback);
+
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
@@ -194,19 +189,22 @@ module.exports = function(io) {
         });
 
         //get top/bottom n rows as per the top n values of columnName
-        socket.on('groupby_filterOrder', function(sortOrder, column_name,dataset,n,sort_column,agg,callback){
+        socket.on('groupby_filterOrder', function(sort_order, column_name,dataset,n,sort_column,agg,callback){
             try{
-                console.log("user has requested top n rows for the groupby operation for dimension: "+column_name);
-                var query_args = ["groupby_filterOrder",column_name,sortOrder,n,sort_column,agg];
 
-                process_client_input(socket.session_id,dataset,create_query(query_args))
-                  .then((message) => {
-                          console.log("groupby_filterOrder: ");
-                          callback(false,message);
-                  }).catch((error) => {
-                    console.log(error);
-                    callback(error,false);
-                  });
+                let command = 'groupby_filterOrder';
+                let query = {
+                    'session_id': socket.session_id,
+                    'dataset': dataset,
+                    'dimension_name': column_name,
+                    'groupby_agg':agg,
+                    'sort_order': sort_order,
+                    'num_rows': n,
+                    'sort_column': sort_column
+                };
+
+                pygdf_query(command,params(query),"user has requested filterOrder rows for the groupby operation for dimension:"+column_name,callback);
+
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
@@ -217,19 +215,25 @@ module.exports = function(io) {
          //query the dataframe as per a range-> return results
          socket.on('dimension_filter_range', function(column_name,dataset,range_min,range_max,callback){
             try{
-                console.log("user requesting filtering of the dataset as per a range of rows");
-                var query_args = ["dimension_filter_range",column_name,range_min,range_max];
-                process_client_input(socket.session_id,dataset,create_query(query_args))
-                  .then((message) => {
-                          console.log("dimension_filter_range: ");
-                          isDataLoaded[socket.session_id+dataset] = true
-                          dataLoaded[socket.session_id+dataset] = dataset
-                          socket.emit("update_size", dataset, JSON.parse(message)['data']);
-                          callback(false,message);
-                  }).catch((error) => {
-                    console.log(error);
-                    callback(error,false);
-                  });
+                let command = 'dimension_filter_range';
+                let query = {
+                    'session_id': socket.session_id,
+                    'dataset': dataset,
+                    'dimension_name': column_name,
+                    'min_value':range_min,
+                    'max_value': range_max
+                };
+
+                pygdf_query(command,params(query),"user requesting filtering of the dataset as per a range of rows",(error, message) => {
+                    if(!error){
+                      socket.emit("update_size", dataset, JSON.parse(message)['data']);
+                      callback(false,message);
+                    }else{
+                      console.log(error);
+                      callback(error,false);
+                    }
+                });
+
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
@@ -240,19 +244,22 @@ module.exports = function(io) {
         //reset all filters on a dimension
         socket.on('dimension_filterAll', function(column_name,dataset, callback){
             try{
-                console.log("user requesting resetting filters on the current dimension");
-                var query_args = ["dimension_reset",column_name];
-                console.log("query:"+create_query(query_args));
-                process_client_input(socket.session_id,dataset,create_query(query_args))
-                  .then((message) => {
-                          console.log("dimension_filterAll: ");
-                          isDataLoaded[socket.session_id+dataset] = true
-                          dataLoaded[socket.session_id+dataset] = dataset
-                          callback(false,message);
-                  }).catch((error) => {
-                    console.log(error);
-                    callback(error,false);
-                  });
+                let command = 'dimension_reset';
+                let query = {
+                    'session_id': socket.session_id,
+                    'dataset': dataset,
+                    'dimension_name': column_name
+                };
+
+                pygdf_query(command,params(query),"user requesting resetting filters on the current dimension",(error, message) => {
+                    if(!error){
+                      socket.emit("update_size", dataset, JSON.parse(message)['data']);
+                      callback(false,message);
+                    }else{
+                      console.log(error);
+                      callback(error,false);
+                    }
+                });
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
@@ -261,20 +268,18 @@ module.exports = function(io) {
         });
 
 
-        socket.on('groupby_size', function(column_name,dataset,type, callback){
+        socket.on('groupby_size', function(column_name,dataset,agg, callback){
             try{
-                console.log("user requesting size of the groupby");
-                var query_args = ["groupby_size",column_name,type];
-                process_client_input(socket.session_id,dataset,create_query(query_args))
-                  .then((message) => {
-                          console.log("groupby_size: ");
-                          isDataLoaded[socket.session_id+dataset] = true
-                          dataLoaded[socket.session_id+dataset] = dataset
-                          callback(false,message);
-                  }).catch((error) => {
-                    console.log(error);
-                    callback(error,false);
-                  });
+                let command = 'groupby_size';
+                let query = {
+                    'session_id': socket.session_id,
+                    'dataset': dataset,
+                    'dimension_name': column_name,
+                    'groupby_agg':agg
+                };
+
+                pygdf_query(command,params(query),"user requesting size of the groupby",callback);
+
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
@@ -285,18 +290,14 @@ module.exports = function(io) {
         //get size of the dataset
         socket.on('size', function(dataset,callback){
             try{
-                console.log("user requesting size of the dataset");
-                var query_args = ['size']
-                process_client_input(socket.session_id,dataset,create_query(query_args))
-                  .then((message) => {
-                          console.log("size: ");
-                          isDataLoaded[socket.session_id+dataset] = true
-                          dataLoaded[socket.session_id+dataset] = dataset
-                          callback(false,message);
-                  }).catch((error) => {
-                    console.log(error);
-                    callback(error,false);
-                  });
+                let command = 'get_size';
+                let query = {
+                    'session_id': socket.session_id,
+                    'dataset': dataset
+                };
+
+                pygdf_query(command,params(query),"user requesting size of the dataset",callback);
+
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
@@ -305,21 +306,21 @@ module.exports = function(io) {
         });
 
         //get top/bottom n rows as per the top n values of columnName
-        socket.on('dimension_filterOrder', function(sortOrder, column_name,dataset,n,columns,callback){
+        socket.on('dimension_filterOrder', function(sort_order, column_name, dataset, num_rows, columns,callback){
             try{
-                console.log("user has requested top n rows as per the column "+column_name);
-                var query_args = ["dimension_filterOrder",column_name,sortOrder,n,columns];
 
-                process_client_input(socket.session_id,dataset,create_query(query_args))
-                  .then((message) => {
-                          console.log("dimension_filterOrder: ");
-                          isDataLoaded[socket.session_id+dataset] = true
-                          dataLoaded[socket.session_id+dataset] = dataset
-                          callback(false,message);
-                  }).catch((error) => {
-                    console.log(error);
-                    callback(error,false);
-                  });
+                let command = 'dimension_filterOrder';
+                let query = {
+                    'session_id': socket.session_id,
+                    'dataset': dataset,
+                    'dimension_name': column_name,
+                    'sort_order': sort_order,
+                    'num_rows': num_rows,
+                    'columns': columns
+                };
+
+                pygdf_query(command,params(query),"user has requested top n rows as per the column "+column_name,callback);
+
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
@@ -328,20 +329,18 @@ module.exports = function(io) {
         });
 
         //getHist
-        socket.on('dimension_getHist', function(column_name,dataset,bins, callback){
+        socket.on('dimension_getHist', function(column_name,dataset,num_of_bins, callback){
             try{
-                console.log("user requested histogram for "+column_name);
-                var query_args = ["dimension_hist",column_name,bins];
-                process_client_input(socket.session_id,dataset,create_query(query_args))
-                  .then((message) => {
-                          console.log("dimension_getHist: ");
-                          isDataLoaded[socket.session_id+dataset] = true
-                          dataLoaded[socket.session_id+dataset] = dataset
-                          callback(false,message);
-                  }).catch((error) => {
-                    console.log(error);
-                    callback(error,false);
-                  });
+                let command = 'dimension_hist';
+                let query = {
+                    'session_id': socket.session_id,
+                    'dataset': dataset,
+                    'dimension_name': column_name,
+                    'num_of_bins': num_of_bins
+                };
+
+                pygdf_query(command,params(query),"user requested histogram for "+column_name,callback);
+
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
@@ -353,18 +352,17 @@ module.exports = function(io) {
         //get Max and Min for a dimension
         socket.on('dimension_getMaxMin', function(column_name,dataset,callback){
             try{
-                console.log("user requested max-min values for "+column_name+" for data="+dataset);
-                var query_args = ['dimension_get_max_min',column_name];
-                process_client_input(socket.session_id,dataset,create_query(query_args))
-                  .then((message) => {
-                          console.log("dimension_getMaxMin: ");
-                          isDataLoaded[socket.session_id+dataset] = true
-                          dataLoaded[socket.session_id+dataset] = dataset
-                          callback(false,message);
-                  }).catch((error) => {
-                    console.log(error);
-                    callback(error,false);
-                  });
+
+                let command = 'dimension_get_max_min';
+                let query = {
+                    'session_id': socket.session_id,
+                    'dataset': dataset,
+                    'dimension_name': column_name
+                };
+                let comment = "user requested max-min values for "+column_name+" for data="+dataset;
+
+                pygdf_query(command,params(query),comment,callback);
+
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
@@ -386,9 +384,48 @@ module.exports = function(io) {
     return router;
 };
 
+
+function callPyServer(command,query){
+  return new Promise((resolve, reject) => {
+       let startTime = Date.now();
+       let url = pyServerURL+'/'+command+'?'+query
+       got(url)
+        .then(val => {
+          var pyresponse = Buffer.from(val.body).toString('utf8').split(":::");
+          var response = {
+                        data: pyresponse[0],
+                        pythonScriptTime: pyresponse[1],
+                        nodeServerTime: Date.now() - startTime
+                    }
+          resolve(JSON.stringify(response));
+        }).catch(error => {
+          console.log(error);
+          reject(true,error.toString());
+        });
+  });
+}
+
+function params(data) {
+  let dataset = data['dataset'];
+  let session_id = data['session_id']
+  // resetServerTime(dataset,session_id);
+  return Object.keys(data).map(key => `${key}=${encodeURIComponent(data[key])}`).join('&');
+}
+
+function pygdf_query(command,query, comments,callback){
+    callPyServer(command,query)
+      .then((message) => {
+              console.log(comments);
+              callback(false,message);
+      }).catch((error) => {
+              console.log(error);
+              callback(error,false);
+      });
+}
+
 function endSession(session_id,dataset,callback){
   let startTime = Date.now()
-  url = 'http://127.0.0.1:3002/endConnection?session_id='+session_id
+  url = 'http://127.0.0.1:3002/end_connection?session_id='+session_id+'&dataset='+dataset
   got(url)
    .then(val => {
      isDataLoaded[session_id+dataset] = false;
@@ -514,6 +551,8 @@ function process_client_input(session_id, dataset, query){
 }
 
 function resetServerTime(dataset, session_id){
+  console.log(dataset);
+  console.log(session_id);
     var server_dataset = dataset.split(":::")[0];
     var server_key = session_id+server_dataset;
     serverOnTime[server_key] = Date.now();
@@ -567,9 +606,10 @@ function initConnection(session_id,dataset, callback){
     // }
     let startTime = Date.now()
 
-    let url = 'http://127.0.0.1:3002/initConnection?session_id='+session_id
+    let url = 'http://127.0.0.1:3002/init_connection?session_id='+session_id+'&dataset='+dataset
     got(url)
       .then(val => {
+        console.log(val.body)
         isConnectionEstablished[session_id+dataset] = true
         var pyresponse = Buffer.from(val.body).toString('utf8').split(":::");
         var response = {
