@@ -1,5 +1,7 @@
 source activate gdf
 export FLASK_ENV=development
 export FLASK_APP=../python_scripts/flask_server/run.py
-flask run --port=3002
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
+flask run --port=3002 &
 npm start
