@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 #	pyarrow \
 #	numba \
 #	cudatoolkit
-RUN source activate gdf && conda install -c conda-forge pyarrow jupyter
+RUN source activate gdf && conda install -c conda-forge pyarrow jupyter flask
 
 RUN apt-get update -yq && apt-get upgrade -yq && \
     apt-get install -yq curl
