@@ -56,14 +56,22 @@ module.exports = function(io) {
 
                 if(isDataLoaded[socket.session_id+dataset] && dataLoaded[socket.session_id+dataset] === dataset && isConnectionEstablished[socket.session_id+dataset]){
                       console.log('data already loaded');
-
+                      let startTime = Date.now();
                       let command = 'reset_all_filters';
                       let query = {
                           'session_id': socket.session_id,
                           'dataset': dataset
                       };
 
-                      pygdf_query(command,params(query),'reset_all',callback);
+                      pygdf_query(command,params(query),'reset_all');
+
+                      //send data already loaded custom response
+                      var response = {
+                                    data: 'data already loaded',
+                                    pythonScriptTime: 0,
+                                    nodeServerTime: Date.now() - startTime
+                                };
+                      callback(false, JSON.stringify(response));
                 }else{
 
                       console.log("loading new data in gpu mem");
@@ -416,10 +424,10 @@ function pygdf_query(command,query, comments,callback){
     callPyServer(command,query)
       .then((message) => {
               console.log(comments);
-              callback(false,message);
+              typeof callback === 'function' && callback(false,message);
       }).catch((error) => {
               console.log(error);
-              callback(error,false);
+              typeof callback === 'function' && callback(error,false);
       });
 }
 
@@ -441,22 +449,6 @@ function endSession(session_id,dataset,callback){
      console.log(error);
      reject(true,error.toString());
    });
-    // try{
-    //     for(var key in pyClient){
-    //         if(key.includes(session_id+dataset)){
-    //             pyClient[key].write("exit");
-    //             pyClient[key].destroy();
-    //             isDataLoaded[key] = false;
-    //             isConnectionEstablished[key] = false;
-    //         }
-    //     }
-    //     callback(false,"session ended");
-    //
-    // }catch(ex){
-    //     console.log(ex);
-    //     callback(true,-1);
-    //     clearGPUMem();
-    // }
 }
 
 //Utility functions:
@@ -515,39 +507,6 @@ function process_client_input(session_id, dataset, query){
             reject(true,error.toString());
           });
     });
-
-    // try{
-    //     resetServerTime(dataset,session_id);
-    //     if(isConnectionEstablished[session_id+dataset]){
-    //         let identifier = query.split(":::")[0];
-    //         if(identifier.includes("dimension") || identifier.includes("group")){
-    //             identifier = identifier+query.split(":::")[1].split('///')[0];
-    //         }
-    //         // callback_store[identifier] = callback;
-    //         // startTimeStore[identifier] = Date.now();
-    //
-    //           // utils(Date.now(), session_id, dataset, query);//
-    //           // function(result){
-    //             // var pyresponse = Buffer.from(result).toString('utf8').split(":::");
-    //             // var response = {
-    //             //     data: pyresponse[0],
-    //             //     pythonScriptTime: pyresponse[1],
-    //             //     nodeServerTime: Date.now() - startTime
-    //             // }
-    //         // });
-    //     }else{
-    //         var response = {
-    //             data: 'No connection established',
-    //             pythonScriptTime: 0,
-    //             nodeServerTime: Date.now() - startTime
-    //         }
-    //         return(false,JSON.stringify(response));
-    //     }
-    // }catch(ex){
-    //     console.log(ex);
-    //     callback(true,-1);
-    //     clearGPUMem();
-    // }
 }
 
 function resetServerTime(dataset, session_id){
@@ -578,32 +537,6 @@ function create_query(list_of_args){
 
 }
 function initConnection(session_id,dataset, callback){
-    // var tryAgain = 0;
-    // var server_dataset = dataset.split(":::")[0];
-    // var server_key = session_id+server_dataset;
-    // var threadCount = 'threadCount';
-    // console.log("server key"+server_key);
-    //
-    //
-    //
-    // if(!(server_key in pyServer) || (server_key in pyServer && pyServer[threadCount+server_key]>1)){
-    //     pyServer[threadCount+server_key] = 1;
-    //     pyServer[server_key] = spawn('python3', ['../python_scripts/pygdfCrossfilter.py',1]);
-    //     console.log("server successfully spawned");
-    //     pyServer[server_key].stdout.on('data', function(data) {
-    //         console.log('PyServer stdout: ');
-    //         console.log(Buffer.from(data).toString('utf8'));
-    //     });
-    //     pyServer[server_key].stderr.on('data', function(data) {
-    //         isConnectionEstablished[session_id+dataset] = false;
-    //         pyServer[threadCount+server_key] = 0;
-    //         pyClient[session_id+dataset].write("exit");
-    //         console.log('PyServer stderr: ');
-    //         console.log(Buffer.from(data).toString('utf8'));
-    //     });
-    // }else{
-    //     pyServer[threadCount+server_key]= pyServer[threadCount+server_key] + 1;
-    // }
     let startTime = Date.now()
 
     let url = 'http://127.0.0.1:3002/init_connection?session_id='+session_id+'&dataset='+dataset
@@ -623,94 +556,4 @@ function initConnection(session_id,dataset, callback){
         isConnectionEstablished[session_id+dataset] = false;
         callback(true,error.toString());
       });
-
-    // pyClient[session_id+dataset] = new net.Socket();
-    // pyClient[session_id+dataset].connect(PORT, HOST, function() {
-    //     console.log('CONNECTED TO: ' + HOST + ':' + PORT);
-    // });
-    // pyClient[session_id+dataset].on('error',function(err){
-    //     console.log("failed. Trying again... "+err);
-    //     if(tryAgain < 3){
-    //         setTimeout(function(){
-    //               pyClient[session_id+dataset].connect(PORT, HOST, function() {
-    //                 });
-    //        },1000);
-    //
-    //        tryAgain= tryAgain+ 1;
-    //      }else{
-    //         callback(true,err.toString());
-    //     }
-    //
-    // });
-    // pyClient[session_id+dataset].on('connect', function(){
-    //     isConnectionEstablished[session_id+dataset] = true;
-    //     pyClient[session_id+dataset].setNoDelay();
-    //     pyClient[session_id+dataset].on('data', function(val){
-    //         // console.log(Buffer.from(val).toString('utf8'));
-    //         if(Buffer.from(val).toString('utf8').substring(val.length - 4) === '////'){
-    //             chunks.push(val);
-    //             console.log('reached end');
-    //             let data = Buffer.concat(chunks);
-    //             chunks = [];
-    //             // pyClient[session_id+dataset].removeAllListeners(['data']);
-    //             var res_str = Buffer.from(data).toString('utf8');
-    //             res_str = res_str.substring(0,res_str.length - 4);
-    //             var pyresponse = Buffer.from(res_str).toString('utf8').split(":::");
-    //             var identifier = pyresponse.shift();
-    //             var response = {
-    //                 data: pyresponse[0],
-    //                 pythonScriptTime: pyresponse[1],
-    //                 nodeServerTime: (Date.now() - startTimeStore[identifier])/1000
-    //             }
-    //             // if(identifier === 'dimension_filterOrder'){
-    //             //     callback_store[identifier](false,data);
-    //             // }else{
-    //                 callback_store[identifier](false,JSON.stringify(response));
-    //             // }
-    //         }else{
-    //             chunks.push(val);
-    //             // console.log(val);
-    //         }
-    //     });
-    //     callback(false,'user has connected to pygdfCrossfilter');
-    //
-    // });
-}
-
-
-// function loadData(dataset,session_id, callback){
-//     try{
-//         console.log('inside loaddata');
-//         pyClient[session_id+dataset].on('data', function(val){
-//             console.log("received data from pyscript");
-//             var pyresponse = Buffer.from(val).toString('utf8').split(":::");
-//             var response = {
-//                 data: pyresponse[0],
-//                 pythonScriptTime: pyresponse[1],
-//                 nodeServerTime: Date.now() - startTime
-//             }
-//             // console.log(response);
-//             isDataLoaded[session_id+dataset] = true;
-//             dataLoaded[session_id+dataset] = dataset;
-//             pyClient[session_id+dataset].removeAllListeners(['data']);
-//             callback(JSON.stringify(response));
-//         });
-//         var temp = create_query(['read',dataset]);
-//         console.log(temp);
-//         pyClient[session_id+dataset].write(temp);
-//     }catch(ex){
-//         console.log(ex);
-//         clearGPUMem();
-//     }
-
-// }
-
-
-function utils(session_id,dataset, query,callback){
-    try{
-        pyClient[session_id+dataset].write(query);
-    }catch(ex){
-        console.log(ex);
-        clearGPUMem();
-    }
 }
