@@ -2,12 +2,6 @@ FROM pygdf
 
 WORKDIR /usr/src/app
 
-# Python packages from conda
-#RUN conda install -n gdf -y \
-#	pandas \
-#	pyarrow \
-#	numba \
-#	cudatoolkit
 RUN source activate gdf && conda install -c conda-forge pyarrow jupyter flask
 
 RUN apt-get update -yq && apt-get upgrade -yq && \
@@ -22,13 +16,8 @@ RUN npm install -g npm
 COPY . .
 
 WORKDIR /usr/src/app/node_server
-RUN pwd
 
 RUN mkdir uploads
 RUN npm install
 
-COPY ./entrypoint.sh ./
-RUN pwd
-RUN ls
-EXPOSE 3000
-ENTRYPOINT ["bash","./entrypoint.sh"]
+ENTRYPOINT ["bash","../entrypoint.sh"]
