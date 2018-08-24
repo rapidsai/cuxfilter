@@ -53,10 +53,16 @@ module.exports = function(io) {
                 if(isDataLoaded[socket.session_id+dataset] && dataLoaded[socket.session_id+dataset] === dataset){
                     console.log('data already loaded');
                     var query_args = ["reset_all"];
+                    let startTime = Date.now()
                     process_client_input(socket.session_id,dataset,create_query(query_args),function(error,message){
                         if(!error){
                             console.log("reset all filters");
-                            callback(true,'data already loaded ... cleared all filters');
+                            var response = {
+                              nodeServerTime: Date.now() - startTime,
+                              pythonScriptTime: 0,
+                              data: "data already loaded ... cleared all filters"
+                            }
+                            callback(true,JSON.stringify(response));
                         }
                     });
                 }else{
