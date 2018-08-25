@@ -341,10 +341,14 @@ class pygdfCrossfilter_utils:
                 string(json) -> "{X:[__values_of_colName_with_max_64_bins__], Y:[__frequencies_per_bin__]}"
         '''
         try:
+            num_of_bins = int(num_of_bins)
             # start = time.time()
-            temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim = [dimension_name])
-            # reset_filters_time = time.time() - start
-            return str(self.hist_numba_GPU(temp_df[str(dimension_name)].to_gpu_array(),num_of_bins))#+":::"+str(reset_filters_time)
+            if len(self.dimensions_filters.keys()) == 0 or (len(self.dimensions_filters.keys()) == 1 and dimension_name in self.dimensions_filters):
+                return str(self.hist_numba_GPU(self.data_gpu[str(dimension_name)].to_gpu_array(),num_of_bins))
+            else:
+                temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim = [dimension_name])
+                # reset_filters_time = time.time() - start
+                return str(self.hist_numba_GPU(temp_df[str(dimension_name)].to_gpu_array(),num_of_bins))#+":::"+str(reset_filters_time)
 
         except Exception as e:
             return str(e)
