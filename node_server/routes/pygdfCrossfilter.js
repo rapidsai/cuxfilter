@@ -17,7 +17,6 @@ let chunks = [];
 const got = require('got');
 const pyServerURL = 'http://127.0.0.1:3002';
 
-
 module.exports = function(io) {
 
     //SOCKET.IO
@@ -69,7 +68,7 @@ module.exports = function(io) {
                       var response = {
                                     data: 'data already loaded',
                                     pythonScriptTime: 0,
-                                    nodeServerTime: Date.now() - startTime
+                                    nodeServerTime: (Date.now() - startTime)/1000
                                 };
                       callback(false, JSON.stringify(response));
                 }else{
@@ -403,8 +402,7 @@ function callPyServer(command,query){
           var response = {
                         data: pyresponse[0],
                         pythonScriptTime: pyresponse[1],
-                        nodeServerTime: Date.now() - startTime
-                    }
+                        nodeServerTime: (Date.now() - startTime)/1000                    }
           resolve(JSON.stringify(response));
         }).catch(error => {
           console.log(error);
@@ -442,7 +440,7 @@ function endSession(session_id,dataset,callback){
      var response = {
                    data: pyresponse[1],
                    pythonScriptTime: pyresponse[2],
-                   nodeServerTime: Date.now() - startTime
+                   nodeServerTime: (Date.now() - startTime)/1000
                }
      callback(false,JSON.stringify(response));
    }).catch(error => {
@@ -499,7 +497,7 @@ function process_client_input(session_id, dataset, query){
             var response = {
                           data: pyresponse[1],
                           pythonScriptTime: pyresponse[2],
-                          nodeServerTime: Date.now() - startTime
+                          nodeServerTime: (Date.now() - startTime)/1000
                       }
             resolve(JSON.stringify(response));
           }).catch(error => {
@@ -548,7 +546,7 @@ function initConnection(session_id,dataset, callback){
         var response = {
                       data: pyresponse[1],
                       pythonScriptTime: pyresponse[2],
-                      nodeServerTime: Date.now() - startTime
+                      nodeServerTime: (Date.now() - startTime)/1000
                   }
         callback(false,JSON.stringify(response));
       }).catch(error => {
