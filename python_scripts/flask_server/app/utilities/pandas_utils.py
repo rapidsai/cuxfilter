@@ -1,6 +1,5 @@
 from pyarrow import RecordBatchStreamReader
-from app.utilities.numbaHistinMem import numba_gpu_histogram
-from pygdf.dataframe import DataFrame
+import pandas as pd
 import json
 import os
 import numpy as np
@@ -8,53 +7,31 @@ import time
 import sys
 
 
-class pygdfCrossfilter_utils:
-    data_gpu = None
-    back_up_dimension = None
+class pandas_utils:
+    pandas_df = None
+    back_up_dimension_pandas = None
     dimensions_filters = {}
     group_by_backups = {}
 
 
-    def hist_numba_GPU(self,data,bins):
+    def hist_numpy(self,data,bins):
         '''
             description:
                 Calculate histogram leveraging gpu via pycuda(using numba jit)
             input:
-                data: pygdf row as a series -> gpu mem pointer, bins: number of bins in the histogram
+                data: np array, bins: number of bins in the histogram
             Output:
                 json -> {X:[__values_of_colName_with_max_64_bins__], Y:[__frequencies_per_bin__]}
         '''
-        print("calculating histogram")
-        df1 = numba_gpu_histogram(data,int(bins))
+        print("calculating histogram pandas/np version")
+        df1 = np.histogram(np.array(data),bins=bins)
         dict_temp ={}
 
-        dict_temp['X'] = list(df1[1].astype(float))
-        dict_temp['Y'] = list(df1[0].astype(float))
+        dict_temp['X'] = list(df1[1].astype(str))
+        dict_temp['Y'] = list(df1[0].astype(str))
 
-        return str(json.dumps(dict_temp))
+        return json.dumps(dict_temp)
 
-    def groupby(self,data,column_name, groupby_agg,groupby_agg_key):
-        '''
-            description:
-                Calculate groupby on a given column on the pygdf
-            input:
-                data: pygdf row as a series -> gpu mem pointer,
-                column_name: column name
-            Output:
-                json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
-        '''
-        # global group_by_backups
-        print(column_name)
-        print("inside groupby function")
-        try:
-            group_appl = data.groupby(by=[column_name]).agg(groupby_agg)
-        except e:
-            print("caught it ....caught it...")
-            print(e)
-        print(len(group_appl))
-        key = column_name+"_"+groupby_agg_key
-        self.group_by_backups[key] = group_appl  #.loc[:,[column_name,column_name+'_'+agg]]
-        return "groupby intialized successfully"
 
     def get_columns(self):
         '''
@@ -65,7 +42,7 @@ class pygdfCrossfilter_utils:
             Output:
                 list of column names
         '''
-        return str(list(self.data_gpu.columns))
+        return str(list(self.pandas_df.columns))
 
     def read_arrow_to_DF(self,source):
         '''
@@ -77,9 +54,8 @@ class pygdfCrossfilter_utils:
                 pandas dataframe
         '''
         source = source+".arrow"
-        pa_df = RecordBatchStreamReader(source).read_all().to_pandas()
-        self.data_gpu = DataFrame.from_pandas(pa_df)
-        self.back_up_dimension = self.data_gpu
+        self.pandas_df = RecordBatchStreamReader(source).read_all().to_pandas()
+        self.back_up_dimension_pandas = self.pandas_df
         return "data read successfully"
 
 
@@ -129,7 +105,7 @@ class pygdfCrossfilter_utils:
                 shape tuple
         '''
         try:
-            return str((len(self.data_gpu),len(self.data_gpu.columns)))
+            return str((len(self.pandas_df),len(self.pandas_df.columns)))
         except Exception as e:
             return str(e)
 
@@ -169,21 +145,6 @@ class pygdfCrossfilter_utils:
             return str(e)
 
 
-    def numba_jit_warm_func(self):
-        '''
-            description:
-                send dummy call to numba_gpu_histogram to precompile jit function
-            input:
-                None
-            Output:
-                None
-        '''
-        try:
-            self.hist_numba_GPU(self.data_gpu[self.data_gpu.columns[-1]].to_gpu_array(),640)
-        except Exception as e:
-            return str(e)
-
-
     def reset_all_filters(self):
         '''
             description:
@@ -194,89 +155,9 @@ class pygdfCrossfilter_utils:
                 number_of_rows_left
         '''
         try:
-            self.data_gpu = self.back_up_dimension
+            self.pandas_df = self.back_up_dimension_pandas
             self.dimensions_filters.clear()
-            return str(len(self.data_gpu))
-
-        except Exception as e:
-            return str(e)
-
-    def groupby_load(self, dimension_name, groupby_agg, groupby_agg_key):
-        '''
-            description:
-                load groupby operation for dimension as per the given groupby_agg
-            input:
-                dimension_name <string>:
-                groupby_agg <dictionary>:
-                groupby_agg_key <string>:
-            return:
-                status: groupby intialized successfully
-        '''
-        try:
-            temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim=list(groupby_agg.keys()))
-            return self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
-
-        except Exception as e:
-            return str(e)
-
-    def groupby_size(self, dimension_name, groupby_agg_key):
-        '''
-            description:
-                get groupby size for a groupby on a dimension
-            input:
-                dimension_name <string>:
-                groupby_agg_key <string>:
-            return:
-                size of the groupby
-        '''
-        try:
-            key = dimension_name+"_"+groupby_agg_key
-            if(key not in self.group_by_backups):
-                res = "groupby not intialized"
-            else:
-                temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim=list(groupby_agg.keys()))
-                self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
-                res = str(len(self.group_by_backups[key]))
-            return res
-
-        except Exception as e:
-            return str(e)
-
-    def groupby_filterOrder(self, dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column):
-        '''
-            description:
-                get groupby values by a filterOrder(all, top(n), bottom(n)) for a groupby on a dimension
-            Get parameters:
-                dimension_name (string)
-                groupby_agg (JSON stringified object)
-                groupby_agg_key <string>:
-                sort_order (string): top/bottom/all
-                num_rows (integer): OPTIONAL -> if sort_order= top/bottom
-                sort_column: column name by which the result should be sorted
-            Response:
-                all rows/error => "groupby not initialized"
-        '''
-        try:
-            key = dimension_name+"_"+groupby_agg_key
-            if(key not in self.group_by_backups):
-                res = "groupby not intialized"
-            else:
-                #removing the cumulative filters on the current dimension for the groupby
-                temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name,include_dim=list(groupby_agg.keys()))
-                self.groupby(temp_df,dimension_name,groupby_agg,groupby_agg_key)
-                if 'all' == sort_order:
-                    temp_df = self.group_by_backups[key].to_pandas().to_dict()
-                else:
-                    # if len(group_by_backups[key]) == 0:
-                    max_rows = max(len(self.group_by_backups[key])-1,0)
-                    n_rows = min(num_rows,max_rows)
-                    # print("number of rows processed",n_rows)
-                    if 'top' == sort_order:
-                        temp_df = self.group_by_backups[key].nlargest(n_rows,[sort_column]).to_pandas().to_dict()
-                    elif 'bottom' == sort_order:
-                        temp_df = self.group_by_backups[key].nsmallest(n_rows,[sort_column]).to_pandas().to_dict()
-                res = str(self.parse_dict(temp_df))
-            return res
+            return str(len(self.pandas_df))
 
         except Exception as e:
             return str(e)
@@ -301,36 +182,36 @@ class pygdfCrossfilter_utils:
         except Exception as e:
             return str(e)
 
+
     def dimension_reset(self, dimension_name):
         '''
             description:
-                reset all filters on a dimension
+                reset all filters on a dimension for pandas df
             Get parameters:
                 dimension_name (string)
             Response:
                 number_of_rows
         '''
         try:
-            self.data_gpu = self.back_up_dimension
+            self.pandas_df = self.back_up_dimension_pandas
             self.dimensions_filters[dimension_name] = ''
-            self.data_gpu = self.reset_filters(self.data_gpu)
-            return str(len(self.data_gpu))
+            self.pandas_df = self.reset_filters(self.pandas_df)
+            return str(len(self.pandas_df))
 
         except Exception as e:
             return str(e)
 
-
     def dimension_get_max_min(self, dimension_name):
         '''
             description:
-                get_max_min for a dimension
+                get_max_min for a dimension for pandas
             Get parameters:
                 dimension_name (string)
             Response:
                 max_min_tuple
         '''
         try:
-            max_min_tuple = (float(self.data_gpu[dimension_name].max()), float(self.data_gpu[dimension_name].min()))
+            max_min_tuple = (float(self.pandas_df[dimension_name].max()), float(self.pandas_df[dimension_name].min()))
             return str(max_min_tuple)
 
         except Exception as e:
@@ -339,7 +220,7 @@ class pygdfCrossfilter_utils:
     def dimension_hist(self, dimension_name, num_of_bins):
         '''
             description:
-                get histogram for a dimension
+                get histogram for a dimension for pandas
             Get parameters:
                 dimension_name (string)
                 num_of_bins (integer)
@@ -350,14 +231,15 @@ class pygdfCrossfilter_utils:
             num_of_bins = int(num_of_bins)
             # start = time.time()
             if len(self.dimensions_filters.keys()) == 0 or (len(self.dimensions_filters.keys()) == 1 and dimension_name in self.dimensions_filters):
-                return str(self.hist_numba_GPU(self.data_gpu[str(dimension_name)].to_gpu_array(),num_of_bins))
+                return str(self.hist_numpy(self.pandas_df[str(dimension_name)].values,num_of_bins))
             else:
-                temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim = [dimension_name])
+                temp_df = self.reset_filters(self.back_up_dimension_pandas, omit=dimension_name, include_dim = [dimension_name])
                 # reset_filters_time = time.time() - start
-                return str(self.hist_numba_GPU(temp_df[str(dimension_name)].to_gpu_array(),num_of_bins))#+":::"+str(reset_filters_time)
+                return str(self.hist_numpy(temp_df[str(dimension_name)].values,num_of_bins))#+":::"+str(reset_filters_time)
 
         except Exception as e:
             return str(e)
+
 
 
     def dimension_filterOrder(self, dimension_name, sort_order, num_rows, columns):
@@ -377,22 +259,22 @@ class pygdfCrossfilter_utils:
         try:
             columns = columns.split(',')
             if(len(columns) == 0 or columns[0]==''):
-                columns = list(self.data_gpu.columns)
+                columns = list(self.pandas_df.columns)
             elif dimension_name not in columns:
                 columns.append(dimension_name)
             print("requested columns",columns)
-            print("available columns",self.data_gpu.columns)
+            print("available columns",self.pandas_df.columns)
 
             if 'all' == sort_order:
-                temp_df = self.data_gpu.loc[:,columns].to_pandas().to_dict()
+                temp_df = self.pandas_df.loc[:,columns].to_dict()
             else:
                 num_rows = int(num_rows)
-                max_rows = max(len(self.data_gpu)-1,0)
+                max_rows = max(len(self.pandas_df)-1,0)
                 n_rows = min(num_rows, max_rows)
                 if 'top' == sort_order:
-                    temp_df = self.data_gpu.loc[:,columns].nlargest(n_rows,[dimension_name]).to_pandas().to_dict()
+                    temp_df = self.pandas_df.loc[:,columns].nlargest(n_rows,[dimension_name]).to_dict()
                 elif 'bottom' == sort_order:
-                    temp_df = self.data_gpu.loc[:,columns].nsmallest(n_rows,[dimension_name]).to_pandas().to_dict()
+                    temp_df = self.pandas_df.loc[:,columns].nsmallest(n_rows,[dimension_name]).to_dict()
 
             return str(self.parse_dict(temp_df))
 
@@ -418,8 +300,8 @@ class pygdfCrossfilter_utils:
                     self.dimensions_filters[dimension_name] += ' and '+ query
                 else:
                     self.dimensions_filters[dimension_name] = query
-            self.data_gpu = self.data_gpu.query(query)
-            return str(len(self.data_gpu))
+            self.pandas_df = self.pandas_df.query(query)
+            return str(len(self.pandas_df))
 
         except Exception as e:
             return str(e)
@@ -443,8 +325,8 @@ class pygdfCrossfilter_utils:
                     self.dimensions_filters[dimension_name] += ' and '+ query
                 else:
                     self.dimensions_filters[dimension_name] = query
-            self.data_gpu = self.data_gpu.query(query)
-            return str(len(self.data_gpu))
+            self.pandas_df = self.pandas_df.query(query)
+            return str(len(self.pandas_df))
 
         except Exception as e:
             return str(e)

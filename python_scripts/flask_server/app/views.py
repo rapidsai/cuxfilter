@@ -6,8 +6,9 @@ import json
 from app import app
 import time
 from app.utilities.pygdfCrossfilter_utils import pygdfCrossfilter_utils as pygdf
-
+from app.utilities.pandas_utils import pandas_utils as pandas
 user_sessions = {}
+user_sessions_pandas = {}
 
 @app.route('/')
 def index():
@@ -16,19 +17,22 @@ def index():
 def init_session(session_id):
     user_sessions[session_id] = pygdf()
 
-@app.route('/process', methods=['GET'])
-def process_input_from_client():
-    #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+def init_session_pandas(session_id):
+    user_sessions_pandas[session_id] = pandas()
 
-    query = request.args.get('query')
-
-    app.logger.debug("query: "+query)
-
-    if session_id not in user_sessions:
-        init_session(session_id)
-    response = user_sessions[session_id].process_input_from_client(query)
-    return append_time_to_response(response,start_time)
+# @app.route('/process', methods=['GET'])
+# def process_input_from_client():
+#     #get basic get parameters
+#     start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
+#
+#     query = request.args.get('query')
+#
+#     app.logger.debug("query: "+query)
+#
+#     if session_id not in user_sessions:
+#         init_session(session_id)
+#     response = user_sessions[session_id].process_input_from_client(query)
+#     return append_time_to_response(response,start_time)
 
 
 @app.route('/init_connection', methods=['GET'])
@@ -39,19 +43,27 @@ def init_connection():
         Get parameters:
             1. session_id (string)
             2. dataset (string)
+            3. engine (pygdf/pandas)
         Response:
             status -> successfully initialized/ error
     '''
     #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     app.logger.debug("init connection for "+session_id)
 
-    if session_id not in user_sessions:
-        init_session(session_id+dataset_name)
-        response = "initialized successfully"
+    if engine == 'pygdf':
+        if session_id not in user_sessions:
+            init_session(session_id+dataset_name)
+            response = "initialized successfully"
+        else:
+            response = "connection already intialized"
     else:
-        response = "connection already intialized"
+        if session_id not in user_sessions_pandas:
+            init_session_pandas(session_id+dataset_name)
+            response = "initialized successfully"
+        else:
+            response = "connection already intialized"
     return append_time_to_response(response,start_time)
 
 
@@ -63,20 +75,26 @@ def read_data():
         Get parameters:
             1. session_id (string)
             2. dataset (string)
+            3. engine (pygdf/pandas)
         Response:
             status -> data read successfully / error
     '''
     #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     # DEBUG: start
     app.logger.debug("read data"+dataset_name+" for "+session_id)
     # DEBUG: end
 
-    #start function execution
-    response = user_sessions[key].read_data('arrow',dataset_name)
-    user_sessions[key].numba_jit_warm_func()
-    #end function execution
+    if engine == 'pygdf':
+        #start function execution
+        response = user_sessions[key].read_data('arrow',dataset_name)
+        user_sessions[key].numba_jit_warm_func()
+        #end function execution
+    else:
+        #start function execution
+        response = user_sessions_pandas[key].read_data('arrow',dataset_name)
+        #end function execution
 
     #return response
     return append_time_to_response(response,start_time)
@@ -89,19 +107,25 @@ def get_schema():
         Get parameters:
             1. session_id (string)
             2. dataset (string)
+            3. engine (pygdf/pandas)
         Response:
             comma separated column names
     '''
     #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     # DEBUG: start
     app.logger.debug("get schema of"+dataset_name+" for "+session_id)
     # DEBUG: end
 
-    #start function execution
-    response = user_sessions[key].get_columns()
-    #end function execution
+    if engine == 'pygdf':
+        #start function execution
+        response = user_sessions[key].get_columns()
+        #end function execution
+    else:
+        #start function execution
+        response = user_sessions_pandas[key].get_columns()
+        #end function execution
 
     #return response
     return append_time_to_response(response,start_time)
@@ -115,19 +139,25 @@ def get_size():
         Get parameters:
             1. session_id (string)
             2. dataset (string)
+            3. engine (pygdf/pandas)
         Response:
             "(num_rows, num_columns)"
     '''
     #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     # DEBUG: start
     app.logger.debug("get size of"+dataset_name+" for "+session_id)
     # DEBUG: end
 
-    #start function execution
-    response = user_sessions[key].get_size()
-    #end function execution
+    if engine == 'pygdf':
+        #start function execution
+        response = user_sessions[key].get_size()
+        #end function execution
+    else:
+        #start function execution
+        response = user_sessions_pandas[key].get_size()
+        #end function execution
 
     #return response
     return append_time_to_response(response,start_time)
@@ -143,11 +173,12 @@ def groupby_load():
             2. dataset (string)
             3. dimension_name (string)
             4. groupby_agg (JSON stringified object)
+            5. engine (pygdf/pandas)
         Response:
             number_of_rows_left
     '''
     #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     #getting remaining parameters
     dimension_name = request.args.get('dimension_name')
@@ -175,11 +206,12 @@ def groupby_size():
             2. dataset (string)
             3. dimension_name (string)
             4. groupby_agg (JSON stringified object)
+            5. engine (pygdf/pandas)
         Response:
             number_of_rows_left
     '''
     #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     #getting remaining parameters
     dimension_name = request.args.get('dimension_name')
@@ -211,11 +243,12 @@ def groupby_filterOrder():
             5. sort_order (string): top/bottom/all
             6. num_rows (integer): OPTIONAL -> if sort_order= top/bottom
             7. sort_column: column name by which the result should be sorted
+            8. engine (pygdf/pandas)
         Response:
             all rows/error => "groupby not initialized"
     '''
     #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     #getting remaining parameters
     dimension_name = request.args.get('dimension_name')
@@ -246,11 +279,12 @@ def dimension_load():
             1. session_id (string)
             2. dataset (string)
             3. dimension_name (string)
+            4. engine (pygdf/pandas)
         Response:
             status -> success: dimension loaded successfully/dimension already exists   // error: "groupby not initialized"
     '''
     #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     #getting remaining parameters
     dimension_name = request.args.get('dimension_name')
@@ -259,9 +293,14 @@ def dimension_load():
     app.logger.debug("dataset: "+dataset_name+" load dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
-    #start function execution
-    response = user_sessions[key].dimension_load(dimension_name)
-    #end function execution
+    if engine == 'pygdf':
+        #start function execution
+        response = user_sessions[key].dimension_load(dimension_name)
+        #end function execution
+    else:
+        #start function execution
+        response = user_sessions_pandas[key].dimension_load(dimension_name)
+        #end function execution
 
     #return response
     return append_time_to_response(response,start_time)
@@ -276,11 +315,12 @@ def dimension_reset():
             1. session_id (string)
             2. dataset (string)
             3. dimension_name (string)
+            4. engine (pygdf/pandas)
         Response:
             number_of_rows
     '''
     #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     #getting remaining parameters
     dimension_name = request.args.get('dimension_name')
@@ -289,13 +329,19 @@ def dimension_reset():
     app.logger.debug("dataset: "+dataset_name+" reset dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
-    #start function execution
-    response = user_sessions[key].dimension_reset(dimension_name)
-    #end function execution
-    # # DEBUG: start
-    # app.logger.debug("reset rows: ")
-    # app.logger.debug(response)
-    # # DEBUG: end
+    if engine == 'pygdf':
+        #start function execution
+        response = user_sessions[key].dimension_reset(dimension_name)
+        #end function execution
+        # # DEBUG: start
+        # app.logger.debug("reset rows: ")
+        # app.logger.debug(response)
+        # # DEBUG: end
+    else:
+        #start function execution
+        response = user_sessions_pandas[key].dimension_reset(dimension_name)
+        #end function execution
+
     #return response
     return append_time_to_response(response,start_time)
 
@@ -308,11 +354,12 @@ def dimension_get_max_min():
             1. session_id (string)
             2. dataset (string)
             3. dimension_name (string)
+            4. engine (pygdf/pandas)
         Response:
             max_min_tuple
     '''
     #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     #getting remaining parameters
     dimension_name = request.args.get('dimension_name')
@@ -321,9 +368,14 @@ def dimension_get_max_min():
     app.logger.debug("dataset: "+dataset_name+" reset dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
-    #start function execution
-    response = user_sessions[key].dimension_get_max_min(dimension_name)
-    #end function execution
+    if engine == 'pygdf':
+        #start function execution
+        response = user_sessions[key].dimension_get_max_min(dimension_name)
+        #end function execution
+    else:
+        #start function execution
+        response = user_sessions_pandas[key].dimension_get_max_min(dimension_name)
+        #end function execution
 
     #return response
     return append_time_to_response(response,start_time)
@@ -338,11 +390,12 @@ def dimension_hist():
             2. dataset (string)
             3. dimension_name (string)
             4. num_of_bins (integer)
+            5. engine (pygdf/pandas)
         Response:
             string(json) -> "{X:[__values_of_colName_with_max_64_bins__], Y:[__frequencies_per_bin__]}"
     '''
     #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     #getting remaining parameters
     dimension_name = request.args.get('dimension_name')
@@ -352,9 +405,14 @@ def dimension_hist():
     app.logger.debug("dataset: "+dataset_name+" get histogram dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
-    #start function execution
-    response = user_sessions[key].dimension_hist(dimension_name,num_of_bins)
-    #end function execution
+    if engine == 'pygdf':
+        #start function execution
+        response = user_sessions[key].dimension_hist(dimension_name,num_of_bins)
+        #end function execution
+    else:
+        #start function execution
+        response = user_sessions_pandas[key].dimension_hist(dimension_name,num_of_bins)
+        #end function execution
 
     #return response
     return append_time_to_response(response,start_time)
@@ -371,11 +429,12 @@ def dimension_filterOrder():
             4. sort_order (string): top/bottom/all
             5. num_rows (integer): OPTIONAL -> if sort_order= top/bottom
             6. columns (string): comma separated column names
+            7. engine (pygdf/pandas)
         Response:
             string(json) -> "{col_1:[__row_values__], col_2:[__row_values__],...}"
     '''
     #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     #getting remaining parameters
     dimension_name = request.args.get('dimension_name')
@@ -387,9 +446,14 @@ def dimension_filterOrder():
     app.logger.debug("dataset:"+dataset_name+"filterOrder dimension_name:"+dimension_name+" for "+session_id)
     # DEBUG: end
 
-    #start function execution
-    response = user_sessions[key].dimension_filterOrder(dimension_name, sort_order, num_rows, columns)
-    #end function execution
+    if engine == 'pygdf':
+        #start function execution
+        response = user_sessions[key].dimension_filterOrder(dimension_name, sort_order, num_rows, columns)
+        #end function execution
+    else:
+        #start function execution
+        response = user_sessions_pandas[key].dimension_filterOrder(dimension_name, sort_order, num_rows, columns)
+        #end function execution
 
     #return response
     return append_time_to_response(response,start_time)
@@ -406,11 +470,12 @@ def dimension_filter():
             3. dimension_name (string)
             4. comparison_operation (string)
             5. value (float/int)
+            6. engine (pygdf/pandas)
         Response:
             number_of_rows_left
     '''
     #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     #getting remaining parameters
     dimension_name = request.args.get('dimension_name')
@@ -421,9 +486,14 @@ def dimension_filter():
     app.logger.debug("dataset: "+dataset_name+" filter dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
-    #start function execution
-    response = user_sessions[key].dimension_filter(dimension_name, comparison_operation, value)
-    #end function execution
+    if engine == 'pygdf':
+        #start function execution
+        response = user_sessions[key].dimension_filter(dimension_name, comparison_operation, value)
+        #end function execution
+    else:
+        #start function execution
+        response = user_sessions_pandas[key].dimension_filter(dimension_name, comparison_operation, value)
+        #end function execution
 
     #return response
     return append_time_to_response(response,start_time)
@@ -440,11 +510,12 @@ def dimension_filter_range():
             3. dimension_name (string)
             4. min_value (integer)
             5. max_value (integer)
+            6. engine (pygdf/pandas)
         Response:
             number_of_rows_left
     '''
     #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     #getting remaining parameters
     dimension_name = request.args.get('dimension_name')
@@ -455,9 +526,14 @@ def dimension_filter_range():
     app.logger.debug("dataset:"+dataset_name+" filter_range dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
-    #start function execution
-    response = user_sessions[key].dimension_filter_range(dimension_name, min_value, max_value)
-    #end function execution
+    if engine == 'pygdf':
+        #start function execution
+        response = user_sessions[key].dimension_filter_range(dimension_name, min_value, max_value)
+        #end function execution
+    else:
+        #start function execution
+        response = user_sessions_pandas[key].dimension_filter_range(dimension_name, min_value, max_value)
+        #end function execution
 
     #return response
     return append_time_to_response(response,start_time)
@@ -470,19 +546,25 @@ def reset_all_filters():
         Get parameters:
             1. session_id (string)
             2. dataset (string)
+            3. engine (pygdf/pandas)
         Response:
             number_of_rows_left
     '''
     #get basic get parameters
-    start_time,session_id,dataset_name,key = parse_basic_get_parameters(request.args)
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     # DEBUG: start
     app.logger.debug("reset all filters of "+dataset_name+" for "+session_id)
     # DEBUG: end
 
-    #start function execution
-    response = user_sessions[key].reset_all_filters()
-    #end function execution
+    if engine == 'pygdf':
+        #start function execution
+        response = user_sessions[key].reset_all_filters()
+        #end function execution
+    else:
+        #start function execution
+        response = user_sessions_pandas[key].reset_all_filters()
+        #end function execution
 
     #return response
     return append_time_to_response(response,start_time)
@@ -493,13 +575,18 @@ def end_connection():
     start_time = time.perf_counter()
     session_id = request.args.get('session_id')
     dataset_name = request.args.get('dataset')
+    engine = request.args.get('engine')
     app.logger.debug("end connection for "+session_id)
     if session_id+dataset_name not in user_sessions:
         response = "Connection does not exist"
     else:
         try:
-            user_sessions.pop(session_id+dataset_name,None)
-            response = "successfully ended"
+            key = session_id+dataset_name
+            if key in user_sessions and engine == 'pygdf':
+                user_sessions.pop(session_id+dataset_name,None)
+            elif key in user_sessions_pandas and engine == 'pandas':
+                user_sessions_pandas.pop(session_id+dataset_name,None)
+            response = "successfully removed dataframe from memory"
         except e:
             response = str(e)
     return append_time_to_response(response,start_time)
@@ -523,8 +610,8 @@ def parse_basic_get_parameters(get_params):
     #start get parameters
     session_id = get_params.get('session_id')
     dataset_name = get_params.get('dataset')
-
+    engine = get_params.get('engine')
     print(dataset_name)
     key = session_id+dataset_name
     #end get parameters
-    return start_time,session_id,dataset_name,key
+    return start_time,session_id,dataset_name,key,engine
