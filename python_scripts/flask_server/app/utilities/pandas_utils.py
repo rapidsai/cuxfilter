@@ -239,7 +239,7 @@ class pandas_utils:
         try:
             num_of_bins = int(num_of_bins)
             # start = time.time()
-            if len(self.dimensions_filters.keys()) == 0 or (len(self.dimensions_filters.keys()) == 1 and dimension_name in self.dimensions_filters):
+            if len(self.dimensions_filters.keys()) == 0 or (dimension_name not in self.dimensions_filters) or (dimension_name in self.dimensions_filters and self.dimensions_filters[dimension_name] == ''):
                 return str(self.hist_numpy(self.pandas_df[str(dimension_name)].values,num_of_bins))
             else:
                 temp_df = self.reset_filters(self.back_up_dimension_pandas, omit=dimension_name, include_dim = [dimension_name])
