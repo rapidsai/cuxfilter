@@ -53,14 +53,14 @@ def init_connection():
     app.logger.debug("init connection for "+session_id)
 
     if engine == 'pygdf':
-        if session_id not in user_sessions:
-            init_session(session_id+dataset_name)
+        if key not in user_sessions:
+            init_session(key)
             response = "initialized successfully"
         else:
             response = "connection already intialized"
     else:
-        if session_id not in user_sessions_pandas:
-            init_session_pandas(session_id+dataset_name)
+        if key not in user_sessions_pandas:
+            init_session_pandas(key)
             response = "initialized successfully"
         else:
             response = "connection already intialized"
@@ -89,7 +89,11 @@ def read_data():
     if engine == 'pygdf':
         #start function execution
         response = user_sessions[key].read_data('arrow',dataset_name)
-        user_sessions[key].numba_jit_warm_func()
+        if response == 'oom error, please reload':
+            user_sessions.pop(session_id+dataset_name,None)
+            app.logger.debug('oom error')
+        else:
+            user_sessions[key].numba_jit_warm_func()
         #end function execution
     else:
         #start function execution
@@ -121,6 +125,9 @@ def get_schema():
     if engine == 'pygdf':
         #start function execution
         response = user_sessions[key].get_columns()
+        if response == 'oom error, please reload':
+            user_sessions.pop(session_id+dataset_name,None)
+            app.logger.debug('oom error')
         #end function execution
     else:
         #start function execution
@@ -153,6 +160,9 @@ def get_size():
     if engine == 'pygdf':
         #start function execution
         response = user_sessions[key].get_size()
+        if response == 'oom error, please reload':
+            user_sessions.pop(session_id+dataset_name,None)
+            app.logger.debug('oom error')
         #end function execution
     else:
         #start function execution
@@ -191,6 +201,9 @@ def groupby_load():
     #start function execution
     groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
     response = user_sessions[key].groupby_load(dimension_name, groupby_agg, groupby_agg_key)
+    if response == 'oom error, please reload':
+        user_sessions.pop(session_id+dataset_name,None)
+        app.logger.debug('oom error')
     #end function execution
 
     #return response
@@ -224,6 +237,9 @@ def groupby_size():
     #start function execution
     groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
     response = user_sessions[key].groupby_size(dimension_name, groupby_agg_key)
+    if response == 'oom error, please reload':
+        user_sessions.pop(session_id+dataset_name,None)
+        app.logger.debug('oom error')
     #end function execution
 
     #return response
@@ -264,6 +280,9 @@ def groupby_filterOrder():
     #start function execution
     groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
     response = user_sessions[key].groupby_filterOrder(dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column)
+    if response == 'oom error, please reload':
+        user_sessions.pop(session_id+dataset_name,None)
+        app.logger.debug('oom error')
     #end function execution
 
     #return response
@@ -296,6 +315,9 @@ def dimension_load():
     if engine == 'pygdf':
         #start function execution
         response = user_sessions[key].dimension_load(dimension_name)
+        if response == 'oom error, please reload':
+            user_sessions.pop(session_id+dataset_name,None)
+            app.logger.debug('oom error')
         #end function execution
     else:
         #start function execution
@@ -332,6 +354,9 @@ def dimension_reset():
     if engine == 'pygdf':
         #start function execution
         response = user_sessions[key].dimension_reset(dimension_name)
+        if response == 'oom error, please reload':
+            user_sessions.pop(session_id+dataset_name,None)
+            app.logger.debug('oom error')
         #end function execution
         # # DEBUG: start
         # app.logger.debug("reset rows: ")
@@ -371,6 +396,9 @@ def dimension_get_max_min():
     if engine == 'pygdf':
         #start function execution
         response = user_sessions[key].dimension_get_max_min(dimension_name)
+        if response == 'oom error, please reload':
+            user_sessions.pop(session_id+dataset_name,None)
+            app.logger.debug('oom error')
         #end function execution
     else:
         #start function execution
@@ -407,11 +435,16 @@ def dimension_hist():
 
     if engine == 'pygdf':
         #start function execution
-        response = user_sessions[key].dimension_hist(dimension_name,num_of_bins)
+        response,status = user_sessions[key].dimension_hist(dimension_name,num_of_bins)
+        if response == 'oom error, please reload':
+            user_sessions.pop(session_id+dataset_name,None)
+        app.logger.debug(response)
+        app.logger.debug(status)
         #end function execution
     else:
         #start function execution
         response = user_sessions_pandas[key].dimension_hist(dimension_name,num_of_bins)
+        app.logger.debug(response)
         #end function execution
 
     #return response
@@ -449,6 +482,15 @@ def dimension_filterOrder():
     if engine == 'pygdf':
         #start function execution
         response = user_sessions[key].dimension_filterOrder(dimension_name, sort_order, num_rows, columns)
+        # app.logger.debug(response)
+        # app.logger.debug(columns)
+        # app.logger.debug(status)
+        # app.logger.debug(n_rows)
+        # app.logger.debug(max_rows)
+        # app.logger.debug(dimension_name)
+        if response == 'oom error, please reload':
+            user_sessions.pop(session_id+dataset_name,None)
+        app.logger.debug('filterOrder:'+response)
         #end function execution
     else:
         #start function execution
@@ -489,6 +531,9 @@ def dimension_filter():
     if engine == 'pygdf':
         #start function execution
         response = user_sessions[key].dimension_filter(dimension_name, comparison_operation, value)
+        if response == 'oom error, please reload':
+            user_sessions.pop(session_id+dataset_name,None)
+            app.logger.debug('oom error')
         #end function execution
     else:
         #start function execution
@@ -529,6 +574,9 @@ def dimension_filter_range():
     if engine == 'pygdf':
         #start function execution
         response = user_sessions[key].dimension_filter_range(dimension_name, min_value, max_value)
+        if response == 'oom error, please reload':
+            user_sessions.pop(session_id+dataset_name,None)
+            app.logger.debug('oom error')
         #end function execution
     else:
         #start function execution
@@ -560,6 +608,9 @@ def reset_all_filters():
     if engine == 'pygdf':
         #start function execution
         response = user_sessions[key].reset_all_filters()
+        if response == 'oom error, please reload':
+            user_sessions.pop(session_id+dataset_name,None)
+            app.logger.debug('oom error')
         #end function execution
     else:
         #start function execution
@@ -584,6 +635,7 @@ def end_connection():
             key = session_id+dataset_name
             if key in user_sessions and engine == 'pygdf':
                 user_sessions.pop(session_id+dataset_name,None)
+                app.logger.debug('oom error')
             elif key in user_sessions_pandas and engine == 'pandas':
                 user_sessions_pandas.pop(session_id+dataset_name,None)
             response = "successfully removed dataframe from memory"

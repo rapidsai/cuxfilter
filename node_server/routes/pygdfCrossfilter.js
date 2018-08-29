@@ -68,7 +68,7 @@ module.exports = function(io) {
                           'engine': engine
                       };
 
-                      pygdf_query(command,params(query),'reset_all');
+                      pygdf_query(command,params(query),'reset_all', engine);
 
                       //send data already loaded custom response
                       var response = {
@@ -88,14 +88,14 @@ module.exports = function(io) {
                       };
                       console.log("params",params(query));
 
-                      pygdf_query(command,params(query),'read_data',(error, message) => {
+                      pygdf_query(command,params(query),'read_data',engine,(error, message) => {
                           if(!error){
                             isDataLoaded[socket.session_id+dataset+engine] = true
                             dataLoaded[socket.session_id+dataset+engine] = dataset
                             callback(false,message);
                           }else{
                             console.log(error);
-                            callback(error,false);
+                            callback(true, error);
                           }
                       });
                     }
@@ -113,7 +113,7 @@ module.exports = function(io) {
                 'engine': engine
             };
 
-            pygdf_query(command,params(query),'reset_all',callback);
+            pygdf_query(command,params(query),'reset_all',engine,callback);
         });
 
         //get schema of the dataset
@@ -126,7 +126,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting schema of the dataset",callback);
+                pygdf_query(command,params(query),"user requesting schema of the dataset",engine,callback);
 
             }catch(ex){
                 console.log(ex);
@@ -147,7 +147,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting loading a new dimension:"+column_name,callback);
+                pygdf_query(command,params(query),"user requesting loading a new dimension:"+column_name,engine,callback);
 
             }catch(ex){
                 console.log(ex);
@@ -169,13 +169,13 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting filtering of the dataset",(error, message) => {
+                pygdf_query(command,params(query),"user requesting filtering of the dataset",engine,(error, message) => {
                     if(!error){
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                       callback(false,message);
                     }else{
                       console.log(error);
-                      callback(error,false);
+                      callback(true,error);
                     }
                 });
 
@@ -198,7 +198,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting groupby for the dimension:"+column_name,callback);
+                pygdf_query(command,params(query),"user requesting groupby for the dimension:"+column_name,engine,callback);
 
             }catch(ex){
                 console.log(ex);
@@ -223,7 +223,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user has requested filterOrder rows for the groupby operation for dimension:"+column_name,callback);
+                pygdf_query(command,params(query),"user has requested filterOrder rows for the groupby operation for dimension:"+column_name,engine,callback);
 
             }catch(ex){
                 console.log(ex);
@@ -245,13 +245,13 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting filtering of the dataset as per a range of rows",(error, message) => {
+                pygdf_query(command,params(query),"user requesting filtering of the dataset as per a range of rows",engine,(error, message) => {
                     if(!error){
                       socket.emit("update_size", dataset, JSON.parse(message)['data']);
                       callback(false,message);
                     }else{
                       console.log(error);
-                      callback(error,false);
+                      callback(true,error);
                     }
                 });
 
@@ -273,13 +273,13 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting resetting filters on the current dimension",(error, message) => {
+                pygdf_query(command,params(query),"user requesting resetting filters on the current dimension",engine,(error, message) => {
                     if(!error){
                       socket.emit("update_size", dataset, JSON.parse(message)['data']);
                       callback(false,message);
                     }else{
                       console.log(error);
-                      callback(error,false);
+                      callback(true,error);
                     }
                 });
             }catch(ex){
@@ -301,7 +301,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting size of the groupby",callback);
+                pygdf_query(command,params(query),"user requesting size of the groupby",engine,callback);
 
             }catch(ex){
                 console.log(ex);
@@ -320,7 +320,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting size of the dataset",callback);
+                pygdf_query(command,params(query),"user requesting size of the dataset",engine,callback);
 
             }catch(ex){
                 console.log(ex);
@@ -344,7 +344,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user has requested top n rows as per the column "+column_name,callback);
+                pygdf_query(command,params(query),"user has requested top n rows as per the column "+column_name,engine,callback);
 
             }catch(ex){
                 console.log(ex);
@@ -365,7 +365,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requested histogram for "+column_name,callback);
+                pygdf_query(command,params(query),"user requested histogram for "+column_name,engine,callback);
 
             }catch(ex){
                 console.log(ex);
@@ -388,7 +388,7 @@ module.exports = function(io) {
                 };
                 let comment = "user requested max-min values for "+column_name+" for data="+dataset;
 
-                pygdf_query(command,params(query),comment,callback);
+                pygdf_query(command,params(query),comment,engine,callback);
 
             }catch(ex){
                 console.log(ex);
@@ -412,7 +412,7 @@ module.exports = function(io) {
 };
 
 
-function callPyServer(command,query){
+function callPyServer(command,query, engine){
   return new Promise((resolve, reject) => {
        let startTime = Date.now();
        let url = pyServerURL+'/'+command+'?'+query
@@ -423,11 +423,20 @@ function callPyServer(command,query){
                         data: pyresponse[0],
                         pythonScriptTime: parseFloat(pyresponse[1]),
                         nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[1])
-                          }
+                        }
+          if(response.data == 'oom error, please reload'){
+            isDataLoaded[session_id+dataset+engine] = false;
+            isConnectionEstablished[session_id+dataset+engine] = false;
+          }
           resolve(JSON.stringify(response));
         }).catch(error => {
           console.log(error);
-          reject(true,error.toString());
+          var response = {
+                          data: error.toString(),
+                          pythonScriptTime: parseFloat(0),
+                          nodeServerTime: ((Date.now() - startTime)/1000)
+                        }
+          reject(true,JSON.stringify(response));
         });
   });
 }
@@ -440,8 +449,8 @@ function params(data) {
   return Object.keys(data).map(key => `${key}=${encodeURIComponent(data[key])}`).join('&');
 }
 
-function pygdf_query(command,query, comments,callback){
-    callPyServer(command,query)
+function pygdf_query(command,query, comments,engine, callback){
+    callPyServer(command,query, engine)
       .then((message) => {
               console.log(comments);
               typeof callback === 'function' && callback(false,message);
@@ -467,7 +476,12 @@ function endSession(session_id,dataset,engine,callback){
      callback(false,JSON.stringify(response));
    }).catch(error => {
      console.log(error);
-     reject(true,error.toString());
+     var response = {
+                     data: error.toString(),
+                     pythonScriptTime: parseFloat(0),
+                     nodeServerTime: ((Date.now() - startTime)/1000)
+                   }
+     reject(true,JSON.stringify(response));
    });
 }
 
@@ -577,6 +591,11 @@ function initConnection(session_id,dataset,engine, callback){
       }).catch(error => {
         console.log(error);
         isConnectionEstablished[session_id+dataset+engine] = false;
-        callback(true,error.toString());
+        var response = {
+                        data: error.toString(),
+                        pythonScriptTime: parseFloat(0),
+                        nodeServerTime: ((Date.now() - startTime)/1000)
+                      }
+        callback(true,JSON.stringify(response));
       });
 }

@@ -13,6 +13,12 @@ class pandas_utils:
     dimensions_filters = {}
     group_by_backups = {}
 
+    def __init__(self):
+        self.pandas_df = None
+        self.back_up_dimension_pandas = None
+        self.dimensions_filters = {}
+        self.group_by_backups = {}
+
 
     def hist_numpy(self,data,bins):
         '''
@@ -27,8 +33,8 @@ class pandas_utils:
         df1 = np.histogram(np.array(data),bins=bins)
         dict_temp ={}
 
-        dict_temp['X'] = list(df1[1].astype(str))
-        dict_temp['Y'] = list(df1[0].astype(str))
+        dict_temp['X'] = list(df1[1].astype(float))[1:]
+        dict_temp['Y'] = list(df1[0].astype(float))
 
         return json.dumps(dict_temp)
 
@@ -75,7 +81,10 @@ class pandas_utils:
         return status
 
     def default(self,o):
+        if isinstance(o, np.int32): return int(o)
         if isinstance(o, np.int64): return int(o)
+        if isinstance(o, np.float32): return float(o)
+        if isinstance(o, np.float64): return float(o)
         raise TypeError
 
     def parse_dict(self,data):
