@@ -134,47 +134,47 @@ function getHist(){
         });
 }
 
-function getAllHist(col){
-    var data = {
-        col: col,
-        processing: processing,
-        bins:12,
-        file: $.urlParam('file')
-    };
-    url = '/socket-calc/getHist';
+// function getAllHist(col){
+//     var data = {
+//         col: col,
+//         processing: processing,
+//         bins:12,
+//         file: $.urlParam('file')
+//     };
+//     url = '/socket-calc/getHist';
+//
+//     if(!persistentConnStatus){
+//         url = '/calc/getHist';
+//         data.load_type = load_type;
+//     }
+//
+//     $.post({
+//         url: url,
+//         data:data,
+//         responseTime: Date.now(),
+//         complete: function(data){
+//                 totalTime = Date.now() - responseTime;
+//                 data = data.responseText;
+//                 data = JSON.parse(data);
+//                 pyData = data.pyData.split(":::");
+//                 console.log(pyData);
+//                 X = JSON.parse(pyData[0])['A'];
+//                 Y = JSON.parse(pyData[0])['B'];
+//                 console.log(X);
+//                 genPlot(X,Y,type);
+//                 displayTimings(totalTime,pyData[1],data.nodeServerTime);
+//             }
+//         });
+// }
 
-    if(!persistentConnStatus){
-        url = '/calc/getHist';
-        data.load_type = load_type;
-    }
-
-    $.post({
-        url: url,
-        data:data,
-        responseTime: Date.now(),
-        complete: function(data){
-                totalTime = Date.now() - responseTime;
-                data = data.responseText;
-                data = JSON.parse(data);
-                pyData = data.pyData.split(":::");
-                console.log(pyData);
-                X = JSON.parse(pyData[0])['A'];
-                Y = JSON.parse(pyData[0])['B'];
-                console.log(X);
-                genPlot(X,Y,type);
-                displayTimings(totalTime,pyData[1],data.nodeServerTime);
-            }
-        });
-}
-
-function test(){
-  getAllHist('sourceid');
-  getAllHist('dstid');
-  getAllHist('mean_travel_time');
-  getAllHist('standard_deviation_travel_time');
-  getAllHist('source_long');
-  getAllHist('source_lat');
-}
+// function test(){
+//   getAllHist('sourceid');
+//   getAllHist('dstid');
+//   getAllHist('mean_travel_time');
+//   getAllHist('standard_deviation_travel_time');
+//   getAllHist('source_long');
+//   getAllHist('source_lat');
+// }
 
 function genPlot(X,Y,type){
 

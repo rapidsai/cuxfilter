@@ -76,7 +76,7 @@ def get_bin_edges(a_range, bin_edges):
 def numba_gpu_histogram(a, bins):
     # Move data to GPU so we can do two operations on it
     # a_gpu = cuda.to_device(a)
-    print("in mem version")
+#     print("in mem version")
     a_gpu = a
     # index_gpu = cuda.to_device(np.array(index))
     ### Find min and max value in array
