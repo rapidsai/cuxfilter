@@ -247,7 +247,7 @@ module.exports = function(io) {
 
                 pygdf_query(command,params(query),"user requesting filtering of the dataset as per a range of rows",engine,(error, message) => {
                     if(!error){
-                      socket.emit("update_size", dataset, JSON.parse(message)['data']);
+                      socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                       callback(false,message);
                     }else{
                       console.log(error);
@@ -275,7 +275,7 @@ module.exports = function(io) {
 
                 pygdf_query(command,params(query),"user requesting resetting filters on the current dimension",engine,(error, message) => {
                     if(!error){
-                      socket.emit("update_size", dataset, JSON.parse(message)['data']);
+                      socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                       callback(false,message);
                     }else{
                       console.log(error);
