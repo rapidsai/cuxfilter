@@ -466,9 +466,9 @@ function pygdf_query(command,query, comments,engine, callback){
 
 function endSession(session_id,dataset,engine,callback){
   let startTime = Date.now()
-  let url = pyServerURLPygdf+'end_connection?session_id='+session_id+'&dataset='+dataset+'&engine='+engine
+  let url = pyServerURLPygdf+'/end_connection?session_id='+session_id+'&dataset='+dataset+'&engine='+engine
   if(engine == 'pandas'){
-    url = pyServerURLPandas+'end_connection?session_id='+session_id+'&dataset='+dataset+'&engine='+engine
+    url = pyServerURLPandas+'/end_connection?session_id='+session_id+'&dataset='+dataset+'&engine='+engine
   }
 
   got(url)
@@ -565,9 +565,9 @@ function create_query(list_of_args){
 function initConnection(session_id,dataset,engine, callback){
     let startTime = Date.now()
     // let url = pyServerURL+'/'+'init_connection'+'?'+query
-    let url = pyServerURLPygdf+'init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset
+    let url = pyServerURLPygdf+'/init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset
     if(engine == 'pandas'){
-      url = pyServerURLPandas+'init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset
+      url = pyServerURLPandas+'/init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset
     }
     got(url)
       .then(val => {
