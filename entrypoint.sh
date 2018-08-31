@@ -12,5 +12,5 @@ cd ../node_server
 npm start
 
 
-# cd ../
-# jupyter notebook --ip 0.0.0.0 --port 3004 --allow-root &
+#cd ../
+#jupyter notebook --ip 0.0.0.0 --port 3004 --allow-root &
