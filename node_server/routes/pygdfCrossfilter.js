@@ -15,7 +15,8 @@ const callback_store = {};
 const startTimeStore = {};
 let chunks = [];
 const got = require('got');
-const pyServerURL = 'http://127.0.0.1:3002';
+const pyServerURLPygdf = 'http://127.0.0.1:3002';
+const pyServerURLPandas = 'http://127.0.0.1:3003';
 
 module.exports = function(io) {
 
@@ -415,7 +416,10 @@ module.exports = function(io) {
 function callPyServer(command,query, engine){
   return new Promise((resolve, reject) => {
        let startTime = Date.now();
-       let url = pyServerURL+'/'+command+'?'+query
+       let url = pyServerURLPygdf+'/'+command+'?'+query
+       if(engine == 'pandas'){
+         url = pyServerURLPandas+'/'+command+'?'+query
+       }
        got(url)
         .then(val => {
           var pyresponse = Buffer.from(val.body).toString('utf8').split(":::");
@@ -462,7 +466,11 @@ function pygdf_query(command,query, comments,engine, callback){
 
 function endSession(session_id,dataset,engine,callback){
   let startTime = Date.now()
-  url = 'http://127.0.0.1:3002/end_connection?session_id='+session_id+'&dataset='+dataset+'&engine='+engine
+  let url = pyServerURLPygdf+'end_connection?session_id='+session_id+'&dataset='+dataset+'&engine='+engine
+  if(engine == 'pandas'){
+    url = pyServerURLPandas+'end_connection?session_id='+session_id+'&dataset='+dataset+'&engine='+engine
+  }
+
   got(url)
    .then(val => {
      isDataLoaded[session_id+dataset+engine] = false;
@@ -526,25 +534,6 @@ function clearGPUMem(){
     }
 }
 
-// function process_client_input(session_id, dataset, query){
-//     return new Promise((resolve, reject) => {
-//          let startTime = Date.now();
-//          url = 'http://127.0.0.1:3002/process?session_id='+session_id+'&query='+query
-//          got(url)
-//           .then(val => {
-//             var pyresponse = Buffer.from(val.body).toString('utf8').split(":::");
-//             var response = {
-//                           data: pyresponse[1],
-//                           pythonScriptTime: pyresponse[2],
-//                           nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[2])
-//                       }
-//             resolve(JSON.stringify(response));
-//           }).catch(error => {
-//             console.log(error);
-//             reject(true,error.toString());
-//           });
-//     });
-// }
 
 function resetServerTime(dataset, session_id, engine){
   console.log(dataset);
@@ -576,7 +565,10 @@ function create_query(list_of_args){
 function initConnection(session_id,dataset,engine, callback){
     let startTime = Date.now()
     // let url = pyServerURL+'/'+'init_connection'+'?'+query
-    let url = 'http://127.0.0.1:3002/init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset;
+    let url = pyServerURLPygdf+'init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset
+    if(engine == 'pandas'){
+      url = pyServerURLPandas+'init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset
+    }
     got(url)
       .then(val => {
         console.log(val.body)
