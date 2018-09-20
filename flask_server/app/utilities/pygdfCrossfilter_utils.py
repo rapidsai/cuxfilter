@@ -7,6 +7,7 @@ import os
 import numpy as np
 import time
 import sys
+import gc
 
 def default(o):
     if isinstance(o, np.int32): return int(o)
@@ -97,10 +98,15 @@ class pygdfCrossfilter_utils:
                 self.data_gpu[i] = pygdf.Series(np.array(pa_df[i].values))
             if 'nonfilter' not in source:
                 self.back_up_dimension = self.data_gpu
+            del(pa_df)
+            gc.collect()
         except Exception as e:
+            del(pa_df)
             del(self.data_gpu)
             del(self.back_up_dimension)
+            gc.collect()
             return "oom error, please reload"+e
+
         return "data read successfully"
 
 
