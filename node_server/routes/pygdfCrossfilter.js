@@ -17,6 +17,7 @@ let chunks = [];
 const got = require('got');
 const pyServerURLPygdf = 'http://127.0.0.1:3002';
 const pyServerURLPandas = 'http://127.0.0.1:3003';
+let useSessions = true;
 
 module.exports = function(io) {
 
@@ -31,10 +32,16 @@ module.exports = function(io) {
     io.on('connection',function(socket){
 
         //initialize the socket connection with the python script. this is executed when user initializes a pygdfCrossfilter instance
-        socket.on('init', function(dataset, engine, callback){
+        socket.on('init', function(dataset, engine, usingSessions, callback){
             try{
                 console.log("connection init requested");
-                socket.session_id = parseCookie(socket.handshake.headers.cookie);
+                useSessions = usingSessions;
+                if(useSessions){
+                    socket.session_id = parseCookie(socket.handshake.headers.cookie);
+                }else{
+                    socket.session_id = 111;
+                }
+
                 if(isConnectionEstablished[socket.session_id+dataset+engine] === true){
                     callback(false,'connection already established');
                 }else{
@@ -69,14 +76,27 @@ module.exports = function(io) {
                           'engine': engine
                       };
 
-                      pygdf_query(command,params(query),'reset_all', engine);
-
+                      // pygdf_query(command,params(query),'reset_all', engine, (error, message) => {
+                      //     if(!error){
+                      //       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
+                      //       socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
+                      //       socket.broadcast.emit("update_event", dataset,engine);
+                      //       //callback(false,message);
+                      //     }else{
+                      //       console.log(error);
+                      //       //callback(true,error);
+                      //     }
+                      // });
+                      socket.broadcast.emit("update_event", dataset,engine);
                       //send data already loaded custom response
                       var response = {
                                     data: 'data already loaded',
                                     pythonScriptTime: 0,
                                     nodeServerTime: (Date.now() - startTime)/1000
                                 };
+                      // if(!useSessions){
+                      //   socket.broadcast.emit('load_data',dataset,engine,false,JSON.stringify(response));
+                      // }
                       callback(false, JSON.stringify(response));
                 }else{
 
@@ -89,10 +109,13 @@ module.exports = function(io) {
                       };
                       console.log("params",params(query));
 
-                      pygdf_query(command,params(query),'read_data',engine,(error, message) => {
+                      pygdf_query(command,params(query),'read_data',engine, (error, message) => {
                           if(!error){
                             isDataLoaded[socket.session_id+dataset+engine] = true
                             dataLoaded[socket.session_id+dataset+engine] = dataset
+                            // if(!useSessions){
+                            //   socket.broadcast.emit('load_data',dataset,engine,false,message);
+                            // }
                             callback(false,message);
                           }else{
                             console.log(error);
@@ -114,7 +137,19 @@ module.exports = function(io) {
                 'engine': engine
             };
 
-            pygdf_query(command,params(query),'reset_all',engine,callback);
+            pygdf_query(command,params(query),'reset_all',engine, (error, message) => {
+                if(!error){
+                  socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
+                  if(!useSessions){
+                    socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
+                    socket.broadcast.emit("update_event", dataset,engine);
+                  }
+                  callback(false,message);
+                }else{
+                  console.log(error);
+                  callback(true,error);
+                }
+            });
         });
 
         //get schema of the dataset
@@ -127,7 +162,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting schema of the dataset",engine,callback);
+                pygdf_query(command,params(query),"user requesting schema of the dataset",engine, callback);
 
             }catch(ex){
                 console.log(ex);
@@ -148,7 +183,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting loading a new dimension:"+column_name,engine,callback);
+                pygdf_query(command,params(query),"user requesting loading a new dimension:"+column_name, engine, callback);
 
             }catch(ex){
                 console.log(ex);
@@ -170,9 +205,13 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting filtering of the dataset",engine,(error, message) => {
+                pygdf_query(command,params(query),"user requesting filtering of the dataset", engine, (error, message) => {
                     if(!error){
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
+                      if(!useSessions){
+                        socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
+                        socket.broadcast.emit("update_event", dataset,engine);
+                      }
                       callback(false,message);
                     }else{
                       console.log(error);
@@ -199,7 +238,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting groupby for the dimension:"+column_name,engine,callback);
+                pygdf_query(command,params(query),"user requesting groupby for the dimension:"+column_name,engine, callback);
 
             }catch(ex){
                 console.log(ex);
@@ -224,7 +263,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user has requested filterOrder rows for the groupby operation for dimension:"+column_name,engine,callback);
+                pygdf_query(command,params(query),"user has requested filterOrder rows for the groupby operation for dimension:"+column_name, engine, callback);
 
             }catch(ex){
                 console.log(ex);
@@ -246,9 +285,13 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting filtering of the dataset as per a range of rows",engine,(error, message) => {
+                pygdf_query(command,params(query),"user requesting filtering of the dataset as per a range of rows",engine, (error, message) => {
                     if(!error){
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
+                      if(!useSessions){
+                        socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
+                        socket.broadcast.emit("update_event", dataset,engine);
+                      }
                       callback(false,message);
                     }else{
                       console.log(error);
@@ -274,9 +317,13 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting resetting filters on the current dimension",engine,(error, message) => {
+                pygdf_query(command,params(query),"user requesting resetting filters on the current dimension",engine, (error, message) => {
                     if(!error){
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
+                      if(!useSessions){
+                        socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
+                        socket.broadcast.emit("update_event", dataset,engine);
+                      }
                       callback(false,message);
                     }else{
                       console.log(error);
@@ -302,7 +349,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting size of the groupby",engine,callback);
+                pygdf_query(command,params(query),"user requesting size of the groupby",engine, callback);
 
             }catch(ex){
                 console.log(ex);
@@ -321,7 +368,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requesting size of the dataset",engine,callback);
+                pygdf_query(command,params(query),"user requesting size of the dataset",engine, callback);
 
             }catch(ex){
                 console.log(ex);
@@ -345,7 +392,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user has requested top n rows as per the column "+column_name,engine,callback);
+                pygdf_query(command,params(query),"user has requested top n rows as per the column "+column_name, engine, callback);
 
             }catch(ex){
                 console.log(ex);
@@ -366,7 +413,7 @@ module.exports = function(io) {
                     'engine': engine
                 };
 
-                pygdf_query(command,params(query),"user requested histogram for "+column_name,engine,callback);
+                pygdf_query(command,params(query),"user requested histogram for "+column_name, engine, callback);
 
             }catch(ex){
                 console.log(ex);
@@ -389,7 +436,7 @@ module.exports = function(io) {
                 };
                 let comment = "user requested max-min values for "+column_name+" for data="+dataset;
 
-                pygdf_query(command,params(query),comment,engine,callback);
+                pygdf_query(command,params(query),comment,engine, callback);
 
             }catch(ex){
                 console.log(ex);
@@ -457,10 +504,11 @@ function pygdf_query(command,query, comments,engine, callback){
     callPyServer(command,query, engine)
       .then((message) => {
               console.log(comments);
+              // socket.broadcast.emit(command,false,message);
               typeof callback === 'function' && callback(false,message);
       }).catch((error) => {
               console.log(error);
-              typeof callback === 'function' && callback(error,false);
+              typeof callback === 'function' && callback(true,error);
       });
 }
 
