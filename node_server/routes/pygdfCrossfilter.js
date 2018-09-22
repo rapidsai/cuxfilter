@@ -473,7 +473,7 @@ function callPyServer(command,query, engine){
           var response = {
                         data: pyresponse[0],
                         pythonScriptTime: parseFloat(pyresponse[1]),
-                        nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[1])
+                        nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[1]),
                         activeFilters: pyresponse[2]
                         }
           if(response.data == 'oom error, please reload'){
