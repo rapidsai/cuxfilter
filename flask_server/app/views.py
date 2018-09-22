@@ -659,11 +659,11 @@ def end_connection():
     dataset_name = request.args.get('dataset')
     engine = request.args.get('engine')
     app.logger.debug("end connection for "+session_id)
+    key = session_id+dataset_name
     if session_id+dataset_name not in user_sessions:
         response = "Connection does not exist"
     else:
         try:
-            key = session_id+dataset_name
             if key in user_sessions and engine == 'pygdf':
                 user_sessions.pop(session_id+dataset_name,None)
                 app.logger.debug('oom error')
@@ -677,9 +677,9 @@ def end_connection():
 def append_time_to_response(res,start_time, key, engine):
     elapsed = time.perf_counter() - start_time
     if engine == 'pygdf':
-        res = res+":::"+str(elapsed)+":::"+str(user_sessions[key].dimensions_filters)
+        res = res+":::"+str(elapsed)+":::"+str(user_sessions[key].dimensions_filters_response_format)
     else:
-        res = res+":::"+str(elapsed)+":::"+str(user_sessions_pandas[key].dimensions_filters)
+        res = res+":::"+str(elapsed)+":::"+str(user_sessions_pandas[key].dimensions_filters_response_format)
     return res
 
 

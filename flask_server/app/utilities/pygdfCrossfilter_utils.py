@@ -26,6 +26,7 @@ class pygdfCrossfilter_utils:
         self.data_gpu = None
         self.back_up_dimension = None
         self.dimensions_filters = {}
+        self.dimensions_filters_response_format = {}
         self.group_by_backups = {}
 
     def hist_numba_GPU(self,data,bins):
@@ -227,6 +228,7 @@ class pygdfCrossfilter_utils:
         try:
             self.data_gpu = self.back_up_dimension
             self.dimensions_filters.clear()
+            self.dimensions_filters_response_format.clear()
             return str(len(self.data_gpu))
 
         except Exception as e:
@@ -335,6 +337,7 @@ class pygdfCrossfilter_utils:
         try:
             if dimension_name not in self.dimensions_filters:
                 self.dimensions_filters[dimension_name] = ''
+                self.dimensions_filters_response_format[dimension_name] = []
                 res = 'dimension loaded successfully'
             else:
                 res = 'dimension already exists'
@@ -355,6 +358,7 @@ class pygdfCrossfilter_utils:
         try:
             self.data_gpu = self.back_up_dimension
             self.dimensions_filters[dimension_name] = ''
+            self.dimensions_filters_response_format[dimension_name] = []
             self.data_gpu = self.reset_filters(self.data_gpu)
             return str(len(self.data_gpu))
 
@@ -473,6 +477,7 @@ class pygdfCrossfilter_utils:
                     self.dimensions_filters[dimension_name] += ' and '+ query
                 else:
                     self.dimensions_filters[dimension_name] = query
+                self.dimensions_filters_response_format[dimension_name] = [value,value]
             try:
                 self.data_gpu = self.data_gpu.query(query)
             except Exception as e:
@@ -504,6 +509,7 @@ class pygdfCrossfilter_utils:
                     self.dimensions_filters[dimension_name] += ' and '+ query
                 else:
                     self.dimensions_filters[dimension_name] = query
+                self.dimensions_filters_response_format[dimension_name] = [min_value,max_value]
             try:
                 self.data_gpu = self.data_gpu.query(query)
             except Exception as e:

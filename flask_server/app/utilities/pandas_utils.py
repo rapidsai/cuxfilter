@@ -17,6 +17,7 @@ class pandas_utils:
         self.pandas_df = None
         self.back_up_dimension_pandas = None
         self.dimensions_filters = {}
+        self.dimensions_filters_response_format = {}
         self.group_by_backups = {}
 
 
@@ -166,6 +167,7 @@ class pandas_utils:
         try:
             self.pandas_df = self.back_up_dimension_pandas
             self.dimensions_filters.clear()
+            self.dimensions_filters_response_format.clear()
             return str(len(self.pandas_df))
 
         except Exception as e:
@@ -183,6 +185,7 @@ class pandas_utils:
         try:
             if dimension_name not in self.dimensions_filters:
                 self.dimensions_filters[dimension_name] = ''
+                self.dimensions_filters_response_format[dimension_name] = []
                 res = 'dimension loaded successfully'
             else:
                 res = 'dimension already exists'
@@ -204,6 +207,7 @@ class pandas_utils:
         try:
             self.pandas_df = self.back_up_dimension_pandas
             self.dimensions_filters[dimension_name] = ''
+            self.dimensions_filters_response_format[dimension_name] = []
             self.pandas_df = self.reset_filters(self.pandas_df)
             return str(len(self.pandas_df))
 
@@ -309,6 +313,7 @@ class pandas_utils:
                     self.dimensions_filters[dimension_name] += ' and '+ query
                 else:
                     self.dimensions_filters[dimension_name] = query
+                self.dimensions_filters_response_format[dimension_name] = [value,value]
             self.pandas_df = self.pandas_df.query(query)
             return str(len(self.pandas_df))
 
@@ -334,6 +339,7 @@ class pandas_utils:
                     self.dimensions_filters[dimension_name] += ' and '+ query
                 else:
                     self.dimensions_filters[dimension_name] = query
+                self.dimensions_filters_response_format[dimension_name] = [min_value,max_value]
             self.pandas_df = self.pandas_df.query(query)
             return str(len(self.pandas_df))
 
