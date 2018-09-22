@@ -474,6 +474,7 @@ function callPyServer(command,query, engine){
                         data: pyresponse[0],
                         pythonScriptTime: parseFloat(pyresponse[1]),
                         nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[1])
+                        activeFilters: pyresponse[2]
                         }
           if(response.data == 'oom error, please reload'){
             isDataLoaded[session_id+dataset+engine] = false;
@@ -527,7 +528,8 @@ function endSession(session_id,dataset,engine,callback){
      var response = {
                    data: pyresponse[0],
                    pythonScriptTime: parseFloat(pyresponse[1]),
-                   nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[1])
+                   nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[1]),
+                   activeFilters: pyresponse[2]
                }
      callback(false,JSON.stringify(response));
    }).catch(error => {
@@ -625,7 +627,8 @@ function initConnection(session_id,dataset,engine, callback){
         var response = {
                       data: pyresponse[0],
                       pythonScriptTime: parseFloat(pyresponse[1]),
-                      nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[1])
+                      nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[1]),
+                      activeFilters: pyresponse[2]
                   }
         callback(false,JSON.stringify(response));
       }).catch(error => {

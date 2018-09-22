@@ -32,7 +32,7 @@ def init_session_pandas(session_id):
 #     if session_id not in user_sessions:
 #         init_session(session_id)
 #     response = user_sessions[session_id].process_input_from_client(query)
-#     return append_time_to_response(response,start_time)
+#     return append_time_to_response(response,start_time, key, engine)
 
 
 @app.route('/init_connection', methods=['GET'])
@@ -64,8 +64,39 @@ def init_connection():
             response = "initialized successfully"
         else:
             response = "connection already intialized"
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
+
+@app.route('/get_active_filters', methods=['GET'])
+def get_active_filters():
+    '''
+        description:
+            return a list of active filters
+        Get parameters:
+            1. session_id (string)
+            2. dataset (string)
+            3. engine (pygdf/pandas)
+        Response:
+            list of filters
+    '''
+    #get basic get parameters
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
+
+    # DEBUG: start
+    app.logger.debug("get active filters for "+dataset_name+" and sessId: "+session_id)
+    # DEBUG: end
+
+    if engine == 'pygdf':
+        #start function execution
+        response = str(user_sessions[key].dimensions_filters)
+        #end function execution
+    else:
+        #start function execution
+        response = str(user_sessions[key].dimensions_filters)
+        #end function execution
+
+    #return response
+    return response
 
 @app.route('/read_data', methods=['GET'])
 def read_data():
@@ -83,7 +114,7 @@ def read_data():
     start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
 
     # DEBUG: start
-    app.logger.debug("read data"+dataset_name+" for "+session_id)
+    app.logger.debug("read data for "+dataset_name+" and sessId: "+session_id)
     # DEBUG: end
 
     if engine == 'pygdf':
@@ -101,7 +132,7 @@ def read_data():
         #end function execution
 
     #return response
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
 @app.route('/get_schema', methods=['GET'])
 def get_schema():
@@ -135,7 +166,7 @@ def get_schema():
         #end function execution
 
     #return response
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
 
 @app.route('/get_size', methods=['GET'])
@@ -170,7 +201,7 @@ def get_size():
         #end function execution
 
     #return response
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
 
 @app.route('/groupby_load', methods=['GET'])
@@ -207,7 +238,7 @@ def groupby_load():
     #end function execution
 
     #return response
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
 @app.route('/groupby_size', methods=['GET'])
 def groupby_size():
@@ -243,7 +274,7 @@ def groupby_size():
     #end function execution
 
     #return response
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
 
 @app.route('/groupby_filterOrder', methods=['GET'])
@@ -286,7 +317,7 @@ def groupby_filterOrder():
     #end function execution
 
     #return response
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
 
 @app.route('/dimension_load', methods=['GET'])
@@ -325,7 +356,7 @@ def dimension_load():
         #end function execution
 
     #return response
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
 
 @app.route('/dimension_reset', methods=['GET'])
@@ -368,7 +399,7 @@ def dimension_reset():
         #end function execution
 
     #return response
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
 @app.route('/dimension_get_max_min', methods=['GET'])
 def dimension_get_max_min():
@@ -406,7 +437,7 @@ def dimension_get_max_min():
         #end function execution
 
     #return response
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
 @app.route('/dimension_hist', methods=['GET'])
 def dimension_hist():
@@ -448,7 +479,7 @@ def dimension_hist():
         #end function execution
 
     #return response
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
 @app.route('/dimension_filterOrder', methods=['GET'])
 def dimension_filterOrder():
@@ -498,7 +529,7 @@ def dimension_filterOrder():
         #end function execution
 
     #return response
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
 
 @app.route('/dimension_filter', methods=['GET'])
@@ -541,7 +572,7 @@ def dimension_filter():
         #end function execution
 
     #return response
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
 
 @app.route('/dimension_filter_range', methods=['GET'])
@@ -584,7 +615,7 @@ def dimension_filter_range():
         #end function execution
 
     #return response
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
 @app.route('/reset_all_filters', methods=['GET'])
 def reset_all_filters():
@@ -618,7 +649,7 @@ def reset_all_filters():
         #end function execution
 
     #return response
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
 
 @app.route('/end_connection', methods=['GET'])
@@ -641,18 +672,14 @@ def end_connection():
             response = "successfully removed dataframe from memory"
         except e:
             response = str(e)
-    return append_time_to_response(response,start_time)
+    return append_time_to_response(response,start_time, key, engine)
 
-def append_time_to_response(res,start_time):
+def append_time_to_response(res,start_time, key, engine):
     elapsed = time.perf_counter() - start_time
-    # #appending
-    # if len(res.split(":::"))>2:
-    #     res = res+","+str(elapsed)+"////"
-    # else:
-    #     res = res+":::"+str(elapsed)+"////"
-    # # encode the result string
-    # res = res.encode("utf8")
-    res = res+":::"+str(elapsed)
+    if engine == 'pygdf':
+        res = res+":::"+str(elapsed)+":::"+str(user_sessions[key].dimensions_filters)
+    else:
+        res = res+":::"+str(elapsed)+":::"+str(user_sessions_pandas[key].dimensions_filters)
     return res
 
 
