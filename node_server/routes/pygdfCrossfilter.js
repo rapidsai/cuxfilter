@@ -61,32 +61,20 @@ module.exports = function(io) {
         });
 
         //loads the data in GPU memory
-        socket.on('load_data', function(dataset,engine, callback){
+        socket.on('load_data', function(dataset,engine, load_type, callback){
             try{
                 console.log("user tried to load data from "+dataset);
                 // resetServerTime(dataset,socket.session_id);
 
-                if(isDataLoaded[socket.session_id+dataset+engine] && dataLoaded[socket.session_id+dataset+engine] === dataset && isConnectionEstablished[socket.session_id+dataset+engine]){
+                if(isDataLoaded[socket.session_id+dataset+engine] && dataLoaded[socket.session_id+dataset+engine] == dataset){
                       console.log('data already loaded');
                       let startTime = Date.now();
-                      let command = 'reset_all_filters';
-                      let query = {
-                          'session_id': socket.session_id,
-                          'dataset': dataset,
-                          'engine': engine
-                      };
-
-                      // pygdf_query(command,params(query),'reset_all', engine, (error, message) => {
-                      //     if(!error){
-                      //       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                      //       socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                      //       socket.broadcast.emit("update_event", dataset,engine);
-                      //       //callback(false,message);
-                      //     }else{
-                      //       console.log(error);
-                      //       //callback(true,error);
-                      //     }
-                      // });
+                      // let command = 'reset_all_filters';
+                      // let query = {
+                      //     'session_id': socket.session_id,
+                      //     'dataset': dataset,
+                      //     'engine': engine
+                      // };
                       socket.broadcast.emit("update_event", dataset,engine);
                       //send data already loaded custom response
                       var response = {
@@ -99,13 +87,13 @@ module.exports = function(io) {
                       // }
                       callback(false, JSON.stringify(response));
                 }else{
-
                       console.log("loading new data in gpu mem");
                       let command = 'read_data';
                       let query = {
                           'session_id': socket.session_id,
                           'dataset': dataset,
-                          'engine': engine
+                          'engine': engine,
+                          'load_type': load_type
                       };
                       console.log("params",params(query));
 
@@ -522,14 +510,14 @@ function endSession(session_id,dataset,engine,callback){
 
   got(url)
    .then(val => {
+     console.log("session is being ended");
      isDataLoaded[session_id+dataset+engine] = false;
      isConnectionEstablished[session_id+dataset+engine] = false;
      var pyresponse = Buffer.from(val.body).toString('utf8').split(":::");
      var response = {
                    data: pyresponse[0],
                    pythonScriptTime: parseFloat(pyresponse[1]),
-                   nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[1]),
-                   activeFilters: pyresponse[2]
+                   nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[1])
                }
      callback(false,JSON.stringify(response));
    }).catch(error => {
