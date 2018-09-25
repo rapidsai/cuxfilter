@@ -107,11 +107,14 @@ def read_data():
             1. session_id (string)
             2. dataset (string)
             3. engine (pygdf/pandas)
+            4. load_type (arrow/ipc)
         Response:
             status -> data read successfully / error
     '''
     #get basic get parameters
     start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
+
+    load_type = request.args.get('load_type')
 
     # DEBUG: start
     app.logger.debug("read data for "+dataset_name+" and sessId: "+session_id)
@@ -119,7 +122,7 @@ def read_data():
 
     if engine == 'pygdf':
         #start function execution
-        response = user_sessions[key].read_data('arrow',dataset_name)
+        response = user_sessions[key].read_data(load_type,dataset_name)
         if response == 'oom error, please reload':
             user_sessions.pop(session_id+dataset_name,None)
             app.logger.debug('oom error')
@@ -672,7 +675,10 @@ def end_connection():
             response = "successfully removed dataframe from memory"
         except e:
             response = str(e)
-    return append_time_to_response(response,start_time, key, engine)
+
+    elapsed = time.perf_counter() - start_time
+    response = response+":::"+str(elapsed)
+    return response
 
 def append_time_to_response(res,start_time, key, engine):
     elapsed = time.perf_counter() - start_time
