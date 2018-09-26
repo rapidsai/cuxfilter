@@ -45,11 +45,6 @@ module.exports = function(io) {
                 if(isConnectionEstablished[socket.session_id+dataset+engine] === true){
                     callback(false,'connection already established');
                 }else{
-                    // let query = {
-                    //     'session_id': socket.session_id,
-                    //     'dataset': dataset,
-                    //     'engine': engine
-                    // };
                     initConnection(socket.session_id,dataset, engine, function(error,result){
                         callback(error, result);
                     });
@@ -69,12 +64,7 @@ module.exports = function(io) {
                 if(isDataLoaded[socket.session_id+dataset+engine] && dataLoaded[socket.session_id+dataset+engine] == dataset){
                       console.log('data already loaded');
                       let startTime = Date.now();
-                      // let command = 'reset_all_filters';
-                      // let query = {
-                      //     'session_id': socket.session_id,
-                      //     'dataset': dataset,
-                      //     'engine': engine
-                      // };
+
                       socket.broadcast.emit("update_event", dataset,engine);
                       //send data already loaded custom response
                       var response = {
@@ -82,9 +72,7 @@ module.exports = function(io) {
                                     pythonScriptTime: 0,
                                     nodeServerTime: (Date.now() - startTime)/1000
                                 };
-                      // if(!useSessions){
-                      //   socket.broadcast.emit('load_data',dataset,engine,false,JSON.stringify(response));
-                      // }
+
                       callback(false, JSON.stringify(response));
                 }else{
                       console.log("loading new data in gpu mem");
@@ -101,9 +89,7 @@ module.exports = function(io) {
                           if(!error){
                             isDataLoaded[socket.session_id+dataset+engine] = true
                             dataLoaded[socket.session_id+dataset+engine] = dataset
-                            // if(!useSessions){
-                            //   socket.broadcast.emit('load_data',dataset,engine,false,message);
-                            // }
+
                             callback(false,message);
                           }else{
                             console.log(error);
@@ -130,7 +116,7 @@ module.exports = function(io) {
                   socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                   if(!useSessions){
                     socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                    socket.broadcast.emit("update_event", dataset,engine);
+                    triggerUpdateEvent(socket, dataset, engine);
                   }
                   callback(false,message);
                 }else{
@@ -198,7 +184,7 @@ module.exports = function(io) {
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                       if(!useSessions){
                         socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                        socket.broadcast.emit("update_event", dataset,engine);
+                        triggerUpdateEvent(socket, dataset, engine);
                       }
                       callback(false,message);
                     }else{
@@ -278,7 +264,7 @@ module.exports = function(io) {
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                       if(!useSessions){
                         socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                        socket.broadcast.emit("update_event", dataset,engine);
+                        triggerUpdateEvent(socket, dataset, engine);
                       }
                       callback(false,message);
                     }else{
@@ -310,7 +296,7 @@ module.exports = function(io) {
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                       if(!useSessions){
                         socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                        socket.broadcast.emit("update_event", dataset,engine);
+                        triggerUpdateEvent(socket, dataset, engine);
                       }
                       callback(false,message);
                     }else{
@@ -447,7 +433,10 @@ module.exports = function(io) {
     return router;
 };
 
-
+function triggerUpdateEvent(socket, dataset, engine){
+  socket.emit("update_event", dataset,engine);
+  socket.broadcast.emit("update_event", dataset,engine);
+}
 function callPyServer(command,query, engine){
   return new Promise((resolve, reject) => {
        let startTime = Date.now();
