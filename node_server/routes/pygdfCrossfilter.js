@@ -17,7 +17,6 @@ let chunks = [];
 const got = require('got');
 const pyServerURLPygdf = 'http://127.0.0.1:3002';
 const pyServerURLPandas = 'http://127.0.0.1:3003';
-let useSessions = true;
 
 module.exports = function(io) {
 
@@ -35,8 +34,8 @@ module.exports = function(io) {
         socket.on('init', function(dataset, engine, usingSessions, callback){
             try{
                 console.log("connection init requested");
-                useSessions = usingSessions;
-                if(useSessions){
+                socket.useSessions = usingSessions;
+                if(socket.useSessions){
                     socket.session_id = parseCookie(socket.handshake.headers.cookie);
                 }else{
                     socket.session_id = 111;
@@ -114,7 +113,7 @@ module.exports = function(io) {
             pygdf_query(command,params(query),'reset_all',engine, (error, message) => {
                 if(!error){
                   socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                  if(!useSessions){
+                  if(socket.useSessions == false){
                     socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                     triggerUpdateEvent(socket, dataset, engine);
                   }
@@ -182,12 +181,13 @@ module.exports = function(io) {
                 pygdf_query(command,params(query),"user requesting filtering of the dataset", engine, (error, message) => {
                     if(!error){
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                      if(!useSessions){
+                      if(socket.useSessions == false){
                         socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                         triggerUpdateEvent(socket, dataset, engine);
                       }
                       callback(false,message);
                     }else{
+                      console.log('there is an error');
                       console.log(error);
                       callback(true,error);
                     }
@@ -262,7 +262,7 @@ module.exports = function(io) {
                 pygdf_query(command,params(query),"user requesting filtering of the dataset as per a range of rows",engine, (error, message) => {
                     if(!error){
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                      if(!useSessions){
+                      if(socket.useSessions == false){
                         socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                         triggerUpdateEvent(socket, dataset, engine);
                       }
@@ -294,7 +294,7 @@ module.exports = function(io) {
                 pygdf_query(command,params(query),"user requesting resetting filters on the current dimension",engine, (error, message) => {
                     if(!error){
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                      if(!useSessions){
+                      if(socket.useSessions == false){
                         socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                         triggerUpdateEvent(socket, dataset, engine);
                       }
@@ -434,6 +434,7 @@ module.exports = function(io) {
 };
 
 function triggerUpdateEvent(socket, dataset, engine){
+  console.log("broadcasting update");
   socket.emit("update_event", dataset,engine);
   socket.broadcast.emit("update_event", dataset,engine);
 }
