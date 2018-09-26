@@ -310,7 +310,7 @@ class pygdfCrossfilter_utils:
                 temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim=list(groupby_agg.keys()))
                 self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
                 res = str(len(self.group_by_backups[key]))
-            del(self.group_by_backups[key])
+            # del(self.group_by_backups[key])
             return res
 
         except Exception as e:
@@ -355,7 +355,7 @@ class pygdfCrossfilter_utils:
                         del(self.back_up_dimension)
                         print("******** oom error **********")
                         return 'oom error, please reload'
-                del(self.group_by_backups[key])
+                # del(self.group_by_backups[key])
                 res = str(self.parse_dict(temp_df))
             return res
 
