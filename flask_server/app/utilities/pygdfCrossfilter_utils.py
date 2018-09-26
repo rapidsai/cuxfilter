@@ -8,6 +8,7 @@ import numpy as np
 import time
 import sys
 import gc
+import pickle
 
 def default(o):
     if isinstance(o, np.int32): return int(o)
@@ -110,20 +111,56 @@ class pygdfCrossfilter_utils:
 
         return "data read successfully"
 
+    def read_ipc_to_DF(self,source):
+        '''
+            description:
+                Read arrow file from another dataframe already in the gpu
+            input:
+                source: file path
+            return:
+                pandas dataframe
+        '''
+        with open(source+'.pickle', 'rb') as handle:
+            buffer = eval(pickle.load(handle))
+        with open(source+'-col.pickle', 'rb') as handle:
+            columns = list(pickle.load(handle))
+        try:
+            self.data_gpu = DataFrame()
+            for i,j in enumerate(buffer):
+                temp_ipc_handler = pickle.loads(j)
+                with temp_ipc_handler as temp_nd_array:
+                    np_arr = np.zeros((arr.size), dtype=arr.dtype)
+                    np_arr_gpu = cuda.to_device(np_arr)
+                    np_arr_gpu.copy_to_device(temp_nd_array)
+                    gdf[columns[i]] = pygdf.Series(np_arr_gpu)
+
+            self.back_up_dimension = self.data_gpu
+        except Exception as e:
+            del(self.data_gpu)
+            del(self.back_up_dimension)
+            gc.collect()
+            return "oom error, please reload"+e
+
+        return "data read successfully"
+
+
 
     def read_data(self,load_type,file):
         '''
             description:
                 Read file as per the load type
             input:
-                load_type: csv or arrow
+                load_type: csv or arrow or ipc
                 file: file path
             return:
                 pandas dataframe
         '''
         #file is in the uploads/ folder, so append that to the path
         file = str("/usr/src/app/node_server/uploads/"+file)
-        status = self.read_arrow_to_DF(file)
+        if load_type == 'arrow':
+            status = self.read_arrow_to_DF(file)
+        elif load_type == 'ipc':
+            status = self.read_ipc_to_DF(file)
         return status
 
 
@@ -248,8 +285,8 @@ class pygdfCrossfilter_utils:
         try:
             temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim=list(groupby_agg.keys()))
             response = self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
-            key = column_name+"_"+groupby_agg_key
-            del(self.group_by_backups[key])
+            # key = dimension_name+"_"+groupby_agg_key
+            # del(self.group_by_backups[key])
             return response
 
         except Exception as e:
@@ -296,7 +333,7 @@ class pygdfCrossfilter_utils:
         try:
             key = dimension_name+"_"+groupby_agg_key
             if(key not in self.group_by_backups):
-                res = "groupby not intialized"
+                res = "groupby not intialized"#+sort_order+key+"/"+str(list(self.group_by_backups.keys()))
             else:
                 #removing the cumulative filters on the current dimension for the groupby
                 temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name,include_dim=list(groupby_agg.keys()))
