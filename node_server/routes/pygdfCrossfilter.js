@@ -88,12 +88,8 @@ module.exports = function(io) {
                           if(!error){
                             isDataLoaded[socket.session_id+dataset+engine] = true
                             dataLoaded[socket.session_id+dataset+engine] = dataset
-
-                            callback(false,message);
-                          }else{
-                            console.log(error);
-                            callback(true, error);
                           }
+                          callback(error, message);
                       });
                     }
             }catch(ex){
@@ -117,11 +113,8 @@ module.exports = function(io) {
                     socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                     triggerUpdateEvent(socket, dataset, engine);
                   }
-                  callback(false,message);
-                }else{
-                  console.log(error);
-                  callback(true,error);
                 }
+                callback(error, message);
             });
         });
 
@@ -185,12 +178,8 @@ module.exports = function(io) {
                         socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                         triggerUpdateEvent(socket, dataset, engine);
                       }
-                      callback(false,message);
-                    }else{
-                      console.log('there is an error');
-                      console.log(error);
-                      callback(true,error);
                     }
+                    callback(error, message);
                 });
 
             }catch(ex){
@@ -266,11 +255,8 @@ module.exports = function(io) {
                         socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                         triggerUpdateEvent(socket, dataset, engine);
                       }
-                      callback(false,message);
-                    }else{
-                      console.log(error);
-                      callback(true,error);
                     }
+                    callback(error, message);
                 });
 
             }catch(ex){
@@ -298,11 +284,8 @@ module.exports = function(io) {
                         socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                         triggerUpdateEvent(socket, dataset, engine);
                       }
-                      callback(false,message);
-                    }else{
-                      console.log(error);
-                      callback(true,error);
                     }
+                    callback(error, message);
                 });
             }catch(ex){
                 console.log(ex);
@@ -454,11 +437,18 @@ function callPyServer(command,query, engine){
                         nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[1]),
                         activeFilters: pyresponse[2]
                         }
-          if(response.data == 'oom error, please reload'){
-            isDataLoaded[session_id+dataset+engine] = false;
-            isConnectionEstablished[session_id+dataset+engine] = false;
+          if(response.data.indexOf('Exception') > -1){
+            response.data = response.data.split('***')[1];
+            if(response.data.indexOf('OOM') > -1 ){
+              isDataLoaded[session_id+dataset+engine] = false;
+              isConnectionEstablished[session_id+dataset+engine] = false;
+              endSession(session_id,dataset,engine,(err,message)=>{});
+            }
+            reject(JSON.stringify(response));
+          }else{
+            resolve(JSON.stringify(response));
           }
-          resolve(JSON.stringify(response));
+
         }).catch(error => {
           console.log(error);
           var response = {
@@ -466,7 +456,7 @@ function callPyServer(command,query, engine){
                           pythonScriptTime: parseFloat(0),
                           nodeServerTime: ((Date.now() - startTime)/1000)
                         }
-          reject(true,JSON.stringify(response));
+          reject(JSON.stringify(response));
         });
   });
 }
@@ -485,9 +475,9 @@ function pygdf_query(command,query, comments,engine, callback){
               console.log(comments);
               // socket.broadcast.emit(command,false,message);
               typeof callback === 'function' && callback(false,message);
-      }).catch((error) => {
-              console.log(error);
-              typeof callback === 'function' && callback(true,error);
+      }).catch((error_message) => {
+              console.log(error_message);
+              typeof callback === 'function' && callback(true,error_message);
       });
 }
 
