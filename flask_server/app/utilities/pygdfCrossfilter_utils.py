@@ -9,6 +9,7 @@ import time
 import sys
 import gc
 import pickle
+from numba import cuda
 
 def default(o):
     if isinstance(o, np.int32): return int(o)
@@ -107,7 +108,7 @@ class pygdfCrossfilter_utils:
             del(self.data_gpu)
             del(self.back_up_dimension)
             gc.collect()
-            return "oom error, please reload"+e
+            return "oom error, please reload"+str(e)
 
         return "data read successfully"
 
@@ -129,17 +130,17 @@ class pygdfCrossfilter_utils:
             for i,j in enumerate(buffer):
                 temp_ipc_handler = pickle.loads(j)
                 with temp_ipc_handler as temp_nd_array:
-                    np_arr = np.zeros((arr.size), dtype=arr.dtype)
+                    np_arr = np.zeros((temp_nd_array.size), dtype=temp_nd_array.dtype)
                     np_arr_gpu = cuda.to_device(np_arr)
                     np_arr_gpu.copy_to_device(temp_nd_array)
-                    gdf[columns[i]] = pygdf.Series(np_arr_gpu)
+                    self.data_gpu[columns[i]] = pygdf.Series(np_arr_gpu)
 
             self.back_up_dimension = self.data_gpu
         except Exception as e:
             del(self.data_gpu)
             del(self.back_up_dimension)
             gc.collect()
-            return "oom error, please reload"+e
+            return "oom error, please reload"+str(e)
 
         return "data read successfully"
 
