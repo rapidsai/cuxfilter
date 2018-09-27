@@ -1,38 +1,43 @@
 # views.py
 
-from flask import render_template,jsonify,request
-import logging
-import json
+#import required libraries
+from flask import render_template, jsonify, request
+import logging, json, time
 from app import app
-import time
 from app.utilities.pygdfCrossfilter_utils import pygdfCrossfilter_utils as pygdf
 from app.utilities.pandas_utils import pandas_utils as pandas
+
+#global dictionaries to keep track of different user sessions. end_connection for a user_session results in the dictionary key-value pair being popped
 user_sessions = {}
 user_sessions_pandas = {}
 
 @app.route('/')
 def index():
+    '''
+        description:
+            if no route is provided, serve index.html
+    '''
     return render_template("index.html")
 
 def init_session(session_id):
+    '''
+        description:
+            initialize the session for pygdf dataframe object in the user_sessions global dictionary
+        input:
+            1. session_id
+        No output
+    '''
     user_sessions[session_id] = pygdf()
 
 def init_session_pandas(session_id):
+    '''
+        description:
+            initialize the session for pandas dataframe object in the user_sessions_pandas global dictionary
+        input:
+            1. session_id
+        No output
+    '''
     user_sessions_pandas[session_id] = pandas()
-
-# @app.route('/process', methods=['GET'])
-# def process_input_from_client():
-#     #get basic get parameters
-#     start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
-#
-#     query = request.args.get('query')
-#
-#     app.logger.debug("query: "+query)
-#
-#     if session_id not in user_sessions:
-#         init_session(session_id)
-#     response = user_sessions[session_id].process_input_from_client(query)
-#     return append_time_to_response(response,start_time, key, engine)
 
 
 @app.route('/init_connection', methods=['GET'])
@@ -117,12 +122,13 @@ def read_data():
     load_type = request.args.get('load_type')
 
     # DEBUG: start
-    app.logger.debug("read data for "+dataset_name+" and sessId: "+session_id)
+    app.logger.debug("read data for "+dataset_name+" and sessId: "+session_id+load_type)
     # DEBUG: end
 
     if engine == 'pygdf':
         #start function execution
         response = user_sessions[key].read_data(load_type,dataset_name)
+        app.logger.debug("read data response = "+str(response))
         if response == 'oom error, please reload':
             user_sessions.pop(session_id+dataset_name,None)
             app.logger.debug('oom error')
@@ -657,13 +663,22 @@ def reset_all_filters():
 
 @app.route('/end_connection', methods=['GET'])
 def end_connection():
-    start_time = time.perf_counter()
-    session_id = request.args.get('session_id')
-    dataset_name = request.args.get('dataset')
-    engine = request.args.get('engine')
+    '''
+        description:
+            end connection by removing the dataframe for the session from memory (gpu memory for pygdf/ cpu memory for pandas DataFrame)
+        Get parameters:
+            1. session_id (string)
+            2. dataset (string)
+            3. engine (pygdf/pandas)
+        Response:
+            status
+    '''
+    #get basic get parameters
+    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
+
     app.logger.debug("end connection for "+session_id)
-    key = session_id+dataset_name
-    if session_id+dataset_name not in user_sessions:
+
+    if key not in user_sessions:
         response = "Connection does not exist"
     else:
         try:
@@ -680,16 +695,39 @@ def end_connection():
     response = response+":::"+str(elapsed)
     return response
 
-def append_time_to_response(res,start_time, key, engine):
+def append_time_to_response(response,start_time, key, engine):
+    '''
+        description:
+            append time and activeFilters to the response string
+        Get parameters:
+            1. response (string)
+            2. start_time (string)
+            3. key (string -> session_id+dataset_name)
+            4. engine (pygdf/pandas)
+        Response:
+            response string with time taken and activeFilters appended with ':::' as a separator
+    '''
     elapsed = time.perf_counter() - start_time
     if engine == 'pygdf':
-        res = res+":::"+str(elapsed)+":::"+str(user_sessions[key].dimensions_filters_response_format)
+        response = response+":::"+str(elapsed)+":::"+str(user_sessions[key].dimensions_filters_response_format)
     else:
-        res = res+":::"+str(elapsed)+":::"+str(user_sessions_pandas[key].dimensions_filters_response_format)
-    return res
+        response = response+":::"+str(elapsed)+":::"+str(user_sessions_pandas[key].dimensions_filters_response_format)
+    return response
 
 
 def parse_basic_get_parameters(get_params):
+    '''
+        description:
+            parse the get parameters to extract basic information required for each function
+        Get parameters:
+            1. get_params
+        Response:
+            start_time
+            session_id
+            dataset_name
+            key(session_id+dataset_name)
+            engine(pygdf/pandas)
+    '''
     #start timer
     start_time = time.perf_counter()
     #start get parameters
