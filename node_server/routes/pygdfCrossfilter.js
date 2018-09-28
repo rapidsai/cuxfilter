@@ -439,10 +439,10 @@ function callPyServer(command,query, engine){
                         }
           if(response.data.indexOf('Exception') > -1){
             response.data = response.data.split('***')[1];
-            if(response.data.indexOf('OOM') > -1 ){
+            if(response.data.indexOf('out of memory') > -1  || response.data.indexOf('thrust::system::system_error') > -1){
               isDataLoaded[session_id+dataset+engine] = false;
               isConnectionEstablished[session_id+dataset+engine] = false;
-              endSession(session_id,dataset,engine,(err,message)=>{});
+              // endSession(session_id,dataset,engine,(err,message)=>{});
             }
             reject(JSON.stringify(response));
           }else{
