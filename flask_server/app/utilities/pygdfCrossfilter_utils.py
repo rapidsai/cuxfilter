@@ -1,3 +1,5 @@
+#pygdfCrossfilter_utils.py
+
 from pyarrow import RecordBatchStreamReader
 from app.utilities.numbaHistinMem import numba_gpu_histogram
 from pygdf.dataframe import DataFrame
@@ -63,11 +65,11 @@ class pygdfCrossfilter_utils:
                 json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
         '''
         # global group_by_backups
-        print(column_name)
-        print("inside groupby function")
+        # print(column_name)
+        # print("inside groupby function")
         try:
             group_appl = data.groupby(by=[column_name]).agg(groupby_agg)
-            print(len(group_appl))
+            # print(len(group_appl))
             key = column_name+"_"+groupby_agg_key
             self.group_by_backups[key] = group_appl  #.loc[:,[column_name,column_name+'_'+agg]]
         except Exception as e:
