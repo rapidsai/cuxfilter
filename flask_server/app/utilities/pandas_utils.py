@@ -40,6 +40,33 @@ class pandas_utils:
         return json.dumps(dict_temp)
 
 
+    def groupby(self,data,column_name, groupby_agg,groupby_agg_key):
+        '''
+            description:
+                Calculate groupby on a given column on the pygdf
+            input:
+                data: pygdf row as a series -> gpu mem pointer,
+                column_name: column name
+            Output:
+                json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
+        '''
+        # global group_by_backups
+        # print(column_name)
+        # print("inside groupby function")
+        try:
+            group_appl = data.groupby(by=[column_name]).agg(groupby_agg)
+            group_appl.reset_index(inplace=True)
+            key = column_name+"_"+groupby_agg_key
+            self.group_by_backups[key] = group_appl  #.loc[:,[column_name,column_name+'_'+agg]]
+        except Exception as e:
+            del(self.pandas_df)
+            del(self.back_up_dimension_pandas)
+            return "Exception *** "+str(e)
+
+        return "groupby intialized successfully"
+
+
+
     def get_columns(self):
         '''
             description:
@@ -100,7 +127,11 @@ class pandas_utils:
         try:
             temp_dict = {}
             for i in data:
-                temp_dict[i] = list(data[i].values())
+                if i[1] == '':
+                    temp_key = i[0]
+                else:
+                    temp_key = '_'.join(i[::-1]) #to match the pygdf output format for dataframe column names of groupby results
+                temp_dict[temp_key] = list(data[i].values())
             return json.dumps(temp_dict,default=self.default)
         except Exception as e:
             return str(e)
@@ -345,3 +376,89 @@ class pandas_utils:
 
         except Exception as e:
             return str(e)
+
+    def groupby_load(self, dimension_name, groupby_agg, groupby_agg_key):
+        '''
+            description:
+                load groupby operation for dimension as per the given groupby_agg
+            input:
+                dimension_name <string>:
+                groupby_agg <dictionary>:
+                groupby_agg_key <string>:
+            return:
+                status: groupby intialized successfully
+        '''
+        try:
+            temp_df = self.reset_filters(self.back_up_dimension_pandas, omit=dimension_name, include_dim=list(groupby_agg.keys()))
+            response = self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
+            return response
+
+        except Exception as e:
+            return 'Exception *** '+str(e)
+
+    def groupby_size(self, dimension_name, groupby_agg_key):
+        '''
+            description:
+                get groupby size for a groupby on a dimension
+            input:
+                dimension_name <string>:
+                groupby_agg_key <string>:
+            return:
+                size of the groupby
+        '''
+        try:
+            key = dimension_name+"_"+groupby_agg_key
+            if(key not in self.group_by_backups):
+                res = "groupby not intialized"
+            else:
+                temp_df = self.reset_filters(self.back_up_dimension_pandas, omit=dimension_name, include_dim=list(groupby_agg.keys()))
+                self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
+                res = str(len(self.group_by_backups[key]))
+            return res
+
+        except Exception as e:
+            return 'Exception *** '+str(e)
+
+    def groupby_filterOrder(self, dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column):
+        '''
+            description:
+                get groupby values by a filterOrder(all, top(n), bottom(n)) for a groupby on a dimension
+            Get parameters:
+                dimension_name (string)
+                groupby_agg (JSON stringified object)
+                groupby_agg_key <string>:
+                sort_order (string): top/bottom/all
+                num_rows (integer): OPTIONAL -> if sort_order= top/bottom
+                sort_column: column name by which the result should be sorted
+            Response:
+                all rows/error => "groupby not initialized"
+        '''
+        try:
+            key = dimension_name+"_"+groupby_agg_key
+            if(key not in self.group_by_backups):
+                res = "groupby not intialized"#+sort_order+key+"/"+str(list(self.group_by_backups.keys()))
+            else:
+                #removing the cumulative filters on the current dimension for the groupby
+                temp_df = self.reset_filters(self.back_up_dimension_pandas, omit=dimension_name,include_dim=list(groupby_agg.keys()))
+                self.groupby(temp_df,dimension_name,groupby_agg,groupby_agg_key)
+                if 'all' == sort_order:
+                    temp_df = self.group_by_backups[key].to_dict()
+                else:
+                    # if len(group_by_backups[key]) == 0:
+                    max_rows = max(len(self.group_by_backups[key])-1,0)
+                    n_rows = min(num_rows,max_rows)
+                    # print("number of rows processed",n_rows)
+                    try:
+                        if 'top' == sort_order:
+                            temp_df = self.group_by_backups[key].nlargest(n_rows,[sort_column]).to_dict()
+                        elif 'bottom' == sort_order:
+                            temp_df = self.group_by_backups[key].nsmallest(n_rows,[sort_column]).to_dict()
+                    except Exception as e:
+                        del(self.pandas_df)
+                        del(self.back_up_dimension_pandas)
+                        return 'Exception *** '+str(e)
+                res = str(self.parse_dict(temp_df))
+            return res
+
+        except Exception as e:
+            return 'Exception *** '+str(e)

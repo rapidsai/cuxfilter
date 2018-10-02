@@ -238,13 +238,19 @@ def groupby_load():
     app.logger.debug("groupby load of "+dataset_name+" for dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
-    #start function execution
-    groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
-    response = user_sessions[key].groupby_load(dimension_name, groupby_agg, groupby_agg_key)
-    if 'out of memory' in response or 'thrust::system::system_error' in response:
-        user_sessions.pop(session_id+dataset_name,None)
-        app.logger.debug('out of memory error')
-    #end function execution
+    if engine == 'pygdf':
+        #start function execution
+        groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
+        response = user_sessions[key].groupby_load(dimension_name, groupby_agg, groupby_agg_key)
+        if 'out of memory' in response or 'thrust::system::system_error' in response:
+            user_sessions.pop(session_id+dataset_name,None)
+            app.logger.debug('out of memory error')
+        #end function execution
+    else:
+        #start function execution
+        groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
+        response = user_sessions_pandas[key].groupby_load(dimension_name, groupby_agg, groupby_agg_key)
+        #end function execution
 
     #return response
     return append_time_to_response(response,start_time, key, engine)
@@ -274,13 +280,19 @@ def groupby_size():
     app.logger.debug("groupby size of "+dataset_name+" for dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
-    #start function execution
-    groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
-    response = user_sessions[key].groupby_size(dimension_name, groupby_agg_key)
-    if 'out of memory' in response or 'thrust::system::system_error' in response:
-        user_sessions.pop(session_id+dataset_name,None)
-        app.logger.debug('out of memory error')
-    #end function execution
+    if engine == 'pygdf':
+        #start function execution
+        groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
+        response = user_sessions[key].groupby_size(dimension_name, groupby_agg_key)
+        if 'out of memory' in response or 'thrust::system::system_error' in response:
+            user_sessions.pop(session_id+dataset_name,None)
+            app.logger.debug('out of memory error')
+        #end function execution
+    else:
+        #start function execution
+        groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
+        response = user_sessions_pandas[key].groupby_size(dimension_name, groupby_agg_key)
+        #end function execution
 
     #return response
     return append_time_to_response(response,start_time, key, engine)
@@ -317,13 +329,19 @@ def groupby_filterOrder():
     app.logger.debug("groupby filterOrder of "+dataset_name+" for dimension_name "+dimension_name+" for "+session_id)
     # DEBUG: end
 
-    #start function execution
-    groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
-    response = user_sessions[key].groupby_filterOrder(dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column)
-    if 'out of memory' in response or 'thrust::system::system_error' in response:
-        user_sessions.pop(session_id+dataset_name,None)
-        app.logger.debug('out of memory error')
-    #end function execution
+    if engine == 'pygdf':
+        #start function execution
+        groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
+        response = user_sessions[key].groupby_filterOrder(dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column)
+        if 'out of memory' in response or 'thrust::system::system_error' in response:
+            user_sessions.pop(session_id+dataset_name,None)
+            app.logger.debug('out of memory error')
+        #end function execution
+    else:
+        #start function execution
+        groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
+        response = user_sessions_pandas[key].groupby_filterOrder(dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column)
+        #end function execution
 
     #return response
     return append_time_to_response(response,start_time, key, engine)
