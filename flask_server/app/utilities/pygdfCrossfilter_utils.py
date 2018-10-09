@@ -73,8 +73,8 @@ class pygdfCrossfilter_utils:
             key = column_name+"_"+groupby_agg_key
             self.group_by_backups[key] = group_appl  #.loc[:,[column_name,column_name+'_'+agg]]
         except Exception as e:
-            del(self.data_gpu)
-            del(self.back_up_dimension)
+            #del(self.data_gpu)
+            #del(self.back_up_dimension)
             return "Exception *** "+str(e)
 
         return "groupby intialized successfully"
@@ -239,8 +239,8 @@ class pygdfCrossfilter_utils:
                     try:
                         return_val = data.loc[:,column_list].query(query)
                     except Exception as e:
-                        del(self.data_gpu)
-                        del(self.back_up_dimension)
+                        #del(self.data_gpu)
+                        #del(self.back_up_dimension)
                         # print("******** oom error **********")
                         return 'Exception *** '+str(e)
                     return return_val
@@ -498,8 +498,8 @@ class pygdfCrossfilter_utils:
                         # status = 'here in bottom'
                         temp_df = self.data_gpu.loc[:,list(columns)].nsmallest(n_rows,[dimension_name]).to_pandas().to_dict()
                 except Exception as e:
-                    del(self.data_gpu)
-                    del(self.back_up_dimension)
+                    #del(self.data_gpu)
+                    #del(self.back_up_dimension)
                     return 'Exception *** '+str(e)
 
             return str(self.parse_dict(temp_df))
@@ -529,8 +529,8 @@ class pygdfCrossfilter_utils:
             try:
                 self.data_gpu = self.data_gpu.query(query)
             except Exception as e:
-                del(self.data_gpu)
-                del(self.back_up_dimension)
+                #del(self.data_gpu)
+                #del(self.back_up_dimension)
                 # print("******** oom error **********")
                 return 'Exception *** '+str(e)
             return str(len(self.data_gpu))
@@ -561,8 +561,8 @@ class pygdfCrossfilter_utils:
             try:
                 self.data_gpu = self.data_gpu.query(query)
             except Exception as e:
-                del(self.data_gpu)
-                del(self.back_up_dimension)
+                #del(self.data_gpu)
+                #del(self.back_up_dimension)
                 # print("******** oom error **********")
                 return 'Exception *** '+str(e)
 
