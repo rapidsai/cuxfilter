@@ -17,6 +17,7 @@ let chunks = [];
 const got = require('got');
 const pyServerURLPygdf = 'http://127.0.0.1:3002';
 const pyServerURLPandas = 'http://127.0.0.1:3003';
+let singleSessionId = '';
 
 module.exports = function(io) {
 
@@ -36,7 +37,18 @@ module.exports = function(io) {
                 console.log("connection init requested");
                 socket.useSessions = usingSessions;
                 if(socket.useSessions){
-                    socket.session_id = parseCookie(socket.handshake.headers.cookie);
+                  let tempSessionId = parseCookie(socket.handshake.headers.cookie);
+                    if(tempSessionId != singleSessionId){
+                      endSession(singleSessionId,dataset,engine,function(error, message){
+                          if(!error){
+                            singleSessionId = tempSessionId;
+                            console.log("old session replaced with new session, gpu mem cleared");
+                          }else{
+                            console.log("old session replaced with new session, failed:",message);
+                          }
+                      });
+                    }
+                    socket.session_id = tempSessionId;
                 }else{
                     socket.session_id = 111;
                 }
@@ -507,7 +519,7 @@ function endSession(session_id,dataset,engine,callback){
                      pythonScriptTime: parseFloat(0),
                      nodeServerTime: ((Date.now() - startTime)/1000)
                    }
-     reject(true,JSON.stringify(response));
+     callback(true,JSON.stringify(response));
    });
 }
 

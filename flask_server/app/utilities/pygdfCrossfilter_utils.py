@@ -43,7 +43,6 @@ class pygdfCrossfilter_utils:
                 json -> {X:[__values_of_colName_with_max_64_bins__], Y:[__frequencies_per_bin__]}
         '''
         try:
-            print("calculating histogram")
             df1 = numba_gpu_histogram(data,int(bins))
             dict_temp ={}
 
@@ -52,7 +51,7 @@ class pygdfCrossfilter_utils:
 
             return str(json.dumps(dict_temp))
         except Exception as e:
-            return 'Exception *** '+str(e)
+            return 'Exception *** in pygdf hist_numba_GPU():'+str(e)
 
     def groupby(self,data,column_name, groupby_agg,groupby_agg_key):
         '''
@@ -64,18 +63,12 @@ class pygdfCrossfilter_utils:
             Output:
                 json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
         '''
-        # global group_by_backups
-        # print(column_name)
-        # print("inside groupby function")
         try:
             group_appl = data.groupby(by=[column_name]).agg(groupby_agg)
-            # print(len(group_appl))
             key = column_name+"_"+groupby_agg_key
-            self.group_by_backups[key] = group_appl  #.loc[:,[column_name,column_name+'_'+agg]]
+            self.group_by_backups[key] = group_appl
         except Exception as e:
-            #del(self.data_gpu)
-            #del(self.back_up_dimension)
-            return "Exception *** "+str(e)
+            return "Exception *** in pygdf groupby(): "+str(e)
 
         return "groupby intialized successfully"
 
@@ -91,7 +84,7 @@ class pygdfCrossfilter_utils:
         try:
             return str(list(self.data_gpu.columns))
         except Exception as e:
-            return "Exception *** "+str(e)
+            return "Exception *** in pygdf get_columns():"+str(e)
 
     def read_arrow_to_DF(self,source):
         '''
@@ -117,7 +110,7 @@ class pygdfCrossfilter_utils:
             del(self.data_gpu)
             del(self.back_up_dimension)
             gc.collect()
-            return "Exception *** "+str(e)
+            return "Exception *** in pygdf read_arrow_to_DF():"+str(e)
 
         return "data read successfully"
 
@@ -152,7 +145,7 @@ class pygdfCrossfilter_utils:
             del(self.data_gpu)
             del(self.back_up_dimension)
             gc.collect()
-            return "Exception *** "+str(e)
+            return "Exception *** in pygdf read_ipc_to_DF():"+str(e)
 
         return "data read successfully"
 
@@ -192,7 +185,7 @@ class pygdfCrossfilter_utils:
                 temp_dict[i] = list(data[i].values())
             return json.dumps(temp_dict,default=default)
         except Exception as e:
-            return 'Exception *** '+str(e)
+            return 'Exception *** in pygdf parse_dict() (helper function):'+str(e)
 
     def get_size(self):
         '''
@@ -206,7 +199,7 @@ class pygdfCrossfilter_utils:
         try:
             return str((len(self.data_gpu),len(self.data_gpu.columns)))
         except Exception as e:
-            return 'Exception *** '+str(e)
+            return 'Exception *** in pygdf get_size():'+str(e)
 
     def reset_filters(self, data, omit=None, include_dim=['all']):
         '''
@@ -220,8 +213,6 @@ class pygdfCrossfilter_utils:
             Output:
                 result dataframe after executing the filters using the dataframe.query() command
         '''
-        # global dimensions_filters
-        # print("inside reset filters")
         try:
             temp_list = []
             for key in self.dimensions_filters.keys():
@@ -231,7 +222,6 @@ class pygdfCrossfilter_utils:
                     temp_list.append(self.dimensions_filters[key])
             query = ' and '.join(temp_list)
             if(len(query) >0):
-                # return data.query(query)
                 if include_dim[0] == 'all':
                     return data.query(query)
                 else:
@@ -239,10 +229,7 @@ class pygdfCrossfilter_utils:
                     try:
                         return_val = data.loc[:,column_list].query(query)
                     except Exception as e:
-                        #del(self.data_gpu)
-                        #del(self.back_up_dimension)
-                        # print("******** oom error **********")
-                        return 'Exception *** '+str(e)
+                        return 'Exception *** in pygdf reset_filters():'+str(e)
                     return return_val
             else:
                 return data
@@ -263,7 +250,7 @@ class pygdfCrossfilter_utils:
         try:
             self.hist_numba_GPU(self.data_gpu[self.data_gpu.columns[-1]].to_gpu_array(),640)
         except Exception as e:
-            return 'Exception *** '+str(e)
+            return 'Exception *** in pygdf numba_jit_warm_func():'+str(e)
 
 
     def reset_all_filters(self):
@@ -282,7 +269,7 @@ class pygdfCrossfilter_utils:
             return str(len(self.data_gpu))
 
         except Exception as e:
-            return 'Exception *** '+str(e)
+            return 'Exception *** in pygdf reset_all_filters:'+str(e)
 
     def groupby_load(self, dimension_name, groupby_agg, groupby_agg_key):
         '''
@@ -298,12 +285,10 @@ class pygdfCrossfilter_utils:
         try:
             temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim=list(groupby_agg.keys()))
             response = self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
-            # key = dimension_name+"_"+groupby_agg_key
-            # del(self.group_by_backups[key])
             return response
 
         except Exception as e:
-            return 'Exception *** '+str(e)
+            return 'Exception *** in pygdf groupby_load():'+str(e)
 
     def groupby_size(self, dimension_name, groupby_agg_key):
         '''
@@ -323,11 +308,10 @@ class pygdfCrossfilter_utils:
                 temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim=list(groupby_agg.keys()))
                 self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
                 res = str(len(self.group_by_backups[key]))
-            # del(self.group_by_backups[key])
             return res
 
         except Exception as e:
-            return 'Exception *** '+str(e)
+            return 'Exception *** in pygdf groupby_size():'+str(e)
 
     def groupby_filterOrder(self, dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column):
         '''
@@ -346,7 +330,7 @@ class pygdfCrossfilter_utils:
         try:
             key = dimension_name+"_"+groupby_agg_key
             if(key not in self.group_by_backups):
-                res = "groupby not intialized"#+sort_order+key+"/"+str(list(self.group_by_backups.keys()))
+                res = "groupby not intialized"
             else:
                 #removing the cumulative filters on the current dimension for the groupby
                 temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name,include_dim=list(groupby_agg.keys()))
@@ -354,21 +338,15 @@ class pygdfCrossfilter_utils:
                 if 'all' == sort_order:
                     temp_df = self.group_by_backups[key].to_pandas().to_dict()
                 else:
-                    # if len(group_by_backups[key]) == 0:
                     max_rows = max(len(self.group_by_backups[key])-1,0)
                     n_rows = min(num_rows,max_rows)
-                    # print("number of rows processed",n_rows)
                     try:
                         if 'top' == sort_order:
                             temp_df = self.group_by_backups[key].nlargest(n_rows,[sort_column]).to_pandas().to_dict()
                         elif 'bottom' == sort_order:
                             temp_df = self.group_by_backups[key].nsmallest(n_rows,[sort_column]).to_pandas().to_dict()
                     except Exception as e:
-                        #del(self.data_gpu)
-                        #del(self.back_up_dimension)
-                        # print("******** oom error **********")
-                        return 'Exception *** '+str(e)
-                # del(self.group_by_backups[key])
+                        return 'Exception *** in pygdf groupby_filterOrder():'+str(e)
                 res = str(self.parse_dict(temp_df))
             return res
 
@@ -394,7 +372,7 @@ class pygdfCrossfilter_utils:
             return res
 
         except Exception as e:
-            return 'Exception *** '+str(e)
+            return 'Exception *** in pygdf dimension_load():'+str(e)
 
     def dimension_reset(self, dimension_name):
         '''
@@ -413,7 +391,7 @@ class pygdfCrossfilter_utils:
             return str(len(self.data_gpu))
 
         except Exception as e:
-            return 'Exception *** '+str(e)
+            return 'Exception *** in pygdf dimension_reset():'+str(e)
 
 
     def dimension_get_max_min(self, dimension_name):
@@ -430,7 +408,7 @@ class pygdfCrossfilter_utils:
             return str(max_min_tuple)
 
         except Exception as e:
-            return 'Exception *** '+str(e)
+            return 'Exception *** in pygdf dimension_get_max_min():'+str(e)
 
     def dimension_hist(self, dimension_name, num_of_bins):
         '''
@@ -444,19 +422,14 @@ class pygdfCrossfilter_utils:
         '''
         try:
             num_of_bins = int(num_of_bins)
-            # start = time.time()
-            # status = "not here"
-            # status += str(self.dimensions_filters.keys())
             if len(self.dimensions_filters.keys()) == 0 or (dimension_name not in self.dimensions_filters) or (dimension_name in self.dimensions_filters and self.dimensions_filters[dimension_name] == ''):
-                # status = 'in here'
                 return str(self.hist_numba_GPU(self.data_gpu[str(dimension_name)].to_gpu_array(),num_of_bins))
             else:
                 temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim = [dimension_name])
-                # reset_filters_time = time.time() - start
-                return str(self.hist_numba_GPU(temp_df[str(dimension_name)].to_gpu_array(),num_of_bins))#, status+":::"+str(reset_filters_time)
+                return str(self.hist_numba_GPU(temp_df[str(dimension_name)].to_gpu_array(),num_of_bins))
 
         except Exception as e:
-            return 'Exception *** '+str(e)
+            return 'Exception *** in pygdf dimension_hist():'+str(e)
 
 
     def dimension_filterOrder(self, dimension_name, sort_order, num_rows, columns):
@@ -471,16 +444,12 @@ class pygdfCrossfilter_utils:
             Response:
                 string(json) -> "{col_1:[__row_values__], col_2:[__row_values__],...}"
         '''
-        # print(args)
-        # print(columns)
         try:
             columns = columns.split(',')
             if(len(columns) == 0 or columns[0]==''):
                 columns = list(self.data_gpu.columns)
             elif dimension_name not in columns:
                 columns.append(dimension_name)
-            print("requested columns",columns)
-            print("available columns",self.data_gpu.columns)
 
             if 'all' == sort_order:
                 temp_df = self.data_gpu.loc[:,list(columns)].to_pandas().to_dict()
@@ -490,22 +459,16 @@ class pygdfCrossfilter_utils:
                 n_rows = min(num_rows, max_rows)
                 try:
                     if 'top' == sort_order:
-                        # status = 'here in top'
                         temp_df = self.data_gpu.loc[:,list(columns)].nlargest(n_rows,[dimension_name]).to_pandas().to_dict()
-                        # status += ' and now temp_df is calculated'
-                        # status += str(temp_df)
                     elif 'bottom' == sort_order:
-                        # status = 'here in bottom'
                         temp_df = self.data_gpu.loc[:,list(columns)].nsmallest(n_rows,[dimension_name]).to_pandas().to_dict()
                 except Exception as e:
-                    #del(self.data_gpu)
-                    #del(self.back_up_dimension)
-                    return 'Exception *** '+str(e)
+                    return 'Exception *** in pygdf dimension_filterOrder(1):'+str(e)
 
             return str(self.parse_dict(temp_df))
 
         except Exception as e:
-            return 'Exception *** '+str(e)
+            return 'Exception *** in pygdf dimension_filterOrder(2):'+str(e)
 
     def dimension_filter(self, dimension_name, comparison_operation, value):
         '''
@@ -529,14 +492,11 @@ class pygdfCrossfilter_utils:
             try:
                 self.data_gpu = self.data_gpu.query(query)
             except Exception as e:
-                #del(self.data_gpu)
-                #del(self.back_up_dimension)
-                # print("******** oom error **********")
-                return 'Exception *** '+str(e)
+                return 'Exception *** in pygdf dimension_filter(1):'+str(e)
             return str(len(self.data_gpu))
 
         except Exception as e:
-            return 'Exception *** '+str(e)
+            return 'Exception *** in pygdf dimension_filter(2):'+str(e)
 
     def dimension_filter_range(self, dimension_name, min_value, max_value):
         '''
@@ -551,7 +511,6 @@ class pygdfCrossfilter_utils:
         '''
         try:
             query = dimension_name+">="+min_value+" and "+dimension_name+"<="+max_value
-            # print(str(query))
             if dimension_name in self.dimensions_filters:
                 if len(self.dimensions_filters[dimension_name])>0:
                     self.dimensions_filters[dimension_name] += ' and '+ query
@@ -561,12 +520,7 @@ class pygdfCrossfilter_utils:
             try:
                 self.data_gpu = self.data_gpu.query(query)
             except Exception as e:
-                #del(self.data_gpu)
-                #del(self.back_up_dimension)
-                # print("******** oom error **********")
-                return 'Exception *** '+str(e)
-
+                return 'Exception *** in pygdf dimension_filter_range(1):'+str(e)
             return str(len(self.data_gpu))
-
         except Exception as e:
-            return 'Exception *** '+str(e)
+            return 'Exception *** in pygdf dimension_filter_range(2):'+str(e)

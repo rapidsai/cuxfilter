@@ -73,12 +73,7 @@ def get_bin_edges(a_range, bin_edges):
     bin_edges[-1] = a_max  # Avoid roundoff error on last point
 
 
-def numba_gpu_histogram(a, bins):
-    # Move data to GPU so we can do two operations on it
-    # a_gpu = cuda.to_device(a)
-    print("in mem version")
-    a_gpu = a
-    # index_gpu = cuda.to_device(np.array(index))
+def numba_gpu_histogram(a_gpu, bins):
     ### Find min and max value in array
     dtype_min, dtype_max = dtype_min_max(a.dtype)
     # Put them in the array in reverse order so that they will be replaced by the first element in the array
@@ -89,9 +84,7 @@ def numba_gpu_histogram(a, bins):
 
     get_bin_edges[64,64](min_max_array_gpu,bin_edges)
 
-    # counter = cuda.to_device(np.array([0]))
     ### Bin the data into a histogram
     histogram_out = cuda.to_device(np.zeros(shape=(bins,), dtype=np.int32))
-    # histogram[64, 64](a_gpu,index_gpu, min_max_array_gpu, histogram_out)
     histogram[64, 64](a_gpu, min_max_array_gpu, histogram_out)
     return histogram_out.copy_to_host(), bin_edges.copy_to_host()
