@@ -364,8 +364,8 @@ class pygdfCrossfilter_utils:
                         elif 'bottom' == sort_order:
                             temp_df = self.group_by_backups[key].nsmallest(n_rows,[sort_column]).to_pandas().to_dict()
                     except Exception as e:
-                        del(self.data_gpu)
-                        del(self.back_up_dimension)
+                        #del(self.data_gpu)
+                        #del(self.back_up_dimension)
                         # print("******** oom error **********")
                         return 'Exception *** '+str(e)
                 # del(self.group_by_backups[key])
