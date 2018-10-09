@@ -454,8 +454,8 @@ class pandas_utils:
                         elif 'bottom' == sort_order:
                             temp_df = self.group_by_backups[key].nsmallest(n_rows,[sort_column]).to_dict()
                     except Exception as e:
-                        del(self.pandas_df)
-                        del(self.back_up_dimension_pandas)
+                        #del(self.pandas_df)
+                        #del(self.back_up_dimension_pandas)
                         return 'Exception *** '+str(e)
                 res = str(self.parse_dict(temp_df))
             return res
