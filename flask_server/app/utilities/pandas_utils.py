@@ -59,8 +59,8 @@ class pandas_utils:
             key = column_name+"_"+groupby_agg_key
             self.group_by_backups[key] = group_appl  #.loc[:,[column_name,column_name+'_'+agg]]
         except Exception as e:
-            del(self.pandas_df)
-            del(self.back_up_dimension_pandas)
+            #del(self.pandas_df)
+            #del(self.back_up_dimension_pandas)
             return "Exception *** "+str(e)
 
         return "groupby intialized successfully"
