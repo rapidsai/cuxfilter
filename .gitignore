@@ -1,11 +1,9 @@
 node_modules
 .idea
-package-lock.json
 uploads
 data
 *arrow
 __pycache__
-Scrap-book.ipynb
+*ipynb
 *.csv
-nyc_taxi_data
 .ipynb_checkpoints
