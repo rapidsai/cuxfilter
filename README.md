@@ -1,11 +1,15 @@
 ## pygdfCrossfilter Server
 
-Sample UI:
+### Sample UI:
 
 ![sample image](sample-ui.png)
 
 
-To build using Docker:
+### Javascript (es6) client - pygdfCrossfilter
+
+https://gitlab-master.nvidia.com/athorve/pycrossfilter
+
+### To build using Docker:
 
 while in the directory, run the following commands:
 (you should already have pygdf image in your local system)
