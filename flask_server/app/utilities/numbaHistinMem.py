@@ -75,7 +75,7 @@ def get_bin_edges(a_range, bin_edges):
 
 def numba_gpu_histogram(a_gpu, bins):
     ### Find min and max value in array
-    dtype_min, dtype_max = dtype_min_max(a.dtype)
+    dtype_min, dtype_max = dtype_min_max(a_gpu.dtype)
     # Put them in the array in reverse order so that they will be replaced by the first element in the array
     min_max_array_gpu = cuda.to_device(np.array([dtype_max, dtype_min], dtype=np.float32))
     # min_max[64, 64](a_gpu,index_gpu, min_max_array_gpu)
