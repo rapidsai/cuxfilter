@@ -1,12 +1,12 @@
 var express = require('express');
 var router = express.Router();
 var util = require("util");
-var fs = require("fs"); 
+var fs = require("fs");
 
 router.get('/', function(req, res) {
     res.render("upload", {title: "file upload!"});
-  }); 
-  
+  });
+
 router.post("/", function(req, res, next){
       if (req.files) {
         //   console.log(util.inspect(req.files));
@@ -21,14 +21,14 @@ router.post("/", function(req, res, next){
                             sessId: sessId,
                             path : req.files[0].path
                           };
-                  
+
                   let data = JSON.stringify(db);
                   fs.writeFileSync('../data/data.json',data);
 		  console.log("entering the arrow conversion stage");
                   convertToArrow(sessId, function(res){
                     console.log("arrow file conversion complete");
-                  });        
-                  res.redirect('../calc?file='+db.path.split('/').pop());
+                  });
+                  res.end("file uploaded successfully, arrow conversion in process");
               } else {
                   res.end("oh snap, that didn't work!");
               }
@@ -37,15 +37,15 @@ router.post("/", function(req, res, next){
         res.send("fail");
       }
   });
-  
+
   function convertToArrow(sessId,callback){
-    var spawn = require('child_process').spawn;  
+    var spawn = require('child_process').spawn;
     var py = spawn('python3', ['../python_scripts/convertToArrow.py', sessId]);
     py.stdin.write(JSON.stringify(sessId));
     py.stdout.on('end', function(){
       callback("success");
     });
     py.stdin.end();
-    
+
   }
   module.exports = router;
