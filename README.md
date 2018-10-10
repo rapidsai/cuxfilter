@@ -1,10 +1,5 @@
 ## pygdfCrossfilter Server
 
-### Sample UI:
-
-![sample image](sample-ui.png)
-
-
 ### Javascript (es6) client - pygdfCrossfilter
 
 https://gitlab-master.nvidia.com/athorve/pycrossfilter
