@@ -31,20 +31,13 @@ const storage = multer.diskStorage({
 
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 var upload = require('./routes/upload');
-var calc = require('./routes/calc');
-var socket_calc = require('./routes/socket-calc');
-
 var app = express();
-
-
 app.io = require('socket.io')({
   path: '/pygdfCrossfilter'
 });
 
 
-app.set('file_path','Hello World!');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
@@ -73,24 +66,11 @@ app.use(function (req, res, next) {
 });
 app.use(sessionMiddleware);
 
-
-// app.io.use(function(socket,next){
-//   session({
-//     secret: 'mouse dog',
-//     resave: true,
-//     saveUninitialized: true
-//   })(socket.handshake,{},next);
-// });
-
-
 var pygdfCrossfilter = require('./routes/pygdfCrossfilter')(app.io);
 
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/upload',upload);
-app.use('/calc',calc);
-app.use('/socket-calc',socket_calc);
 app.use('/pygdfCrossfilter',pygdfCrossfilter);
 
 // catch 404 and forward to error handler
