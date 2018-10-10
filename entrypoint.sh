@@ -10,13 +10,10 @@ flask run --port=3002 &
 #pandas engine
 flask run --port=3003 &
 
-
-# uncomment the below 4 lines if you want to run the nvidia-smi gadget for the front-end
-cd ../nvidia-smi-gadget
-npm start &
 cd ../node_server
 npm start
 
 
+#uncomment below two lines to run a jupyter notebook intance
 #cd ../
 #jupyter notebook --ip 0.0.0.0 --port 3004 --allow-root &
