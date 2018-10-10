@@ -14,9 +14,6 @@ RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - && \
 RUN npm install -g npm
 
 COPY . .
-WORKDIR /usr/src/app/nvidia-smi-gadget
-RUN npm install
-
 WORKDIR /usr/src/app/node_server
 
 RUN mkdir uploads
