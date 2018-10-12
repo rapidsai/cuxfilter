@@ -1,78 +1,40 @@
 const express = require('express');
+const utils = require('./utilities/pygdfCrossfilter_utils');
 const router = express.Router();
-const spawn = require('child_process').spawn;
-const net = require('net');
-const HOST = '127.0.0.1';
-const PORT = 3001;
-const pyClient = {};
-const pyServer = {};
-const isConnectionEstablished = {}; // key -> session_id; value: socket.id
-const isDataLoaded = {};
-const dataLoaded = {};
-const serverOnTime = {};
-// var session = require('express-session');
-const callback_store = {};
-const startTimeStore = {};
-let chunks = [];
-const got = require('got');
-const pyServerURLPygdf = 'http://127.0.0.1:3002';
-const pyServerURLPandas = 'http://127.0.0.1:3003';
-let singleSessionId = '';
 
-module.exports = function(io) {
-
-    //SOCKET.IO
-    router.get('/', function(req, res) {
-        var sessId = req.session.id;
-        console.log("session id is : "+sessId);
-        session_id = sessId;
+module.exports = (io) => {
+    router.get('/', (req, res) => {
         res.end("ok");
     });
 
-    io.on('connection',function(socket){
+    //SOCKET.IO
+    io.on('connection',(socket) => {
 
         //initialize the socket connection with the python script. this is executed when user initializes a pygdfCrossfilter instance
-        socket.on('init', function(dataset, engine, usingSessions, callback){
+        socket.on('init', (dataset, engine, usingSessions, callback) => {
             try{
-                console.log("connection init requested");
-                socket.useSessions = usingSessions;
-                if(socket.useSessions){
-                  let tempSessionId = parseCookie(socket.handshake.headers.cookie);
-                    if(tempSessionId != singleSessionId){
-                      endSession(singleSessionId,dataset,engine,function(error, message){
-                          if(!error){
-                            singleSessionId = tempSessionId;
-                            console.log("old session replaced with new session, gpu mem cleared");
-                          }else{
-                            console.log("old session replaced with new session, failed:",message);
-                          }
-                      });
-                    }
-                    socket.session_id = tempSessionId;
-                }else{
-                    socket.session_id = 111;
-                }
+                  console.log("connection init requested");
+                  socket.session_id = utils.init_session(socket, dataset, engine, usingSessions, socket.handshake.headers.cookie)
+                  socket.useSessions = usingSessions;
 
-                if(isConnectionEstablished[socket.session_id+dataset+engine] === true){
-                    callback(false,'connection already established');
-                }else{
-                    initConnection(socket.session_id,dataset, engine, function(error,result){
-                        callback(error, result);
-                    });
-                }
+                  if(utils.isConnectionEstablished[socket.session_id+dataset+engine] === true){
+                      callback(false,'connection already established');
+                  }else{
+                      utils.initConnection(socket.session_id,dataset, engine,callback);
+                  }
             }catch(ex){
                 console.log(ex);
-                clearGPUMem();
+                utils.clearGPUMem();
             }
         });
 
         //loads the data in GPU memory
-        socket.on('load_data', function(dataset,engine, load_type, callback){
+        socket.on('load_data', (dataset,engine, load_type, callback) => {
             try{
                 console.log("user tried to load data from "+dataset);
-                // resetServerTime(dataset,socket.session_id);
+                // utils.resetServerTime(dataset,socket.session_id);
 
-                if(isDataLoaded[socket.session_id+dataset+engine] && dataLoaded[socket.session_id+dataset+engine] == dataset){
+                if(utils.isDataLoaded[socket.session_id+dataset+engine] && utils.dataLoaded[socket.session_id+dataset+engine] == dataset){
                       console.log('data already loaded');
                       let startTime = Date.now();
 
@@ -89,41 +51,34 @@ module.exports = function(io) {
                       console.log("loading new data in gpu mem");
                       let command = 'read_data';
                       let query = {
-                          'session_id': socket.session_id,
-                          'dataset': dataset,
-                          'engine': engine,
                           'load_type': load_type
                       };
-                      console.log("params",params(query));
 
-                      pygdf_query(command,params(query),'read_data',engine, (error, message) => {
+                      utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),'read_data',engine, (error, message) => {
                           if(!error){
-                            isDataLoaded[socket.session_id+dataset+engine] = true
-                            dataLoaded[socket.session_id+dataset+engine] = dataset
+                            utils.isDataLoaded[socket.session_id+dataset+engine] = true
+                            utils.dataLoaded[socket.session_id+dataset+engine] = dataset
                           }
                           callback(error, message);
                       });
                     }
             }catch(ex){
                 console.log(ex);
-                clearGPUMem();
+                utils.clearGPUMem();
             }
         });
 
-        socket.on("resetAllFilters", function(dataset,engine,callback){
+        //remove all filters from the dataset and retain the original dataset state
+        socket.on("resetAllFilters", (dataset,engine,callback) => {
             let command = 'reset_all_filters';
-            let query = {
-                'session_id': socket.session_id,
-                'dataset': dataset,
-                'engine': engine
-            };
+            let query = {};
 
-            pygdf_query(command,params(query),'reset_all',engine, (error, message) => {
+            utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),'reset_all',engine, (error, message) => {
                 if(!error){
                   socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                   if(socket.useSessions == false){
                     socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                    triggerUpdateEvent(socket, dataset, engine);
+                    utils.triggerUpdateEvent(socket, dataset, engine);
                   }
                 }
                 callback(error, message);
@@ -131,64 +86,54 @@ module.exports = function(io) {
         });
 
         //get schema of the dataset
-        socket.on('getSchema', function(dataset,engine,callback){
+        socket.on('getSchema', (dataset,engine,callback) => {
             try{
                 let command = 'get_schema';
-                let query = {
-                    'session_id': socket.session_id,
-                    'dataset': dataset,
-                    'engine': engine
-                };
+                let query = {};
 
-                pygdf_query(command,params(query),"user requesting schema of the dataset",engine, callback);
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting schema of the dataset",engine, callback);
 
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
-                clearGPUMem();
+                utils.clearGPUMem();
             }
 
         });
 
         //load dimension
-        socket.on('dimension_load', function(column_name,dataset,engine, callback){
+        socket.on('dimension_load', (column_name,dataset,engine, callback) => {
             try{
                 let command = 'dimension_load';
                 let query = {
-                    'session_id': socket.session_id,
-                    'dataset': dataset,
-                    'dimension_name': column_name,
-                    'engine': engine
+                    'dimension_name': column_name
                 };
 
-                pygdf_query(command,params(query),"user requesting loading a new dimension:"+column_name, engine, callback);
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting loading a new dimension:"+column_name, engine, callback);
 
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
-                clearGPUMem();
+                utils.clearGPUMem();
             }
         });
 
         //query the dataframe -> return results
-        socket.on('dimension_filter', function(column_name,dataset,comparison,value,engine,callback){
+        socket.on('dimension_filter', (column_name,dataset,comparison,value,engine,callback) => {
             try{
                 let command = 'dimension_filter';
                 let query = {
-                    'session_id': socket.session_id,
-                    'dataset': dataset,
                     'dimension_name': column_name,
                     'comparison_operation':comparison,
-                    'value': value,
-                    'engine': engine
+                    'value': value
                 };
 
-                pygdf_query(command,params(query),"user requesting filtering of the dataset", engine, (error, message) => {
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset", engine, (error, message) => {
                     if(!error){
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                       if(socket.useSessions == false){
                         socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                        triggerUpdateEvent(socket, dataset, engine);
+                        utils.triggerUpdateEvent(socket, dataset, engine);
                       }
                     }
                     callback(error, message);
@@ -197,75 +142,66 @@ module.exports = function(io) {
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
-                clearGPUMem();
+                utils.clearGPUMem();
             }
         });
 
         //query the dataframe -> return results
-        socket.on('groupby_load', function(column_name,dataset,agg,engine,callback){
+        socket.on('groupby_load', (column_name,dataset,agg,engine,callback) => {
             try{
                 let command = 'groupby_load';
                 let query = {
-                    'session_id': socket.session_id,
-                    'dataset': dataset,
                     'dimension_name': column_name,
-                    'groupby_agg':agg,
-                    'engine': engine
+                    'groupby_agg':agg
                 };
 
-                pygdf_query(command,params(query),"user requesting groupby for the dimension:"+column_name,engine, callback);
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting groupby for the dimension:"+column_name,engine, callback);
 
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
-                clearGPUMem();
+                utils.clearGPUMem();
             }
         });
 
         //get top/bottom n rows as per the top n values of columnName
-        socket.on('groupby_filterOrder', function(sort_order, column_name,dataset,n,sort_column,agg,engine,callback){
+        socket.on('groupby_filterOrder', (sort_order, column_name,dataset,n,sort_column,agg,engine,callback) => {
             try{
 
                 let command = 'groupby_filterOrder';
                 let query = {
-                    'session_id': socket.session_id,
-                    'dataset': dataset,
                     'dimension_name': column_name,
                     'groupby_agg':agg,
                     'sort_order': sort_order,
                     'num_rows': n,
-                    'sort_column': sort_column,
-                    'engine': engine
+                    'sort_column': sort_column
                 };
 
-                pygdf_query(command,params(query),"user has requested filterOrder rows for the groupby operation for dimension:"+column_name, engine, callback);
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested filterOrder rows for the groupby operation for dimension:"+column_name, engine, callback);
 
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
-                clearGPUMem();
+                utils.clearGPUMem();
             }
         });
 
          //query the dataframe as per a range-> return results
-         socket.on('dimension_filter_range', function(column_name,dataset,range_min,range_max,engine,callback){
+        socket.on('dimension_filter_range', (column_name,dataset,range_min,range_max,engine,callback) => {
             try{
                 let command = 'dimension_filter_range';
                 let query = {
-                    'session_id': socket.session_id,
-                    'dataset': dataset,
                     'dimension_name': column_name,
                     'min_value':range_min,
-                    'max_value': range_max,
-                    'engine': engine
+                    'max_value': range_max
                 };
 
-                pygdf_query(command,params(query),"user requesting filtering of the dataset as per a range of rows",engine, (error, message) => {
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset as per a range of rows",engine, (error, message) => {
                     if(!error){
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                       if(socket.useSessions == false){
                         socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                        triggerUpdateEvent(socket, dataset, engine);
+                        utils.triggerUpdateEvent(socket, dataset, engine);
                       }
                     }
                     callback(error, message);
@@ -274,27 +210,24 @@ module.exports = function(io) {
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
-                clearGPUMem();
+                utils.clearGPUMem();
             }
         });
 
         //reset all filters on a dimension
-        socket.on('dimension_filterAll', function(column_name,dataset,engine, callback){
+        socket.on('dimension_filterAll', (column_name,dataset,engine, callback) => {
             try{
                 let command = 'dimension_reset';
                 let query = {
-                    'session_id': socket.session_id,
-                    'dataset': dataset,
-                    'dimension_name': column_name,
-                    'engine': engine
+                    'dimension_name': column_name
                 };
 
-                pygdf_query(command,params(query),"user requesting resetting filters on the current dimension",engine, (error, message) => {
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting resetting filters on the current dimension",engine, (error, message) => {
                     if(!error){
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                       if(socket.useSessions == false){
                         socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                        triggerUpdateEvent(socket, dataset, engine);
+                        utils.triggerUpdateEvent(socket, dataset, engine);
                       }
                     }
                     callback(error, message);
@@ -302,124 +235,109 @@ module.exports = function(io) {
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
-                clearGPUMem();
+                utils.clearGPUMem();
             }
         });
 
-
-        socket.on('groupby_size', function(column_name,dataset,agg,engine, callback){
+        //get size of the groupby aggregation result for the specific agg function & column name
+        socket.on('groupby_size', (column_name,dataset,agg,engine, callback) => {
             try{
                 let command = 'groupby_size';
                 let query = {
-                    'session_id': socket.session_id,
-                    'dataset': dataset,
                     'dimension_name': column_name,
-                    'groupby_agg':agg,
-                    'engine': engine
+                    'groupby_agg':agg
                 };
 
-                pygdf_query(command,params(query),"user requesting size of the groupby",engine, callback);
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting size of the groupby",engine, callback);
 
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
-                clearGPUMem();
+                utils.clearGPUMem();
             }
         });
 
-        //get size of the dataset
-        socket.on('size', function(dataset,engine,callback){
+        //get size of the current state of the dataset
+        socket.on('size', (dataset,engine,callback) => {
             try{
                 let command = 'get_size';
-                let query = {
-                    'session_id': socket.session_id,
-                    'dataset': dataset,
-                    'engine': engine
-                };
+                let query = {};
 
-                pygdf_query(command,params(query),"user requesting size of the dataset",engine, callback);
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting size of the dataset",engine, callback);
 
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
-                clearGPUMem();
+                utils.clearGPUMem();
             }
         });
 
         //get top/bottom n rows as per the top n values of columnName
-        socket.on('dimension_filterOrder', function(sort_order, column_name, dataset, num_rows, columns,engine,callback){
+        socket.on('dimension_filterOrder', (sort_order, column_name, dataset, num_rows, columns,engine,callback) => {
             try{
 
                 let command = 'dimension_filterOrder';
                 let query = {
-                    'session_id': socket.session_id,
-                    'dataset': dataset,
                     'dimension_name': column_name,
                     'sort_order': sort_order,
                     'num_rows': num_rows,
-                    'columns': columns,
-                    'engine': engine
+                    'columns': columns
                 };
 
-                pygdf_query(command,params(query),"user has requested top n rows as per the column "+column_name, engine, callback);
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested top n rows as per the column "+column_name, engine, callback);
 
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
-                clearGPUMem();
+                utils.clearGPUMem();
             }
         });
 
-        //getHist
-        socket.on('dimension_getHist', function(column_name,dataset,num_of_bins, engine,callback){
+        //get histogram specific to a column name in the given dataset, and as per the number of bins specified
+        socket.on('dimension_getHist', (column_name,dataset,num_of_bins, engine,callback) => {
             try{
                 let command = 'dimension_hist';
                 let query = {
-                    'session_id': socket.session_id,
-                    'dataset': dataset,
                     'dimension_name': column_name,
-                    'num_of_bins': num_of_bins,
-                    'engine': engine
+                    'num_of_bins': num_of_bins
                 };
 
-                pygdf_query(command,params(query),"user requested histogram for "+column_name, engine, callback);
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requested histogram for "+column_name, engine, callback);
 
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
-                clearGPUMem();
+                utils.clearGPUMem();
             }
 
         });
 
         //get Max and Min for a dimension
-        socket.on('dimension_getMaxMin', function(column_name,dataset,engine,callback){
+        socket.on('dimension_getMaxMin', (column_name,dataset,engine,callback) => {
             try{
 
                 let command = 'dimension_get_max_min';
                 let query = {
-                    'session_id': socket.session_id,
-                    'dataset': dataset,
-                    'dimension_name': column_name,
-                    'engine': engine
+                    'dimension_name': column_name
                 };
                 let comment = "user requested max-min values for "+column_name+" for data="+dataset;
 
-                pygdf_query(command,params(query),comment,engine, callback);
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),comment,engine, callback);
 
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
-                clearGPUMem();
+                utils.clearGPUMem();
             }
         });
 
-
-        socket.on('disconnect', function(){
+        //executes when socket connection disconnects
+        socket.on('disconnect', () => {
         });
+
         //onClose
-        socket.on('endSession', function (dataset,engine,callback) {
-            endSession(socket.session_id,dataset,engine, function(error, message){
+        socket.on('endSession', (dataset,engine,callback) => {
+            utils.endSession(socket.session_id,dataset,engine, (error, message) => {
                 callback(error,message);
             });
         });
@@ -427,198 +345,3 @@ module.exports = function(io) {
 
     return router;
 };
-
-function triggerUpdateEvent(socket, dataset, engine){
-  console.log("broadcasting update");
-  socket.emit("update_event", dataset,engine);
-  socket.broadcast.emit("update_event", dataset,engine);
-}
-function callPyServer(command,query, engine){
-  return new Promise((resolve, reject) => {
-       let startTime = Date.now();
-       let url = pyServerURLPygdf+'/'+command+'?'+query
-       if(engine == 'pandas'){
-         url = pyServerURLPandas+'/'+command+'?'+query
-       }
-       got(url)
-        .then(val => {
-          var pyresponse = Buffer.from(val.body).toString('utf8').split(":::");
-          var response = {
-                        data: pyresponse[0],
-                        pythonScriptTime: parseFloat(pyresponse[1]),
-                        nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[1]),
-                        activeFilters: pyresponse[2]
-                        }
-          if(response.data.indexOf('Exception') > -1){
-            response.data = response.data.split('***')[1];
-            if(response.data.indexOf('out of memory') > -1  || response.data.indexOf('thrust::system::system_error') > -1){
-              isDataLoaded[session_id+dataset+engine] = false;
-              isConnectionEstablished[session_id+dataset+engine] = false;
-              // endSession(session_id,dataset,engine,(err,message)=>{});
-            }
-            reject(JSON.stringify(response));
-          }else{
-            resolve(JSON.stringify(response));
-          }
-
-        }).catch(error => {
-          console.log(error);
-          var response = {
-                          data: error.toString(),
-                          pythonScriptTime: parseFloat(0),
-                          nodeServerTime: ((Date.now() - startTime)/1000)
-                        }
-          reject(JSON.stringify(response));
-        });
-  });
-}
-
-function params(data) {
-  let dataset = data['dataset'];
-  let session_id = data['session_id']
-  let engine = data['engine']
-  resetServerTime(dataset,session_id,engine);
-  return Object.keys(data).map(key => `${key}=${encodeURIComponent(data[key])}`).join('&');
-}
-
-function pygdf_query(command,query, comments,engine, callback){
-    callPyServer(command,query, engine)
-      .then((message) => {
-              console.log(comments);
-              // socket.broadcast.emit(command,false,message);
-              typeof callback === 'function' && callback(false,message);
-      }).catch((error_message) => {
-              console.log(error_message);
-              typeof callback === 'function' && callback(true,error_message);
-      });
-}
-
-function endSession(session_id,dataset,engine,callback){
-  let startTime = Date.now()
-  let url = pyServerURLPygdf+'/end_connection?session_id='+session_id+'&dataset='+dataset+'&engine='+engine
-  if(engine == 'pandas'){
-    url = pyServerURLPandas+'/end_connection?session_id='+session_id+'&dataset='+dataset+'&engine='+engine
-  }
-
-  got(url)
-   .then(val => {
-     console.log("session is being ended");
-     isDataLoaded[session_id+dataset+engine] = false;
-     isConnectionEstablished[session_id+dataset+engine] = false;
-     var pyresponse = Buffer.from(val.body).toString('utf8').split(":::");
-     var response = {
-                   data: pyresponse[0],
-                   pythonScriptTime: parseFloat(pyresponse[1]),
-                   nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[1])
-               }
-     callback(false,JSON.stringify(response));
-   }).catch(error => {
-     console.log(error);
-     var response = {
-                     data: error.toString(),
-                     pythonScriptTime: parseFloat(0),
-                     nodeServerTime: ((Date.now() - startTime)/1000)
-                   }
-     callback(true,JSON.stringify(response));
-   });
-}
-
-//Utility functions:
-function parseCookie(cookie){
-    var output = {};
-    cookie.split(/\s*;\s*/).forEach(function(pair) {
-        pair = pair.split(/\s*=\s*/);
-        output[pair[0]] = pair.splice(1).join('=');
-    });
-    return output['connect.sid'].toString('utf8').split('.')[0].substring(4);
-}
-
-setInterval(function(){
-    console.log("clearing the clutter");
-    console.log(Object.keys(serverOnTime));
-    for(var key in serverOnTime){
-        if(Date.now() - serverOnTime[key] > 10*60*1000){
-            console.log("clearing "+key);
-            // pyClient[key].write("exit");
-            // pyClient[key].destroy();
-            endSession(key.split(':::')[0], key.split(':::')[1], key.split(':::')[2], (err,res) => {
-              console.log(res);
-            });
-            isDataLoaded[key] = false;
-            isConnectionEstablished[key] = false;
-        }
-    }
-},10*59*1000);
-
-function clearGPUMem(){
-    console.log(Object.keys(serverOnTime));
-    console.log(Object.keys(pyClient));
-
-    for(var key in serverOnTime){
-        console.log("clearing "+key);
-
-            // pyClient[key].write("exit");
-            // pyClient[key].destroy();
-            isDataLoaded[key] = false;
-            isConnectionEstablished[key] = false;
-    }
-}
-
-
-function resetServerTime(dataset, session_id, engine){
-  console.log(dataset);
-  console.log(session_id);
-    var server_dataset = dataset.split(":::")[0];
-    var server_key = session_id+":::"+server_dataset+":::"+engine;
-    serverOnTime[server_key] = Date.now();
-}
-
-function create_query(list_of_args){
-    if(list_of_args instanceof Array){
-        if(list_of_args.length ==0){
-            return "number of arguments cannot be zero";
-        }
-        query = list_of_args[0];
-        for(var index=1; index<list_of_args.length; index++){
-            if(index == list_of_args.length-1){
-                query = query + ":::" +list_of_args[index];
-            }else{
-                query = query + ":::" +list_of_args[index]
-            }
-        }
-        return query;
-    }else{
-        return "input has to be an array of arguments";
-    }
-
-}
-function initConnection(session_id,dataset,engine, callback){
-    let startTime = Date.now()
-    // let url = pyServerURL+'/'+'init_connection'+'?'+query
-    let url = pyServerURLPygdf+'/init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset
-    if(engine == 'pandas'){
-      url = pyServerURLPandas+'/init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset
-    }
-    got(url)
-      .then(val => {
-        console.log(val.body)
-        isConnectionEstablished[session_id+dataset+engine] = true
-        var pyresponse = Buffer.from(val.body).toString('utf8').split(":::");
-        var response = {
-                      data: pyresponse[0],
-                      pythonScriptTime: parseFloat(pyresponse[1]),
-                      nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[1]),
-                      activeFilters: pyresponse[2]
-                  }
-        callback(false,JSON.stringify(response));
-      }).catch(error => {
-        console.log(error);
-        isConnectionEstablished[session_id+dataset+engine] = false;
-        var response = {
-                        data: error.toString(),
-                        pythonScriptTime: parseFloat(0),
-                        nodeServerTime: ((Date.now() - startTime)/1000)
-                      }
-        callback(true,JSON.stringify(response));
-      });
-}
