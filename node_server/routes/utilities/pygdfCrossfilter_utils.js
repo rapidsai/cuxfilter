@@ -6,7 +6,10 @@ const dataLoaded = {};
 const serverOnTime = {};
 const pyServerURLPygdf = 'http://127.0.0.1:3002';
 const pyServerURLPandas = 'http://127.0.0.1:3003';
-let singleSessionId = '';
+let singleSessionId = {
+  'pygdf': '',
+  'pandas': ''
+};
 const sessionlessID = 111;
 const got = require('got');
 
@@ -15,10 +18,10 @@ const got = require('got');
 function init_session(socket, dataset, engine, usingSessions, cookies){
   if(usingSessions){
       let tempSessionId = parseCookie(cookies);
-      if(tempSessionId != singleSessionId){
-          endSession(singleSessionId,dataset,engine,(error, message) =>{
+      if(tempSessionId != singleSessionId[engine]){
+          endSession(singleSessionId[engine],dataset,engine,(error, message) =>{
               if(!error){
-                singleSessionId = tempSessionId;
+                singleSessionId[engine] = tempSessionId;
                 console.log("old session replaced with new session, gpu mem cleared");
               }else{
                 console.log("old session replaced with new session, failed:",message);

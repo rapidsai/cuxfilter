@@ -38,7 +38,9 @@ module.exports = (io) => {
                       console.log('data already loaded');
                       let startTime = Date.now();
 
-                      socket.broadcast.emit("update_event", dataset,engine);
+                      if(socket.useSessions == false){
+                        socket.broadcast.emit("update_event", dataset,engine);
+                      }
                       //send data already loaded custom response
                       var response = {
                                     data: 'data already loaded',
