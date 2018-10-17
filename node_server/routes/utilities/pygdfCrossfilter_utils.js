@@ -1,11 +1,12 @@
 //Utility functions:
-
+const config = require('/usr/src/app/config.json');
 const isConnectionEstablished = {}; // key -> session_id; value: socket.id
 const isDataLoaded = {};
 const dataLoaded = {};
 const serverOnTime = {};
-const pyServerURLPygdf = 'http://127.0.0.1:3002';
-const pyServerURLPandas = 'http://127.0.0.1:3003';
+
+const pyServerURLPygdf = config.flask_server_url+":"+config.flask_server_port_pygdf
+const pyServerURLPandas = config.flask_server_url+":"+config.flask_server_port_pandas
 let singleSessionId = {
   'pygdf': '',
   'pandas': ''
@@ -24,6 +25,7 @@ function init_session(socket, dataset, engine, usingSessions, cookies){
                 singleSessionId[engine] = tempSessionId;
                 console.log("old session replaced with new session, gpu mem cleared");
               }else{
+                singleSessionId[engine] = tempSessionId;
                 console.log("old session replaced with new session, failed:",message);
               }
           });
