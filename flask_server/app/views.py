@@ -17,7 +17,7 @@ def index():
         description:
             if no route is provided, serve index.html
     '''
-    return render_template("index.html")
+    return 'successfully loaded'
 
 def init_session(session_id):
     '''
