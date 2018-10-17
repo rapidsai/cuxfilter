@@ -7,7 +7,7 @@ https://gitlab-master.nvidia.com/athorve/pycrossfilter
 ### To build using Docker:
 
 while in the directory, run the following commands:
-(you should already have pygdf image in your local system)
+
 
 <pre>
 docker build -t user_name/viz .
