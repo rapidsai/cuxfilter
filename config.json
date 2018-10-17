@@ -1,0 +1,5 @@
+{
+    "flask_server_url": "http://localhost",
+    "flask_server_port_pygdf": 3002,
+    "flask_server_port_pandas": 3003
+}
