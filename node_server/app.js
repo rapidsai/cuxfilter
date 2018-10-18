@@ -8,9 +8,7 @@ var cors = require('cors');
 var session = require('express-session');
 var sharedSession = require("express-socket.io-session");
 //for file upload handling
-var multer = require('multer');
 var connect = require('connect');
-var maxSize = 1000000*9000 ;
 
 
 var sessionMiddleware = session({
@@ -19,27 +17,10 @@ var sessionMiddleware = session({
   saveUninitialized: true});
 
 
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/')
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname.split(".")[0])
-  }
-})
-
-
-var indexRouter = require('./routes/index');
-var upload = require('./routes/upload');
 var app = express();
 app.io = require('socket.io')({
   path: '/pygdfCrossfilter'
 });
-
-
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
 
 // enable cors
 let whitelist = ['http://localhost:3000','http://localhost:3002','http://localhost:9000'];
@@ -59,7 +40,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(multer({dest: "./uploads/",storage: storage, limits:{fileSize:maxSize}}).any());
 app.use(function (req, res, next) {
     res.header('Cache-Control', 'private, no-cache, no-store');
     next()
@@ -68,9 +48,6 @@ app.use(sessionMiddleware);
 
 var pygdfCrossfilter = require('./routes/pygdfCrossfilter')(app.io);
 
-
-app.use('/', indexRouter);
-app.use('/upload',upload);
 app.use('/pygdfCrossfilter',pygdfCrossfilter);
 
 // catch 404 and forward to error handler
