@@ -6,15 +6,12 @@ var logger = require('morgan');
 var cors = require('cors');
 //using the session variable to track unique user sessions
 var session = require('express-session');
-var sharedSession = require("express-socket.io-session");
-//for file upload handling
-var connect = require('connect');
-
+const config = require('/usr/src/app/config.json');
 
 var sessionMiddleware = session({
-  secret: 'mouse dog',
   resave: true,
-  saveUninitialized: true});
+  saveUninitialized: true
+});
 
 
 var app = express();
@@ -23,7 +20,7 @@ app.io = require('socket.io')({
 });
 
 // enable cors
-let whitelist = ['http://localhost:3000','http://localhost:3002','http://localhost:9000'];
+let whitelist = config.whitelisted_urls_for_clients;
 let corsOptions = {
     origin: (origin, callback)=>{
         if (whitelist.indexOf(origin) !== -1) {
