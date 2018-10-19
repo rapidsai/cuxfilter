@@ -95,7 +95,7 @@ class pygdfCrossfilter_utils:
             return:
                 pyarrow table
         '''
-        reader = pa.RecordBatchStreamReader(source)
+        reader = RecordBatchStreamReader(source)
         pa_df = reader.read_all()
         return pa_df
 
