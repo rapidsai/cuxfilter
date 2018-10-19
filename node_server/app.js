@@ -9,6 +9,7 @@ var session = require('express-session');
 const config = require('/usr/src/app/config.json');
 
 var sessionMiddleware = session({
+  secret: 'pygdf',
   resave: true,
   saveUninitialized: true
 });
@@ -18,6 +19,9 @@ var app = express();
 app.io = require('socket.io')({
   path: '/pygdfCrossfilter'
 });
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
 
 // enable cors
 let whitelist = config.whitelisted_urls_for_clients;
