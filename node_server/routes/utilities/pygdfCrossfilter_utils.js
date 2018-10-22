@@ -14,6 +14,8 @@ let singleSessionId = {
 const sessionlessID = 111;
 const got = require('got');
 
+const dimensions = {};
+const groups = {};
 
 //init connection and set session_id
 function init_session(socket, dataset, engine, usingSessions, cookies){
@@ -37,6 +39,43 @@ function init_session(socket, dataset, engine, usingSessions, cookies){
 }
 
 
+//triggering an update event which broadcasts to all the neighbouring socket connections in case of a multi-tab sessionless access
+function UpdateClientSideValues(socket, dataset, engine){
+  console.log("updating values on client side");
+  console.log(dimensions);
+  console.log(groups);
+  for(let dimension in dimensions){
+    if(dimensions.hasOwnProperty(dimension)){
+      let command = 'dimension_hist';
+      let query = dimensions[dimension];
+      pygdf_query(command,params(query, socket.session_id, dataset, engine),"user requested histogram for "+query.dimension_name, engine, (error, message)=>{
+        if(!error){
+          socket.emit('update_hist', query.dimension_name, engine, message);
+          if(socket.session_id === 111){
+            socket.broadcast.emit('update_hist', query.dimension_name, message);
+          }
+        }
+      });
+    }
+  }
+
+  for(let group in groups){
+    if(groups.hasOwnProperty(group)){
+      let command = 'groupby_filterOrder';
+      let query = groups[group];
+      console.log("query for group",query);
+      pygdf_query(command,params(query, socket.session_id, dataset, engine),"updating filterOrder for group:"+query.dimension_name, engine, (error, message)=>{
+        if(!error){
+          socket.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
+          if(socket.session_id === 111){
+            socket.broadcast.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
+          }
+        }
+      });
+    }
+  }
+
+}
 
 
 //triggering an update event which broadcasts to all the neighbouring socket connections in case of a multi-tab sessionless access
@@ -239,6 +278,8 @@ module.exports = {
   singleSessionId: singleSessionId,
   sessionlessID: sessionlessID,
 
+  dimensions: dimensions,
+  groups: groups,
   //init connection and set session_id
   init_session: init_session,
 
@@ -272,6 +313,7 @@ module.exports = {
   create_query: create_query,
 
   //initialize connection with pyServer by creating a pygdf/pandas object
-  initConnection: initConnection
+  initConnection: initConnection,
 
+  UpdateClientSideValues: UpdateClientSideValues
 }

@@ -133,6 +133,7 @@ module.exports = (io) => {
                 utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset", engine, (error, message) => {
                     if(!error){
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
+                      utils.UpdateClientSideValues(socket, dataset, engine);
                       if(socket.useSessions == false){
                         socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                         utils.triggerUpdateEvent(socket, dataset, engine);
@@ -166,7 +167,7 @@ module.exports = (io) => {
             }
         });
 
-        //get top/bottom n rows as per the top n values of columnName
+        //get top/bottom n rows as per the top n values of column_name
         socket.on('groupby_filterOrder', (sort_order, column_name,dataset,n,sort_column,agg,engine,callback) => {
             try{
 
@@ -179,7 +180,9 @@ module.exports = (io) => {
                     'sort_column': sort_column
                 };
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested filterOrder rows for the groupby operation for dimension:"+column_name, engine, callback);
+                utils.groups[column_name+agg] = query;
+
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested filterOrder rows for the groupby operation for dimension:"+column_name, engine);//, callback);
 
             }catch(ex){
                 console.log(ex);
@@ -274,7 +277,7 @@ module.exports = (io) => {
             }
         });
 
-        //get top/bottom n rows as per the top n values of columnName
+        //get top/bottom n rows as per the top n values of column_name
         socket.on('dimension_filterOrder', (sort_order, column_name, dataset, num_rows, columns,engine,callback) => {
             try{
 
@@ -304,7 +307,8 @@ module.exports = (io) => {
                     'num_of_bins': num_of_bins
                 };
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requested histogram for "+column_name, engine, callback);
+                utils.dimensions[column_name] = query;
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requested histogram for "+column_name, engine);//, callback);
 
             }catch(ex){
                 console.log(ex);
