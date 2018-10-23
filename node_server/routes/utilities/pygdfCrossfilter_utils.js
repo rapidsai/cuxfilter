@@ -19,6 +19,7 @@ const groups = {};
 
 //init connection and set session_id
 function init_session(socket, dataset, engine, usingSessions, cookies){
+  reset_params();
   if(usingSessions){
       let tempSessionId = parseCookie(cookies);
       if(tempSessionId != singleSessionId[engine]){
@@ -38,6 +39,14 @@ function init_session(socket, dataset, engine, usingSessions, cookies){
   }
 }
 
+function reset_params(){
+  Object.keys(dimensions).forEach(function (prop) {
+    delete dimensions[prop];
+  });
+  Object.keys(groups).forEach(function (prop) {
+    delete groups[prop];
+  });
+}
 
 //triggering an update event which broadcasts to all the neighbouring socket connections in case of a multi-tab sessionless access
 function UpdateClientSideValues(socket, dataset, engine){

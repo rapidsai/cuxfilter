@@ -182,7 +182,14 @@ module.exports = (io) => {
 
                 utils.groups[column_name+agg] = query;
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested filterOrder rows for the groupby operation for dimension:"+column_name, engine);//, callback);
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested filterOrder rows for the groupby operation for dimension:"+column_name, engine, (error,message) => {
+                  if(!error){
+                    socket.emit('update_group', column_name, agg, engine, message);
+                    if(socket.session_id === 111){
+                      socket.broadcast.emit('update_group', column_name, agg, engine, message);
+                    }
+                  }
+                });
 
             }catch(ex){
                 console.log(ex);
@@ -308,8 +315,14 @@ module.exports = (io) => {
                 };
 
                 utils.dimensions[column_name] = query;
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requested histogram for "+column_name, engine);//, callback);
-
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requested histogram for "+column_name, engine, (error,message) => {
+                  if(!error){
+                    socket.emit('update_hist', column_name, engine, message);
+                    if(socket.session_id === 111){
+                      socket.broadcast.emit('update_hist', column_name, engine, message);
+                    }
+                  }
+                });
             }catch(ex){
                 console.log(ex);
                 callback(true,-1);
