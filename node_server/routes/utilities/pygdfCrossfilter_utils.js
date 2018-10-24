@@ -15,6 +15,7 @@ const sessionlessID = 111;
 const got = require('got');
 
 const dimensions = {};
+const histograms = {};
 const groups = {};
 
 //init connection and set session_id
@@ -50,13 +51,26 @@ function reset_params(){
 
 //triggering an update event which broadcasts to all the neighbouring socket connections in case of a multi-tab sessionless access
 function UpdateClientSideValues(socket, dataset, engine){
-  console.log("updating values on client side");
-  console.log(dimensions);
-  console.log(groups);
+
   for(let dimension in dimensions){
     if(dimensions.hasOwnProperty(dimension)){
-      let command = 'dimension_hist';
+      let command = 'dimension_filterOrder';
       let query = dimensions[dimension];
+      pygdf_query(command,params(query, socket.session_id, dataset, engine),"user has requested "+query.sort_order+" n rows as per the column "+query.dimension_name, engine, (error, message)=>{
+        if(!error){
+          socket.emit('update_dimension', query.dimension_name, engine, message);
+          if(socket.session_id === 111){
+            socket.broadcast.emit('update_dimension', query.dimension_name, message);
+          }
+        }
+      });
+    }
+  }
+
+  for(let histogram in histograms){
+    if(dimensions.hasOwnProperty(histogram)){
+      let command = 'dimension_hist';
+      let query = histograms[histogram];
       pygdf_query(command,params(query, socket.session_id, dataset, engine),"user requested histogram for "+query.dimension_name, engine, (error, message)=>{
         if(!error){
           socket.emit('update_hist', query.dimension_name, engine, message);
@@ -289,6 +303,7 @@ module.exports = {
 
   dimensions: dimensions,
   groups: groups,
+  histograms: histograms,
   //init connection and set session_id
   init_session: init_session,
 

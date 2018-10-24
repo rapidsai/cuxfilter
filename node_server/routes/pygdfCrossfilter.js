@@ -18,7 +18,7 @@ module.exports = (io) => {
                   socket.useSessions = usingSessions;
 
                   if(utils.isConnectionEstablished[socket.session_id+dataset+engine] === true){
-                      callback(false,'connection already established');
+                      typeof callback === 'function' && callback(false,'connection already established');
                   }else{
                       utils.initConnection(socket.session_id,dataset, engine,callback);
                   }
@@ -61,7 +61,7 @@ module.exports = (io) => {
                             utils.isDataLoaded[socket.session_id+dataset+engine] = true
                             utils.dataLoaded[socket.session_id+dataset+engine] = dataset
                           }
-                          callback(error, message);
+                          typeof callback === 'function' && callback(error, message);
                       });
                     }
             }catch(ex){
@@ -78,12 +78,13 @@ module.exports = (io) => {
             utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),'reset_all',engine, (error, message) => {
                 if(!error){
                   socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
+                  utils.UpdateClientSideValues(socket, dataset, engine);
                   if(socket.useSessions == false){
                     socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                     utils.triggerUpdateEvent(socket, dataset, engine);
                   }
                 }
-                callback(error, message);
+                typeof callback === 'function' && callback(error, message);
             });
         });
 
@@ -97,35 +98,35 @@ module.exports = (io) => {
 
             }catch(ex){
                 console.log(ex);
-                callback(true,-1);
+                typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem();
             }
 
         });
 
         //load dimension
-        socket.on('dimension_load', (column_name,dataset,engine, callback) => {
+        socket.on('dimension_load', (dimension_name,dataset,engine, callback) => {
             try{
                 let command = 'dimension_load';
                 let query = {
-                    'dimension_name': column_name
+                    'dimension_name': dimension_name
                 };
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting loading a new dimension:"+column_name, engine, callback);
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting loading a new dimension:"+dimension_name, engine, callback);
 
             }catch(ex){
                 console.log(ex);
-                callback(true,-1);
+                typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem();
             }
         });
 
         //query the dataframe -> return results
-        socket.on('dimension_filter', (column_name,dataset,comparison,value,engine,callback) => {
+        socket.on('dimension_filter', (dimension_name,dataset,comparison,value,engine,callback) => {
             try{
                 let command = 'dimension_filter';
                 let query = {
-                    'dimension_name': column_name,
+                    'dimension_name': dimension_name,
                     'comparison_operation':comparison,
                     'value': value
                 };
@@ -139,71 +140,71 @@ module.exports = (io) => {
                         utils.triggerUpdateEvent(socket, dataset, engine);
                       }
                     }
-                    callback(error, message);
+                    typeof callback === 'function' && callback(error, message);
                 });
 
             }catch(ex){
                 console.log(ex);
-                callback(true,-1);
+                typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem();
             }
         });
 
         //query the dataframe -> return results
-        socket.on('groupby_load', (column_name,dataset,agg,engine,callback) => {
+        socket.on('groupby_load', (dimension_name,dataset,agg,engine,callback) => {
             try{
                 let command = 'groupby_load';
                 let query = {
-                    'dimension_name': column_name,
+                    'dimension_name': dimension_name,
                     'groupby_agg':agg
                 };
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting groupby for the dimension:"+column_name,engine, callback);
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting groupby for the dimension:"+dimension_name,engine, callback);
 
             }catch(ex){
                 console.log(ex);
-                callback(true,-1);
+                typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem();
             }
         });
 
-        //get top/bottom n rows as per the top n values of column_name
-        socket.on('groupby_filterOrder', (sort_order, column_name,dataset,n,sort_column,agg,engine,callback) => {
+        //get top/bottom n rows as per the top n values of dimension_name
+        socket.on('groupby_filterOrder', (sort_order, dimension_name,dataset,n,sort_column,agg,engine,callback) => {
             try{
 
                 let command = 'groupby_filterOrder';
                 let query = {
-                    'dimension_name': column_name,
+                    'dimension_name': dimension_name,
                     'groupby_agg':agg,
                     'sort_order': sort_order,
                     'num_rows': n,
                     'sort_column': sort_column
                 };
 
-                utils.groups[column_name+agg] = query;
+                utils.groups[dimension_name+agg] = query;
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested filterOrder rows for the groupby operation for dimension:"+column_name, engine, (error,message) => {
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested filterOrder rows for the groupby operation for dimension:"+dimension_name, engine, (error,message) => {
                   if(!error){
-                    socket.emit('update_group', column_name, agg, engine, message);
+                    socket.emit('update_group', dimension_name, agg, engine, message);
                     if(socket.session_id === 111){
-                      socket.broadcast.emit('update_group', column_name, agg, engine, message);
+                      socket.broadcast.emit('update_group', dimension_name, agg, engine, message);
                     }
                   }
                 });
 
             }catch(ex){
                 console.log(ex);
-                callback(true,-1);
+                typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem();
             }
         });
 
          //query the dataframe as per a range-> return results
-        socket.on('dimension_filter_range', (column_name,dataset,range_min,range_max,engine,callback) => {
+        socket.on('dimension_filter_range', (dimension_name,dataset,range_min,range_max,engine,callback) => {
             try{
                 let command = 'dimension_filter_range';
                 let query = {
-                    'dimension_name': column_name,
+                    'dimension_name': dimension_name,
                     'min_value':range_min,
                     'max_value': range_max
                 };
@@ -211,52 +212,54 @@ module.exports = (io) => {
                 utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset as per a range of rows",engine, (error, message) => {
                     if(!error){
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
+                      utils.UpdateClientSideValues(socket, dataset, engine);
                       if(socket.useSessions == false){
                         socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                         utils.triggerUpdateEvent(socket, dataset, engine);
                       }
                     }
-                    callback(error, message);
+                    typeof callback === 'function' && callback(error, message);
                 });
 
             }catch(ex){
                 console.log(ex);
-                callback(true,-1);
+                typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem();
             }
         });
 
         //reset all filters on a dimension
-        socket.on('dimension_filterAll', (column_name,dataset,engine, callback) => {
+        socket.on('dimension_filterAll', (dimension_name,dataset,engine, callback) => {
             try{
                 let command = 'dimension_reset';
                 let query = {
-                    'dimension_name': column_name
+                    'dimension_name': dimension_name
                 };
 
                 utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting resetting filters on the current dimension",engine, (error, message) => {
                     if(!error){
                       socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
+                      utils.UpdateClientSideValues(socket, dataset, engine);
                       if(socket.useSessions == false){
                         socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
                         utils.triggerUpdateEvent(socket, dataset, engine);
                       }
                     }
-                    callback(error, message);
+                    typeof callback === 'function' && callback(error, message);
                 });
             }catch(ex){
                 console.log(ex);
-                callback(true,-1);
+                typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem();
             }
         });
 
         //get size of the groupby aggregation result for the specific agg function & column name
-        socket.on('groupby_size', (column_name,dataset,agg,engine, callback) => {
+        socket.on('groupby_size', (dimension_name,dataset,agg,engine, callback) => {
             try{
                 let command = 'groupby_size';
                 let query = {
-                    'dimension_name': column_name,
+                    'dimension_name': dimension_name,
                     'groupby_agg':agg
                 };
 
@@ -264,7 +267,7 @@ module.exports = (io) => {
 
             }catch(ex){
                 console.log(ex);
-                callback(true,-1);
+                typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem();
             }
         });
@@ -279,73 +282,80 @@ module.exports = (io) => {
 
             }catch(ex){
                 console.log(ex);
-                callback(true,-1);
+                typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem();
             }
         });
 
-        //get top/bottom n rows as per the top n values of column_name
-        socket.on('dimension_filterOrder', (sort_order, column_name, dataset, num_rows, columns,engine,callback) => {
+        //get top/bottom n rows as per the top n values of dimension_name
+        socket.on('dimension_filterOrder', (sort_order, dimension_name, dataset, num_rows, columns,engine,callback) => {
             try{
 
                 let command = 'dimension_filterOrder';
                 let query = {
-                    'dimension_name': column_name,
+                    'dimension_name': dimension_name,
                     'sort_order': sort_order,
                     'num_rows': num_rows,
                     'columns': columns
                 };
+                utils.dimensions[dimension_name] = query;
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested top n rows as per the column "+column_name, engine, callback);
-
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested "+sort_order+" n rows as per the column "+dimension_name, engine, (error,message) => {
+                      if(!error){
+                        socket.emit('update_dimension', dimension_name, engine, message);
+                        if(socket.session_id === 111){
+                          socket.broadcast.emit('update_dimension', dimension_name, engine, message);
+                        }
+                      }
+                  });
             }catch(ex){
                 console.log(ex);
-                callback(true,-1);
+                typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem();
             }
         });
 
         //get histogram specific to a column name in the given dataset, and as per the number of bins specified
-        socket.on('dimension_getHist', (column_name,dataset,num_of_bins, engine,callback) => {
+        socket.on('dimension_getHist', (dimension_name,dataset,num_of_bins, engine,callback) => {
             try{
                 let command = 'dimension_hist';
                 let query = {
-                    'dimension_name': column_name,
+                    'dimension_name': dimension_name,
                     'num_of_bins': num_of_bins
                 };
 
-                utils.dimensions[column_name] = query;
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requested histogram for "+column_name, engine, (error,message) => {
+                utils.histograms[dimension_name] = query;
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requested histogram for "+dimension_name, engine, (error,message) => {
                   if(!error){
-                    socket.emit('update_hist', column_name, engine, message);
+                    socket.emit('update_hist', dimension_name, engine, message);
                     if(socket.session_id === 111){
-                      socket.broadcast.emit('update_hist', column_name, engine, message);
+                      socket.broadcast.emit('update_hist', dimension_name, engine, message);
                     }
                   }
                 });
             }catch(ex){
                 console.log(ex);
-                callback(true,-1);
+                typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem();
             }
 
         });
 
         //get Max and Min for a dimension
-        socket.on('dimension_getMaxMin', (column_name,dataset,engine,callback) => {
+        socket.on('dimension_getMaxMin', (dimension_name,dataset,engine,callback) => {
             try{
 
                 let command = 'dimension_get_max_min';
                 let query = {
-                    'dimension_name': column_name
+                    'dimension_name': dimension_name
                 };
-                let comment = "user requested max-min values for "+column_name+" for data="+dataset;
+                let comment = "user requested max-min values for "+dimension_name+" for data="+dataset;
 
                 utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),comment,engine, callback);
 
             }catch(ex){
                 console.log(ex);
-                callback(true,-1);
+                typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem();
             }
         });
@@ -357,7 +367,7 @@ module.exports = (io) => {
         //onClose
         socket.on('endSession', (dataset,engine,callback) => {
             utils.endSession(socket.session_id,dataset,engine, (error, message) => {
-                callback(error,message);
+                typeof callback === 'function' && callback(error,message);
             });
         });
     });
