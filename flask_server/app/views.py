@@ -253,49 +253,50 @@ def groupby_load():
         #end function execution
 
     #return response
+    app.logger.debug(response)
     return append_time_to_response(response,start_time, key, engine)
 
-@app.route('/groupby_size', methods=['GET'])
-def groupby_size():
-    '''
-        description:
-            get groupby size for a groupby on a dimension
-        Get parameters:
-            1. session_id (string)
-            2. dataset (string)
-            3. dimension_name (string)
-            4. groupby_agg (JSON stringified object)
-            5. engine (pygdf/pandas)
-        Response:
-            number_of_rows_left
-    '''
-    #get basic get parameters
-    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
-
-    #getting remaining parameters
-    dimension_name = request.args.get('dimension_name')
-    groupby_agg = json.loads(request.args.get('groupby_agg'))
-
-    # DEBUG: start
-    app.logger.debug("groupby size of "+dataset_name+" for dimension_name: "+dimension_name+" for "+session_id)
-    # DEBUG: end
-
-    if engine == 'pygdf':
-        #start function execution
-        groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
-        response = user_sessions[key].groupby_size(dimension_name, groupby_agg_key)
-        if 'out of memory' in response or 'thrust::system::system_error' in response:
-            user_sessions.pop(session_id+dataset_name,None)
-            app.logger.debug('out of memory error')
-        #end function execution
-    else:
-        #start function execution
-        groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
-        response = user_sessions_pandas[key].groupby_size(dimension_name, groupby_agg_key)
-        #end function execution
-
-    #return response
-    return append_time_to_response(response,start_time, key, engine)
+# @app.route('/groupby_size', methods=['GET'])
+# def groupby_size():
+#     '''
+#         description:
+#             get groupby size for a groupby on a dimension
+#         Get parameters:
+#             1. session_id (string)
+#             2. dataset (string)
+#             3. dimension_name (string)
+#             4. groupby_agg (JSON stringified object)
+#             5. engine (pygdf/pandas)
+#         Response:
+#             number_of_rows_left
+#     '''
+#     #get basic get parameters
+#     start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
+#
+#     #getting remaining parameters
+#     dimension_name = request.args.get('dimension_name')
+#     groupby_agg = json.loads(request.args.get('groupby_agg'))
+#
+#     # DEBUG: start
+#     app.logger.debug("groupby size of "+dataset_name+" for dimension_name: "+dimension_name+" for "+session_id)
+#     # DEBUG: end
+#
+#     if engine == 'pygdf':
+#         #start function execution
+#         groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
+#         response = user_sessions[key].groupby_size(dimension_name, groupby_agg_key)
+#         if 'out of memory' in response or 'thrust::system::system_error' in response:
+#             user_sessions.pop(session_id+dataset_name,None)
+#             app.logger.debug('out of memory error')
+#         #end function execution
+#     else:
+#         #start function execution
+#         groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
+#         response = user_sessions_pandas[key].groupby_size(dimension_name, groupby_agg_key)
+#         #end function execution
+#
+#     #return response
+#     return append_time_to_response(response,start_time, key, engine)
 
 
 @app.route('/groupby_filterOrder', methods=['GET'])

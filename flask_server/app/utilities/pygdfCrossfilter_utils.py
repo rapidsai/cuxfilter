@@ -209,7 +209,7 @@ class pygdfCrossfilter_utils:
                 shape tuple
         '''
         try:
-            return str((len(self.data_gpu),len(self.data_gpu.columns)))
+            return str(len(self.data_gpu))
         except Exception as e:
             return 'Exception *** in pygdf get_size():'+str(e)
 
@@ -295,35 +295,35 @@ class pygdfCrossfilter_utils:
                 status: groupby intialized successfully
         '''
         try:
+            key = dimension_name+"_"+groupby_agg_key
             temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim=list(groupby_agg.keys()))
             response = self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
-            return response
-
+            return response+"&"+str(len(self.group_by_backups[key]))
         except Exception as e:
             return 'Exception *** in pygdf groupby_load():'+str(e)
 
-    def groupby_size(self, dimension_name, groupby_agg_key):
-        '''
-            description:
-                get groupby size for a groupby on a dimension
-            input:
-                dimension_name <string>:
-                groupby_agg_key <string>:
-            return:
-                size of the groupby
-        '''
-        try:
-            key = dimension_name+"_"+groupby_agg_key
-            if(key not in self.group_by_backups):
-                res = "groupby not intialized"
-            else:
-                temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim=list(groupby_agg.keys()))
-                self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
-                res = str(len(self.group_by_backups[key]))
-            return res
-
-        except Exception as e:
-            return 'Exception *** in pygdf groupby_size():'+str(e)
+    # def groupby_size(self, dimension_name, groupby_agg_key):
+    #     '''
+    #         description:
+    #             get groupby size for a groupby on a dimension
+    #         input:
+    #             dimension_name <string>:
+    #             groupby_agg_key <string>:
+    #         return:
+    #             size of the groupby
+    #     '''
+    #     try:
+    #         key = dimension_name+"_"+groupby_agg_key
+    #         if(key not in self.group_by_backups):
+    #             res = "groupby not intialized"
+    #         else:
+    #             temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim=list(groupby_agg.keys()))
+    #             self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
+    #             res = str(len(self.group_by_backups[key]))
+    #         return res
+    #
+    #     except Exception as e:
+    #         return 'Exception *** in pygdf groupby_size():'+str(e)
 
     def groupby_filterOrder(self, dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column):
         '''
