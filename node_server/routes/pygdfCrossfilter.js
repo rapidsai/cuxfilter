@@ -14,7 +14,7 @@ module.exports = (io) => {
         socket.on('init', (dataset, engine, usingSessions, callback) => {
             try{
                   console.log("connection init requested");
-                  socket.session_id = utils.init_session(socket, dataset, engine, usingSessions, socket.handshake.headers.cookie)
+                  socket.session_id = utils.initSession(socket, dataset, engine, usingSessions, socket.handshake.headers.cookie)
                   socket.useSessions = usingSessions;
 
                   if(utils.isConnectionEstablished[socket.session_id+dataset+engine] === true){
@@ -77,12 +77,8 @@ module.exports = (io) => {
 
             utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),'reset_all',engine, (error, message) => {
                 if(!error){
-                  socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                  utils.UpdateClientSideValues(socket, dataset, engine);
-                  if(socket.useSessions == false){
-                    socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                    utils.triggerUpdateEvent(socket, dataset, engine);
-                  }
+                  let dataset_size = JSON.parse(message)['data'];
+                  utils.updateClientSideValues(socket, dataset, engine, dataset_size);
                 }
                 typeof callback === 'function' && callback(error, message);
             });
@@ -133,12 +129,8 @@ module.exports = (io) => {
 
                 utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset", engine, (error, message) => {
                     if(!error){
-                      socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                      utils.UpdateClientSideValues(socket, dataset, engine);
-                      if(socket.useSessions == false){
-                        socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                        utils.triggerUpdateEvent(socket, dataset, engine);
-                      }
+                      let dataset_size = JSON.parse(message)['data'];
+                      utils.updateClientSideValues(socket, dataset, engine, dataset_size);
                     }
                     typeof callback === 'function' && callback(error, message);
                 });
@@ -159,7 +151,12 @@ module.exports = (io) => {
                     'groupby_agg':agg
                 };
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting groupby for the dimension:"+dimension_name,engine, callback);
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting groupby for the dimension:"+dimension_name,engine, (error,message) => {
+
+                     callback(error,utils.groupbyMessageCustomParse(message));
+
+
+                });
 
             }catch(ex){
                 console.log(ex);
@@ -211,12 +208,8 @@ module.exports = (io) => {
 
                 utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset as per a range of rows",engine, (error, message) => {
                     if(!error){
-                      socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                      utils.UpdateClientSideValues(socket, dataset, engine);
-                      if(socket.useSessions == false){
-                        socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                        utils.triggerUpdateEvent(socket, dataset, engine);
-                      }
+                      let dataset_size = JSON.parse(message)['data'];
+                      utils.updateClientSideValues(socket, dataset, engine, dataset_size);
                     }
                     typeof callback === 'function' && callback(error, message);
                 });
@@ -238,12 +231,8 @@ module.exports = (io) => {
 
                 utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting resetting filters on the current dimension",engine, (error, message) => {
                     if(!error){
-                      socket.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                      utils.UpdateClientSideValues(socket, dataset, engine);
-                      if(socket.useSessions == false){
-                        socket.broadcast.emit("update_size", dataset,engine, JSON.parse(message)['data']);
-                        utils.triggerUpdateEvent(socket, dataset, engine);
-                      }
+                      let dataset_size = JSON.parse(message)['data'];
+                      utils.updateClientSideValues(socket, dataset, engine, dataset_size);
                     }
                     typeof callback === 'function' && callback(error, message);
                 });
@@ -254,23 +243,23 @@ module.exports = (io) => {
             }
         });
 
-        //get size of the groupby aggregation result for the specific agg function & column name
-        socket.on('groupby_size', (dimension_name,dataset,agg,engine, callback) => {
-            try{
-                let command = 'groupby_size';
-                let query = {
-                    'dimension_name': dimension_name,
-                    'groupby_agg':agg
-                };
-
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting size of the groupby",engine, callback);
-
-            }catch(ex){
-                console.log(ex);
-                typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem();
-            }
-        });
+        // //get size of the groupby aggregation result for the specific agg function & column name
+        // socket.on('groupby_size', (dimension_name,dataset,agg,engine, callback) => {
+        //     try{
+        //         let command = 'groupby_size';
+        //         let query = {
+        //             'dimension_name': dimension_name,
+        //             'groupby_agg':agg
+        //         };
+        //
+        //         utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting size of the groupby",engine, callback);
+        //
+        //     }catch(ex){
+        //         console.log(ex);
+        //         typeof callback === 'function' && callback(true,-1);
+        //         utils.clearGPUMem();
+        //     }
+        // });
 
         //get size of the current state of the dataset
         socket.on('size', (dataset,engine,callback) => {
@@ -278,7 +267,12 @@ module.exports = (io) => {
                 let command = 'get_size';
                 let query = {};
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting size of the dataset",engine, callback);
+                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting size of the dataset",engine, (error,message) => {
+                  if(!error){
+                      let dataset_size = JSON.parse(message)['data'];
+                      utils.updateClientSideSize(socket,dataset,engine, dataset_size);
+                  }
+                });
 
             }catch(ex){
                 console.log(ex);

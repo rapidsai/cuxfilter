@@ -19,8 +19,8 @@ const histograms = {};
 const groups = {};
 
 //init connection and set session_id
-function init_session(socket, dataset, engine, usingSessions, cookies){
-  reset_params();
+function initSession(socket, dataset, engine, usingSessions, cookies){
+  resetParams();
   if(usingSessions){
       let tempSessionId = parseCookie(cookies);
       if(tempSessionId != singleSessionId[engine]){
@@ -40,7 +40,7 @@ function init_session(socket, dataset, engine, usingSessions, cookies){
   }
 }
 
-function reset_params(){
+function resetParams(){
   Object.keys(dimensions).forEach(function (prop) {
     delete dimensions[prop];
   });
@@ -49,9 +49,15 @@ function reset_params(){
   });
 }
 
-//triggering an update event which broadcasts to all the neighbouring socket connections in case of a multi-tab sessionless access
-function UpdateClientSideValues(socket, dataset, engine){
 
+function updateClientSideSize(socket,dataset,engine, dataset_size){
+  socket.emit("update_size", dataset,engine, dataset_size);
+  if(socket.useSessions == false){
+    socket.broadcast.emit("update_size", dataset,engine, dataset_size);
+  }
+}
+
+function updateClientSideDimensions(socket, dataset, engine){
   for(let dimension in dimensions){
     if(dimensions.hasOwnProperty(dimension)){
       let command = 'dimension_filterOrder';
@@ -59,14 +65,16 @@ function UpdateClientSideValues(socket, dataset, engine){
       pygdf_query(command,params(query, socket.session_id, dataset, engine),"user has requested "+query.sort_order+" n rows as per the column "+query.dimension_name, engine, (error, message)=>{
         if(!error){
           socket.emit('update_dimension', query.dimension_name, engine, message);
-          if(socket.session_id === 111){
+          if(socket.useSessions == false){
             socket.broadcast.emit('update_dimension', query.dimension_name, message);
           }
         }
       });
     }
   }
+}
 
+function updateClientSideHistograms(socket, dataset, engine){
   for(let histogram in histograms){
     if(dimensions.hasOwnProperty(histogram)){
       let command = 'dimension_hist';
@@ -74,14 +82,16 @@ function UpdateClientSideValues(socket, dataset, engine){
       pygdf_query(command,params(query, socket.session_id, dataset, engine),"user requested histogram for "+query.dimension_name, engine, (error, message)=>{
         if(!error){
           socket.emit('update_hist', query.dimension_name, engine, message);
-          if(socket.session_id === 111){
+          if(socket.useSessions == false){
             socket.broadcast.emit('update_hist', query.dimension_name, message);
           }
         }
       });
     }
   }
+}
 
+function updateClientSideGroups(socket, dataset, engine){
   for(let group in groups){
     if(groups.hasOwnProperty(group)){
       let command = 'groupby_filterOrder';
@@ -90,22 +100,29 @@ function UpdateClientSideValues(socket, dataset, engine){
       pygdf_query(command,params(query, socket.session_id, dataset, engine),"updating filterOrder for group:"+query.dimension_name, engine, (error, message)=>{
         if(!error){
           socket.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
-          if(socket.session_id === 111){
+          if(socket.useSessions == false){
             socket.broadcast.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
           }
         }
       });
     }
   }
-
+}
+//triggering an update event which broadcasts to all the neighbouring socket connections in case of a multi-tab sessionless access
+function updateClientSideValues(socket, dataset, engine, dataset_size){
+  updateClientSideSize(socket,dataset,engine,dataset_size);
+  updateClientSideDimensions(socket, dataset, engine);
+  updateClientSideHistograms(socket, dataset, engine);
+  updateClientSideGroups(socket, dataset, engine);
 }
 
 
-//triggering an update event which broadcasts to all the neighbouring socket connections in case of a multi-tab sessionless access
-function triggerUpdateEvent(socket, dataset, engine){
-  console.log("broadcasting update");
-  socket.emit("update_event", dataset,engine);
-  socket.broadcast.emit("update_event", dataset,engine);
+function groupbyMessageCustomParse(message){
+  let temp_message = JSON.parse(message);
+  temp_message['size'] = temp_message['data'].split('&')[1];
+  temp_message['data'] = temp_message['data'].split('&')[0];
+  console.log(temp_message['size']);
+  return JSON.stringify(temp_message);
 }
 
 //calling the python server(pandas or pygdf) with the command and query
@@ -151,10 +168,6 @@ function callPyServer(command,query, engine){
 
 //convert json object to encodeURIComponent
 function params(data, session_id, dataset, engine) {
-  // let dataset = data['dataset'];
-  // let session_id = data['session_id']
-  // let engine = data['engine']
-  // resetServerTime(dataset,session_id,engine);
   data['session_id'] = session_id;
   data['dataset'] = dataset;
   data['engine'] = engine;
@@ -305,10 +318,10 @@ module.exports = {
   groups: groups,
   histograms: histograms,
   //init connection and set session_id
-  init_session: init_session,
+  initSession: initSession,
 
   //triggering an update event which broadcasts to all the neighbouring socket connections in case of a multi-tab sessionless access
-  triggerUpdateEvent: triggerUpdateEvent,
+  // triggerUpdateEvent: triggerUpdateEvent,
 
   //calling the python server(pandas or pygdf) with the command and query
   callPyServer: callPyServer,
@@ -339,5 +352,11 @@ module.exports = {
   //initialize connection with pyServer by creating a pygdf/pandas object
   initConnection: initConnection,
 
-  UpdateClientSideValues: UpdateClientSideValues
+  updateClientSideSize: updateClientSideSize,
+  updateClientSideDimensions:updateClientSideDimensions,
+  updateClientSideHistograms:updateClientSideHistograms,
+  updateClientSideGroups:updateClientSideGroups,
+  updateClientSideValues: updateClientSideValues,
+
+  groupbyMessageCustomParse: groupbyMessageCustomParse
 }
