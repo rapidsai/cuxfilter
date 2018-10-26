@@ -1,4 +1,4 @@
-#pygdfCrossfilter_utils.py
+#cuXfilter_utils.py
 
 from pyarrow import RecordBatchStreamReader
 from app.utilities.numbaHistinMem import numba_gpu_histogram
@@ -20,7 +20,7 @@ def default(o):
     if isinstance(o, np.float64): return float(o)
     raise TypeError
 
-class pygdfCrossfilter_utils:
+class cuXfilter_utils:
     data_gpu = None
     back_up_dimension = None
     dimensions_filters = {}
