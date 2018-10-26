@@ -1,6 +1,6 @@
 {
-  "name": "node-python",
-  "version": "0.0.0",
+  "name": "cuXfilter",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
@@ -14,7 +14,6 @@
     "got": "^9.0.0",
     "http-errors": "~1.6.2",
     "morgan": "~1.9.0",
-    "pm2": "^3.0.3",
     "socket.io": "^2.1.1",
     "pug": "^2.0.0"
   }
