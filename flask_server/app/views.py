@@ -4,7 +4,7 @@
 from flask import render_template, jsonify, request
 import logging, json, time
 from app import app
-from app.utilities.pygdfCrossfilter_utils import pygdfCrossfilter_utils as pygdf
+from app.utilities.cuXfilter_utils import cuXfilter_utils as pygdf
 from app.utilities.pandas_utils import pandas_utils as pandas
 
 #global dictionaries to keep track of different user sessions. end_connection for a user_session results in the dictionary key-value pair being popped

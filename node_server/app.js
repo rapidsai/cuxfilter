@@ -17,7 +17,7 @@ var sessionMiddleware = session({
 
 var app = express();
 app.io = require('socket.io')({
-  path: '/pygdfCrossfilter'
+  path: '/cuXfilter'
 });
 
 app.set('views', path.join(__dirname, 'views'));
@@ -47,9 +47,9 @@ app.use(function (req, res, next) {
 });
 app.use(sessionMiddleware);
 
-var pygdfCrossfilter = require('./routes/pygdfCrossfilter')(app.io);
+var cuXfilter = require('./routes/cuXfilter')(app.io);
 
-app.use('/pygdfCrossfilter',pygdfCrossfilter);
+app.use('/cuXfilter',cuXfilter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
