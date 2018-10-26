@@ -1,4 +1,4 @@
-## pygdfCrossfilter Server
+## cuXfilter Server
 
 ### Javascript (es6) client - [cuXilter](client_side)
 
