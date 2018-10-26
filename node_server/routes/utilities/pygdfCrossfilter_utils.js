@@ -36,7 +36,7 @@ function initSession(socket, dataset, engine, usingSessions, cookies){
         }
       return tempSessionId;
   }else{
-      return utils.sessionlessID;
+      return sessionlessID;
   }
 }
 
@@ -53,6 +53,7 @@ function resetParams(){
 function updateClientSideSize(socket,dataset,engine, dataset_size){
   socket.emit("update_size", dataset,engine, dataset_size);
   if(socket.useSessions == false){
+    console.log('broadcasting size');
     socket.broadcast.emit("update_size", dataset,engine, dataset_size);
   }
 }
@@ -66,6 +67,7 @@ function updateClientSideDimensions(socket, dataset, engine){
         if(!error){
           socket.emit('update_dimension', query.dimension_name, engine, message);
           if(socket.useSessions == false){
+            console.log('broadcasting dimension');
             socket.broadcast.emit('update_dimension', query.dimension_name, message);
           }
         }
@@ -83,6 +85,7 @@ function updateClientSideHistograms(socket, dataset, engine){
         if(!error){
           socket.emit('update_hist', query.dimension_name, engine, message);
           if(socket.useSessions == false){
+            console.log('broadcasting histogram');
             socket.broadcast.emit('update_hist', query.dimension_name, message);
           }
         }
@@ -101,6 +104,7 @@ function updateClientSideGroups(socket, dataset, engine){
         if(!error){
           socket.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
           if(socket.useSessions == false){
+            console.log('broadcasting group');
             socket.broadcast.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
           }
         }
@@ -135,7 +139,7 @@ function callPyServer(command,query, engine){
        }
        got(url)
         .then(val => {
-          var pyresponse = Buffer.from(val.body).toString('utf8').split(":::");
+          var pyresponse = Buffer.from(val.body).toString('utf8').split("&");
           var response = {
                         data: pyresponse[0],
                         pythonScriptTime: parseFloat(pyresponse[1]),
@@ -200,7 +204,7 @@ function endSession(session_id,dataset,engine,callback){
      console.log("session is being ended");
      isDataLoaded[session_id+dataset+engine] = false;
      isConnectionEstablished[session_id+dataset+engine] = false;
-     var pyresponse = Buffer.from(val.body).toString('utf8').split(":::");
+     var pyresponse = Buffer.from(val.body).toString('utf8').split("&");
      var response = {
                    data: pyresponse[0],
                    pythonScriptTime: parseFloat(pyresponse[1]),
@@ -244,8 +248,8 @@ function clearGPUMem(){
 function resetServerTime(dataset, session_id, engine){
   console.log(dataset);
   console.log(session_id);
-    var server_dataset = dataset.split(":::")[0];
-    var server_key = session_id+":::"+server_dataset+":::"+engine;
+    var server_dataset = dataset.split("&")[0];
+    var server_key = session_id+"&"+server_dataset+"&"+engine;
     serverOnTime[server_key] = Date.now();
 }
 
@@ -258,9 +262,9 @@ function create_query(list_of_args){
         query = list_of_args[0];
         for(var index=1; index<list_of_args.length; index++){
             if(index == list_of_args.length-1){
-                query = query + ":::" +list_of_args[index];
+                query = query + "&" +list_of_args[index];
             }else{
-                query = query + ":::" +list_of_args[index]
+                query = query + "&" +list_of_args[index]
             }
         }
         return query;
@@ -282,7 +286,7 @@ function initConnection(session_id,dataset,engine, callback){
       .then(val => {
         console.log(val.body)
         isConnectionEstablished[session_id+dataset+engine] = true
-        var pyresponse = Buffer.from(val.body).toString('utf8').split(":::");
+        var pyresponse = Buffer.from(val.body).toString('utf8').split("&");
         var response = {
                       data: pyresponse[0],
                       pythonScriptTime: parseFloat(pyresponse[1]),

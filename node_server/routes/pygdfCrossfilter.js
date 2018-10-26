@@ -38,9 +38,9 @@ module.exports = (io) => {
                       console.log('data already loaded');
                       let startTime = Date.now();
 
-                      if(socket.useSessions == false){
-                        socket.broadcast.emit("update_event", dataset,engine);
-                      }
+                      // if(socket.useSessions == false){
+                      //   socket.broadcast.emit("update_event", dataset,engine);
+                      // }
                       //send data already loaded custom response
                       var response = {
                                     data: 'data already loaded',
@@ -362,6 +362,9 @@ module.exports = (io) => {
         socket.on('endSession', (dataset,engine,callback) => {
             utils.endSession(socket.session_id,dataset,engine, (error, message) => {
                 typeof callback === 'function' && callback(error,message);
+                if(socket.useSessions == false){
+                  socket.broadcast.emit('session_ended', dataset, engine);
+                }
             });
         });
     });

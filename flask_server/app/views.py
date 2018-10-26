@@ -710,7 +710,7 @@ def end_connection():
             response = str(e)
 
     elapsed = time.perf_counter() - start_time
-    response = response+":::"+str(elapsed)
+    response = response+"&"+str(elapsed)
     return response
 
 def append_time_to_response(response,start_time, key, engine):
@@ -723,13 +723,13 @@ def append_time_to_response(response,start_time, key, engine):
             3. key (string -> session_id+dataset_name)
             4. engine (pygdf/pandas)
         Response:
-            response string with time taken and activeFilters appended with ':::' as a separator
+            response string with time taken and activeFilters appended with '&' as a separator
     '''
     elapsed = time.perf_counter() - start_time
     if engine == 'pygdf':
-        response = response+":::"+str(elapsed)+":::"+str(user_sessions[key].dimensions_filters_response_format)
+        response = response+"&"+str(elapsed)+"&"+str(user_sessions[key].dimensions_filters_response_format)
     else:
-        response = response+":::"+str(elapsed)+":::"+str(user_sessions_pandas[key].dimensions_filters_response_format)
+        response = response+"&"+str(elapsed)+"&"+str(user_sessions_pandas[key].dimensions_filters_response_format)
     return response
 
 
