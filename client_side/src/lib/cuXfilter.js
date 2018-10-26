@@ -1,11 +1,10 @@
 // import dependencies
 import io from 'socket.io-client';
 import { Dimension } from '../util/dimension';
-// import { gpuMemoryWidget } from '../util/gpuMemoryWidget';
 
 //cuXfilter.js
 export class cuXfilter{
-    constructor(dataset, url, engine, useSessions = true, load_type='arrow'){//, dimension = null){
+    constructor(dataset, url, engine, useSessions = true, load_type='arrow'){
         this.dataset = dataset;
         this.url = url;
         this.connected = false;
@@ -51,7 +50,6 @@ export class cuXfilter{
     }
 
     tryConnecting(numAttempts, callback){
-        // console.log("Attempt "+numAttempts);
         if(numAttempts<3){
             this.socket.emit('init',this.dataset,this.engine, this.useSessions, (error, message) => {
                 if(error){
@@ -81,12 +79,6 @@ export class cuXfilter{
                 this.size = parseInt(size);
             }
         });
-
-        // this.socket.on('update_event',(dataset,engine) => {
-        //     if(this.dataset === dataset && this.engine === engine){
-        //         dispatchEvent(this.updateEvent);
-        //     }
-        // });
 
         this.socket.on('session_ended', (dimension_name, engine, message) => {
             if(engine == this.engine){
@@ -205,8 +197,4 @@ export class cuXfilter{
             });
         });
     }
-
-    // getGPUUsage(url='http://10.110.45.29:3004'){
-    //     return new gpuMemoryWidget(url);
-    // }
 }
