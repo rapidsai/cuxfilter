@@ -1,4 +1,4 @@
-# cuXfilter library - serverside crossfilter library for the browser.
+# cuXfilter client side
 
 Uses numba and pygdf on the server side. 
 
