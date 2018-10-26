@@ -1,8 +1,7 @@
 ## pygdfCrossfilter Server
 
-### Javascript (es6) client - pygdfCrossfilter
+### Javascript (es6) client - [cuXilter](client_side)
 
-https://gitlab-master.nvidia.com/athorve/pycrossfilter
 
 ### To build using Docker:
 
