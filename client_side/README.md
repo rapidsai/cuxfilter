@@ -1,6 +1,6 @@
 # cuXfilter client side
 
-Uses numba and pygdf on the server side. 
+Uses numba and cudf on the server side. 
 
 Latest demo -> https://drive.google.com/file/d/18pL-kiC91NHdbPqjhgm3U9PvnlYoHFAK/view
 
@@ -9,9 +9,9 @@ To see how to usage -> check dist/index.html
 ## Installation
 
 <pre>
-git clone https://gitlab-master.nvidia.com/athorve/pygdfCrossfilter-Server.git
+git clone https://gitlab-master.nvidia.com/athorve/cuXfilter.git
 cd client_side
-npm install
+(make sure webpack is installed)
 npm run build
 </pre>
 
@@ -34,7 +34,7 @@ use ./dist/index.js
 Const myData = new cuXfilter(&#39;dataset-name-without-extension&#39;, 'http://url-of-server', engine, useSessions, load_type);  
 </pre>
 
-> 1. engine = 'pygdf'/ 'pandas' (string) <br>
+> 1. engine = 'cudf'/ 'pandas' (string) <br>
 > 2. useSessions = true/false (boolean) -> setting this as false allows multi-tab cross filtering in chrome and firefox <br>
 > 3. load_type = 'ipc'/'arrow' (string) -> default value is arrow. optional field
 
@@ -261,7 +261,7 @@ myData.resetAllFilters();
 
 
 ### Groups
-> Groups are objects on top of the dimension that lets us execute pygdf groupby function with customizable aggregations. <b> Applying filters on a dimension do not affect the groups associated with it, and only affect the groups associated with other dimensions.</b> <br>
+> Groups are objects on top of the dimension that lets us execute cudf groupby function with customizable aggregations. <b> Applying filters on a dimension do not affect the groups associated with it, and only affect the groups associated with other dimensions.</b> <br>
 
 To use a group, we need to create it on top of a dimension. 
 
