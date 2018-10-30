@@ -9,7 +9,7 @@ var session = require('express-session');
 const config = require('/usr/src/app/config.json');
 
 var sessionMiddleware = session({
-  secret: 'pygdf',
+  secret: 'cudf',
   resave: true,
   saveUninitialized: true
 });
@@ -19,9 +19,6 @@ var app = express();
 app.io = require('socket.io')({
   path: '/cuXfilter'
 });
-
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
 
 // enable cors
 let whitelist = config.whitelisted_urls_for_clients;
@@ -64,7 +61,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.json({ error: 'err' });
 });
 
 

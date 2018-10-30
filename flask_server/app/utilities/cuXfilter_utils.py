@@ -2,8 +2,8 @@
 
 from pyarrow import RecordBatchStreamReader
 from app.utilities.numbaHistinMem import numba_gpu_histogram
-from pygdf.dataframe import DataFrame
-import pygdf
+from cudf.dataframe import DataFrame
+import cudf
 import json
 import os
 import numpy as np
@@ -38,7 +38,7 @@ class cuXfilter_utils:
             description:
                 Calculate histogram leveraging gpu via pycuda(using numba jit)
             input:
-                data: pygdf row as a series -> gpu mem pointer, bins: number of bins in the histogram
+                data: cudf row as a series -> gpu mem pointer, bins: number of bins in the histogram
             Output:
                 json -> {X:[__values_of_colName_with_max_64_bins__], Y:[__frequencies_per_bin__]}
         '''
@@ -51,14 +51,14 @@ class cuXfilter_utils:
 
             return str(json.dumps(dict_temp))
         except Exception as e:
-            return 'Exception *** in pygdf hist_numba_GPU():'+str(e)
+            return 'Exception *** in cudf hist_numba_GPU():'+str(e)
 
     def groupby(self,data,column_name, groupby_agg,groupby_agg_key):
         '''
             description:
-                Calculate groupby on a given column on the pygdf
+                Calculate groupby on a given column on the cudf
             input:
-                data: pygdf row as a series -> gpu mem pointer,
+                data: cudf row as a series -> gpu mem pointer,
                 column_name: column name
             Output:
                 json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
@@ -68,7 +68,7 @@ class cuXfilter_utils:
             key = column_name+"_"+groupby_agg_key
             self.group_by_backups[key] = group_appl
         except Exception as e:
-            return "Exception *** in pygdf groupby(): "+str(e)
+            return "Exception *** in cudf groupby(): "+str(e)
 
         return "groupby intialized successfully"
 
@@ -84,7 +84,7 @@ class cuXfilter_utils:
         try:
             return str(list(self.data_gpu.columns))
         except Exception as e:
-            return "Exception *** in pygdf get_columns():"+str(e)
+            return "Exception *** in cudf get_columns():"+str(e)
 
     def readArrow(self,source):
         '''
@@ -110,9 +110,9 @@ class cuXfilter_utils:
         '''
         source = source+".arrow"
         try:
-            self.data_gpu = pygdf.DataFrame.from_arrow(self.readArrow(source))
+            self.data_gpu = cudf.DataFrame.from_arrow(self.readArrow(source))
             # for i in pa_df.columns:
-            #     self.data_gpu[i] = pygdf.Series(np.array(pa_df[i].values))
+            #     self.data_gpu[i] = cudf.Series(np.array(pa_df[i].values))
             if 'nonfilter' not in source:
                 self.back_up_dimension = self.data_gpu
             # del(pa_df)
@@ -122,7 +122,7 @@ class cuXfilter_utils:
             del(self.data_gpu)
             del(self.back_up_dimension)
             gc.collect()
-            return "Exception *** in pygdf read_arrow_to_DF():"+str(e)
+            return "Exception *** in cudf read_arrow_to_DF():"+str(e)
 
         return "data read successfully"
 
@@ -149,7 +149,7 @@ class cuXfilter_utils:
                     np_arr = np.zeros((temp_nd_array.size), dtype=temp_nd_array.dtype)
                     np_arr_gpu = cuda.to_device(np_arr)
                     np_arr_gpu.copy_to_device(temp_nd_array)
-                    self.data_gpu[columns[i]] = pygdf.Series(np_arr_gpu)
+                    self.data_gpu[columns[i]] = cudf.Series(np_arr_gpu)
 
             self.back_up_dimension = self.data_gpu
 
@@ -157,7 +157,7 @@ class cuXfilter_utils:
             del(self.data_gpu)
             del(self.back_up_dimension)
             gc.collect()
-            return "Exception *** in pygdf read_ipc_to_DF():"+str(e)
+            return "Exception *** in cudf read_ipc_to_DF():"+str(e)
 
         return "data read successfully"
 
@@ -197,7 +197,7 @@ class cuXfilter_utils:
                 temp_dict[i] = list(data[i].values())
             return json.dumps(temp_dict,default=default)
         except Exception as e:
-            return 'Exception *** in pygdf parse_dict() (helper function):'+str(e)
+            return 'Exception *** in cudf parse_dict() (helper function):'+str(e)
 
     def get_size(self):
         '''
@@ -211,7 +211,7 @@ class cuXfilter_utils:
         try:
             return str(len(self.data_gpu))
         except Exception as e:
-            return 'Exception *** in pygdf get_size():'+str(e)
+            return 'Exception *** in cudf get_size():'+str(e)
 
     def reset_filters(self, data, omit=None, include_dim=['all']):
         '''
@@ -241,7 +241,7 @@ class cuXfilter_utils:
                     try:
                         return_val = data.loc[:,column_list].query(query)
                     except Exception as e:
-                        return 'Exception *** in pygdf reset_filters():'+str(e)
+                        return 'Exception *** in cudf reset_filters():'+str(e)
                     return return_val
             else:
                 return data
@@ -262,7 +262,7 @@ class cuXfilter_utils:
         try:
             self.hist_numba_GPU(self.data_gpu[self.data_gpu.columns[-1]].to_gpu_array(),640)
         except Exception as e:
-            return 'Exception *** in pygdf numba_jit_warm_func():'+str(e)
+            return 'Exception *** in cudf numba_jit_warm_func():'+str(e)
 
 
     def reset_all_filters(self):
@@ -281,7 +281,7 @@ class cuXfilter_utils:
             return str(len(self.data_gpu))
 
         except Exception as e:
-            return 'Exception *** in pygdf reset_all_filters:'+str(e)
+            return 'Exception *** in cudf reset_all_filters:'+str(e)
 
     def groupby_load(self, dimension_name, groupby_agg, groupby_agg_key):
         '''
@@ -300,30 +300,7 @@ class cuXfilter_utils:
             response = self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
             return response+"&"+str(len(self.group_by_backups[key]))
         except Exception as e:
-            return 'Exception *** in pygdf groupby_load():'+str(e)
-
-    # def groupby_size(self, dimension_name, groupby_agg_key):
-    #     '''
-    #         description:
-    #             get groupby size for a groupby on a dimension
-    #         input:
-    #             dimension_name <string>:
-    #             groupby_agg_key <string>:
-    #         return:
-    #             size of the groupby
-    #     '''
-    #     try:
-    #         key = dimension_name+"_"+groupby_agg_key
-    #         if(key not in self.group_by_backups):
-    #             res = "groupby not intialized"
-    #         else:
-    #             temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim=list(groupby_agg.keys()))
-    #             self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
-    #             res = str(len(self.group_by_backups[key]))
-    #         return res
-    #
-    #     except Exception as e:
-    #         return 'Exception *** in pygdf groupby_size():'+str(e)
+            return 'Exception *** in cudf groupby_load():'+str(e)
 
     def groupby_filterOrder(self, dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column):
         '''
@@ -358,7 +335,7 @@ class cuXfilter_utils:
                         elif 'bottom' == sort_order:
                             temp_df = self.group_by_backups[key].nsmallest(n_rows,[sort_column]).to_pandas().to_dict()
                     except Exception as e:
-                        return 'Exception *** in pygdf groupby_filterOrder():'+str(e)
+                        return 'Exception *** in cudf groupby_filterOrder():'+str(e)
                 res = str(self.parse_dict(temp_df))
             return res
 
@@ -384,7 +361,7 @@ class cuXfilter_utils:
             return res
 
         except Exception as e:
-            return 'Exception *** in pygdf dimension_load():'+str(e)
+            return 'Exception *** in cudf dimension_load():'+str(e)
 
     def dimension_reset(self, dimension_name):
         '''
@@ -403,7 +380,7 @@ class cuXfilter_utils:
             return str(len(self.data_gpu))
 
         except Exception as e:
-            return 'Exception *** in pygdf dimension_reset():'+str(e)
+            return 'Exception *** in cudf dimension_reset():'+str(e)
 
 
     def dimension_get_max_min(self, dimension_name):
@@ -420,7 +397,7 @@ class cuXfilter_utils:
             return str(max_min_tuple)
 
         except Exception as e:
-            return 'Exception *** in pygdf dimension_get_max_min():'+str(e)
+            return 'Exception *** in cudf dimension_get_max_min():'+str(e)
 
     def dimension_hist(self, dimension_name, num_of_bins):
         '''
@@ -441,7 +418,7 @@ class cuXfilter_utils:
                 return str(self.hist_numba_GPU(temp_df[str(dimension_name)].to_gpu_array(),num_of_bins))
 
         except Exception as e:
-            return 'Exception *** in pygdf dimension_hist():'+str(e)
+            return 'Exception *** in cudf dimension_hist():'+str(e)
 
 
     def dimension_filterOrder(self, dimension_name, sort_order, num_rows, columns):
@@ -475,12 +452,12 @@ class cuXfilter_utils:
                     elif 'bottom' == sort_order:
                         temp_df = self.data_gpu.loc[:,list(columns)].nsmallest(n_rows,[dimension_name]).to_pandas().to_dict()
                 except Exception as e:
-                    return 'Exception *** in pygdf dimension_filterOrder(1):'+str(e)
+                    return 'Exception *** in cudf dimension_filterOrder(1):'+str(e)
 
             return str(self.parse_dict(temp_df))
 
         except Exception as e:
-            return 'Exception *** in pygdf dimension_filterOrder(2):'+str(e)
+            return 'Exception *** in cudf dimension_filterOrder(2):'+str(e)
 
     def dimension_filter(self, dimension_name, comparison_operation, value):
         '''
@@ -504,11 +481,11 @@ class cuXfilter_utils:
             try:
                 self.data_gpu = self.data_gpu.query(query)
             except Exception as e:
-                return 'Exception *** in pygdf dimension_filter(1):'+str(e)
+                return 'Exception *** in cudf dimension_filter(1):'+str(e)
             return str(len(self.data_gpu))
 
         except Exception as e:
-            return 'Exception *** in pygdf dimension_filter(2):'+str(e)
+            return 'Exception *** in cudf dimension_filter(2):'+str(e)
 
     def dimension_filter_range(self, dimension_name, min_value, max_value):
         '''
@@ -532,7 +509,7 @@ class cuXfilter_utils:
             try:
                 self.data_gpu = self.data_gpu.query(query)
             except Exception as e:
-                return 'Exception *** in pygdf dimension_filter_range(1):'+str(e)
+                return 'Exception *** in cudf dimension_filter_range(1):'+str(e)
             return str(len(self.data_gpu))
         except Exception as e:
-            return 'Exception *** in pygdf dimension_filter_range(2):'+str(e)
+            return 'Exception *** in cudf dimension_filter_range(2):'+str(e)

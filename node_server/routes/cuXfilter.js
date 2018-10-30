@@ -32,16 +32,11 @@ module.exports = (io) => {
         socket.on('load_data', (dataset,engine, load_type, callback) => {
             try{
                 console.log("user tried to load data from "+dataset);
-                // utils.resetServerTime(dataset,socket.session_id);
 
                 if(utils.isDataLoaded[socket.session_id+dataset+engine] && utils.dataLoaded[socket.session_id+dataset+engine] == dataset){
                       console.log('data already loaded');
                       let startTime = Date.now();
 
-                      // if(socket.useSessions == false){
-                      //   socket.broadcast.emit("update_event", dataset,engine);
-                      // }
-                      //send data already loaded custom response
                       var response = {
                                     data: 'data already loaded',
                                     pythonScriptTime: 0,
@@ -56,7 +51,7 @@ module.exports = (io) => {
                           'load_type': load_type
                       };
 
-                      utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),'read_data',engine, (error, message) => {
+                      utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),'read_data',engine, (error, message) => {
                           if(!error){
                             utils.isDataLoaded[socket.session_id+dataset+engine] = true
                             utils.dataLoaded[socket.session_id+dataset+engine] = dataset
@@ -75,7 +70,7 @@ module.exports = (io) => {
             let command = 'reset_all_filters';
             let query = {};
 
-            utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),'reset_all',engine, (error, message) => {
+            utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),'reset_all',engine, (error, message) => {
                 if(!error){
                   let dataset_size = JSON.parse(message)['data'];
                   utils.updateClientSideValues(socket, dataset, engine, dataset_size);
@@ -90,7 +85,7 @@ module.exports = (io) => {
                 let command = 'get_schema';
                 let query = {};
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting schema of the dataset",engine, callback);
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting schema of the dataset",engine, callback);
 
             }catch(ex){
                 console.log(ex);
@@ -108,7 +103,7 @@ module.exports = (io) => {
                     'dimension_name': dimension_name
                 };
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting loading a new dimension:"+dimension_name, engine, callback);
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting loading a new dimension:"+dimension_name, engine, callback);
 
             }catch(ex){
                 console.log(ex);
@@ -127,7 +122,7 @@ module.exports = (io) => {
                     'value': value
                 };
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset", engine, (error, message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset", engine, (error, message) => {
                     if(!error){
                       let dataset_size = JSON.parse(message)['data'];
                       utils.updateClientSideValues(socket, dataset, engine, dataset_size);
@@ -151,7 +146,7 @@ module.exports = (io) => {
                     'groupby_agg':agg
                 };
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting groupby for the dimension:"+dimension_name,engine, (error,message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting groupby for the dimension:"+dimension_name,engine, (error,message) => {
 
                      callback(error,utils.groupbyMessageCustomParse(message));
 
@@ -180,7 +175,7 @@ module.exports = (io) => {
 
                 utils.groups[dimension_name+agg] = query;
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested filterOrder rows for the groupby operation for dimension:"+dimension_name, engine, (error,message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested filterOrder rows for the groupby operation for dimension:"+dimension_name, engine, (error,message) => {
                   if(!error){
                     socket.emit('update_group', dimension_name, agg, engine, message);
                     if(socket.session_id === 111){
@@ -206,7 +201,7 @@ module.exports = (io) => {
                     'max_value': range_max
                 };
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset as per a range of rows",engine, (error, message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset as per a range of rows",engine, (error, message) => {
                     if(!error){
                       let dataset_size = JSON.parse(message)['data'];
                       utils.updateClientSideValues(socket, dataset, engine, dataset_size);
@@ -229,7 +224,7 @@ module.exports = (io) => {
                     'dimension_name': dimension_name
                 };
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting resetting filters on the current dimension",engine, (error, message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting resetting filters on the current dimension",engine, (error, message) => {
                     if(!error){
                       let dataset_size = JSON.parse(message)['data'];
                       utils.updateClientSideValues(socket, dataset, engine, dataset_size);
@@ -243,31 +238,13 @@ module.exports = (io) => {
             }
         });
 
-        // //get size of the groupby aggregation result for the specific agg function & column name
-        // socket.on('groupby_size', (dimension_name,dataset,agg,engine, callback) => {
-        //     try{
-        //         let command = 'groupby_size';
-        //         let query = {
-        //             'dimension_name': dimension_name,
-        //             'groupby_agg':agg
-        //         };
-        //
-        //         utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting size of the groupby",engine, callback);
-        //
-        //     }catch(ex){
-        //         console.log(ex);
-        //         typeof callback === 'function' && callback(true,-1);
-        //         utils.clearGPUMem();
-        //     }
-        // });
-
         //get size of the current state of the dataset
         socket.on('size', (dataset,engine,callback) => {
             try{
                 let command = 'get_size';
                 let query = {};
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting size of the dataset",engine, (error,message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting size of the dataset",engine, (error,message) => {
                   if(!error){
                       let dataset_size = JSON.parse(message)['data'];
                       utils.updateClientSideSize(socket,dataset,engine, dataset_size);
@@ -294,7 +271,7 @@ module.exports = (io) => {
                 };
                 utils.dimensions[dimension_name] = query;
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested "+sort_order+" n rows as per the column "+dimension_name, engine, (error,message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested "+sort_order+" n rows as per the column "+dimension_name, engine, (error,message) => {
                       if(!error){
                         socket.emit('update_dimension', dimension_name, engine, message);
                         if(socket.session_id === 111){
@@ -319,7 +296,7 @@ module.exports = (io) => {
                 };
 
                 utils.histograms[dimension_name] = query;
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requested histogram for "+dimension_name, engine, (error,message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requested histogram for "+dimension_name, engine, (error,message) => {
                   if(!error){
                     socket.emit('update_hist', dimension_name, engine, message);
                     if(socket.session_id === 111){
@@ -345,7 +322,7 @@ module.exports = (io) => {
                 };
                 let comment = "user requested max-min values for "+dimension_name+" for data="+dataset;
 
-                utils.pygdf_query(command,utils.params(query, socket.session_id, dataset, engine),comment,engine, callback);
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),comment,engine, callback);
 
             }catch(ex){
                 console.log(ex);

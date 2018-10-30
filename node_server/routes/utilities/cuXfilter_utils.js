@@ -5,10 +5,10 @@ const isDataLoaded = {};
 const dataLoaded = {};
 const serverOnTime = {};
 
-const pyServerURLPygdf = config.flask_server_url+":"+config.flask_server_port_pygdf
+const pyServerURLcudf = config.flask_server_url+":"+config.flask_server_port_cudf
 const pyServerURLPandas = config.flask_server_url+":"+config.flask_server_port_pandas
 let singleSessionId = {
-  'pygdf': '',
+  'cudf': '',
   'pandas': ''
 };
 const sessionlessID = 111;
@@ -63,7 +63,7 @@ function updateClientSideDimensions(socket, dataset, engine){
     if(dimensions.hasOwnProperty(dimension)){
       let command = 'dimension_filterOrder';
       let query = dimensions[dimension];
-      pygdf_query(command,params(query, socket.session_id, dataset, engine),"user has requested "+query.sort_order+" n rows as per the column "+query.dimension_name, engine, (error, message)=>{
+      cudf_query(command,params(query, socket.session_id, dataset, engine),"user has requested "+query.sort_order+" n rows as per the column "+query.dimension_name, engine, (error, message)=>{
         if(!error){
           socket.emit('update_dimension', query.dimension_name, engine, message);
           if(socket.useSessions == false){
@@ -81,7 +81,7 @@ function updateClientSideHistograms(socket, dataset, engine){
     if(dimensions.hasOwnProperty(histogram)){
       let command = 'dimension_hist';
       let query = histograms[histogram];
-      pygdf_query(command,params(query, socket.session_id, dataset, engine),"user requested histogram for "+query.dimension_name, engine, (error, message)=>{
+      cudf_query(command,params(query, socket.session_id, dataset, engine),"user requested histogram for "+query.dimension_name, engine, (error, message)=>{
         if(!error){
           socket.emit('update_hist', query.dimension_name, engine, message);
           if(socket.useSessions == false){
@@ -100,7 +100,7 @@ function updateClientSideGroups(socket, dataset, engine){
       let command = 'groupby_filterOrder';
       let query = groups[group];
       console.log("query for group",query);
-      pygdf_query(command,params(query, socket.session_id, dataset, engine),"updating filterOrder for group:"+query.dimension_name, engine, (error, message)=>{
+      cudf_query(command,params(query, socket.session_id, dataset, engine),"updating filterOrder for group:"+query.dimension_name, engine, (error, message)=>{
         if(!error){
           socket.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
           if(socket.useSessions == false){
@@ -129,11 +129,11 @@ function groupbyMessageCustomParse(message){
   return JSON.stringify(temp_message);
 }
 
-//calling the python server(pandas or pygdf) with the command and query
+//calling the python server(pandas or cudf) with the command and query
 function callPyServer(command,query, engine){
   return new Promise((resolve, reject) => {
        let startTime = Date.now();
-       let url = pyServerURLPygdf+'/'+command+'?'+query
+       let url = pyServerURLcudf+'/'+command+'?'+query
        if(engine == 'pandas'){
          url = pyServerURLPandas+'/'+command+'?'+query
        }
@@ -179,7 +179,7 @@ function params(data, session_id, dataset, engine) {
 }
 
 //handle queries by calling the python server and returning the results directly to the socket-io-client on the front-end
-function pygdf_query(command,query, comments,engine, callback){
+function cudf_query(command,query, comments,engine, callback){
     callPyServer(command,query, engine)
       .then((message) => {
               console.log(comments);
@@ -194,7 +194,7 @@ function pygdf_query(command,query, comments,engine, callback){
 //end session and remove the dataframe from the gpu memory
 function endSession(session_id,dataset,engine,callback){
   let startTime = Date.now()
-  let url = pyServerURLPygdf+'/end_connection?session_id='+session_id+'&dataset='+dataset+'&engine='+engine
+  let url = pyServerURLcudf+'/end_connection?session_id='+session_id+'&dataset='+dataset+'&engine='+engine
   if(engine == 'pandas'){
     url = pyServerURLPandas+'/end_connection?session_id='+session_id+'&dataset='+dataset+'&engine='+engine
   }
@@ -274,11 +274,11 @@ function create_query(list_of_args){
 
 }
 
-//initialize connection with pyServer by creating a pygdf/pandas object
+//initialize connection with pyServer by creating a cudf/pandas object
 function initConnection(session_id,dataset,engine, callback){
     let startTime = Date.now()
     // let url = pyServerURL+'/'+'init_connection'+'?'+query
-    let url = pyServerURLPygdf+'/init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset
+    let url = pyServerURLcudf+'/init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset
     if(engine == 'pandas'){
       url = pyServerURLPandas+'/init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset
     }
@@ -313,7 +313,7 @@ module.exports = {
   isDataLoaded: isDataLoaded,
   dataLoaded: dataLoaded,
   serverOnTime: serverOnTime,
-  pyServerURLPygdf: pyServerURLPygdf,
+  pyServerURLcudf: pyServerURLcudf,
   pyServerURLPandas: pyServerURLPandas,
   singleSessionId: singleSessionId,
   sessionlessID: sessionlessID,
@@ -327,14 +327,14 @@ module.exports = {
   //triggering an update event which broadcasts to all the neighbouring socket connections in case of a multi-tab sessionless access
   // triggerUpdateEvent: triggerUpdateEvent,
 
-  //calling the python server(pandas or pygdf) with the command and query
+  //calling the python server(pandas or cudf) with the command and query
   callPyServer: callPyServer,
 
   //convert json object to encodeURIComponent
   params: params,
 
   //handle queries by calling the python server and returning the results directly to the socket-io-client on the front-end
-  pygdf_query: pygdf_query,
+  cudf_query: cudf_query,
 
   //end session and remove the dataframe from the gpu memory
   endSession: endSession,
@@ -353,7 +353,7 @@ module.exports = {
   //create a query object from a array of arguments
   create_query: create_query,
 
-  //initialize connection with pyServer by creating a pygdf/pandas object
+  //initialize connection with pyServer by creating a cudf/pandas object
   initConnection: initConnection,
 
   updateClientSideSize: updateClientSideSize,
