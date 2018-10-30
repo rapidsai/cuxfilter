@@ -11,5 +11,5 @@ docker run --runtime=nvidia  -d -p 3000:3000 --name rapids_viz -v /folder/with/d
 
 </pre>
 
-### Javascript (es6) client - [cuXilter](client_side)
+### Javascript (es6) client - [cuXfilter](client_side)
 
