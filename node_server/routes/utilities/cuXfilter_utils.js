@@ -78,7 +78,7 @@ function updateClientSideDimensions(socket, dataset, engine){
 
 function updateClientSideHistograms(socket, dataset, engine){
   for(let histogram in histograms){
-    if(dimensions.hasOwnProperty(histogram)){
+    if(histograms.hasOwnProperty(histogram)){
       let command = 'dimension_hist';
       let query = histograms[histogram];
       cudf_query(command,params(query, socket.session_id, dataset, engine),"user requested histogram for "+query.dimension_name, engine, (error, message)=>{
