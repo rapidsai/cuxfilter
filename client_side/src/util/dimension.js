@@ -66,6 +66,9 @@ class Dimension{
     }
 
     filter(comparison=null,value=null, pre_reset=false){
+        console.log(comparison);
+        console.log(value);
+        console.log(pre_reset);
             let already_executed = false;
             if(comparison == null && value == null){
                 already_executed = true;
@@ -73,7 +76,7 @@ class Dimension{
             }else if(comparison !== null && value == null){
                 if(Array.isArray(comparison)){
                     already_executed = true;
-                    range = comparison;
+                    let range = comparison;
                     this.filterRange(range,pre_reset);
                 }else{
                     value = comparison;
@@ -92,7 +95,7 @@ class Dimension{
         this.filters.push('>'+range_min);
         this.filters.push('<'+range_max);
         let startTime = Date.now();
-        this.socket.emit('dimension_filter_range',this.name,this.parent_dataset, range_min,range_msax,this.engine, pre_reset);
+        this.socket.emit('dimension_filter_range',this.name,this.parent_dataset, range_min,range_max,this.engine, pre_reset);
 
     }
 
