@@ -89,7 +89,7 @@ export class cuXfilter{
 
         this.socket.on('update_hist', (dimension_name, engine, message) => {
             if(engine == this.engine){
-                this.childDimension[dimension_name].histogram = JSON.parse(message)['data'];
+                this.childDimension[dimension_name].histogram = JSON.parse(JSON.parse(message)['data']);
                 this.childDimension[dimension_name].updateMaxMin();
                 dispatchEvent(new CustomEvent('updateHistEvent', {detail: {'column': dimension_name}}));
             }
@@ -97,8 +97,7 @@ export class cuXfilter{
 
         this.socket.on('update_dimension', (dimension_name, engine, message) => {
             if(engine == this.engine){
-                this.childDimension[dimension_name].value = JSON.parse(message)['data'];
-                
+                this.childDimension[dimension_name].value = JSON.parse(JSON.parse(message)['data']);
                 this.childDimension[dimension_name].updateMaxMin();
                 dispatchEvent(new CustomEvent('updateDimensionEvent', {detail: {'column': dimension_name}}));
             }
@@ -106,7 +105,7 @@ export class cuXfilter{
 
         this.socket.on('update_group', (dimension_name, agg, engine, message) => {
             if(engine == this.engine){
-                this.childDimension[dimension_name].childGroup[dimension_name+agg].value = JSON.parse(message)['data'];
+                this.childDimension[dimension_name].childGroup[dimension_name+agg].value = JSON.parse(JSON.parse(message)['data']);
                 dispatchEvent(new CustomEvent('updateGroupEvent', {detail: {column:dimension_name, aggregate:JSON.parse(agg)}}));
             }
         });
