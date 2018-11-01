@@ -257,11 +257,11 @@ def groupby_load():
     return append_time_to_response(response,start_time, key, engine)
 
 
-@app.route('/groupby_filterOrder', methods=['GET'])
-def groupby_filterOrder():
+@app.route('/groupby_filter_order', methods=['GET'])
+def groupby_filter_order():
     '''
         description:
-            get groupby values by a filterOrder(all, top(n), bottom(n)) for a groupby on a dimension
+            get groupby values by a filter_order(all, top(n), bottom(n)) for a groupby on a dimension
         Get parameters:
             1. session_id (string)
             2. dataset (string)
@@ -285,13 +285,13 @@ def groupby_filterOrder():
     sort_column = request.args.get('sort_column')
 
     # DEBUG: start
-    app.logger.debug("groupby filterOrder of "+dataset_name+" for dimension_name "+dimension_name+" for "+session_id)
+    app.logger.debug("groupby filter order of "+dataset_name+" for dimension_name "+dimension_name+" for "+session_id)
     # DEBUG: end
 
     if engine == 'cudf':
         #start function execution
         groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
-        response = user_sessions[key].groupby_filterOrder(dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column)
+        response = user_sessions[key].groupby_filter_order(dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column)
         if 'out of memory' in response or 'thrust::system::system_error' in response:
             user_sessions.pop(session_id+dataset_name,None)
             app.logger.debug('out of memory error')
@@ -299,7 +299,7 @@ def groupby_filterOrder():
     else:
         #start function execution
         groupby_agg_key = ':'.join(list(groupby_agg.keys())+list(groupby_agg.values())[0])
-        response = user_sessions_pandas[key].groupby_filterOrder(dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column)
+        response = user_sessions_pandas[key].groupby_filter_order(dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column)
         #end function execution
 
     #return response
@@ -466,11 +466,11 @@ def dimension_hist():
     #return response
     return append_time_to_response(response,start_time, key, engine)
 
-@app.route('/dimension_filterOrder', methods=['GET'])
-def dimension_filterOrder():
+@app.route('/dimension_filter_order', methods=['GET'])
+def dimension_filter_order():
     '''
         description:
-            get columns values by a filterOrder(all, top(n), bottom(n)) sorted by dimension_name
+            get columns values by a filter_order(all, top(n), bottom(n)) sorted by dimension_name
         Get parameters:
             1. session_id (string)
             2. dataset (string)
@@ -492,17 +492,17 @@ def dimension_filterOrder():
     columns = request.args.get('columns')
 
     # DEBUG: start
-    app.logger.debug("dataset:"+dataset_name+"filterOrder dimension_name:"+dimension_name+" for "+session_id)
+    app.logger.debug("dataset:"+dataset_name+"filter_order dimension_name:"+dimension_name+" for "+session_id)
     # DEBUG: end
 
     if engine == 'cudf':
         #start function execution
-        response = user_sessions[key].dimension_filterOrder(dimension_name, sort_order, num_rows, columns)
-        app.logger.debug('filterOrder:'+response)
+        response = user_sessions[key].dimension_filter_order(dimension_name, sort_order, num_rows, columns)
+        app.logger.debug('filter_order:'+response)
         #end function execution
     else:
         #start function execution
-        response = user_sessions_pandas[key].dimension_filterOrder(dimension_name, sort_order, num_rows, columns)
+        response = user_sessions_pandas[key].dimension_filter_order(dimension_name, sort_order, num_rows, columns)
         #end function execution
 
     #return response
@@ -513,7 +513,7 @@ def dimension_filterOrder():
 def dimension_filter():
     '''
         description:
-            get columns values by a filterOrder(all, top(n), bottom(n)) sorted by dimension_name
+            get columns values by a filter_order(all, top(n), bottom(n)) sorted by dimension_name
         Get parameters:
             1. session_id (string)
             2. dataset (string)
@@ -531,21 +531,23 @@ def dimension_filter():
     dimension_name = request.args.get('dimension_name')
     comparison_operation = request.args.get('comparison_operation')
     value = request.args.get('value')
+    pre_reset = json.loads(request.args.get('pre_reset').lower())   #json.loads converts string to equivalent bool: 'true' to True
 
+    # app.logger.debug('dimension_filter value of pre_reset is '+ str(pre_reset) +' and the type is '+str(type(pre_reset)))
     # DEBUG: start
     app.logger.debug("dataset: "+dataset_name+" filter dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
     if engine == 'cudf':
         #start function execution
-        response = user_sessions[key].dimension_filter(dimension_name, comparison_operation, value)
+        response = user_sessions[key].dimension_filter(dimension_name, comparison_operation, value, pre_reset)
         if 'out of memory' in response or 'thrust::system::system_error' in response:
             user_sessions.pop(session_id+dataset_name,None)
             app.logger.debug('out of memory error')
         #end function execution
     else:
         #start function execution
-        response = user_sessions_pandas[key].dimension_filter(dimension_name, comparison_operation, value)
+        response = user_sessions_pandas[key].dimension_filter(dimension_name, comparison_operation, value, pre_reset)
         #end function execution
 
     #return response
@@ -574,21 +576,21 @@ def dimension_filter_range():
     dimension_name = request.args.get('dimension_name')
     min_value = request.args.get('min_value')
     max_value = request.args.get('max_value')
-
+    pre_reset = json.loads(request.args.get('pre_reset').lower())   #json.loads converts string to equivalent bool: 'true' to True
     # DEBUG: start
     app.logger.debug("dataset:"+dataset_name+" filter_range dimension_name: "+dimension_name+" for "+session_id)
     # DEBUG: end
 
     if engine == 'cudf':
         #start function execution
-        response = user_sessions[key].dimension_filter_range(dimension_name, min_value, max_value)
+        response = user_sessions[key].dimension_filter_range(dimension_name, min_value, max_value, pre_reset)
         if 'out of memory' in response or 'thrust::system::system_error' in response:
             user_sessions.pop(session_id+dataset_name,None)
             app.logger.debug('out of memory error')
         #end function execution
     else:
         #start function execution
-        response = user_sessions_pandas[key].dimension_filter_range(dimension_name, min_value, max_value)
+        response = user_sessions_pandas[key].dimension_filter_range(dimension_name, min_value, max_value, pre_reset)
         #end function execution
 
     #return response

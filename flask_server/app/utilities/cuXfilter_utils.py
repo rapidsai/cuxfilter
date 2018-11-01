@@ -302,10 +302,10 @@ class cuXfilter_utils:
         except Exception as e:
             return 'Exception *** in cudf groupby_load():'+str(e)
 
-    def groupby_filterOrder(self, dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column):
+    def groupby_filter_order(self, dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column):
         '''
             description:
-                get groupby values by a filterOrder(all, top(n), bottom(n)) for a groupby on a dimension
+                get groupby values by a filter_order(all, top(n), bottom(n)) for a groupby on a dimension
             Get parameters:
                 dimension_name (string)
                 groupby_agg (JSON stringified object)
@@ -335,7 +335,7 @@ class cuXfilter_utils:
                         elif 'bottom' == sort_order:
                             temp_df = self.group_by_backups[key].nsmallest(n_rows,[sort_column]).to_pandas().to_dict()
                     except Exception as e:
-                        return 'Exception *** in cudf groupby_filterOrder():'+str(e)
+                        return 'Exception *** in cudf groupby_filter_order():'+str(e)
                 res = str(self.parse_dict(temp_df))
             return res
 
@@ -421,10 +421,10 @@ class cuXfilter_utils:
             return 'Exception *** in cudf dimension_hist():'+str(e)
 
 
-    def dimension_filterOrder(self, dimension_name, sort_order, num_rows, columns):
+    def dimension_filter_order(self, dimension_name, sort_order, num_rows, columns):
         '''
             description:
-                get columns values by a filterOrder(all, top(n), bottom(n)) sorted by dimension_name
+                get columns values by a filter_order(all, top(n), bottom(n)) sorted by dimension_name
             Get parameters:
                 dimension_name (string)
                 sort_order (string): top/bottom/all
@@ -452,14 +452,14 @@ class cuXfilter_utils:
                     elif 'bottom' == sort_order:
                         temp_df = self.data_gpu.loc[:,list(columns)].nsmallest(n_rows,[dimension_name]).to_pandas().to_dict()
                 except Exception as e:
-                    return 'Exception *** in cudf dimension_filterOrder(1):'+str(e)
+                    return 'Exception *** in cudf dimension_filter_order(1):'+str(e)
 
             return str(self.parse_dict(temp_df))
 
         except Exception as e:
-            return 'Exception *** in cudf dimension_filterOrder(2):'+str(e)
+            return 'Exception *** in cudf dimension_filter_order(2):'+str(e)
 
-    def dimension_filter(self, dimension_name, comparison_operation, value):
+    def dimension_filter(self, dimension_name, comparison_operation, value, pre_reset):
         '''
             description:
                 cumulative filter dimension_name by comparison_operation and value
@@ -471,6 +471,10 @@ class cuXfilter_utils:
                 number_of_rows_left
         '''
         try:
+            if pre_reset == True:
+                #implementation of resetThenFilter function
+                self.dimension_reset(dimension_name)
+                
             query = dimension_name+comparison_operation+value
             if dimension_name in self.dimensions_filters:
                 if len(self.dimensions_filters[dimension_name])>0:
@@ -487,7 +491,7 @@ class cuXfilter_utils:
         except Exception as e:
             return 'Exception *** in cudf dimension_filter(2):'+str(e)
 
-    def dimension_filter_range(self, dimension_name, min_value, max_value):
+    def dimension_filter_range(self, dimension_name, min_value, max_value, pre_reset):
         '''
             description:
                 cumulative filter_range dimension_name between range [min_value,max_value]
@@ -499,6 +503,10 @@ class cuXfilter_utils:
                 number_of_rows_left
         '''
         try:
+            if pre_reset == True:
+                #implementation of resetThenFilter function
+                self.dimension_reset(dimension_name)
+
             query = dimension_name+">="+min_value+" and "+dimension_name+"<="+max_value
             if dimension_name in self.dimensions_filters:
                 if len(self.dimensions_filters[dimension_name])>0:

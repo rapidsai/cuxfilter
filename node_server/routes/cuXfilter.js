@@ -66,7 +66,7 @@ module.exports = (io) => {
         });
 
         //remove all filters from the dataset and retain the original dataset state
-        socket.on("resetAllFilters", (dataset,engine,callback) => {
+        socket.on("reset_all_filters", (dataset,engine,callback) => {
             let command = 'reset_all_filters';
             let query = {};
 
@@ -80,7 +80,7 @@ module.exports = (io) => {
         });
 
         //get schema of the dataset
-        socket.on('getSchema', (dataset,engine,callback) => {
+        socket.on('get_schema', (dataset,engine,callback) => {
             try{
                 let command = 'get_schema';
                 let query = {};
@@ -113,13 +113,14 @@ module.exports = (io) => {
         });
 
         //query the dataframe -> return results
-        socket.on('dimension_filter', (dimension_name,dataset,comparison,value,engine,callback) => {
+        socket.on('dimension_filter', (dimension_name,dataset,comparison,value,engine,pre_reset,callback) => {
             try{
                 let command = 'dimension_filter';
                 let query = {
                     'dimension_name': dimension_name,
                     'comparison_operation':comparison,
-                    'value': value
+                    'value': value,
+                    'pre_reset': pre_reset
                 };
 
                 utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset", engine, (error, message) => {
@@ -147,10 +148,7 @@ module.exports = (io) => {
                 };
 
                 utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting groupby for the dimension:"+dimension_name,engine, (error,message) => {
-
                      callback(error,utils.groupbyMessageCustomParse(message));
-
-
                 });
 
             }catch(ex){
@@ -161,10 +159,10 @@ module.exports = (io) => {
         });
 
         //get top/bottom n rows as per the top n values of dimension_name
-        socket.on('groupby_filterOrder', (sort_order, dimension_name,dataset,n,sort_column,agg,engine,callback) => {
+        socket.on('groupby_filter_order', (sort_order, dimension_name,dataset,n,sort_column,agg,engine,callback) => {
             try{
 
-                let command = 'groupby_filterOrder';
+                let command = 'groupby_filter_order';
                 let query = {
                     'dimension_name': dimension_name,
                     'groupby_agg':agg,
@@ -175,12 +173,14 @@ module.exports = (io) => {
 
                 utils.groups[dimension_name+agg] = query;
 
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested filterOrder rows for the groupby operation for dimension:"+dimension_name, engine, (error,message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested filter_order rows for the groupby operation for dimension:"+dimension_name, engine, (error,message) => {
                   if(!error){
                     socket.emit('update_group', dimension_name, agg, engine, message);
                     if(socket.session_id === 111){
                       socket.broadcast.emit('update_group', dimension_name, agg, engine, message);
                     }
+                  }else{
+                    console.log('groupby filter order error',error);
                   }
                 });
 
@@ -192,13 +192,14 @@ module.exports = (io) => {
         });
 
          //query the dataframe as per a range-> return results
-        socket.on('dimension_filter_range', (dimension_name,dataset,range_min,range_max,engine,callback) => {
+        socket.on('dimension_filter_range', (dimension_name, dataset, range_min, range_max, engine, pre_reset, callback) => {
             try{
                 let command = 'dimension_filter_range';
                 let query = {
                     'dimension_name': dimension_name,
                     'min_value':range_min,
-                    'max_value': range_max
+                    'max_value': range_max,
+                    'pre_reset': pre_reset
                 };
 
                 utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset as per a range of rows",engine, (error, message) => {
@@ -217,7 +218,7 @@ module.exports = (io) => {
         });
 
         //reset all filters on a dimension
-        socket.on('dimension_filterAll', (dimension_name,dataset,engine, callback) => {
+        socket.on('dimension_reset_filters', (dimension_name,dataset,engine, callback) => {
             try{
                 let command = 'dimension_reset';
                 let query = {
@@ -259,10 +260,10 @@ module.exports = (io) => {
         });
 
         //get top/bottom n rows as per the top n values of dimension_name
-        socket.on('dimension_filterOrder', (sort_order, dimension_name, dataset, num_rows, columns,engine,callback) => {
+        socket.on('dimension_filter_order', (sort_order, dimension_name, dataset, num_rows, columns,engine,callback) => {
             try{
 
-                let command = 'dimension_filterOrder';
+                let command = 'dimension_filter_order';
                 let query = {
                     'dimension_name': dimension_name,
                     'sort_order': sort_order,
@@ -287,7 +288,7 @@ module.exports = (io) => {
         });
 
         //get histogram specific to a column name in the given dataset, and as per the number of bins specified
-        socket.on('dimension_getHist', (dimension_name,dataset,num_of_bins, engine,callback) => {
+        socket.on('dimension_get_hist', (dimension_name,dataset,num_of_bins, engine,callback) => {
             try{
                 let command = 'dimension_hist';
                 let query = {
@@ -313,7 +314,7 @@ module.exports = (io) => {
         });
 
         //get Max and Min for a dimension
-        socket.on('dimension_getMaxMin', (dimension_name,dataset,engine,callback) => {
+        socket.on('dimension_get_max_min', (dimension_name,dataset,engine,callback) => {
             try{
 
                 let command = 'dimension_get_max_min';
