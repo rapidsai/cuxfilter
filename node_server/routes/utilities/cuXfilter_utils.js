@@ -44,6 +44,9 @@ function resetParams(){
   Object.keys(dimensions).forEach(function (prop) {
     delete dimensions[prop];
   });
+  Object.keys(histograms).forEach(function (prop) {
+    delete histograms[prop];
+  });
   Object.keys(groups).forEach(function (prop) {
     delete groups[prop];
   });
