@@ -23,11 +23,11 @@ export class cuXfilter{
                 credentials: 'include'
             }).then(res => {
                 console.log("cuXfilter initialized");
-                
+
                 this.socket = io(this.url,{
                     path: '/cuXfilter'
                 });
-                
+
                 this.socket.on('connect',() => {
                     console.log("connected to server");
                     // console.log(this.socket.id);
@@ -39,11 +39,11 @@ export class cuXfilter{
                         }
                     });
                 });
-                
+
                 this.socket.on('disconnect',() => {
                     this.connected = false;
                 });
-                
+
                 this.initSocketListeners();
             });
         });
@@ -61,18 +61,18 @@ export class cuXfilter{
                     this.loadData( (res) =>{
                         typeof callback === 'function' && callback(res);
                     });
-                    
-                }            
+
+                }
             });
         }else{
             callback(-1);
             console.log("could not connect, check if server container is running and gdf environment is activated");
         }
-        
+
     }
 
     initSocketListeners(){
-        
+
         this.socket.on('update_size', (dataset,engine, size) => {
             console.log(this);
             if(this.dataset === dataset && this.engine === engine){
@@ -119,7 +119,7 @@ export class cuXfilter{
             this.socket.emit('load_data',this.dataset,this.engine, this.load_type, (error,message) => {
                 // console.log(message);
                 message = JSON.parse(message)
-                
+
                 //init metadata for the current dataset
                 this.initMetaData( (res) => {
                     message['browserTime'] = (Date.now() - startTime)/1000;
@@ -145,7 +145,7 @@ export class cuXfilter{
     getSchema(callback){
         if(this.connected){
             let startTime = Date.now();
-            this.socket.emit('getSchema', this.dataset,this.engine, (error,message) => {
+            this.socket.emit('get_schema', this.dataset,this.engine, (error,message) => {
                 // console.log("schema: "+message);
                 message = JSON.parse(message);
                 message['browserTime'] = (Date.now() - startTime)/1000;
@@ -176,7 +176,7 @@ export class cuXfilter{
     }
 
     resetAllFilters(){
-        this.socket.emit('resetAllFilters',this.dataset,this.engine);
+        this.socket.emit('reset_all_filters',this.dataset,this.engine);
     }
     endSession(){
         return new Promise((resolve,reject) => {

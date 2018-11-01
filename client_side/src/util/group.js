@@ -27,7 +27,7 @@ class Group{
     }
 
     filterOrder(sort_order,n_rows,sort_column=null){
-            this.socket.emit('groupby_filterOrder',sort_order, this.name, this.parent_dataset, n_rows,sort_column,JSON.stringify(this.agg),this.engine);
+            this.socket.emit('groupby_filter_order',sort_order, this.name, this.parent_dataset, n_rows,sort_column,JSON.stringify(this.agg),this.engine);
     }
 
     top(n_rows=10,sort_column= null){
@@ -44,7 +44,7 @@ class Group{
             sort_column = default_key+"_"+this.agg[default_key][0];
         }
         this.filterOrder('bottom',n_rows,sort_column);
-        
+
     }
 
     all(){

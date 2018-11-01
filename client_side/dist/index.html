@@ -38,11 +38,11 @@
         var size = document.getElementById('get_size');
         var end_session = document.getElementById('end_session');
         var dimension_elem = document.getElementById('load_dimension');
-        
+
         let dimension,group;
 
         let myData = new cuXfilter('predictions-v1','http://10.33.227.184:3003','cudf',true,'arrow');
-        
+
         myData.init().then((status) => { //optional callback --> myData.init() also works
             display(status);
             display(myData.size);
@@ -50,16 +50,16 @@
             dimension = myData.dimension('zip');
             return dimension.loadDimension();
         }).then((error,message) => {
-        
+
             console.log(message);
-        
+
             dimension.getHist();
-            const params = { 
-							'delinquency_12_prediction': ['mean'], 
+            const params = {
+							'delinquency_12_prediction': ['mean'],
 							'current_actual_upb': ['sum']
                             };
             group = dimension.group(params)
-            
+
             dimension.top(100);
 
             return group.loadGroup();
@@ -67,8 +67,8 @@
         }).then(() =>{
             group.all();
         });
-        
-        
+
+
         addEventListener('updateHistEvent', (e) => {
             console.log("event update ", e.detail.column);
             console.log(dimension.histogram);
@@ -105,6 +105,6 @@
             elem.appendChild(temp);
         }
 
-        
+
     </script>
 </html>

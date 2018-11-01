@@ -1,6 +1,6 @@
 # cuXfilter client side
 
-Uses numba and cudf on the server side. 
+Uses numba and cudf on the server side.
 
 Latest demo -> https://drive.google.com/file/d/18pL-kiC91NHdbPqjhgm3U9PvnlYoHFAK/view
 
@@ -79,7 +79,7 @@ Const dimA = myData.dimension(myData.schema[0]);
 //load the dimension (you only need to do the following once)
 dimA.loadDimension().then((err,status) => {
 	if(!err){
-			console.log(status); 	// successfully loaded the dimension object on server-side 
+			console.log(status); 	// successfully loaded the dimension object on server-side
 	}
 });
 </pre>
@@ -116,8 +116,8 @@ A.  `updateHistEvent`
 Functions that trigger the `updateHistEvent`:
 1. [dimension.getHist(num_of_bins)](#dimension-hist)
 2. [dimension.filter()](#dimension-filter)
-3. [dimension.filterAll()](#dimension-filterAll)
-4. [cuXfilter.resetAllFilters()](#filterAll)
+3. [dimension.resetFilters()](#dimension-resetFilters)
+4. [cuXfilter.resetAllFilters()](#resetAllFilters)
 
 
 B. `updateDimensionEvent`
@@ -137,8 +137,8 @@ Functions that trigger the `updateDimensionEvent`:
 2. [dimension.bottom(n_rows, columns[])](#dimension-bottom)
 3. [dimension.all(columns[])](#dimension-all)
 4. [dimension.filter()](#dimension-filter)
-5. [dimension.filterAll()](#dimension-filterAll)
-6. [cuXfilter.resetAllFilters()](#filterAll)
+5. [dimension.resetFilters()](#dimension-resetFilters)
+6. [cuXfilter.resetAllFilters()](#resetAllFilters)
 
 ### **Dimension Functions:**
 
@@ -153,7 +153,7 @@ e.g:-&gt; dimA.top(5)
 
 parsedData value -&gt;
 
-{	
+{
 &quot;sourceid&quot;: [234.0, 234.0, 234.0, 1449.0],
 &quot;dstid&quot;: [729.0, 1132.0, 2288.0, 729.0, 1132.0],
 &quot;hod&quot;: [15.0, 15.0, 15.0, 15.0, 15.0],
@@ -191,43 +191,61 @@ e.g:-&gt; dimA.all(['sourceid','hod']);
 </pre>
 
 
-### **4.** <a name="dimension-filter"></a> Filter cuXfilter instance as per a condition:
+### **4.** <a name="dimension-filter"></a> Cumulative Filters: cuXfilter instance as per a condition (preserves previous filter requests):
 <pre>
 dimA.filter(comparison_operator, value);
 </pre>
 
  > 1. Comparison_operator: >, < , ==, !=, %n==, %n!= <br>
  > 2. value: Int/float <br>
- > 3. Optional_callback: returns the remaining number of rows in the dataset after filtering_ <br>
 
 <pre>
-E.g: 
+E.g:
 
 1. mean_travel_time_dimension.filter('>','9999'); // selects mean_travel_time_dimension whose value is greater than 9999
 2. mean_travel_time_dimension.filter([100, 200]); // selects mean_travel_time_dimension whose value is between 100 and 200
 3. mean_travel_time_dimension.filter(120); // selects mean_travel_time_dimension whose value equals 120
 4. mean_travel_time_dimension.filter('%2!=',0); // selects mean_travel_time_dimension whose value is odd
-5. mean_travel_time_dimension.filter(null); // selects all mean_travel_time_dimension -> equivalent to filterAll();
+5. mean_travel_time_dimension.filter(null); // selects all mean_travel_time_dimension -> equivalent to resetFilters();
 
 </pre>
 
-### **5.** Min value of dimension
+### **5.** <a name="dimension-reset-then-filter"></a> Non-Cumulative Filters: cuXfilter instance as per a condition (resets all previous filters on the current dimension, and then applies new filter):
+<pre>
+dimA.resetThenFilter(comparison_operator, value);
+</pre>
+
+ > 1. Comparison_operator: >, < , ==, !=, %n==, %n!= <br>
+ > 2. value: Int/float <br>
+
+<pre>
+E.g:
+
+1. mean_travel_time_dimension.resetThenFilter('>','9999'); // resets previous filters and selects mean_travel_time_dimension whose value is greater than 9999
+2. mean_travel_time_dimension.resetThenFilter([100, 200]); // resets previous filters and selects mean_travel_time_dimension whose value is between 100 and 200
+3. mean_travel_time_dimension.resetThenFilter(120); // resets previous filters and selects mean_travel_time_dimension whose value equals 120
+4. mean_travel_time_dimension.resetThenFilter('%2!=',0); // resets previous filters and selects mean_travel_time_dimension whose value is odd
+5. mean_travel_time_dimension.resetThenFilter(null); // resets previous filters and selects all mean_travel_time_dimension -> equivalent to resetFilters();
+
+</pre>
+
+### **6.** Min value of dimension
 > returns the min value for that specific dimension; Updated on execution of one of the crossfilter functions
 
 <pre>
-dimA.min; 
+dimA.min;
 </pre>
 
 
-### **6.** Max value of dimension
+### **7.** Max value of dimension
  > returns the max value for that specific dimension; Updated on execution of one of the crossfilter functions
 
 <pre>
-dimA.max; 
+dimA.max;
 </pre>
 
 
-### **7.** <a name="dimension-hist"></a>Get Histogram for a dimension
+### **8.** <a name="dimension-hist"></a>Get Histogram for a dimension
 
 <pre>
 dimA.getHist();
@@ -243,15 +261,15 @@ Result :
 </pre>
 
 
-### **8.** <a name="dimension-filterAll"></a> Clear all filters for a dimension
+### **9.** <a name="dimension-resetFilters"></a> Clear all filters for a dimension
 
 <pre>
-dimA.filterAll()
+dimA.resetFilters()
 </pre>
 >num_of_rows_left: returns a number representing number of rows in the dataset after removing dimA filters
 
 
-### **9.** <a name="filterAll"></a> Clear all filters for **ALL** dimensions
+### **10.** <a name="resetAllFilters"></a> Clear all filters for **ALL** dimensions
 
 <pre>
 myData.resetAllFilters();
@@ -263,7 +281,7 @@ myData.resetAllFilters();
 ### Groups
 > Groups are objects on top of the dimension that lets us execute cudf groupby function with customizable aggregations. <b> Applying filters on a dimension do not affect the groups associated with it, and only affect the groups associated with other dimensions.</b> <br>
 
-To use a group, we need to create it on top of a dimension. 
+To use a group, we need to create it on top of a dimension.
 
 <pre>
 const g = dimension.group(aggregate);
@@ -272,7 +290,7 @@ g.loadGroup().then((status)=>{}).catch((err)=>{})
 
 > aggregate(optional): {object of aggregate functions} <br>
 > Available functions: <b> sum, count, min, max, std, mean, sum_of_squares </b> <br>
-	
+
 The default value of aggregate is {'current_dimension': ['mean']}
 <pre>
 e.g:->
@@ -320,8 +338,8 @@ Functions that trigger the `updateGroupEvent`:
 2. [group.bottom(n_rows, sort_by_column)](#group-bottom)
 3. [group.all()](#group-all)
 4. [dimension.filter()](#dimension-filter)
-5. [dimension.filterAll()](#dimension-filterAll)
-6. [cuXfilter.resetAllFilters()](#filterAll)
+5. [dimension.resetFilters()](#dimension-resetFilters)
+6. [cuXfilter.resetAllFilters()](#resetAllFilters)
 
 ### 1. <a name="group-top"></a> Get Top n rows of the group
 > Returns the top n rows of the group sorted by the descending order of value <br>
@@ -339,7 +357,7 @@ e.g:->
 		'hod':['count']
 	}
 	const g = hod_dimension.group(agg_obj);
-	g.loadGroup().then((status)=>{ //make sure group is loaded before calling top. You only need to load the group. 
+	g.loadGroup().then((status)=>{ //make sure group is loaded before calling top. You only need to load the group.
 		g.top(24, 'hod_count');
 	});
 
@@ -347,7 +365,7 @@ e.g:->
 
 `g.value`:
 
-{"hod": [19, 18, 17, 16, 15, 20, 14, 21, 10, 9, 12, 11, 13, 22, 8, 7, 23, 0, 6, 1, 2, 5, 3], 
+{"hod": [19, 18, 17, 16, 15, 20, 14, 21, 10, 9, 12, 11, 13, 22, 8, 7, 23, 0, 6, 1, 2, 5, 3],
 "count_hod": [487377.0, 487348.0, 485483.0, 483019.0, 479681.0, 478943.0, 476477.0, 476329.0, 475103.0, 470711.0, 469911.0, 469267.0, 468466.0, 461968.0, 454894.0, 433271.0, 424425.0, 381642.0, 372519.0, 349338.0, 304540.0, 302475.0, 274982.0]}
 
 2.
@@ -361,8 +379,8 @@ e.g:->
 
 `g.value`:
 
-{"hod": [19, 18, 17, 16, 15, 20, 14, 21, 10, 9, 12, 11, 13, 22, 8, 7, 23, 0, 6, 1, 2, 5, 3], 
-"mean_travel_time_sum": [735853094.06, 828787561.3599999, 927465638.5, 914655524.0500001, 856192499.8499999, 675426962.64, 792288618.48, 655275672.3100001, 709391672.56, 731228575.8699999, 704177415.62, 694722513.09, 718975013.7, 612128111.6800001, 760211029.6199999, 724063042.5000001, 530266475.59999996, 451331445.65, 527771759.35, 404303020.34999996, 328403132.74, 357328868.86, 293221760.27], 
+{"hod": [19, 18, 17, 16, 15, 20, 14, 21, 10, 9, 12, 11, 13, 22, 8, 7, 23, 0, 6, 1, 2, 5, 3],
+"mean_travel_time_sum": [735853094.06, 828787561.3599999, 927465638.5, 914655524.0500001, 856192499.8499999, 675426962.64, 792288618.48, 655275672.3100001, 709391672.56, 731228575.8699999, 704177415.62, 694722513.09, 718975013.7, 612128111.6800001, 760211029.6199999, 724063042.5000001, 530266475.59999996, 451331445.65, 527771759.35, 404303020.34999996, 328403132.74, 357328868.86, 293221760.27],
 "count_mean_travel_time": [487377.0, 487348.0, 485483.0, 483019.0, 479681.0, 478943.0, 476477.0, 476329.0, 475103.0, 470711.0, 469911.0, 469267.0, 468466.0, 461968.0, 454894.0, 433271.0, 424425.0, 381642.0, 372519.0, 349338.0, 304540.0, 302475.0, 274982.0],
 "std_mean_travel_time": [771.078363087773, 857.5915846598338, 1012.8468928821409, 1066.7255469466172, 998.2851407808366, 721.9829221151624, 910.5177036214152, 701.3402122945868, 785.1126356461986, 815.1537911630599, 782.0238233898274, 780.1713432950849, 819.9130816683466, 666.1650694739816, 888.0069238408861, 954.6924313225265, 647.2090044045242, 636.6144405380031, 842.6703223999089, 640.6810597885919, 601.9580064100818, 697.783428367376, 602.9960825330071]}
 
@@ -385,7 +403,7 @@ let agg_obj = {
 }
 const g = hod_dimension.group(agg_obj);
 g.loadGroup().then((status)=>{
-	//make sure group is loaded before calling top. You only need to load the group. 
+	//make sure group is loaded before calling top. You only need to load the group.
 		g.top(24, 'hod_count');
 	});
 
@@ -401,13 +419,13 @@ g.loadGroup().then((status)=>{
 
 <pre>
 const g = hod_dimension.group('count');
-g.loadGroup().then((status)=>{ //make sure group is loaded before calling top. You only need to load the group. 
+g.loadGroup().then((status)=>{ //make sure group is loaded before calling top. You only need to load the group.
 	g.all();
 })
 
 `g.value`:
 
-{"hod": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], 
+{"hod": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
 "count_hod": [381642.0, 349338.0, 304540.0, 274982.0, 273401.0, 302475.0, 372519.0, 433271.0, 454894.0, 470711.0, 475103.0, 469267.0, 469911.0, 468466.0, 476477.0, 479681.0, 483019.0, 485483.0, 487348.0, 487377.0, 478943.0, 476329.0, 461968.0, 424425.0]}
 </pre>
 

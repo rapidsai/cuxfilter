@@ -35,17 +35,17 @@ class Dimension{
                     message = JSON.parse(message)
                     message["browserTime"] = (Date.now() - startTime)/1000;
                     this.updateMaxMin();
-                    resolve(message); 
+                    resolve(message);
                 }else{
                     reject(error);
                 }
-                
+
             });
         });
     }
 
     updateMaxMin(){
-        this.socket.emit('dimension_getMaxMin', this.name, this.parent_dataset,this.engine,(error,message) => {
+        this.socket.emit('dimension_get_max_min', this.name, this.parent_dataset,this.engine,(error,message) => {
             message = JSON.parse(message);
             this.max = parseFloat(message['data'].split(",")[0].split("(")[1]);
             this.min = parseFloat(message['data'].split(",")[1].split(")")[0]);
@@ -53,23 +53,28 @@ class Dimension{
     }
 
     getHist(n_bins=640){
-        this.socket.emit('dimension_getHist', this.name, this.parent_dataset,n_bins,this.engine);
+        this.socket.emit('dimension_get_hist', this.name, this.parent_dataset,n_bins,this.engine);
     }
 
     filterOrder(sort_order,n_rows,columns){
-        this.socket.emit('dimension_filterOrder',sort_order, this.name, this.parent_dataset, n_rows,columns,this.engine);
+        this.socket.emit('dimension_filter_order',sort_order, this.name, this.parent_dataset, n_rows,columns,this.engine);
     }
 
-    filter(comparison=null,value=null){
+    resetThenFilter(comparison=null,value=null){
+        this.filters.length = 0; //clear locally stored filters
+        this.filter(comparison,value, true);
+    }
+
+    filter(comparison=null,value=null, pre_reset=false){
             let already_executed = false;
             if(comparison == null && value == null){
                 already_executed = true;
-                this.filterAll();
+                this.resetFilters();
             }else if(comparison !== null && value == null){
                 if(Array.isArray(comparison)){
                     already_executed = true;
                     range = comparison;
-                    this.filterRange(range);
+                    this.filterRange(range,pre_reset);
                 }else{
                     value = comparison;
                     comparison = "==";
@@ -77,24 +82,24 @@ class Dimension{
             }
             if(already_executed == false){
                 this.filters.push(comparison+""+value);
-                this.socket.emit('dimension_filter',this.name,this.parent_dataset, comparison,value,this.engine);
+                this.socket.emit('dimension_filter',this.name,this.parent_dataset, comparison,value,this.engine, pre_reset);
             }
     }
 
-    filterRange(range){
+    filterRange(range,pre_reset=false){
         const range_min = range[0];
-        const range_max = range[1]; 
+        const range_max = range[1];
         this.filters.push('>'+range_min);
         this.filters.push('<'+range_max);
         let startTime = Date.now();
-        this.socket.emit('dimension_filter_range',this.name,this.parent_dataset, range_min,range_max,this.engine);
+        this.socket.emit('dimension_filter_range',this.name,this.parent_dataset, range_min,range_msax,this.engine, pre_reset);
 
     }
 
     //reset the dimension
-    filterAll(){
-            let startTime = Date.now();
-            this.socket.emit('dimension_filterAll', this.name, this.parent_dataset,this.engine);
+    resetFilters(){
+            this.filters.length = 0; //clear locally stored filters
+            this.socket.emit('dimension_reset_filters', this.name, this.parent_dataset,this.engine);
     }
 
     top(n_rows=10, columns = []){
