@@ -276,8 +276,9 @@ class cuXfilter_utils:
         '''
         try:
             self.data_gpu = self.back_up_dimension
-            self.dimensions_filters.clear()
-            self.dimensions_filters_response_format.clear()
+            for key in self.dimensions_filters.keys():
+                self.dimensions_filters[key] = ''
+                self.dimensions_filters_response_format[key]=[]
             return str(len(self.data_gpu))
 
         except Exception as e:
@@ -474,7 +475,7 @@ class cuXfilter_utils:
             if pre_reset == True:
                 #implementation of resetThenFilter function
                 self.dimension_reset(dimension_name)
-                
+
             query = dimension_name+comparison_operation+value
             if dimension_name in self.dimensions_filters:
                 if len(self.dimensions_filters[dimension_name])>0:

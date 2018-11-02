@@ -72,37 +72,6 @@ def init_connection():
     return append_time_to_response(response,start_time, key, engine)
 
 
-@app.route('/get_active_filters', methods=['GET'])
-def get_active_filters():
-    '''
-        description:
-            return a list of active filters
-        Get parameters:
-            1. session_id (string)
-            2. dataset (string)
-            3. engine (cudf/pandas)
-        Response:
-            list of filters
-    '''
-    #get basic get parameters
-    start_time,session_id,dataset_name,key, engine = parse_basic_get_parameters(request.args)
-
-    # DEBUG: start
-    app.logger.debug("get active filters for "+dataset_name+" and sessId: "+session_id)
-    # DEBUG: end
-
-    if engine == 'cudf':
-        #start function execution
-        response = str(user_sessions[key].dimensions_filters)
-        #end function execution
-    else:
-        #start function execution
-        response = str(user_sessions[key].dimensions_filters)
-        #end function execution
-
-    #return response
-    return response
-
 @app.route('/read_data', methods=['GET'])
 def read_data():
     '''
