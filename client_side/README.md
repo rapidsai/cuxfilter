@@ -8,25 +8,25 @@ Latest demo -> https://drive.google.com/file/d/18pL-kiC91NHdbPqjhgm3U9PvnlYoHFAK
 - [Installation](#installation)
 - [Import](#import)
 - [Functions: server-side crossfilter](#functions-server-side-crossfilter)
-	- [**1.** Load data](#1-load-data)
-	- [**2.** Get Data size](#2-get-data-size)
-	- [**3.** Get Data schema](#3-get-data-schema)
-	- [**4.** End session](#4-end-session)
+	- [1. Load data](#1-load-data)
+	- [2. Get Data size](#2-get-data-size)
+	- [3. Get Data schema](#3-get-data-schema)
+	- [4. End session](#4-end-session)
 - [Dimensions:](#dimensions)
-	- [**1.** Get top n rows sorted as per dimension](#1-get-top-n-rows-sorted-as-per-dimension)
-	- [**2.**  Get bottom n rows sorted as per dimension](#2--get-bottom-n-rows-sorted-as-per-dimension)
-	- [**3.** Get all rows sorted as per dimension](#3-get-all-rows-sorted-as-per-dimension)
-	- [**4.** Cumulative Filters: cuXfilter instance as per a condition (preserves previous filter requests)](#4-cumulative-filters-cuxfilter-instance-as-per-a-condition-preserves-previous-filter-requests)
-	- [**5.** Non-Cumulative Filters: cuXfilter instance as per a condition (resets all previous filters on the current dimension, and then applies new filter)](#5-non-cumulative-filters-cuxfilter-instance-as-per-a-condition-resets-all-previous-filters-on-the-current-dimension-and-then-applies-new-filter)
-	- [**6.** Min value of dimension](#6-min-value-of-dimension)
-	- [**7.** Max value of dimension](#7-max-value-of-dimension)
-	- [**8.** Get Histogram for a dimension](#8-get-histogram-for-a-dimension)
-	- [**9.** Clear all filters for a dimension](#9-clear-all-filters-for-a-dimension)
-	- [**10.** Clear all filters for **ALL** dimensions](#10-clear-all-filters-for-all-dimensions)
+	- [1. Get top n rows sorted as per dimension](#1-get-top-n-rows-sorted-as-per-dimension)
+	- [2.  Get bottom n rows sorted as per dimension](#2--get-bottom-n-rows-sorted-as-per-dimension)
+	- [3. Get all rows sorted as per dimension](#3-get-all-rows-sorted-as-per-dimension)
+	- [4. Cumulative Filters: cuXfilter instance as per a condition (preserves previous filter requests)](#4-cumulative-filters-cuxfilter-instance-as-per-a-condition-preserves-previous-filter-requests)
+	- [5. Non-Cumulative Filters: cuXfilter instance as per a condition (resets all previous filters on the current dimension, and then applies new filter)](#5-non-cumulative-filters-cuxfilter-instance-as-per-a-condition-resets-all-previous-filters-on-the-current-dimension-and-then-applies-new-filter)
+	- [6. Min value of dimension](#6-min-value-of-dimension)
+	- [7. Max value of dimension](#7-max-value-of-dimension)
+	- [8. Get Histogram for a dimension](#8-get-histogram-for-a-dimension)
+	- [9. Clear all filters for a dimension](#9-clear-all-filters-for-a-dimension)
+	- [10. Clear all filters for ALL dimensions](#10-clear-all-filters-for-all-dimensions)
 - [Groups](#groups)
-	- [**1.** Get Top n rows of the group](#1-get-top-n-rows-of-the-group)
-	- [**2.** Get bottom n rows of the group](#2-get-bottom-n-rows-of-the-group)
-	- [**3.** group.all()](#3-groupall)
+	- [1. Get Top n rows of the group](#1-get-top-n-rows-of-the-group)
+	- [2. Get bottom n rows of the group](#2-get-bottom-n-rows-of-the-group)
+	- [3. group.all()](#3-groupall)
 - [Multi-tab sessionless crossfiltering](#multi-tab-sessionless-crossfiltering)
 
 
@@ -53,7 +53,7 @@ use ./dist/index.js
 
 ## Functions: server-side crossfilter
 
-### **1.** Load data
+### 1. Load data
 <pre>
 Const myData = new cuXfilter(&#39;dataset-name-without-extension&#39;, 'http://url-of-server', engine, useSessions, load_type);  
 </pre>
@@ -70,14 +70,14 @@ myData.init().then((status) => {
 });
 </pre>
 
-### **2.** Get Data size
+### 2. Get Data size
 <pre>
 myData.init().then((status) => {
         myData.size; //returns an integer
 });
 </pre>
 
-### **3.** Get Data schema
+### 3. Get Data schema
 <pre>
 myData.init().then((status) => {
 	myData.schema; //returns an array of column names of the dataset
@@ -86,7 +86,7 @@ myData.init().then((status) => {
 E.g: [&#39;sourceid&#39;, &#39;dstid&#39;, &#39;hod&#39;, &#39;mean_travel_time&#39;, &#39;standard_deviation_travel_time&#39;, &#39;geometric_mean_travel_time&#39;, &#39;geometric_standard_deviation_travel_time&#39;]
 </pre>
 
-### **4.** End session
+### 4. End session
 
 <pre>
 myData.endSession().then((status)=>{}).catch((err)=>{});
@@ -167,7 +167,7 @@ Functions that trigger the `updateDimensionEvent`:
 7. [cuXfilter.resetAllFilters()](#10-clear-all-filters-for-all-dimensions)
 
 
-### **1.** Get top n rows sorted as per dimension
+### 1. Get top n rows sorted as per dimension
 <pre>
 dimA.top(n_rows,list_of_columns);
 </pre>
@@ -190,7 +190,7 @@ parsedData value -&gt;
 </pre>
 
 
-### **2.**  Get bottom n rows sorted as per dimension
+### 2.  Get bottom n rows sorted as per dimension
 
 <pre>
 dimA.bottom(n_rows, list_of_columns);
@@ -202,7 +202,7 @@ dimA.bottom(n_rows, list_of_columns);
 e.g:-&gt; dimA.bottom(5,['sourceid','hod']);
 </pre>
 
-### **3.** Get all rows sorted as per dimension
+### 3. Get all rows sorted as per dimension
 
 <i> not recommended, as it would download the entire dataset to the browser, resulting in a crash</i>
 
@@ -216,7 +216,7 @@ e.g:-&gt; dimA.all(['sourceid','hod']);
 </pre>
 
 
-### **4.** Cumulative Filters: cuXfilter instance as per a condition (preserves previous filter requests)
+### 4. Cumulative Filters: cuXfilter instance as per a condition (preserves previous filter requests)
 <pre>
 dimA.filter(comparison_operator, value);
 </pre>
@@ -235,7 +235,7 @@ E.g:
 
 </pre>
 
-### **5.** Non-Cumulative Filters: cuXfilter instance as per a condition (resets all previous filters on the current dimension, and then applies new filter)
+### 5. Non-Cumulative Filters: cuXfilter instance as per a condition (resets all previous filters on the current dimension, and then applies new filter)
 <pre>
 dimA.resetThenFilter(comparison_operator, value);
 </pre>
@@ -254,7 +254,7 @@ E.g:
 
 </pre>
 
-### **6.** Min value of dimension
+### 6. Min value of dimension
 > returns the min value for that specific dimension; Updated on execution of one of the crossfilter functions
 
 <pre>
@@ -262,7 +262,7 @@ dimA.min;
 </pre>
 
 
-### **7.** Max value of dimension
+### 7. Max value of dimension
  > returns the max value for that specific dimension; Updated on execution of one of the crossfilter functions
 
 <pre>
@@ -270,7 +270,7 @@ dimA.max;
 </pre>
 
 
-### **8.** Get Histogram for a dimension
+### 8. Get Histogram for a dimension
 
 <pre>
 dimA.getHist();
@@ -286,7 +286,7 @@ Result :
 </pre>
 
 
-### **9.** Clear all filters for a dimension
+### 9. Clear all filters for a dimension
 
 <pre>
 dimA.resetFilters()
@@ -294,7 +294,7 @@ dimA.resetFilters()
 >num_of_rows_left: returns a number representing number of rows in the dataset after removing dimA filters
 
 
-### **10.** Clear all filters for **ALL** dimensions
+### 10. Clear all filters for ALL dimensions
 
 <pre>
 myData.resetAllFilters();
@@ -366,7 +366,7 @@ Functions that trigger the `updateGroupEvent`:
 5. [dimension.resetFilters()](#5-non-cumulative-filters-cuxfilter-instance-as-per-a-condition-resets-all-previous-filters-on-the-current-dimension-and-then-applies-new-filter)
 6. [cuXfilter.resetAllFilters()](#10-clear-all-filters-for-all-dimensions)
 
-### **1.** Get Top n rows of the group
+### 1. Get Top n rows of the group
 > Returns the top n rows of the group sorted by the descending order of value <br>
 <pre>
 g.top(num_of_rows=10,sort_by_column)
@@ -411,7 +411,7 @@ e.g:->
 
 </pre>
 
-### **2.** Get bottom n rows of the group
+### 2. Get bottom n rows of the group
 > Similar to group.top(). Returns the top n rows of the group sorted by the ascending order of value <br>
 
 <pre>
@@ -439,7 +439,7 @@ g.loadGroup().then((status)=>{
 "count_hod": [273401.0, 274982.0, 302475.0, 304540.0, 349338.0, 372519.0, 381642.0, 424425.0, 433271.0, 454894.0, 461968.0, 468466.0, 469267.0, 469911.0, 470711.0, 475103.0, 476329.0, 476477.0, 478943.0, 479681.0, 483019.0, 485483.0, 487348.0]}
 </pre>
 
-### **3.** group.all()
+### 3. group.all()
 > Returns entire group in ascending natural order by key. <br>
 
 <pre>
