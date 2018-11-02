@@ -12,7 +12,7 @@ Latest demo -> https://drive.google.com/file/d/18pL-kiC91NHdbPqjhgm3U9PvnlYoHFAK
 	- [2. Get Data size](#2-get-data-size)
 	- [3. Get Data schema](#3-get-data-schema)
 	- [4. End session](#4-end-session)
-- [Dimensions:](#dimensions)
+- [Dimensions](#dimensions)
 	- [1. Get top n rows sorted as per dimension](#1-get-top-n-rows-sorted-as-per-dimension)
 	- [2.  Get bottom n rows sorted as per dimension](#2--get-bottom-n-rows-sorted-as-per-dimension)
 	- [3. Get all rows sorted as per dimension](#3-get-all-rows-sorted-as-per-dimension)
@@ -26,7 +26,7 @@ Latest demo -> https://drive.google.com/file/d/18pL-kiC91NHdbPqjhgm3U9PvnlYoHFAK
 - [Groups](#groups)
 	- [1. Get Top n rows of the group](#1-get-top-n-rows-of-the-group)
 	- [2. Get bottom n rows of the group](#2-get-bottom-n-rows-of-the-group)
-	- [3. group.all()](#3-groupall)
+	- [3. Get all n rows of the group](#3-Get-all-n-rows-of-the-group)
 - [Multi-tab sessionless crossfiltering](#multi-tab-sessionless-crossfiltering)
 
 
@@ -361,7 +361,7 @@ A.  `updateGroupEvent`
 Functions that trigger the `updateGroupEvent`:
 1. [group.top(n_rows, sort_by_column)](#1-get-top-n-rows-of-the-group)
 2. [group.bottom(n_rows, sort_by_column)](#2-get-bottom-n-rows-of-the-group)
-3. [group.all()](#3-groupall)
+3. [group.all()](#3-Get-all-n-rows-of-the-group)
 4. [dimension.filter()](#4-cumulative-filters-cuxfilter-instance-as-per-a-condition-preserves-previous-filter-requests)
 5. [dimension.resetFilters()](#5-non-cumulative-filters-cuxfilter-instance-as-per-a-condition-resets-all-previous-filters-on-the-current-dimension-and-then-applies-new-filter)
 6. [cuXfilter.resetAllFilters()](#10-clear-all-filters-for-all-dimensions)
@@ -439,7 +439,7 @@ g.loadGroup().then((status)=>{
 "count_hod": [273401.0, 274982.0, 302475.0, 304540.0, 349338.0, 372519.0, 381642.0, 424425.0, 433271.0, 454894.0, 461968.0, 468466.0, 469267.0, 469911.0, 470711.0, 475103.0, 476329.0, 476477.0, 478943.0, 479681.0, 483019.0, 485483.0, 487348.0]}
 </pre>
 
-### 3. group.all()
+### 3. Get all n rows of the group
 > Returns entire group in ascending natural order by key. <br>
 
 <pre>
