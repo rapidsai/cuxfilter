@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>cuXfilter: Demo 1</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script type="text/javascript" src="../client_side/dist/index.js"></script>
+    <link href="./styles/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="./styles/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <style>
+        .bar1-set,.bar2-set{
+          width:50%;
+          float: left;
+        }
+        #bar2_slider,#bar1_slider {
+          width: 150px;
+        }
+    </style>
+  </head>
+  <body>
+      <nav class="lighten-1" style= 'background-color: rgb(116, 0, 255);' role="navigation">
+          <div class="nav-wrapper container"><a id="logo-container" href="../" class="brand-logo">cuXfilter</a>
+            <ul class="right hide-on-med-and-down">
+              <li><a href="https://rapids.ai/">RAPIDS</a></li>
+            </ul>
+      
+            <ul id="nav-mobile" class="sidenav">
+              <li><a href="https://rapids.ai/">RAPIDS</a></li>
+            </ul>
+            <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+          </div>
+        </nav>
+        <h1 class="header center" style= 'color: rgb(116, 0, 255);' >Demo 1  - 146M row Mortgage dataset</h1>
+
+      <h6 class='center'>(double click to reset selection for bar charts )</h6>
+    <br><br>
+      
+        <span class='bar1-set'>
+        <label for="bar1_slider">number of bins</label>
+        <input type="range" id="bar1_slider" name="bar1_slider" onclick="updateBins('bar1')"
+           min="1" max="100" value="50" step="2" />
+        
+        <div id="bar1"><!-- Plotly chart will be drawn inside this DIV --></div>
+      </span>
+
+        <span class='bar2-set'>
+        <label for="bar2_slider">number of bins</label>
+        <input type="range" id="bar2_slider" name="bar2_slider"  onclick="updateBins('bar2')"
+           min="1" max="100" value="50" step="1" />
+        
+        <div id="bar2"><!-- Plotly chart will be drawn inside this DIV --></div>
+      </span>
+    <script>
+      
+//intialize a cuXfilter object for a dataset called predictions-v1 (arrow format), with cudf engine and useSessions=true at the url
+var cuObj = new cuXfilter('predictions-v1','http://10.33.227.184:3003','cudf',true,'arrow');
+var bar1 = document.getElementById('bar1');
+var bar2 = document.getElementById('bar2');
+
+cuObj.init().then((status) => { 
+    //load dimension 1
+    dimension1 = cuObj.dimension(cuObj.schema[1]);
+
+    //load dimension 2
+    dimension2 = cuObj.dimension(cuObj.schema[5]);
+
+    //wait for the dimension loading to finish before requesting for histogram by resolving the promises given below
+    return Promise.all([dimension1.loadDimension(),dimension2.loadDimension()]);
+}).then((error,message) => {
+    //get histograms for dimension1 and dimension2
+    dimension1.getHist(100);
+    dimension2.getHist(100);
+    init();
+});
+
+function init(){
+
+    Plotly.newPlot(bar1, [{x: [], y: [], type: 'bar'}], {title: cuObj.schema[1]+' histogram', dragmode:'select',selectdirection:'h'}, {modeBarButtons: [[]]});
+    
+    Plotly.newPlot(bar2, [{x: [], y: [], type: 'bar'}], {title: cuObj.schema[5]+' histogram', dragmode:'select',selectdirection:'h'}, {modeBarButtons: [[]]});
+
+    //plotly event when a range is selected for crossfilter
+    bar1.on('plotly_selected', (eventData) => {
+        if(eventData){ dimension1.resetThenFilter(eventData.range.x); }
+    });
+
+    //plotly event when a range is deselected by double clicking on the screen
+    bar1.on('plotly_deselect', () => {
+        dimension1.resetFilters();
+    });
+
+    //plotly event when a range is selected for crossfilter
+    bar2.on('plotly_selected', (eventData) => {
+        if(eventData){ dimension2.resetThenFilter(eventData.range.x); }
+    });
+
+    //plotly event when a range is deselected by double clicking on the screen
+    bar2.on('plotly_deselect', () => {
+        dimension2.resetFilters();
+    });
+}
+
+//intialize eventlistener for the updateHistEvent, which listens for changes to histogram values for all bar charts in the current session
+addEventListener('updateHistEvent', (e) => {        
+    if(e.detail.column == cuObj.schema[1]){
+        updateBar1()
+    }else{
+        updateBar2();
+    }
+});
+
+//update bar chart 1 when updated values are received
+function updateBar1(){
+    Plotly.restyle(bar1,'x', [dimension1.histogram.X]);
+    Plotly.restyle(bar1,'y', [dimension1.histogram.Y]);
+};
+
+//update bar chart 2 when updated values are received
+function updateBar2(){
+    Plotly.restyle(bar2,'x', [dimension2.histogram.X]);
+    Plotly.restyle(bar2,'y', [dimension2.histogram.Y]);
+};
+
+//custom function which fires when the range slider value is updated firing a getHist method for the specific dimension, with update bin size
+function updateBins(chart) {
+    if(chart == 'bar1'){
+        var x = document.getElementById("bar1_slider").value;
+        dimension1.getHist(x);
+    }
+    else{
+        var x = document.getElementById("bar2_slider").value;
+        dimension2.getHist(x);
+    }
+}
+    
+    </script>
+
+
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="./scripts/materialize.js"></script>
+  <script src="./scripts/init.js"></script>
+  </body>
+</html>
