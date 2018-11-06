@@ -1,39 +1,38 @@
 # cuXfilter (client-side)
 
-Uses numba and cudf on the server side.
+> A javascript(es6) client library that provides crossfilter functionality to create interactive vizualizations on big data(100M+ rows) right from the browser, using the power of cudf & numba on the backend.
 
-Latest demo -> https://drive.google.com/file/d/18pL-kiC91NHdbPqjhgm3U9PvnlYoHFAK/view
 
 ### Table of Contents
 - [Installation](#installation)
 - [Import](#import)
 - [Functions: server-side crossfilter](#functions-server-side-crossfilter)
-	- [1. Load data](#1-load-data)
-	- [2. Get Data size](#2-get-data-size)
-	- [3. Get Data schema](#3-get-data-schema)
-	- [4. End session](#4-end-session)
+	1. [Load data](#1-load-data)
+	2. [Get Data size](#2-get-data-size)
+	3. [Get Data schema](#3-get-data-schema)
+	4. [End session](#4-end-session)
 - [Dimensions](#dimensions)
-	- [1. Get top n rows sorted as per dimension](#1-get-top-n-rows-sorted-as-per-dimension)
-	- [2.  Get bottom n rows sorted as per dimension](#2--get-bottom-n-rows-sorted-as-per-dimension)
-	- [3. Get all rows sorted as per dimension](#3-get-all-rows-sorted-as-per-dimension)
-	- [4. Cumulative Filters: cuXfilter instance as per a condition (preserves previous filter requests)](#4-cumulative-filters-cuxfilter-instance-as-per-a-condition-preserves-previous-filter-requests)
-	- [5. Non-Cumulative Filters: cuXfilter instance as per a condition (resets all previous filters on the current dimension, and then applies new filter)](#5-non-cumulative-filters-cuxfilter-instance-as-per-a-condition-resets-all-previous-filters-on-the-current-dimension-and-then-applies-new-filter)
-	- [6. Min value of dimension](#6-min-value-of-dimension)
-	- [7. Max value of dimension](#7-max-value-of-dimension)
-	- [8. Get Histogram for a dimension](#8-get-histogram-for-a-dimension)
-	- [9. Clear all filters for a dimension](#9-clear-all-filters-for-a-dimension)
-	- [10. Clear all filters for ALL dimensions](#10-clear-all-filters-for-all-dimensions)
+	1. [Get top n rows sorted as per dimension](#1-get-top-n-rows-sorted-as-per-dimension)
+	2. [Get bottom n rows sorted as per dimension](#2--get-bottom-n-rows-sorted-as-per-dimension)
+	3. [Get all rows sorted as per dimension](#3-get-all-rows-sorted-as-per-dimension)
+	4. [Cumulative Filters: cuXfilter instance as per a condition (preserves previous filter requests)](#4-cumulative-filters-cuxfilter-instance-as-per-a-condition-preserves-previous-filter-requests)
+	5. [Non-Cumulative Filters: cuXfilter instance as per a condition (resets all previous filters on the current dimension, and then applies new filter)](#5-non-cumulative-filters-cuxfilter-instance-as-per-a-condition-resets-all-previous-filters-on-the-current-dimension-and-then-applies-new-filter)
+	6. [Min value of dimension](#6-min-value-of-dimension)
+	7. [Max value of dimension](#7-max-value-of-dimension)
+	8. [Get Histogram for a dimension](#8-get-histogram-for-a-dimension)
+	9. [Clear all filters for a dimension](#9-clear-all-filters-for-a-dimension)
+	10. [Clear all filters for ALL dimensions](#10-clear-all-filters-for-all-dimensions)
 - [Groups](#groups)
-	- [1. Get Top n rows of the group](#1-get-top-n-rows-of-the-group)
-	- [2. Get bottom n rows of the group](#2-get-bottom-n-rows-of-the-group)
-	- [3. Get all n rows of the group](#3-Get-all-n-rows-of-the-group)
+	1. [Get Top n rows of the group](#1-get-top-n-rows-of-the-group)
+	2. [Get bottom n rows of the group](#2-get-bottom-n-rows-of-the-group)
+	3. [Get all n rows of the group](#3-get-all-n-rows-of-the-group)
 - [Multi-tab sessionless crossfiltering](#multi-tab-sessionless-crossfiltering)
 
 
 ## Installation
 
 <pre>
-git clone https://gitlab-master.nvidia.com/athorve/cuXfilter.git
+git clone cuXfilter-repo
 cd client_side
 (make sure webpack is installed)
 npm run build
@@ -232,7 +231,7 @@ E.g:
 3. mean_travel_time_dimension.filter(120); // selects mean_travel_time_dimension whose value equals 120
 4. mean_travel_time_dimension.filter('%2!=',0); // selects mean_travel_time_dimension whose value is odd
 5. mean_travel_time_dimension.filter(null); // selects all mean_travel_time_dimension -> equivalent to resetFilters();
-
+6. mean_travel_time_dimension.filter('==',[9999,200,6745]); //selects all mean_travel_time_dimension where value matches <b>ANY ONE</b> of the values in the given array
 </pre>
 
 ### 5. Non-Cumulative Filters: cuXfilter instance as per a condition (resets all previous filters on the current dimension, and then applies new filter)
@@ -251,7 +250,7 @@ E.g:
 3. mean_travel_time_dimension.resetThenFilter(120); // resets previous filters and selects mean_travel_time_dimension whose value equals 120
 4. mean_travel_time_dimension.resetThenFilter('%2!=',0); // resets previous filters and selects mean_travel_time_dimension whose value is odd
 5. mean_travel_time_dimension.resetThenFilter(null); // resets previous filters and selects all mean_travel_time_dimension -> equivalent to resetFilters();
-
+6. mean_travel_time_dimension.resetThenFilter('==',[9999,200,6745]); //resets previous filters and selects all mean_travel_time_dimension where value matches <b>ANY ONE</b> of the values in the given array
 </pre>
 
 ### 6. Min value of dimension
@@ -361,7 +360,7 @@ A.  `updateGroupEvent`
 Functions that trigger the `updateGroupEvent`:
 1. [group.top(n_rows, sort_by_column)](#1-get-top-n-rows-of-the-group)
 2. [group.bottom(n_rows, sort_by_column)](#2-get-bottom-n-rows-of-the-group)
-3. [group.all()](#3-Get-all-n-rows-of-the-group)
+3. [group.all()](#3-get-all-n-rows-of-the-group)
 4. [dimension.filter()](#4-cumulative-filters-cuxfilter-instance-as-per-a-condition-preserves-previous-filter-requests)
 5. [dimension.resetFilters()](#5-non-cumulative-filters-cuxfilter-instance-as-per-a-condition-resets-all-previous-filters-on-the-current-dimension-and-then-applies-new-filter)
 6. [cuXfilter.resetAllFilters()](#10-clear-all-filters-for-all-dimensions)

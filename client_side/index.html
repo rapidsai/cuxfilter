@@ -48,7 +48,8 @@
             display(myData.size);
             console.log(myData.schema);
             dimension = myData.dimension('zip');
-            return dimension.loadDimension();
+            dimension1 = myData.dimension(myData.schema[2]);
+            return Promise.all([dimension.loadDimension(),dimension1.loadDimension()]);
         }).then((error,message) => {
         
             console.log(message);
@@ -88,7 +89,7 @@
         });
 
         filter_data.onclick = function(){
-            dimension.filter(739.0);
+            dimension1.filter('>',3000);
         }
         size.onclick = function(){
             console.log("the size of the dataset is "+myData.size);
