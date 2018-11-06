@@ -2,5 +2,6 @@
     "flask_server_url": "http://localhost",
     "flask_server_port_cudf": 3002,
     "flask_server_port_pandas": 3003,
+    "demos_serve_url": 3004,
     "whitelisted_urls_for_clients": ["http://localhost:3000"]
 }

@@ -7,6 +7,7 @@ export LANG=C.UTF-8
 
 cudf_port=`cat config.json | jq --raw-output '.flask_server_port_cudf'`
 pandas_port=`cat config.json | jq --raw-output '.flask_server_port_pandas'`
+demos_serve_url=`cat config.json | jq --raw-output '.demos_serve_url'`
 
 #cudf engine
 pm2 start "flask run --port=$cudf_port" --watch
@@ -16,6 +17,9 @@ pm2 start "flask run --port=$pandas_port" --watch
 
 cd ./node_server
 pm2 start npm -- start --watch
+
+cd ../
+pm2 serve --port=$demos_serve_url
 
 pm2 logs
 #uncomment below two lines to run a jupyter notebook intance
