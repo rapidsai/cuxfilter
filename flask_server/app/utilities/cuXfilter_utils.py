@@ -12,13 +12,20 @@ import sys
 import gc
 import pickle
 from numba import cuda
+from app import app
 
 def default(o):
-    if isinstance(o, np.int32): return int(o)
-    if isinstance(o, np.int64): return int(o)
-    if isinstance(o, np.float32): return float(o)
-    if isinstance(o, np.float64): return float(o)
-    raise TypeError
+    if isinstance(o, np.int8): return int(o)
+    elif isinstance(o, np.int16): return int(o)
+    elif isinstance(o, np.int32): return int(o)
+    elif isinstance(o, np.int64): return int(o)
+    elif isinstance(o, np.float8): return float(o)
+    elif isinstance(o, np.float16): return float(o)
+    elif isinstance(o, np.float32): return float(o)
+    elif isinstance(o, np.float64): return float(o)
+    else:
+        app.logger.debug(str(type(o)))
+        raise TypeError
 
 class cuXfilter_utils:
     data_gpu = None
@@ -192,11 +199,16 @@ class cuXfilter_utils:
                 shape string
         '''
         try:
+            app.logger.debug(data)
             temp_dict = {}
             for i in data:
+                app.logger.debug('inside for loop')
                 temp_dict[i] = list(data[i].values())
+            app.logger.debug('for loop ends')
+            app.logger.debug(temp_dict)
             return json.dumps(temp_dict,default=default)
         except Exception as e:
+            app.logger.debug(str(e))
             return 'Exception *** in cudf parse_dict() (helper function):'+str(e)
 
     def get_size(self):
@@ -476,7 +488,16 @@ class cuXfilter_utils:
                 #implementation of resetThenFilter function
                 self.dimension_reset(dimension_name)
 
-            query = dimension_name+comparison_operation+value
+            if type(eval(value)) == type(tuple()):
+                val_list = list(eval(value))
+                query_list = []
+                for v in val_list:
+                    query_list.append(str(dimension_name+comparison_operation+str(v)))
+                query = ' or '.join(query_list)
+                query = '('+query+')'
+            else:
+                query = dimension_name+comparison_operation+value
+
             if dimension_name in self.dimensions_filters:
                 if len(self.dimensions_filters[dimension_name])>0:
                     self.dimensions_filters[dimension_name] += ' and '+ query

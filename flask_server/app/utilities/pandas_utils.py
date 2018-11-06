@@ -108,10 +108,8 @@ class pandas_utils:
         return status
 
     def default(self,o):
-        if isinstance(o, np.int32): return int(o)
-        if isinstance(o, np.int64): return int(o)
-        if isinstance(o, np.float32): return float(o)
-        if isinstance(o, np.float64): return float(o)
+        if isinstance(o, np.int8) or isinstance(o, np.int16) or isinstance(o, np.int32) or isinstance(o, np.int64): return int(o)
+        elif isinstance(o, np.float8) or isinstance(o, np.float16) or isinstance(o, np.float32) or isinstance(o, np.float64): return float(o)
         raise TypeError
 
     def parse_dict(self,data):
@@ -386,29 +384,6 @@ class pandas_utils:
             return response+"&"+str(len(self.group_by_backups[key]))
         except Exception as e:
             return 'Exception *** in pandas groupby_load():'+str(e)
-
-    # def groupby_size(self, dimension_name, groupby_agg_key):
-    #     '''
-    #         description:
-    #             get groupby size for a groupby on a dimension
-    #         input:
-    #             dimension_name <string>:
-    #             groupby_agg_key <string>:
-    #         return:
-    #             size of the groupby
-    #     '''
-    #     try:
-    #         key = dimension_name+"_"+groupby_agg_key
-    #         if(key not in self.group_by_backups):
-    #             res = "groupby not intialized"
-    #         else:
-    #             temp_df = self.reset_filters(self.back_up_dimension_pandas, omit=dimension_name, include_dim=list(groupby_agg.keys()))
-    #             self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
-    #             res = str(len(self.group_by_backups[key]))
-    #         return res
-    #
-    #     except Exception as e:
-    #         return 'Exception *** in pandas groupby_size():'+str(e)
 
     def groupby_filter_order(self, dimension_name, groupby_agg, groupby_agg_key, sort_order, num_rows, sort_column):
         '''
