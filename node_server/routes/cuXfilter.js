@@ -126,7 +126,7 @@ module.exports = (io) => {
                 utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset", engine, (error, message) => {
                     if(!error){
                       let dataset_size = JSON.parse(message)['data'];
-                      utils.updateClientSideValues(socket, dataset, engine, dataset_size);
+                      utils.updateClientSideValues(socket, dataset, engine, dataset_size, dimension_name);
                     }
                     typeof callback === 'function' && callback(error, message);
                 });
@@ -205,7 +205,7 @@ module.exports = (io) => {
                 utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset as per a range of rows",engine, (error, message) => {
                     if(!error){
                       let dataset_size = JSON.parse(message)['data'];
-                      utils.updateClientSideValues(socket, dataset, engine, dataset_size);
+                      utils.updateClientSideValues(socket, dataset, engine, dataset_size, dimension_name);
                     }
                     typeof callback === 'function' && callback(error, message);
                 });
@@ -228,7 +228,7 @@ module.exports = (io) => {
                 utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting resetting filters on the current dimension",engine, (error, message) => {
                     if(!error){
                       let dataset_size = JSON.parse(message)['data'];
-                      utils.updateClientSideValues(socket, dataset, engine, dataset_size);
+                      utils.updateClientSideValues(socket, dataset, engine, dataset_size, dimension_name);
                     }
                     typeof callback === 'function' && callback(error, message);
                 });

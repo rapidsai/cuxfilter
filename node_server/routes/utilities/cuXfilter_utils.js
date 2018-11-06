@@ -62,13 +62,10 @@ function updateClientSideSize(socket,dataset,engine, dataset_size){
   }
 }
 
-function updateClientSideDimensions(socket, dataset, engine){
-  //
-  // console.log('inside updateClientSideDimensions');
-  // console.log(dimensions);
+function updateClientSideDimensions(socket, dataset, engine, dimension_name){
 
   for(let dimension in dimensions){
-    if(dimensions.hasOwnProperty(dimension)){
+    if(dimensions.hasOwnProperty(dimension) && dimension.indexOf(dimension_name) < 0){
       let command = 'dimension_filter_order';
       let query = dimensions[dimension];
       cudf_query(command,params(query, socket.session_id, dataset, engine),"user has requested "+query.sort_order+" n rows as per the column "+query.dimension_name, engine, (error, message)=>{
@@ -87,13 +84,13 @@ function updateClientSideDimensions(socket, dataset, engine){
   }
 }
 
-function updateClientSideHistograms(socket, dataset, engine){
+function updateClientSideHistograms(socket, dataset, engine, dimension_name){
 
   // console.log('inside updateClientSideHistograms');
   // console.log(histograms);
 
   for(let histogram in histograms){
-    if(histograms.hasOwnProperty(histogram)){
+    if(histograms.hasOwnProperty(histogram) && histogram.indexOf(dimension_name) < 0){
       let command = 'dimension_hist';
       let query = histograms[histogram];
       cudf_query(command,params(query, socket.session_id, dataset, engine),"user requested histogram for "+query.dimension_name, engine, (error, message)=>{
@@ -112,37 +109,34 @@ function updateClientSideHistograms(socket, dataset, engine){
   }
 }
 
-function updateClientSideGroups(socket, dataset, engine){
-
-  // console.log('inside updateClientSideGroups');
-  // console.log(groups);
+function updateClientSideGroups(socket, dataset, engine, dimension_name){
 
   for(let group in groups){
-    if(groups.hasOwnProperty(group)){
-      let command = 'groupby_filter_order';
-      let query = groups[group];
-      // console.log("query for group",query);
-      cudf_query(command,params(query, socket.session_id, dataset, engine),"updating filter_order for group:"+query.dimension_name, engine, (error, message)=>{
-        if(!error){
-          socket.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
-          if(socket.useSessions == false){
-            console.log('broadcasting group');
-            socket.broadcast.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
+      if(groups.hasOwnProperty(group) && group.indexOf(dimension_name) < 0){
+        let command = 'groupby_filter_order';
+        let query = groups[group];
+        // console.log("query for group",query);
+        cudf_query(command,params(query, socket.session_id, dataset, engine),"updating filter_order for group:"+query.dimension_name, engine, (error, message)=>{
+          if(!error){
+            socket.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
+            if(socket.useSessions == false){
+              console.log('broadcasting group');
+              socket.broadcast.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
+            }
+          }else{
+            console.log('error in updateClientSideGroups:');
+            console.log(message);
           }
-        }else{
-          console.log('error in updateClientSideGroups:');
-          console.log(message);
-        }
-      });
-    }
+        });
+      }
   }
 }
 //triggering an update event which broadcasts to all the neighbouring socket connections in case of a multi-tab sessionless access
-function updateClientSideValues(socket, dataset, engine, dataset_size){
+function updateClientSideValues(socket, dataset, engine, dataset_size, dimension_name='null'){
   updateClientSideSize(socket,dataset,engine,dataset_size);
-  updateClientSideDimensions(socket, dataset, engine);
-  updateClientSideHistograms(socket, dataset, engine);
-  updateClientSideGroups(socket, dataset, engine);
+  updateClientSideDimensions(socket, dataset, engine, dimension_name);
+  updateClientSideHistograms(socket, dataset, engine, dimension_name);
+  updateClientSideGroups(socket, dataset, engine, dimension_name);
 }
 
 
