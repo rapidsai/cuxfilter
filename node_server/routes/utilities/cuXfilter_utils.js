@@ -64,7 +64,7 @@ function updateClientSideSize(socket,dataset,engine, dataset_size){
 
 function updateClientSideDimensions(socket, dataset, engine, dimension_name,startTime){
   for(let dimension in dimensions){
-    if(dimensions.hasOwnProperty(dimension) && dimension.indexOf(dimension_name) < 0){
+    if(dimensions.hasOwnProperty(dimension)){// && dimension.indexOf(dimension_name) < 0){
       let command = 'dimension_filter_order';
       let query = dimensions[dimension];
       cudf_query(command,params(query, socket.session_id, dataset, engine),"user has requested "+query.sort_order+" n rows as per the column "+query.dimension_name, engine, startTime, (error, message)=>{
@@ -89,7 +89,7 @@ function updateClientSideHistograms(socket, dataset, engine, dimension_name,star
   // console.log(histograms);
 
   for(let histogram in histograms){
-    if(histograms.hasOwnProperty(histogram) && histogram.indexOf(dimension_name) < 0){
+    if(histograms.hasOwnProperty(histogram)){ //&& histogram.indexOf(dimension_name) < 0){
       let command = 'dimension_hist';
       let query = histograms[histogram];
       cudf_query(command,params(query, socket.session_id, dataset, engine),"user requested histogram for "+query.dimension_name, engine,startTime, (error, message)=>{
@@ -111,7 +111,7 @@ function updateClientSideHistograms(socket, dataset, engine, dimension_name,star
 function updateClientSideGroups(socket, dataset, engine, dimension_name,startTime){
 
   for(let group in groups){
-      if(groups.hasOwnProperty(group) && group.indexOf(dimension_name) < 0){
+      if(groups.hasOwnProperty(group)){// && group.indexOf(dimension_name) < 0){
         let command = 'groupby_filter_order';
         let query = groups[group];
         // console.log("query for group",query);
