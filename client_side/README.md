@@ -1,4 +1,4 @@
-# cuXfilter (client-side)
+# cuXfilter-client.js
 
 > A javascript(es6) client library that provides crossfilter functionality to create interactive vizualizations on big data(100M+ rows) right from the browser, using the power of cudf & numba on the backend.
 
@@ -6,7 +6,7 @@
 ### Table of Contents
 - [Installation](#installation)
 - [Import](#import)
-- [Functions: server-side crossfilter](#functions-server-side-crossfilter)
+- [Functions](#functions)
 	1. [Load data](#1-load-data)
 	2. [Get Data size](#2-get-data-size)
 	3. [Get Data schema](#3-get-data-schema)
@@ -50,7 +50,7 @@ use ./dist/index.js
 <pre> < script type="text/javascript" src="index.js">< / script > </pre>
 
 
-## Functions: server-side crossfilter
+## Functions
 
 ### 1. Load data
 <pre>
