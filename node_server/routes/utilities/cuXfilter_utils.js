@@ -62,13 +62,12 @@ function updateClientSideSize(socket,dataset,engine, dataset_size){
   }
 }
 
-function updateClientSideDimensions(socket, dataset, engine, dimension_name){
-
+function updateClientSideDimensions(socket, dataset, engine, dimension_name,startTime){
   for(let dimension in dimensions){
     if(dimensions.hasOwnProperty(dimension) && dimension.indexOf(dimension_name) < 0){
       let command = 'dimension_filter_order';
       let query = dimensions[dimension];
-      cudf_query(command,params(query, socket.session_id, dataset, engine),"user has requested "+query.sort_order+" n rows as per the column "+query.dimension_name, engine, (error, message)=>{
+      cudf_query(command,params(query, socket.session_id, dataset, engine),"user has requested "+query.sort_order+" n rows as per the column "+query.dimension_name, engine, startTime, (error, message)=>{
         if(!error){
           socket.emit('update_dimension', query.dimension_name, engine, message);
           if(socket.useSessions == false){
@@ -84,7 +83,7 @@ function updateClientSideDimensions(socket, dataset, engine, dimension_name){
   }
 }
 
-function updateClientSideHistograms(socket, dataset, engine, dimension_name){
+function updateClientSideHistograms(socket, dataset, engine, dimension_name,startTime){
 
   // console.log('inside updateClientSideHistograms');
   // console.log(histograms);
@@ -93,7 +92,7 @@ function updateClientSideHistograms(socket, dataset, engine, dimension_name){
     if(histograms.hasOwnProperty(histogram) && histogram.indexOf(dimension_name) < 0){
       let command = 'dimension_hist';
       let query = histograms[histogram];
-      cudf_query(command,params(query, socket.session_id, dataset, engine),"user requested histogram for "+query.dimension_name, engine, (error, message)=>{
+      cudf_query(command,params(query, socket.session_id, dataset, engine),"user requested histogram for "+query.dimension_name, engine,startTime, (error, message)=>{
         if(!error){
           socket.emit('update_hist', query.dimension_name, engine, message);
           if(socket.useSessions == false){
@@ -109,14 +108,14 @@ function updateClientSideHistograms(socket, dataset, engine, dimension_name){
   }
 }
 
-function updateClientSideGroups(socket, dataset, engine, dimension_name){
+function updateClientSideGroups(socket, dataset, engine, dimension_name,startTime){
 
   for(let group in groups){
       if(groups.hasOwnProperty(group) && group.indexOf(dimension_name) < 0){
         let command = 'groupby_filter_order';
         let query = groups[group];
         // console.log("query for group",query);
-        cudf_query(command,params(query, socket.session_id, dataset, engine),"updating filter_order for group:"+query.dimension_name, engine, (error, message)=>{
+        cudf_query(command,params(query, socket.session_id, dataset, engine),"updating filter_order for group:"+query.dimension_name, engine,startTime, (error, message)=>{
           if(!error){
             socket.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
             if(socket.useSessions == false){
@@ -132,11 +131,12 @@ function updateClientSideGroups(socket, dataset, engine, dimension_name){
   }
 }
 //triggering an update event which broadcasts to all the neighbouring socket connections in case of a multi-tab sessionless access
-function updateClientSideValues(socket, dataset, engine, dataset_size, dimension_name='null'){
+function updateClientSideValues(socket, dataset, engine, dataset_size, startTime, dimension_name='null'){
+  // let startTime = Date.now();
   updateClientSideSize(socket,dataset,engine,dataset_size);
-  updateClientSideDimensions(socket, dataset, engine, dimension_name);
-  updateClientSideHistograms(socket, dataset, engine, dimension_name);
-  updateClientSideGroups(socket, dataset, engine, dimension_name);
+  updateClientSideDimensions(socket, dataset, engine, dimension_name,startTime);
+  updateClientSideHistograms(socket, dataset, engine, dimension_name,startTime);
+  updateClientSideGroups(socket, dataset, engine, dimension_name,startTime);
 }
 
 
@@ -149,9 +149,9 @@ function groupbyMessageCustomParse(message){
 }
 
 //calling the python server(pandas or cudf) with the command and query
-function callPyServer(command,query, engine){
+function callPyServer(command,query, engine, startTime){
   return new Promise((resolve, reject) => {
-       let startTime = Date.now();
+       // let startTime = Date.now();
        let url = pyServerURLcudf+'/'+command+'?'+query
        if(engine == 'pandas'){
          url = pyServerURLPandas+'/'+command+'?'+query
@@ -198,8 +198,8 @@ function params(data, session_id, dataset, engine) {
 }
 
 //handle queries by calling the python server and returning the results directly to the socket-io-client on the front-end
-function cudf_query(command,query, comments,engine, callback){
-    callPyServer(command,query, engine)
+function cudf_query(command,query, comments, engine, startTime, callback){
+    callPyServer(command,query, engine, startTime)
       .then((message) => {
               console.log(comments);
               // socket.broadcast.emit(command,false,message);

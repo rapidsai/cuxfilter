@@ -51,7 +51,7 @@ module.exports = (io) => {
                           'load_type': load_type
                       };
 
-                      utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),'read_data',engine, (error, message) => {
+                      utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),'read_data',engine,Date.now(), (error, message) => {
                           if(!error){
                             utils.isDataLoaded[socket.session_id+dataset+engine] = true
                             utils.dataLoaded[socket.session_id+dataset+engine] = dataset
@@ -69,11 +69,11 @@ module.exports = (io) => {
         socket.on("reset_all_filters", (dataset,engine,callback) => {
             let command = 'reset_all_filters';
             let query = {};
-
-            utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),'reset_all',engine, (error, message) => {
+            let startTime = Date.now();
+            utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),'reset_all',engine, startTime,  (error, message) => {
                 if(!error){
                   let dataset_size = JSON.parse(message)['data'];
-                  utils.updateClientSideValues(socket, dataset, engine, dataset_size);
+                  utils.updateClientSideValues(socket, dataset, engine, dataset_size,startTime);
                 }
                 typeof callback === 'function' && callback(error, message);
             });
@@ -85,7 +85,7 @@ module.exports = (io) => {
                 let command = 'get_schema';
                 let query = {};
 
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting schema of the dataset",engine, callback);
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting schema of the dataset",engine,Date.now(),  callback);
 
             }catch(ex){
                 console.log(ex);
@@ -103,7 +103,7 @@ module.exports = (io) => {
                     'dimension_name': dimension_name
                 };
 
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting loading a new dimension:"+dimension_name, engine, callback);
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting loading a new dimension:"+dimension_name, engine,Date.now(),  callback);
 
             }catch(ex){
                 console.log(ex);
@@ -122,11 +122,11 @@ module.exports = (io) => {
                     'value': value,
                     'pre_reset': pre_reset
                 };
-
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset", engine, (error, message) => {
+                let startTime = Date.now()
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset", engine, startTime,  (error, message) => {
                     if(!error){
                       let dataset_size = JSON.parse(message)['data'];
-                      utils.updateClientSideValues(socket, dataset, engine, dataset_size, dimension_name);
+                      utils.updateClientSideValues(socket, dataset, engine, dataset_size,startTime, dimension_name);
                     }
                     typeof callback === 'function' && callback(error, message);
                 });
@@ -147,7 +147,7 @@ module.exports = (io) => {
                     'groupby_agg':agg
                 };
 
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting groupby for the dimension:"+dimension_name,engine, (error,message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting groupby for the dimension:"+dimension_name,engine,Date.now(),  (error,message) => {
                      callback(error,utils.groupbyMessageCustomParse(message));
                 });
 
@@ -173,7 +173,7 @@ module.exports = (io) => {
 
                 utils.groups[dimension_name+agg] = query;
 
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested filter_order rows for the groupby operation for dimension:"+dimension_name, engine, (error,message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested filter_order rows for the groupby operation for dimension:"+dimension_name, engine,Date.now(),  (error,message) => {
                   if(!error){
                     socket.emit('update_group', dimension_name, agg, engine, message);
                     if(socket.session_id === 111){
@@ -201,11 +201,11 @@ module.exports = (io) => {
                     'max_value': range_max,
                     'pre_reset': pre_reset
                 };
-
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset as per a range of rows",engine, (error, message) => {
+                let startTime = Date.now();
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset as per a range of rows",engine, startTime, (error, message) => {
                     if(!error){
                       let dataset_size = JSON.parse(message)['data'];
-                      utils.updateClientSideValues(socket, dataset, engine, dataset_size, dimension_name);
+                      utils.updateClientSideValues(socket, dataset, engine, dataset_size, startTime, dimension_name);
                     }
                     typeof callback === 'function' && callback(error, message);
                 });
@@ -224,11 +224,11 @@ module.exports = (io) => {
                 let query = {
                     'dimension_name': dimension_name
                 };
-
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting resetting filters on the current dimension",engine, (error, message) => {
+                let startTime = Date.now();
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting resetting filters on the current dimension",engine, startTime, (error, message) => {
                     if(!error){
                       let dataset_size = JSON.parse(message)['data'];
-                      utils.updateClientSideValues(socket, dataset, engine, dataset_size, dimension_name);
+                      utils.updateClientSideValues(socket, dataset, engine, dataset_size,startTime, dimension_name);
                     }
                     typeof callback === 'function' && callback(error, message);
                 });
@@ -245,7 +245,7 @@ module.exports = (io) => {
                 let command = 'get_size';
                 let query = {};
 
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting size of the dataset",engine, (error,message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting size of the dataset",engine,Date.now(),  (error,message) => {
                   if(!error){
                       let dataset_size = JSON.parse(message)['data'];
                       utils.updateClientSideSize(socket,dataset,engine, dataset_size);
@@ -272,7 +272,7 @@ module.exports = (io) => {
                 };
                 utils.dimensions[dimension_name] = query;
 
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested "+sort_order+" n rows as per the column "+dimension_name, engine, (error,message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested "+sort_order+" n rows as per the column "+dimension_name, engine,Date.now(),  (error,message) => {
                       if(!error){
                         socket.emit('update_dimension', dimension_name, engine, message);
                         if(socket.session_id === 111){
@@ -297,7 +297,7 @@ module.exports = (io) => {
                 };
 
                 utils.histograms[dimension_name] = query;
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requested histogram for "+dimension_name, engine, (error,message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requested histogram for "+dimension_name, engine,Date.now(),  (error,message) => {
                   if(!error){
                     socket.emit('update_hist', dimension_name, engine, message);
                     if(socket.session_id === 111){
@@ -323,7 +323,7 @@ module.exports = (io) => {
                 };
                 let comment = "user requested max-min values for "+dimension_name+" for data="+dataset;
 
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),comment,engine, callback);
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),comment,engine,Date.now(),  callback);
 
             }catch(ex){
                 console.log(ex);
