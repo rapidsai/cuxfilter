@@ -19,7 +19,7 @@ def default(o):
     elif isinstance(o, np.int16): return int(o)
     elif isinstance(o, np.int32): return int(o)
     elif isinstance(o, np.int64): return int(o)
-    elif isinstance(o, np.float8): return float(o)
+    # elif isinstance(o, np.float8): return float(o)
     elif isinstance(o, np.float16): return float(o)
     elif isinstance(o, np.float32): return float(o)
     elif isinstance(o, np.float64): return float(o)
