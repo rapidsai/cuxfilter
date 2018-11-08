@@ -11,17 +11,19 @@
 	2. [Get Data size](#2-get-data-size)
 	3. [Get Data schema](#3-get-data-schema)
 	4. [End session](#4-end-session)
+	5. [Update Size Event](#5-update-size-event)
 - [Dimensions](#dimensions)
 	1. [Get top n rows sorted as per dimension](#1-get-top-n-rows-sorted-as-per-dimension)
-	2. [Get bottom n rows sorted as per dimension](#2--get-bottom-n-rows-sorted-as-per-dimension)
+	2. [Get bottom n rows sorted as per dimension](#2-get-bottom-n-rows-sorted-as-per-dimension)
 	3. [Get all rows sorted as per dimension](#3-get-all-rows-sorted-as-per-dimension)
 	4. [Cumulative Filters: cuXfilter instance as per a condition (preserves previous filter requests)](#4-cumulative-filters-cuxfilter-instance-as-per-a-condition-preserves-previous-filter-requests)
 	5. [Non-Cumulative Filters: cuXfilter instance as per a condition (resets all previous filters on the current dimension, and then applies new filter)](#5-non-cumulative-filters-cuxfilter-instance-as-per-a-condition-resets-all-previous-filters-on-the-current-dimension-and-then-applies-new-filter)
-	6. [Min value of dimension](#6-min-value-of-dimension)
-	7. [Max value of dimension](#7-max-value-of-dimension)
-	8. [Get Histogram for a dimension](#8-get-histogram-for-a-dimension)
-	9. [Clear all filters for a dimension](#9-clear-all-filters-for-a-dimension)
-	10. [Clear all filters for ALL dimensions](#10-clear-all-filters-for-all-dimensions)
+	6. [Dimension Filter Events](#6-dimension-filter-events)
+	7. [Min value of dimension](#7-min-value-of-dimension)
+	8. [Max value of dimension](#8-max-value-of-dimension)
+	9. [Get Histogram for a dimension](#9-get-histogram-for-a-dimension)
+	10. [Clear all filters for a dimension](#10-clear-all-filters-for-a-dimension)
+	11. [Clear all filters for ALL dimensions](#11-clear-all-filters-for-all-dimensions)
 - [Groups](#groups)
 	1. [Get Top n rows of the group](#1-get-top-n-rows-of-the-group)
 	2. [Get bottom n rows of the group](#2-get-bottom-n-rows-of-the-group)
@@ -90,6 +92,20 @@ E.g: [&#39;sourceid&#39;, &#39;dstid&#39;, &#39;hod&#39;, &#39;mean_travel_time&
 <pre>
 myData.endSession().then((status)=>{}).catch((err)=>{});
 </pre>
+
+### 5. Update Size Event
+
+To keep track of changes to these dataset size, an event listener is provided:
+
+A. `updateSizeEvent`
+
+<pre> addEventListener('updateSizeEvent', (e) => {
+		console.log(myData.size);
+
+		let your_size_variable = myData.size; //updated size
+});
+</pre>
+
 
 ##  Dimensions
 > Dimensions are objects on top of the dataset that lets us reference a single column. This helps in getting rows from dataset sorted as per the current dimension, or getting a histogram for the dimension column. Groupby operations can also be performed on dimensions(More on that in the Groups sections) <br>
@@ -253,7 +269,28 @@ E.g:
 6. mean_travel_time_dimension.resetThenFilter('==',[9999,200,6745]); //resets previous filters and selects all mean_travel_time_dimension where value matches <b>ANY ONE</b> of the values in the given array
 </pre>
 
-### 6. Min value of dimension
+
+### 6. Dimension filter events
+
+Whenever a `dimension.filter` or `dimension.resetThenFilter` request is made, the `allUpdatesComplete` event is fired when all the groups and dimensions changed due to the filter are done updating.
+
+A. `allUpdatesComplete`
+
+> this can be useful if you want to wait for changes to reflect on your page after a filter, before allowing the user to apply another filter, to prevent GPU memory spike.
+
+E.g:
+
+<pre>
+dimension.filter(120);
+blockInteractionsOnPage();
+	
+addEventListener('allUpdatesComplete', (e) => {
+	unblockInteractionsOnPage();
+});
+</pre>
+
+
+### 7. Min value of dimension
 > returns the min value for that specific dimension; Updated on execution of one of the crossfilter functions
 
 <pre>
@@ -261,7 +298,7 @@ dimA.min;
 </pre>
 
 
-### 7. Max value of dimension
+### 8. Max value of dimension
  > returns the max value for that specific dimension; Updated on execution of one of the crossfilter functions
 
 <pre>
@@ -269,7 +306,7 @@ dimA.max;
 </pre>
 
 
-### 8. Get Histogram for a dimension
+### 9. Get Histogram for a dimension
 
 <pre>
 dimA.getHist();
@@ -285,7 +322,7 @@ Result :
 </pre>
 
 
-### 9. Clear all filters for a dimension
+### 10. Clear all filters for a dimension
 
 <pre>
 dimA.resetFilters()
@@ -293,7 +330,7 @@ dimA.resetFilters()
 >num_of_rows_left: returns a number representing number of rows in the dataset after removing dimA filters
 
 
-### 10. Clear all filters for ALL dimensions
+### 11. Clear all filters for ALL dimensions
 
 <pre>
 myData.resetAllFilters();
