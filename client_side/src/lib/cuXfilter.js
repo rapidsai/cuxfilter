@@ -74,9 +74,16 @@ export class cuXfilter{
     initSocketListeners(){
 
         this.socket.on('update_size', (dataset,engine, size) => {
-            console.log(this);
             if(this.dataset === dataset && this.engine === engine){
                 this.size = parseInt(size);
+                dispatchEvent(new CustomEvent('updateSizeEvent', {detail: {'dataset': dataset}}));
+            }
+        });
+
+        this.socket.on('all_updates_complete', (dataset,engine) => {
+            console.log('all updates completed!!!!');
+            if(this.dataset === dataset && this.engine === engine){
+                dispatchEvent(new CustomEvent('allUpdatesComplete', {detail: {'dataset': dataset}}));
             }
         });
 
