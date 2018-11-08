@@ -63,80 +63,118 @@ function updateClientSideSize(socket,dataset,engine, dataset_size){
 }
 
 function updateClientSideDimensions(socket, dataset, engine, dimension_name,startTime){
-  for(let dimension in dimensions){
-    if(dimensions.hasOwnProperty(dimension)){// && dimension.indexOf(dimension_name) < 0){
-      let command = 'dimension_filter_order';
-      let query = dimensions[dimension];
-      cudf_query(command,params(query, socket.session_id, dataset, engine),"user has requested "+query.sort_order+" n rows as per the column "+query.dimension_name, engine, startTime, (error, message)=>{
-        if(!error){
-          socket.emit('update_dimension', query.dimension_name, engine, message);
-          if(socket.useSessions == false){
-            console.log('broadcasting dimension');
-            socket.broadcast.emit('update_dimension', query.dimension_name, message);
-          }
-        }else{
-          console.log('error in updateClientSideDimensions:');
-          console.log(message);
-        }
-      });
+  return new Promise((resolve,reject) => {
+    let length_groups = Object.keys(dimensions).length;
+    let i = 0;
+    if(i == length_groups){
+      resolve();
     }
-  }
-}
-
-function updateClientSideHistograms(socket, dataset, engine, dimension_name,startTime){
-
-  // console.log('inside updateClientSideHistograms');
-  // console.log(histograms);
-
-  for(let histogram in histograms){
-    if(histograms.hasOwnProperty(histogram)){ //&& histogram.indexOf(dimension_name) < 0){
-      let command = 'dimension_hist';
-      let query = histograms[histogram];
-      cudf_query(command,params(query, socket.session_id, dataset, engine),"user requested histogram for "+query.dimension_name, engine,startTime, (error, message)=>{
-        if(!error){
-          socket.emit('update_hist', query.dimension_name, engine, message);
-          if(socket.useSessions == false){
-            console.log('broadcasting histogram');
-            socket.broadcast.emit('update_hist', query.dimension_name, message);
-          }
-        }else{
-          console.log('error in updateClientSideHistograms:');
-          console.log(message);
-        }
-      });
-    }
-  }
-}
-
-function updateClientSideGroups(socket, dataset, engine, dimension_name,startTime){
-
-  for(let group in groups){
-      if(groups.hasOwnProperty(group)){// && group.indexOf(dimension_name) < 0){
-        let command = 'groupby_filter_order';
-        let query = groups[group];
-        // console.log("query for group",query);
-        cudf_query(command,params(query, socket.session_id, dataset, engine),"updating filter_order for group:"+query.dimension_name, engine,startTime, (error, message)=>{
+    for(let dimension in dimensions){
+      if(dimensions.hasOwnProperty(dimension)){// && dimension.indexOf(dimension_name) < 0){
+        i = i+1;
+        let command = 'dimension_filter_order';
+        let query = dimensions[dimension];
+        cudf_query(command,params(query, socket.session_id, dataset, engine),"user has requested "+query.sort_order+" n rows as per the column "+query.dimension_name, engine, startTime, (error, message)=>{
           if(!error){
-            socket.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
+            socket.emit('update_dimension', query.dimension_name, engine, message);
             if(socket.useSessions == false){
-              console.log('broadcasting group');
-              socket.broadcast.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
+              console.log('broadcasting dimension');
+              socket.broadcast.emit('update_dimension', query.dimension_name, message);
+            }
+            console.log('dimensions',i);
+            if(i == length_groups){
+              resolve();
             }
           }else{
-            console.log('error in updateClientSideGroups:');
+            console.log('error in updateClientSideDimensions:');
             console.log(message);
           }
         });
       }
-  }
+    }
+  });
+}
+
+function updateClientSideHistograms(socket, dataset, engine, dimension_name,startTime){
+  return new Promise((resolve,reject) => {
+      let length_groups = Object.keys(histograms).length;
+      let i = 0;
+      if(i == length_groups){
+        resolve();
+      }
+      for(let histogram in histograms){
+        if(histograms.hasOwnProperty(histogram)){ //&& histogram.indexOf(dimension_name) < 0){
+          i = i+1;
+          let command = 'dimension_hist';
+          let query = histograms[histogram];
+          cudf_query(command,params(query, socket.session_id, dataset, engine),"user requested histogram for "+query.dimension_name, engine,startTime, (error, message)=>{
+            if(!error){
+              socket.emit('update_hist', query.dimension_name, engine, message);
+              if(socket.useSessions == false){
+                console.log('broadcasting histogram');
+                socket.broadcast.emit('update_hist', query.dimension_name, message);
+              }
+              console.log('histograms',i,Object.keys(histograms).length);
+              if(i == length_groups){
+                resolve();
+              }
+            }else{
+              console.log('error in updateClientSideHistograms:');
+              console.log(message);
+            }
+          });
+        }
+      }
+    });
+}
+
+function updateClientSideGroups(socket, dataset, engine, dimension_name,startTime){
+  return new Promise((resolve,reject) => {
+    let length_groups = Object.keys(groups).length;
+    let i = 0;
+    if(i == length_groups){
+      resolve();
+    }
+    for(let group in groups){
+        if(groups.hasOwnProperty(group)){// && group.indexOf(dimension_name) < 0){
+          i = i+1;
+          let command = 'groupby_filter_order';
+          let query = groups[group];
+          // console.log("query for group",query);
+          cudf_query(command,params(query, socket.session_id, dataset, engine),"updating filter_order for group:"+query.dimension_name, engine,startTime, (error, message)=>{
+            if(!error){
+              socket.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
+              if(socket.useSessions == false){
+                console.log('broadcasting group');
+                socket.broadcast.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
+              }
+              console.log('groups',i);
+              if(i == length_groups){
+                resolve();
+              }
+            }else{
+              console.log('error in updateClientSideGroups:');
+              console.log(message);
+            }
+          });
+        }
+      }
+    });
 }
 //triggering an update event which broadcasts to all the neighbouring socket connections in case of a multi-tab sessionless access
 function updateClientSideValues(socket, dataset, engine, dataset_size, startTime, dimension_name='null'){
   // let startTime = Date.now();
   updateClientSideSize(socket,dataset,engine,dataset_size);
-  updateClientSideDimensions(socket, dataset, engine, dimension_name,startTime);
-  updateClientSideHistograms(socket, dataset, engine, dimension_name,startTime);
-  updateClientSideGroups(socket, dataset, engine, dimension_name,startTime);
+  Promise.all([updateClientSideDimensions(socket, dataset, engine, dimension_name,startTime),
+              updateClientSideHistograms(socket, dataset, engine, dimension_name,startTime),
+              updateClientSideGroups(socket, dataset, engine, dimension_name,startTime)])
+              .then(()=> {
+                console.log('all updates complete');
+                socket.emit('all_updates_complete', dataset, engine);
+                if(socket.useSessions == false){
+                  socket.broadcast.emit('all_updates_complete', dataset, engine);
+                }
+              });
 }
 
 
