@@ -199,16 +199,11 @@ class cuXfilter_utils:
                 shape string
         '''
         try:
-            app.logger.debug(data)
             temp_dict = {}
             for i in data:
-                app.logger.debug('inside for loop')
                 temp_dict[i] = list(data[i].values())
-            app.logger.debug('for loop ends')
-            app.logger.debug(temp_dict)
             return json.dumps(temp_dict,default=default)
         except Exception as e:
-            app.logger.debug(str(e))
             return 'Exception *** in cudf parse_dict() (helper function):'+str(e)
 
     def get_size(self):

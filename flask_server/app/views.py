@@ -97,7 +97,7 @@ def read_data():
     if engine == 'cudf':
         #start function execution
         response = user_sessions[key].read_data(load_type,dataset_name)
-        app.logger.debug("read data response = "+str(response))
+        # app.logger.debug("read data response = "+str(response))
         if 'out of memory' in response or 'thrust::system::system_error' in response:
             user_sessions.pop(session_id+dataset_name,None)
             app.logger.debug('out of memory error')
@@ -222,7 +222,7 @@ def groupby_load():
         #end function execution
 
     #return response
-    app.logger.debug(response)
+    # app.logger.debug(response)
     return append_time_to_response(response,start_time, key, engine)
 
 
@@ -424,12 +424,12 @@ def dimension_hist():
         response = user_sessions[key].dimension_hist(dimension_name,num_of_bins)
         if 'out of memory' in response or 'thrust::system::system_error' in response:
             user_sessions.pop(session_id+dataset_name,None)
-        app.logger.debug(response)
+        # app.logger.debug(response)
         #end function execution
     else:
         #start function execution
         response = user_sessions_pandas[key].dimension_hist(dimension_name,num_of_bins)
-        app.logger.debug(response)
+        # app.logger.debug(response)
         #end function execution
 
     #return response
