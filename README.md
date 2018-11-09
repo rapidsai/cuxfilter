@@ -26,7 +26,7 @@ You can skip steps 1&2 if you do not wish to expose the `cuXfilter` demos on por
 4. `docker run --runtime=nvidia  -d -p 3000:3000 -p 3004:3004 --name rapids_viz -v /folder/with/data:/usr/src/app/node_server/uploads user_name/viz`
 
 
-Access the crossfilter demos at `http://server.ip.addr:3004`
+Access the crossfilter demos at `http://server.ip.addr:3004/demos/examples`
 
 
 ## Architecture
