@@ -5,7 +5,13 @@ import numpy as np
 
 def pandas_df_to_arrow(df):
     print('converting arrow dataframe to a pandas df')
-    return pa.RecordBatch.from_pandas(data)
+    return pa.RecordBatch.from_pandas(df)
+
+def read_arrow(source):
+    print('reading arrow file as arrow table from disk')
+    reader = pa.RecordBatchStreamReader(source)
+    pa_df = reader.read_all()
+    return pa_df
 
 def read_arrow_as_pandas(source):
     print('reading arrow file as pandas dataframe from disk')
@@ -17,7 +23,7 @@ def write_arrow_to_disk(arrow_df, path):
     print('saving as an arrow file on the path specified:', path.split('.')[0])
     path = path.split('.')[0]+".arrow"
     file = open(path, 'wb')
-    writer = pa.ipc.RecordBatchStreamWriter(file, pa_df.schema)
+    writer = pa.ipc.RecordBatchStreamWriter(file, arrow_df.schema)
     writer.write_batch(arrow_df)
     writer.close()
     file.close()
@@ -34,7 +40,7 @@ def csv_to_arrow(source):
         data = pd.read_csv(source,dtype=np.float32)
         write_arrow_to_disk(pandas_df_to_arrow(data), source)
         print("file successfully converted to an arrow format")
-    except e as Exception:
+    except Exception as e:
         print("error:",e)
 
 def arrow_to_csv(source):
@@ -43,7 +49,7 @@ def arrow_to_csv(source):
         data = read_arrow_as_pandas(source)
         write_csv_to_disk(data, source)
         print("file successfully converted to an csv format")
-    except e as Exception:
+    except Exception as e:
         print("error:",e)
 
 def generate_random_dataset(num_rows,num_columns,type,range_min,range_max, destination):
