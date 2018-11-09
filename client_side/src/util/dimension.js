@@ -66,7 +66,6 @@ class Dimension{
     }
 
     filter(comparison=null,value=null, pre_reset=false){
-        console.log('here 0 ', value)
             let already_executed = false;
             if(comparison == null && value == null){
                 already_executed = true;
@@ -82,7 +81,6 @@ class Dimension{
                 }
             }else{
                 if(Array.isArray(value)){
-                    console.log('here')
                     if(value.length == 0){
                         already_executed = true;
                         this.resetFilters();
