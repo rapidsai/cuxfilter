@@ -6,6 +6,9 @@
     <script type="text/javascript" src="../client_side/dist/index.js"></script>
     <link href="./styles/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="./styles/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="./scripts/materialize.js"></script>
+  <script src="./scripts/init.js"></script>
     <style>
         .bar1-set,.bar2-set{
           width:50%;
@@ -14,9 +17,22 @@
         #bar2_slider,#bar1_slider {
           width: 150px;
         }
+        #modal1 {
+            transform: translateY(-50%) scaleX(1) !important; 
+            margin-top: 25%;
+        }
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+        main {
+            flex: 1 0 auto;
+        }
     </style>
   </head>
   <body>
+<main>
       <nav class="lighten-1" style= 'background-color: rgb(116, 0, 255);' role="navigation">
           <div class="nav-wrapper container"><a id="logo-container" href="../" class="brand-logo">cuXfilter</a>
             <ul class="right hide-on-med-and-down">
@@ -49,12 +65,31 @@
         
         <div id="bar2"><!-- Plotly chart will be drawn inside this DIV --></div>
       </span>
+
+  <!-- Modal Structure -->
+  <div id="modal1" class="modal transparent">
+    <div class="modal-content center transparent">
+      Loading ...
+    </div>
+  </div>
+</main>
+
+  <footer class="page-footer" style= 'background-color: rgb(116, 0, 255);'>
+        <div class="footer-copyright">
+          <div class="container">
+          Made by <a class="orange-text text-lighten-3" href="https://rapids.ai/">rapids.ai</a>
+          </div>
+        </div>
+      </footer>
     <script>
       
 //intialize a cuXfilter object for a dataset called predictions-v1 (arrow format), with cudf engine and useSessions=true at the url
 var cuObj = new cuXfilter('146M_predictions','http://10.33.227.184:3003','cudf',true,'arrow');
 var bar1 = document.getElementById('bar1');
 var bar2 = document.getElementById('bar2');
+
+//initialize all modals           
+$('.modal').modal({opacity: 0.5,outDuration:0, inDuration:0,dismissible:false});
 
 cuObj.init().then((status) => { 
     //load dimension 1
@@ -80,21 +115,29 @@ function init(){
 
     //plotly event when a range is selected for crossfilter
     bar1.on('plotly_selected', (eventData) => {
-        if(eventData){ dimension1.resetThenFilter(eventData.range.x); }
+        if(eventData){ 
+            $('.modal').modal('open');
+            dimension1.resetThenFilter(eventData.range.x); 
+        }
     });
 
     //plotly event when a range is deselected by double clicking on the screen
     bar1.on('plotly_deselect', () => {
+        $('.modal').modal('open');
         dimension1.resetFilters();
     });
 
     //plotly event when a range is selected for crossfilter
     bar2.on('plotly_selected', (eventData) => {
-        if(eventData){ dimension2.resetThenFilter(eventData.range.x); }
+        if(eventData){ 
+            $('.modal').modal('open');
+            dimension2.resetThenFilter(eventData.range.x); 
+        }
     });
 
     //plotly event when a range is deselected by double clicking on the screen
     bar2.on('plotly_deselect', () => {
+        $('.modal').modal('open');
         dimension2.resetFilters();
     });
 }
@@ -106,6 +149,10 @@ addEventListener('updateHistEvent', (e) => {
     }else{
         updateBar2();
     }
+});
+
+addEventListener('allUpdatesComplete',(e) => {
+    $('.modal').modal('close');
 });
 
 //update bar chart 1 when updated values are received
@@ -131,12 +178,17 @@ function updateBins(chart) {
         dimension2.getHist(x);
     }
 }
+
+function disableInteractions(){
+    Plotly.restyle(bar1,'staticPlot',true);
+    Plotly.restyle(bar2,'staticPlot',true);
+}
+
+function enableInteractions(){
+    $('.modal').modal('open');
+}
     
     </script>
 
-
-<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="./scripts/materialize.js"></script>
-  <script src="./scripts/init.js"></script>
   </body>
 </html>

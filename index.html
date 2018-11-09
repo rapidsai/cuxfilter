@@ -4,13 +4,25 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
   <title>Starter Template - Materialize</title>
+  <style>
+  body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+  }
 
+  main {
+    flex: 1 0 auto;
+  }
+ </style>
   <!-- CSS  -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="demos/styles/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
   <link href="demos/styles/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
 </head>
 <body>
+
+<main>
   <nav class="lighten-1" style= 'background-color: rgb(116, 0, 255);' role="navigation">
     <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">cuXfilter</a>
       <ul class="right hide-on-med-and-down">
@@ -31,17 +43,34 @@
         <h5 class="header col s12 light"></h5>
       </div>
       <div class="row">
-            <div class="collection">
-                    <a href="./demos/demo1.html"  style= 'color: rgb(116, 0, 255);' class="collection-item">Demo 1</a>
-                    <a href="./demos/demo2.html"  style= 'color: rgb(116, 0, 255);' class="collection-item">Demo 2</a>
-                  </div>            
+        <div class="col s12 m6">
+          <div class="card small">
+            <div class="card-image">
+              <img src="./demos/data/demo1.png">
+            </div>
+            <div class="card-action">
+              <a href="./demos/demo1.html">Demo 1</a>
+            </div>
+          </div>
+        </div>
+        <div class="col s12 m6">
+          <div class="card small">
+            <div class="card-image">
+              <img src="./demos/data/demo2.png">
+            </div>
+            <div class="card-action">
+              <a href="./demos/demo2.html">Demo 2</a>
+            </div>
+          </div>
+        </div>
       </div>
+       
       <br><br>
 
     </div>
   </div>
 
-
+</main>
   
 
   <footer class="page-footer" style= 'background-color: rgb(116, 0, 255);'>

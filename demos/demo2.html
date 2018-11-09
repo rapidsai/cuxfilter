@@ -6,6 +6,9 @@
     <script type="text/javascript" src="../client_side/dist/index.js"></script>
     <link href="./styles/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="./styles/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="./scripts/materialize.js"></script>
+  <script src="./scripts/init.js"></script>
     <style>
         #pie1,#bar2{
             width: 100%;
@@ -13,9 +16,23 @@
         #bar2_slider {
           width: 150px;
         }
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+        #modal1 {
+            transform: translateY(-50%) scaleX(1) !important; 
+            margin-top: 25%;
+        }
+
+        main {
+            flex: 1 0 auto;
+        }
     </style>
   </head>
   <body>
+    <main>
     <nav class="lighten-1" style= 'background-color: rgb(116, 0, 255);' role="navigation">
             <div class="nav-wrapper container"><a id="logo-container" href="../" class="brand-logo">cuXfilter</a>
                 <ul class="right hide-on-med-and-down">
@@ -41,7 +58,24 @@
            min="1" max="100" value="50" step="1" />
         
         <div id="bar2"><!-- Plotly chart will be drawn inside this DIV --></div>
+      <!-- Modal Structure -->
+  <div id="modal1" class="modal transparent">
+        <div class="modal-content center transparent">
+          Loading ...
+        </div>
+      </div>
+    </main>
+
+    </main>
+
     
+    <footer class="page-footer" style= 'background-color: rgb(116, 0, 255);'>
+            <div class="footer-copyright">
+              <div class="container">
+              Made by <a class="orange-text text-lighten-3" href="https://rapids.ai/">rapids.ai</a>
+              </div>
+            </div>
+          </footer>
     <script>
       
 //intialize a cuXfilter object for a dataset called predictions-v1 (arrow format), with cudf engine and useSessions=true at the url
@@ -54,6 +88,10 @@ var pie_categories = 1;
 
 var seller_name_mappings = ["AmTrust", "AmeriHome Mortgage", "Bank of America", "Bishops Gate Mortgage", "Caliber Funding", "Chicago Mortgage", "Citi", "Ditech", "Flagstar Bank", "Franklin America", "Freedom Mortgage", "GMAC", "Guild Mortgage", "HomeBridge", "Impac Mortgage", "Irwin Mortgage", "JP Morgan Chase", "LoanDepot.com", "Nationstar Mortgage", "Other", "PHH Mortgage", "PNC", "PennyMac", "Prospect Mortgage", "Provident Funding", "Quicken Loans", "Sierra Pacific Mortgage", "Stearns Lending", "Stonegate Mortgage", "Suntrust", "US Bank", "USAA", "Unknown", "Wells Fargo"]
 
+
+//initialize all modals           
+$('.modal').modal({opacity: 0.5,outDuration:0, inDuration:0,dismissible:false});
+
 cuObj.init().then((status) => { 
     //load dimension 1
     dimension1 = cuObj.dimension(cuObj.schema[6]);
@@ -65,7 +103,7 @@ cuObj.init().then((status) => {
     return Promise.all([dimension1.loadDimension(),dimension2.loadDimension()]);
 }).then((error,message) => {
     //get histograms for dimension1 and dimension2
-    group1 = dimension1.group({'seller_name':['count']});
+    group1 = dimension1.group({'seller_name': ['count']});
     dimension2.getHist(100);
 
     return group1.loadGroup();
@@ -96,7 +134,7 @@ function init(){
             pie_colors[point_number] = 'lightgray';
             pie_filters.push(point_number);
         }
-
+        $('.modal').modal('open');
         dimension1.resetThenFilter('==',pie_filters);
         Plotly.restyle(pie1,'marker', {colors:pie_colors});
     });
@@ -104,17 +142,21 @@ function init(){
     
     //plotly event when a range is selected for crossfilter
     bar2.on('plotly_selected', (eventData) => {
-        if(eventData){ dimension2.resetThenFilter(eventData.range.x); }
+        if(eventData){ 
+            $('.modal').modal('open');
+            dimension2.resetThenFilter(eventData.range.x);
+         }
     });
 
     //plotly event when a range is deselected by double clicking on the screen
     bar2.on('plotly_deselect', () => {
+        $('.modal').modal('open');
         dimension2.resetFilters();
     });
 }
 
 //intialize eventlistener for the updateHistEvent, which listens for changes to histogram values for all bar charts in the current session
-addEventListener('updateHistEvent', (e) => {        
+addEventListener('updateHistEvent', (e) => {
     Plotly.restyle(bar2,'x', [dimension2.histogram.X]);
     Plotly.restyle(bar2,'y', [dimension2.histogram.Y]);
 });
@@ -124,9 +166,13 @@ addEventListener('updateGroupEvent', (e) => {
         pie_categories = group1.value.seller_name.length;
         pie_colors = Array(pie_categories).fill(0);
     }
-    Plotly.restyle(pie1,'labels', [Object.values(seller_name_mappings)]);
+    Plotly.restyle(pie1,'labels', [seller_name_mappings]);
     Plotly.restyle(pie1,'values', [group1.value.count_seller_name]);
     Plotly.restyle(pie1,'marker', {colors:pie_colors});
+});
+
+addEventListener('allUpdatesComplete',(e) => {
+    $('.modal').modal('close');
 });
 
 //custom function which fires when the range slider value is updated firing a getHist method for the specific dimension, with update bin size
@@ -156,8 +202,6 @@ function clearHOD(){
     </script>
 
 
-<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-  <script src="./scripts/materialize.js"></script>
-  <script src="./scripts/init.js"></script>
+
   </body>
 </html>
