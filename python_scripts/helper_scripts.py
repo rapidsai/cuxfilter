@@ -5,7 +5,7 @@ import numpy as np
 
 def pandas_df_to_arrow(df):
     print('converting arrow dataframe to a pandas df')
-    return pa.RecordBatch.from_pandas(df)
+    return pa.RecordBatch.from_pandas(df, preserve_index=False)
 
 def read_arrow(source):
     print('reading arrow file as arrow table from disk')
