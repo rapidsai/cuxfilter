@@ -79,14 +79,14 @@
     <script>
       
 //intialize a cuXfilter object for a dataset called predictions-v1 (arrow format), with cudf engine and useSessions=true at the url
-var cuObj = new cuXfilter('146M_predictions','http://10.33.227.184:3003','cudf',true,'arrow');
+var cuObj = new cuXfilter('146M_predictions_v2','http://localhost:3000','cudf',true,'arrow');
 var pie1 = document.getElementById('pie1');
 var bar2 = document.getElementById('bar2');
 var pie_filters = [];
 var pie_colors = 'not initialized yet';
 var pie_categories = 1;
 
-var seller_name_mappings = ["AmTrust", "AmeriHome Mortgage", "Bank of America", "Bishops Gate Mortgage", "Caliber Funding", "Chicago Mortgage", "Citi", "Ditech", "Flagstar Bank", "Franklin America", "Freedom Mortgage", "GMAC", "Guild Mortgage", "HomeBridge", "Impac Mortgage", "Irwin Mortgage", "JP Morgan Chase", "LoanDepot.com", "Nationstar Mortgage", "Other", "PHH Mortgage", "PNC", "PennyMac", "Prospect Mortgage", "Provident Funding", "Quicken Loans", "Sierra Pacific Mortgage", "Stearns Lending", "Stonegate Mortgage", "Suntrust", "US Bank", "USAA", "Unknown", "Wells Fargo"]
+var seller_name_mappings = ['Ally Bank', 'AmTrust', 'AmeriHome Mortgage', 'Amerisave', 'Bank of America', 'Bishops Gate Mortgage', 'Caliber Funding', 'CashCall', 'Chicago Mortgage', 'Citi', 'Ditech', 'FDIC', 'Fedral Home of Chicago', 'Fifth Third Bank', 'Flagstar Bank', 'Franklin America', 'Freedom Mortgage', 'Fremont Bank', 'GMAC', 'Guild Mortgage', 'HSBC', 'HomeBridge', 'Homeward Mortgage', 'Impac Mortgage', 'Irwin Mortgage', 'JP Morgan Chase', 'LoanDepot.com', 'Metlife', 'NYCB', 'Nationstar Mortgage', 'Other', 'PHH Mortgage', 'PNC', 'PennyMac', 'Prospect Mortgage', 'Provident Funding', 'Pulte Mortgage', 'Quicken Loans', 'Regions', 'Sierra Pacific Mortgage', 'Stearns Lending', 'Stonegate Mortgage', 'Suntrust', 'US Bank', 'USAA', 'Unknown', 'Wells Fargo']
 
 
 //initialize all modals           
