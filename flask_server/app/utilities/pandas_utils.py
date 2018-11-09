@@ -58,7 +58,7 @@ class pandas_utils:
         except Exception as e:
             return "Exception *** in pandas groupby():"+str(e)
 
-        return "groupby intialized successfully"
+        return group_appl
 
 
 
@@ -109,7 +109,7 @@ class pandas_utils:
 
     def default(self,o):
         if isinstance(o, np.int8) or isinstance(o, np.int16) or isinstance(o, np.int32) or isinstance(o, np.int64): return int(o)
-        elif isinstance(o, np.float8) or isinstance(o, np.float16) or isinstance(o, np.float32) or isinstance(o, np.float64): return float(o)
+        elif isinstance(o, np.float16) or isinstance(o, np.float32) or isinstance(o, np.float64): return float(o)
         raise TypeError
 
     def parse_dict(self,data):
@@ -173,7 +173,11 @@ class pandas_utils:
                     return data.query(query)
                 else:
                     column_list = list(set(list(self.dimensions_filters.keys())+include_dim))
-                    return data.loc[:,column_list].query(query)
+                    try:
+                        return_val = data.loc[:,column_list].query(query)
+                    except Exception as e:
+                        return 'Exception *** in pandas reset_filters():'+str(e)
+                    return return_val
             else:
                 return data
         except Exception as e:
@@ -204,7 +208,7 @@ class pandas_utils:
             Get parameters:
                 dimension_name (string)
             Response:
-                status -> success: dimension loaded successfully/dimension already exists   // error: "groupby not initialized"
+                status -> success: dimension loaded successfully/dimension already exists   // error: "dimension not initialized"
         '''
         try:
             if dimension_name not in self.dimensions_filters:
@@ -267,7 +271,7 @@ class pandas_utils:
             if len(self.dimensions_filters.keys()) == 0 or (dimension_name not in self.dimensions_filters) or (dimension_name in self.dimensions_filters and self.dimensions_filters[dimension_name] == ''):
                 return str(self.hist_numpy(self.pandas_df[str(dimension_name)].values,num_of_bins))
             else:
-                temp_df = self.reset_filters(self.back_up_dimension_pandas, omit=dimension_name, include_dim = [dimension_name])
+                temp_df = self.reset_filters(self.back_up_dimension_pandas, omit=dimension_name)
                 return str(self.hist_numpy(temp_df[str(dimension_name)].values,num_of_bins))
         except Exception as e:
             return "Exception *** in pandas dimension_hist():"+str(e)
@@ -379,9 +383,9 @@ class pandas_utils:
         '''
         try:
             key = dimension_name+"_"+groupby_agg_key
-            temp_df = self.reset_filters(self.back_up_dimension_pandas, omit=dimension_name, include_dim=list(groupby_agg.keys()))
-            response = self.groupby(temp_df,dimension_name,groupby_agg, groupby_agg_key)
-            return response+"&"+str(len(self.group_by_backups[key]))
+            self.group_by_backups[key] = True
+            response = 'groupby initialized successfully'
+            return response
         except Exception as e:
             return 'Exception *** in pandas groupby_load():'+str(e)
 
@@ -405,7 +409,7 @@ class pandas_utils:
                 res = "groupby not intialized"
             else:
                 #removing the cumulative filters on the current dimension for the groupby
-                temp_df = self.reset_filters(self.back_up_dimension_pandas, omit=dimension_name,include_dim=list(groupby_agg.keys()))
+                temp_df = self.reset_filters(self.back_up_dimension_pandas, omit=dimension_name)
                 self.groupby(temp_df,dimension_name,groupby_agg,groupby_agg_key)
                 if 'all' == sort_order:
                     temp_df = self.group_by_backups[key].to_dict()

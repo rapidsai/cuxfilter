@@ -148,7 +148,7 @@ module.exports = (io) => {
                 };
 
                 utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting groupby for the dimension:"+dimension_name,engine,Date.now(),  (error,message) => {
-                     callback(error,utils.groupbyMessageCustomParse(message));
+                     callback(error,message);
                 });
 
             }catch(ex){

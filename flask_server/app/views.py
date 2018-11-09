@@ -627,7 +627,7 @@ def end_connection():
             elif key in user_sessions_pandas and engine == 'pandas':
                 user_sessions_pandas.pop(session_id+dataset_name,None)
             response = "successfully removed dataframe from memory"
-        except e:
+        except Exception as e:
             response = str(e)
 
     elapsed = time.perf_counter() - start_time
