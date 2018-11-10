@@ -1,0 +1,325 @@
+/* mapchartChart Styles */
+
+/* full screen container */
+.mapchart {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	min-width: 1200px;
+	overflow: hidden;
+}
+
+/* legend seciton */
+.mapchart-legend-container{
+	z-index: 999;
+	position: absolute;
+	display: inline-block;
+	background-color:  rgba(25, 26, 26, 0.9);
+	top: 0;
+	left: 0;
+	width: 18rem;
+	height: 100%;
+	font-variant: small-caps;
+	color: white;
+	box-shadow: 0 0 2px 1px rgba(0,0,0,0.4);
+}
+
+.mapchart-legend-section{
+	position: relative;
+	margin: 1.5rem 2rem;
+	z-index: 10;
+}
+
+.mapchart-legend-section-dial{
+	position: relative;
+	margin: 0rem 1rem;
+	z-index: 10;
+}
+
+.mapchart-legend-section-1col{
+	position: relative;
+	text-align: center;
+}
+
+.mapchart-legend-section-2col{
+	position: relative;
+	width: 50%;
+	display: inline-block;
+	text-align: center;
+}
+
+.mapchart-legend-heading{
+	font-size: 1.3rem;
+}
+
+.mapchart-circ-value{
+	position: absolute;
+	text-align: center;
+	color: white;
+	width: 100%;
+	top: 46%;
+	font-size: 1.3rem;
+	z-index: -1;
+}
+
+.mapchart-key-ul{
+	list-style-type: none;
+	padding-left: 0;
+	margin: 0;
+}
+
+
+.mapchart-perf-title{
+	font-size: 1.1rem;
+}
+
+.mapchart-perf-cube{
+	display: inline-block;
+	vertical-align: top;
+	margin-top: 0.25rem;
+	font-size: 1.2rem;
+}
+
+.legend-img{
+	width: 2rem;
+}
+
+.mapchart-bank-list{
+	font-size: 0.9rem;
+	width: 100%;
+}
+
+.mapchart-perf{
+	display: inline-block;
+	width: 2rem;
+	height: 0.9rem;
+	margin-right: 0.25rem;
+	text-align: center;
+}
+
+.mapchart-sel0{
+	background-color: rgb(16, 130, 214);
+}
+
+.mapchart-sel1{
+	background-color: rgb(107,174,214);
+}
+
+.mapchart-sel2{
+	background-color: rgb(123,142,216);
+}
+
+.mapchart-sel3{
+	background-color: rgb(226,103,152);
+}
+
+.mapchart-sel4{
+	background-color: rgb(255,0,104);
+}
+
+
+
+.mapchart-legend-button {
+	color: #888888;
+    width: 100%;
+    font-size: 1.2rem;
+    padding: 1.25rem 0rem;
+    text-align: center;
+    background-color: #1f1f1f;
+    cursor: pointer;
+}
+
+.mapchart-legend-button:hover {
+	color: white;
+}
+
+.a-button {
+	text-decoration: none;
+    color: #888888;
+}
+
+.a-button:hover{
+	color: white;
+}
+
+.mapchart-legend-button-small{
+	width: 100%;
+	color: #888888;
+    font-size: 1.2rem;
+    padding: 0.25rem 0rem;
+    text-align: center;
+    background-color: #1f1f1f;
+    cursor: pointer;
+}
+
+.mapchart-legend-button-small:hover{
+	color: white;
+}
+
+.mapchart-legend-sink {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+}
+
+/* map section */
+.mapboxgl-ctrl.mapboxgl-ctrl-attrib {
+	display: none;
+}
+
+.mapboxgl-ctrl-bottom-left {
+	display: none;
+}
+
+.mapchart-heading-body{
+    position: absolute;
+    text-align: center;
+    z-index: 999;
+    margin-left: 18rem;
+    width: calc(100% - 18rem);
+    background-color: rgba(25, 26, 26, 0.8);
+}
+
+.mapchart-heading-container{
+	display: inline-block;
+}
+
+.mapchart-header-title{
+	padding-top: 0.7rem;
+	font-size: 2rem;
+	font-variant: small-caps;
+	text-align: center;
+}
+
+.mapchart-total-bar-cudf{
+	text-align: center;
+	height: 0.25rem;
+	width: 100%;
+	margin-bottom: 0.7rem;
+    background-color: rgb(118, 185, 0);
+    transition: all 0.6s ease;
+}
+
+.mapchart-total-bar-pandas{
+	text-align: center;
+	height: 0.25rem;
+	width: 100%;
+	margin-bottom: 0.7rem;
+    background-color: rgb(0, 113, 197);
+    transition: all 0.6s ease;
+}
+
+.percent {
+	font-size: 1.3rem;
+}
+
+.mapchart-map-body{
+	position: absolute;
+	vertical-align: top;
+	display: inline-block;
+	background-color: rgba(0,0,0,0.3);
+	width: 100%;
+	height: 100%;
+}
+
+/* chart section */
+.mapchart-chart-body{
+	position: absolute;
+	bottom: 0;
+	margin-left: 18rem;
+	width: calc(100% - 18rem);
+	height: 30%;
+	background-color: rgba(25, 26, 26, 0.8);
+}
+
+.mapchart-col1-container{
+	display: inline-block;
+	vertical-align: top;
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+.mapchart-col2-container{
+	display: inline-block;
+	vertical-align: top;
+	position: relative;
+	width: 50%;
+	height: 100%;
+}
+
+.mapchart-col3-container{
+	display: inline-block;
+	vertical-align: top;
+	position: relative;
+	width: 28.32%;
+	height: 100%;
+	padding: 0% 2%;
+}
+
+.VictoryContainer{
+	overflow: hidden;
+}
+
+
+/* super wide screens */
+@media only screen and (min-width: 2000px) {
+	.mapchart-chart-body{
+		position: absolute;
+		top: 4em;
+		right: 0;
+		margin-left: 0;
+		width: 25%;
+		height: calc(100% - 4rem);
+		background-color: rgba(25, 26, 26, 0.8);
+	}
+	
+	.mapchart-col1-container{
+		position: relative;
+		width: 96%;
+		height: 96%;
+		padding: 2% 2%;
+	}
+
+	.mapchart-col2-container{
+		position: relative;
+		width: 92%;
+		height: 42%;
+		padding: 2% 2%;
+	}
+
+	.mapchart-col3-container{
+		position: relative;
+		width: 96%;
+		height: 28%;
+		padding: 2% 2%;
+	}
+
+}
+
+
+/* status stripes */
+.stripes {
+  transition: all 0.6s ease;
+  animation: barberpole 1s linear infinite;
+  background-size: 30px 30px;
+  background-image: linear-gradient(
+    45deg, 
+    rgba(black, 0.2)  25%, 
+    transparent       25%, 
+    transparent       50%, 
+    rgba(black, 0.2)  50%, 
+    rgba(black, 0.2)  75%, 
+    transparent       75%, 
+    transparent
+  );  
+}
+
+@keyframes barberpole {
+  from { background-position: 0 0; }
+  to   { background-position: 60px 30px; }
+}
+
+
+
+

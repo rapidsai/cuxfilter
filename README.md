@@ -1,9 +1,8 @@
 
 # cuXfilter 
-> `cuXfilter` is inspired from a library called Crossfilter, which is a fast browser side in-memory filtering mechanism across multiple dimensions and offers features do groupby operations on top of the dimensions. One of the major limitations of using Crossfilter is that it keeps data in-memory on client-side in a browser, making it inefficient for processing large datasets. `cuXfilter` uses `cuDF` on the server-side, while keeping the dataframe in the GPU throughout the session. This results in sub-second response times for histogram calculations, groupby operations and querying datasets in the range of 10M to 200M rows(multiple columns).
+> `cuXfilter` is inspired from the Crossfilter library, which is a fast, browser-based filtering mechanism across multiple dimensions and offers features do groupby operations on top of the dimensions. One of the major limitations of using Crossfilter is that it keeps data in-memory on client-side in a browser, making it inefficient for processing large datasets. `cuXfilter` uses `cuDF` on the server-side, while keeping the dataframe in the GPU throughout the session. This results in sub-second response times for histogram calculations, groupby operations and querying datasets in the range of 10M to 200M rows(multiple columns).
 
 ### Table of Contents
-
 - [Installation](#installation)
 - [Architecture](#architecture)
     - [Server-side](#server-side)
@@ -14,7 +13,6 @@
 
 
 ## Installation
-
 **To build using Docker:**
 
 while in the directory, run the following commands:
@@ -30,7 +28,6 @@ Access the crossfilter demos at `http://server.ip.addr:3004/demos/examples`
 
 
 ## Architecture
-
 > **Docker container(python_flask <--> node) SERVER  <<<===(socket.io)===>>> browser(client-side JS)**
        
 ### Server-side
@@ -63,7 +60,6 @@ Access the crossfilter demos at `http://server.ip.addr:3004/demos/examples`
 
 
 ## Memory Limitations
-
 Currently, there are a few memory limitations for running cuXfilter. 
 
 - Dataset size should be half the size of total GPU memory available. This is because the GPU memory usage spikes around 2X, in case of groupby operations.
@@ -72,7 +68,6 @@ Currently, there are a few memory limitations for running cuXfilter.
 
 
 ## Troubleshooting
-
 In case the server becomes unresponsive, here are the steps you can take to resolve it:
 
 1. Check if the gpu memory is full, using the `nvidia-smi` command. If the gpu memory usage seems full and frozen, this may be due to the cudf out of memory error, which may happen if the dataset is too large to fit into the GPU memory. Please refer `Memory limitations` while choosing datasets
@@ -81,6 +76,5 @@ A docker container restart might solve the issue temporarily.
 
 
 ## File Conversion
-
 Currently, cuXfilter supports only arrow file format as input. The `python_scripts` folder in the root directory provides a helper script to convert csv to arrow file. For more information, follow this [link](python_scripts)
 
