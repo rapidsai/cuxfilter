@@ -8,7 +8,7 @@ module.exports = {
         library: 'cuXfilter',
         libraryTarget: 'umd',
         libraryExport: 'default',
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, '../dist'),
         filename: 'cuXfilter-client.js'
     },
     mode: 'production',
