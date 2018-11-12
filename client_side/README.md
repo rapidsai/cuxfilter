@@ -35,7 +35,7 @@
 
 <pre>
 git clone cuXfilter-repo
-cd client_side
+cd client_side/library_src
 npm install
 npm run build
 </pre>
