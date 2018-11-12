@@ -36,20 +36,20 @@
 <pre>
 git clone cuXfilter-repo
 cd client_side
-(make sure webpack is installed)
+npm install
 npm run build
 </pre>
 
-use ./dist/index.js
+use ./dist/cuXfilter-client.js
 
 
 ## Import
 
 1. React/Angular
-<pre>import cuXfilter from "index.js"; </pre>
+<pre>import cuXfilter from "cuXfilter-client.js"; </pre>
 
 2. html
-<pre> < script type="text/javascript" src="index.js">< / script > </pre>
+<pre> < script type="text/javascript" src="cuXfilter-client.js">< / script > </pre>
 
 
 ## Functions

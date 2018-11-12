@@ -22,15 +22,12 @@ export class cuXfilter{
                 method: 'GET',
                 credentials: 'include'
             }).then(res => {
-                console.log("cuXfilter initialized");
-
                 this.socket = io(this.url,{
                     path: '/cuXfilter'
                 });
 
                 this.socket.on('connect',() => {
                     console.log("connected to server");
-                    // console.log(this.socket.id);
                     this.tryConnecting(1, function(res){
                         if(res === -1){
                             reject('check if server is running');
@@ -81,7 +78,6 @@ export class cuXfilter{
         });
 
         this.socket.on('all_updates_complete', (dataset,engine) => {
-            console.log('all updates completed!!!!');
             if(this.dataset === dataset && this.engine === engine){
                 dispatchEvent(new CustomEvent('allUpdatesComplete', {detail: {'dataset': dataset}}));
             }
@@ -124,7 +120,6 @@ export class cuXfilter{
         if(this.connected){
             let startTime = Date.now();
             this.socket.emit('load_data',this.dataset,this.engine, this.load_type, (error,message) => {
-                // console.log(message);
                 message = JSON.parse(message)
 
                 //init metadata for the current dataset
@@ -153,7 +148,6 @@ export class cuXfilter{
         if(this.connected){
             let startTime = Date.now();
             this.socket.emit('get_schema', this.dataset,this.engine, (error,message) => {
-                // console.log("schema: "+message);
                 message = JSON.parse(message);
                 message['browserTime'] = (Date.now() - startTime)/1000;
                 this.schema = message['data'].replace(/[\[\]']+/g,"").split(', ');
@@ -190,11 +184,8 @@ export class cuXfilter{
             let startTime = Date.now();
             this.socket.emit('endSession',this.dataset,this.engine, (error, message) => {
                 if(error){
-                    console.log(error);
                     reject(error);
-                    // callback(error);
                 }else{
-                    // console.log(message);
                     message = JSON.parse(message);
                     message['browserTime'] = (Date.now() - startTime)/1000;
                     this.connected = false;

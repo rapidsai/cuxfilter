@@ -9,7 +9,6 @@ class Dimension{
         this.min = 0;
         this.socket = socket;
         this.filters = [];
-        // this.loadDimension();
         this.childGroup = {};
         this.engine = engine;
         this.value = {};
@@ -110,12 +109,10 @@ class Dimension{
     }
 
     top(n_rows=10, columns = []){
-            console.log(n_rows);
             this.filterOrder('top',n_rows,columns.toString());
     }
 
     bottom(n_rows=10, columns = []){
-            console.log(n_rows);
             this.filterOrder('bottom',n_rows,columns.toString());
     }
 
@@ -129,7 +126,6 @@ class Dimension{
             agg[this.name] = ['mean'];
         }
         let key = this.name+JSON.stringify(agg);
-        console.log('group by key', key);
         this.childGroup[key] = new Group(this.name,this.parent_dataset, this.socket,agg, this.engine);
         return this.childGroup[key];
     }
