@@ -9,8 +9,9 @@ module.exports = {
         libraryTarget: 'umd',
         libraryExport: 'default',
         path: path.resolve(__dirname, 'dist'),
-        filename: 'index.js'
+        filename: 'cuXfilter-client.js'
     },
+    mode: 'production',
     module: {
         rules: [
             {
@@ -31,9 +32,9 @@ module.exports = {
     },
     plugins: [
         new uglifyJsPlugin(),
-        new HTMLWebpackPlugin({
-            template: path.resolve(__dirname, 'index.html')
-        }),
+        // new HTMLWebpackPlugin({
+        //     template: path.resolve(__dirname, 'index.html')
+        // }),
         new webpack.HotModuleReplacementPlugin(),
     ]
 };
