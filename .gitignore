@@ -1,7 +1,7 @@
 node_modules
 .idea
 uploads
-data
+/data
 *arrow
 __pycache__
 *ipynb
