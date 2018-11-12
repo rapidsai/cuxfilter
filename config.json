@@ -1,5 +1,5 @@
 {
-    "server_ip":"http://10.33.227.184",
+    "server_ip":"http://ip.addr",
     "cuXfilter_port_external":3000,
     "demos_serve_port_external": 3004,
     "gtc_demo_port_external": 3005,
