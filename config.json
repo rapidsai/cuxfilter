@@ -1,7 +1,10 @@
 {
-    "flask_server_url": "http://localhost",
-    "flask_server_port_cudf": 3002,
-    "flask_server_port_pandas": 3003,
-    "demos_serve_url": 3004,
+    "server_ip":"http://10.33.227.184",
+    "cuXfilter_port_external":3000,
+    "demos_serve_port_external": 3004,
+    "gtc_demo_port_external": 3005,
+    "flask_server_port_cudf_internal": 3002,
+    "flask_server_port_pandas_internal": 3003,
+    "demos_serve_port_internal":3004,
     "whitelisted_urls_for_clients": ["http://localhost:3000"]
 }

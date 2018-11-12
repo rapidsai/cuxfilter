@@ -5,9 +5,9 @@ export FLASK_APP=./flask_server/run.py
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
-cudf_port=`cat config.json | jq --raw-output '.flask_server_port_cudf'`
-pandas_port=`cat config.json | jq --raw-output '.flask_server_port_pandas'`
-demos_serve_url=`cat config.json | jq --raw-output '.demos_serve_url'`
+cudf_port=`cat config.json | jq --raw-output '.flask_server_port_cudf_internal'`
+pandas_port=`cat config.json | jq --raw-output '.flask_server_port_pandas_internal'`
+demos_serve_url=`cat config.json | jq --raw-output '.demos_serve_port_internal'`
 
 #cudf engine
 pm2 start "flask run --port=$cudf_port" --watch
@@ -17,6 +17,9 @@ pm2 start "flask run --port=$pandas_port" --watch
 
 cd ./node_server
 pm2 start npm -- start --watch
+
+cd './demos/GTC demo'
+pm2 start npm -- start
 
 cd ../
 pm2 serve --port=$demos_serve_url

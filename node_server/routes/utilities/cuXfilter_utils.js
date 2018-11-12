@@ -5,8 +5,8 @@ const isDataLoaded = {};
 const dataLoaded = {};
 const serverOnTime = {};
 
-const pyServerURLcudf = config.flask_server_url+":"+config.flask_server_port_cudf
-const pyServerURLPandas = config.flask_server_url+":"+config.flask_server_port_pandas
+const pyServerURLcudf = "http://localhost:"+config.flask_server_port_cudf_internal
+const pyServerURLPandas = "http://localhost:"+config.flask_server_port_pandas_internal
 let singleSessionId = {
   'cudf': '',
   'pandas': ''
