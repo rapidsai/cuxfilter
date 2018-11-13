@@ -3,7 +3,7 @@
   <head>
     <title>cuXfilter: Demo 2</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script type="text/javascript" src="../../client_side/dist/index.js"></script>
+    <script type="text/javascript" src="../../client_side/dist/cuXfilter-client.js"></script>
     <link href="./styles/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="./styles/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
     <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
@@ -22,7 +22,7 @@
             flex-direction: column;
         }
         #modal1 {
-            transform: translateY(-50%) scaleX(1) !important; 
+            transform: translateY(-50%) scaleX(1) !important;
             margin-top: 25%;
         }
 
@@ -34,11 +34,11 @@
   <body>
     <main>
     <nav class="lighten-1" style= 'background-color: rgb(116, 0, 255);' role="navigation">
-            <div class="nav-wrapper container"><a id="logo-container" href="../" class="brand-logo">cuXfilter</a>
+            <div class="nav-wrapper container"><a id="logo-container" href="./index.html" class="brand-logo">cuXfilter</a>
                 <ul class="right hide-on-med-and-down">
                 <li><a href="https://rapids.ai/">RAPIDS</a></li>
                 </ul>
-        
+
                 <ul id="nav-mobile" class="sidenav">
                 <li><a href="https://rapids.ai/">RAPIDS</a></li>
                 </ul>
@@ -46,7 +46,7 @@
             </div>
             </nav>
             <h1 class="header center" style= 'color: rgb(116, 0, 255);' >Demo 2  - 146M row Mortgage dataset</h1>
-    
+
         <h6 class='center'>(double click to reset selection for bar charts )</h6>
         <br><br>
 
@@ -56,7 +56,7 @@
         <label for="bar2_slider">number of bins</label>
         <input type="range" id="bar2_slider" name="bar2_slider"  onclick="updateBins('bar2')"
            min="1" max="100" value="50" step="1" />
-        
+
         <div id="bar2"><!-- Plotly chart will be drawn inside this DIV --></div>
       <!-- Modal Structure -->
   <div id="modal1" class="modal transparent">
@@ -68,7 +68,7 @@
 
     </main>
 
-    
+
     <footer class="page-footer" style= 'background-color: rgb(116, 0, 255);'>
             <div class="footer-copyright">
               <div class="container">
@@ -77,9 +77,40 @@
             </div>
           </footer>
     <script>
-      
+
+var cuObj;
+
+$.getJSON('../../config.json', function(data){
+
+var ip_addr = data.server_ip+":"+data.cuXfilter_port_external;
+console.log(ip_addr);
+cuObj = new cuXfilter('146M_predictions_v2',ip_addr,'cudf',true,'arrow');
+cuObj.init().then((status) => {
+      //load dimension 1
+      dimension1 = cuObj.dimension(cuObj.schema[6]);
+
+      //load dimension 2
+      dimension2 = cuObj.dimension(cuObj.schema[1]);
+
+      //wait for the dimension loading to finish before requesting for histogram by resolving the promises given below
+      return Promise.all([dimension1.loadDimension(),dimension2.loadDimension()]);
+  }).then((error,message) => {
+      //get histograms for dimension1 and dimension2
+      group1 = dimension1.group({'seller_name': ['count']});
+      dimension2.getHist(100);
+
+      return group1.loadGroup();
+
+  }).then((error,message) => {
+      //get groupby values for hour of day(hod)
+      group1.all();
+
+      //initializing all charts and event listeners
+      init();
+  });
+});
+
 //intialize a cuXfilter object for a dataset called predictions-v1 (arrow format), with cudf engine and useSessions=true at the url
-var cuObj = new cuXfilter('146M_predictions_v2','http://localhost:3000','cudf',true,'arrow');
 var pie1 = document.getElementById('pie1');
 var bar2 = document.getElementById('bar2');
 var pie_filters = [];
@@ -89,36 +120,14 @@ var pie_categories = 1;
 var seller_name_mappings = ['Ally Bank', 'AmTrust', 'AmeriHome Mortgage', 'Amerisave', 'Bank of America', 'Bishops Gate Mortgage', 'Caliber Funding', 'CashCall', 'Chicago Mortgage', 'Citi', 'Ditech', 'FDIC', 'Fedral Home of Chicago', 'Fifth Third Bank', 'Flagstar Bank', 'Franklin America', 'Freedom Mortgage', 'Fremont Bank', 'GMAC', 'Guild Mortgage', 'HSBC', 'HomeBridge', 'Homeward Mortgage', 'Impac Mortgage', 'Irwin Mortgage', 'JP Morgan Chase', 'LoanDepot.com', 'Metlife', 'NYCB', 'Nationstar Mortgage', 'Other', 'PHH Mortgage', 'PNC', 'PennyMac', 'Prospect Mortgage', 'Provident Funding', 'Pulte Mortgage', 'Quicken Loans', 'Regions', 'Sierra Pacific Mortgage', 'Stearns Lending', 'Stonegate Mortgage', 'Suntrust', 'US Bank', 'USAA', 'Unknown', 'Wells Fargo']
 
 
-//initialize all modals           
+//initialize all modals
 $('.modal').modal({opacity: 0.5,outDuration:0, inDuration:0,dismissible:false});
 
-cuObj.init().then((status) => { 
-    //load dimension 1
-    dimension1 = cuObj.dimension(cuObj.schema[6]);
 
-    //load dimension 2
-    dimension2 = cuObj.dimension(cuObj.schema[1]);
-
-    //wait for the dimension loading to finish before requesting for histogram by resolving the promises given below
-    return Promise.all([dimension1.loadDimension(),dimension2.loadDimension()]);
-}).then((error,message) => {
-    //get histograms for dimension1 and dimension2
-    group1 = dimension1.group({'seller_name': ['count']});
-    dimension2.getHist(100);
-
-    return group1.loadGroup();
-    
-}).then((error,message) => {
-    //get groupby values for hour of day(hod)
-    group1.all();
-
-    //initializing all charts and event listeners
-    init();
-});
 
 function init(){
     cuObj.resetAllFilters();
-   
+
     Plotly.newPlot(pie1, [{values: [10], labels: ['before_val_update1'], type: 'pie',textinfo: 'none'}], {title: cuObj.schema[6]+' pie chart'},{modeBarButtons: [[]]});
     Plotly.newPlot(bar2, [{x: [], y: [], type: 'bar'}], {title: cuObj.schema[1]+' histogram', dragmode:'select',selectdirection:'h'}, {modeBarButtons: [[]]});
 
@@ -138,11 +147,11 @@ function init(){
         dimension1.resetThenFilter('==',pie_filters);
         Plotly.restyle(pie1,'marker', {colors:pie_colors});
     });
-    
-    
+
+
     //plotly event when a range is selected for crossfilter
     bar2.on('plotly_selected', (eventData) => {
-        if(eventData){ 
+        if(eventData){
             $('.modal').modal('open');
             dimension2.resetThenFilter(eventData.range.x);
          }
@@ -182,7 +191,7 @@ function updateBins(chart) {
         dimension2.getHist(x);
     }
 }
- 
+
 
 function removeFromFilters(element) {
     const index = pie_filters.indexOf(element);
@@ -198,7 +207,6 @@ function clearHOD(){
         dimension1.resetFilters();
         Plotly.restyle(pie1,'marker', {colors:pie_colors});
 }
-
     </script>
 
 

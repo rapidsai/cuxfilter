@@ -1,0 +1,6 @@
+{
+	"readme":"https://gitlab-master.nvidia.com/athorve/pycrossfilter/blob/master/README.md",
+	"ip":"http://10.33.227.184:3000",
+	"dataset":"146M_predictions_v2",
+	"mapboxtoken": "pk.eyJ1IjoiYWVuZW1hcmsiLCJhIjoiY2prM2JvcWZpMTFicDNrcWx3dzhnNnozeiJ9.uBPhXMKZxB3YWM34JcEH3w"
+}
