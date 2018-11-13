@@ -83,8 +83,9 @@ var cuObj;
 $.getJSON('../../config.json', function(data){
 
 var ip_addr = data.server_ip+":"+data.cuXfilter_port_external;
+var dataset_name = data.demo_dataset_name;
 console.log(ip_addr);
-cuObj = new cuXfilter('146M_predictions_v2',ip_addr,'cudf',true,'arrow');
+cuObj = new cuXfilter(dataset_name,ip_addr,'cudf',true,'arrow');
 cuObj.init().then((status) => {
       //load dimension 1
       dimension1 = cuObj.dimension(cuObj.schema[6]);
