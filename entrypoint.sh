@@ -19,9 +19,9 @@ cd ./node_server
 pm2 start npm -- start --watch
 
 cd '../demos/GTC demo/'
-npm run start
+npm run start &
 
-cd ../
+cd ../../
 pm2 serve --port=$demos_serve_url
 
 pm2 logs
