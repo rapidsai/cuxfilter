@@ -18,8 +18,8 @@ pm2 start "flask run --port=$pandas_port" --watch
 cd ./node_server
 pm2 start npm -- start --watch
 
-cd './demos/GTC demo'
-pm2 start npm -- start
+cd '../demos/GTC demo/'
+npm run start
 
 cd ../
 pm2 serve --port=$demos_serve_url
