@@ -3,6 +3,7 @@ const webpack = require("webpack");
 
 // import config
 const config = require('../../config.json')
+console.log("Config: ", config)
 
 module.exports = {
     entry: path.resolve(__dirname, "src/index.jsx"),

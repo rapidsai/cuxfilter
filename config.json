@@ -1,7 +1,7 @@
 {
     "server_ip":"http://10.33.227.184",
     "cuXfilter_port_external":3000,
-    "demos_serve_port_external": 3004,
+    "demos_serve_port_external": 3003,
     "gtc_demo_port_external": 3005,
     "flask_server_port_cudf_internal": 3002,
     "flask_server_port_pandas_internal": 3003,

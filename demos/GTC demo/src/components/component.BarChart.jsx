@@ -68,7 +68,7 @@ class BarChart extends React.PureComponent {
 						width={width} height={height}
 					 	containerComponent={
 					 						<VictoryBrushContainer
-					 						  allowDrag={true}
+					 						  allowDrag={false}
 					 						  disable={active}
 										      brushDimension="x"
 										      defaultBrushArea="all"

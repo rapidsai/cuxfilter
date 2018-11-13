@@ -428,7 +428,7 @@ class MapChart extends React.Component {
 				}
 			}
 
-
+			// NOTE: produces bug when 3zip is filtered THEN bank is filtered after - unfiltering 3zip does not update map (force update?)
 			this.setState({
 				geoData: { type: "FeatureCollection", features: geoDataFeatures }, // new obj required since react only does shallow compare for state change
 				error: false
