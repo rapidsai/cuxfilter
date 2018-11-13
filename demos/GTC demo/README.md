@@ -44,7 +44,7 @@ The data is visualized wit the following features:
 ## Software Requirements
 The demo has two parts, the *web demo frontend* and the *cuXfilter demo backend*. While the frontend can be served on most Linux, Ubuntu, or Windows machines and accessed from any modern web browser, the backend requires a Linux or Ubuntu system. Note: While the demo can technically server multiple users at once, because of memory limitations this will likely result in OOM - out of memory - errors. 
 
-Note: the demo requires a *Mapbox Access Token*, [details here](https://www.mapbox.com/help/define-access-token/), to use the underlying geographic map layer. For limited usage they are free with a Mapbox account. Supply the token in the ```/data/cuXfilter-config.json``` configuration file located in the /src and /public folders. Without a token, only data will be rendered (e.g. no roads or city names).
+Note: the demo requires a *Mapbox Access Token*, [details here](https://www.mapbox.com/help/define-access-token/), to use the underlying geographic map layer. For limited usage they are free with a Mapbox account. Supply the token in the ```/config.json``` configuration file located in root repo directory. Without a token, only data will be rendered (e.g. no roads or city names).
 
 
 ## Hardware Requirements
@@ -66,12 +66,17 @@ If the frontend demo appears to hang or the status bar turns orange, check the w
 
 ## Installation
 ### RAPIDS Mortgage Visualization Demo Docker Install (recommended)
-To install the fully encapsulated demo via docker, please refer to the [cuXfilter](https://gitlab-master.nvidia.com/ai-infra-ase/RAPIDs/cuXfilter) readme. 
+To install the fully encapsulated demo via docker, please refer to the [cuXfilter](https://gitlab-master.nvidia.com/RAPIDS/cuXfilter) readme. Note: Be sure to setup the ```/config.json``` file *before* running the docker command.
 
 ### RAPIDS Mortgage Visualization Frontend Only Source Install
 To install and run the frontend demo from source, follow the typical node + webpack procure. Note: assumes that the backend has been already setup. 
 
+Note: any update to cuXfilter-client.js requires the frontend be rebuilt as well.
+
 Note: installing on a Windows machine may require some additional steps, such as making sure the Python environment is setup correctly.
+
+Note: running the demo locally with a remote backend requires the local ```/config.json``` gtc_demo_port_external value to be set to port 3000, *not port 3005*.
+
 
 Clone repo.
 ```git clone```
@@ -79,15 +84,15 @@ Clone repo.
 Install node modules.
 ```npm install```
 
-Edit configuration file to add backend IP address, dataset name, and mapbox token.
-```/data/cuXfilter-config.json```
+Edit configuration file located in the repo's root to add backend IP address, dataset name, and mapbox token etc.
+```/config.json```
 
 Run hot update webpack development server.
 ```npm run dev```
 
-Build via webpack. Note: /src/data folder is not automatically copied over to /public on build.
+Build via webpack. Note: /src/data folder is *not* automatically copied over to /public on build.
 ```npm run build```
 
-Run express web server.
+Run express web server to host.
 ```npm run start``` 
 

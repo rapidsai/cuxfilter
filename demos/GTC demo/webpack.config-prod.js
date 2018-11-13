@@ -39,8 +39,9 @@ module.exports = {
         rules: [{
                 test: /\.(js|jsx)$/,
                 exclude: /(node_modules)/,
+                include: [path.resolve(__dirname)],
                 loader: "babel-loader",
-                options: { presets: ['env'] }
+                options: { presets: ['env', 'react'] }
             },
             {
                 test: /\.(css|scss)$/,

@@ -15,7 +15,7 @@
 ## Installation
 **To build using Docker:**
 
-while in the directory, run the following commands:
+Edit the `config.json` file to reflect accurate IP, dataset name, and mapbox token values. While in the directory, run the following commands:
 
 You can skip steps 1&2 if you do not wish to expose the `cuXfilter` demos on port 3004
 1. edit the config.json file in the root directory
@@ -23,8 +23,11 @@ You can skip steps 1&2 if you do not wish to expose the `cuXfilter` demos on por
 3. `docker build -t user_name/viz .`
 4. `docker run --runtime=nvidia  -d -p 3000:3000 -p 3004:3004 -p 3005:3005 --name rapids_viz -v /folder/with/data:/usr/src/app/node_server/uploads user_name/viz`
 
+With the defualt settings:
 
 Access the crossfilter demos at `http://server.ip.addr:3004/demos/examples`
+
+Access the GTC demos at `http://server.ip.addr:3005/`
 
 
 ## Architecture
@@ -59,12 +62,14 @@ Access the crossfilter demos at `http://server.ip.addr:3004/demos/examples`
     Documentation and examples can be found [here](client_side)
 
 
+
 ## Memory Limitations
 Currently, there are a few memory limitations for running cuXfilter.
 
 - Dataset size should be half the size of total GPU memory available. This is because the GPU memory usage spikes around 2X, in case of groupby operations.
 
 >  This will not be an issue once dask_gdf engine is implemented(assuming the user has access to multiple GPUs)
+
 
 
 ## Troubleshooting
@@ -75,5 +80,8 @@ In case the server becomes unresponsive, here are the steps you can take to reso
 A docker container restart might solve the issue temporarily.
 
 
+
 ## File Conversion
 Currently, cuXfilter supports only arrow file format as input. The `python_scripts` folder in the root directory provides a helper script to convert csv to arrow file. For more information, follow this [link](python_scripts)
+
+

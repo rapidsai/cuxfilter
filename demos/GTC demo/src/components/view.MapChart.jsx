@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import {render} from "react-dom";
 
+
 // https://deck.gl/#/
 import DeckGL, {ScatterplotLayer, GeoJsonLayer} from 'deck.gl';
 import {StaticMap} from 'react-map-gl';
@@ -11,13 +12,15 @@ import BarChart from './component.BarChart'
 // https://github.com/dmitrymorozoff/react-circle-slider
 import { CircleSlider } from "react-circle-slider"; 
 
+
+// EXTERNAL
 // RAPIDS cuXFilter 
-// NOTE: npm eventually / from source (import running into issues with .babelrc file)
-import cuXfilter from "../cuXfilter/index.js"
+// NOTE: if cuXfilter-client.js is updated, MUST rebuild GTC demo from source
+import cuXfilter from "../../../../client_side/dist/cuXfilter-client.js"
+
 
 // scss
 import './scss/mapchart-style';
-
 
 // location of zip3 geoJson
 const geoURL ='./data/zip3-ms-rhs-lessprops.json';
@@ -30,14 +33,14 @@ class MapChart extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			configURL: './data/cuXfilter-config.json',
+			configURL: '/config.json', // EXTERNAL 
 			xFilter: undefined,
 			engine: 'cudf',
 			ip: undefined,
 			dataset: undefined,
 			memformat: 'arrow',
 			sessions: true,
-			mapboxtoken: undefined, // NOTE: Map underlay requires MapBox Token set in /data/cuXfilter-config.json - https://www.mapbox.com/help/define-access-token/
+			mapboxtoken: undefined, // NOTE: Map underlay requires MapBox Token set in config.json - https://www.mapbox.com/help/define-access-token/
 			geoData: undefined,
 			hover: undefined,
 			currentZip: undefined,
@@ -163,26 +166,26 @@ class MapChart extends React.Component {
 			
 			console.log("xFilter Config data loaded.", json)
 
-			// NOTE: check if /data/cuXfilter-config.json is filled out correctly
-			if(json.ip === '' || json.dataset  === ''){
+			// NOTE: check if config.json is filled out correctly
+			if(json.server_ip === '' || json.dataset  === '' || json.cuXfilter_port_external === ''){
 				
 				this.setState({
 					error: true
 				})
 
-				console.log('cuXfilter-config.json error. Make sure the config file is fill out correctly');
+				console.log('config.json error. Make sure the config file is fill out correctly');
 			} else{
 
 
-				if(json.mapboxtoken === ''){
+				if(json.demo_mapbox_token === ''){
 					console.log('WARNING: no mapbox token token configured, there will be NO map base layer!')
 				}
 
 				// set state
 				this.setState({
-					ip: json.ip,
-					dataset: json.dataset,
-					mapboxtoken: json.mapboxtoken
+					ip: json.server_ip + ':' + json.cuXfilter_port_external,
+					dataset: json.demo_dataset_name,
+					mapboxtoken: json.demo_mapbox_token
 
 				})
 
@@ -196,7 +199,7 @@ class MapChart extends React.Component {
 				error: true
 			})
 
-			console.log('cuXfilter-config.json fetch error. Make sure the config file is setup correctly: ', err);
+			console.log('config.json fetch error. Make sure the config file is setup correctly: ', err);
 		});
 	}
 

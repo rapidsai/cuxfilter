@@ -42,6 +42,7 @@ npm run build
 
 use ./dist/cuXfilter-client.js
 
+Note: if cuXfilter-client.js is updated you must also rebuild the GTC demo from source.
 
 ## Import
 

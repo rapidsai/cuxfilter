@@ -4,6 +4,10 @@ import path from 'path';
 import { Server } from 'http';
 import Express from 'express';
 
+// import config
+import config from '../../config.json'
+console.log("Config File Settings: ", config)
+
 const app = new Express();
 const server = new Server(app);
 
@@ -12,9 +16,11 @@ const server = new Server(app);
 // define the folder that will be used for static assets
 app.use(Express.static(path.join(__dirname, '/public')));
 
+// static for config.json
+app.use(Express.static(path.resolve(__dirname, '../../')));
+
 // # routing handled by react
 app.get('/', (req, res) => {
-      
       // return react
       return res.sendFile(path.join(__dirname+'/public/index.html'));
 });
@@ -31,7 +37,7 @@ app.use(function (req, res, next) {
 })
 
 // start the server
-const port = process.env.PORT || 3000;
+const port = config.gtc_demo_port_external;
 const env = process.env.NODE_ENV || 'production';
 server.listen(port, err => {
   if (err) {

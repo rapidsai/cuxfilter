@@ -1,6 +1,9 @@
 const path = require("path");
 const webpack = require("webpack");
 
+// import config
+const config = require('../../config.json')
+
 module.exports = {
     entry: path.resolve(__dirname, "src/index.jsx"),
     devtool: "source-map",
@@ -12,8 +15,9 @@ module.exports = {
         rules: [{
                 test: /\.(js|jsx)$/,
                 exclude: /(node_modules)/,
+                include: [path.resolve(__dirname)],
                 loader: "babel-loader",
-                options: { presets: ['env'] }
+                options: { presets: ['env', 'react'] }
             },
             {
                 test: /\.(css|scss)$/,
@@ -49,9 +53,9 @@ module.exports = {
         filename: "bundle.js"
     },
     devServer: {
-        contentBase: path.join(__dirname, "src/"),
-        port: 3000,
-        publicPath: "http://localhost:3000/",
+        contentBase: [path.join(__dirname, "src/"), path.resolve('../../')],
+        port: config.gtc_demo_port_external,
+        publicPath: "http://localhost:" + config.gtc_demo_port_external,
         hotOnly: true,
         open: false,
 

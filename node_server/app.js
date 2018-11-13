@@ -23,7 +23,10 @@ app.io = require('socket.io')({
 // enable cors
 let whitelist = config.whitelisted_urls_for_clients;
 whitelist.push(config.server_ip+":"+config.demos_serve_port_external);
-console.log(whitelist);
+whitelist.push(config.server_ip+":"+config.gtc_demo_port_external);
+
+console.log("Whitelist: ",whitelist);
+
 let corsOptions = {
     origin: (origin, callback)=>{
         if (whitelist.indexOf(origin) !== -1) {
