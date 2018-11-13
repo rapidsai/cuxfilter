@@ -13,8 +13,10 @@ RUN apt-get update -yq && apt-get upgrade -yq && \
 COPY . .
 
 WORKDIR /usr/src/app/node_server
-
 RUN mkdir uploads && npm install && npm install -g pm2
+
+WORKDIR '/usr/src/app/demos/GTC demo'
+RUN npm install
 
 WORKDIR /usr/src/app
 ENTRYPOINT ["bash","./entrypoint.sh"]
