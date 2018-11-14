@@ -5,7 +5,6 @@
     "gtc_demo_port_external": 3005,
     "flask_server_port_cudf_internal": 3002,
     "flask_server_port_pandas_internal": 3003,
-    "demos_serve_port_internal":3004,
     "whitelisted_urls_for_clients": ["http://localhost:3000"],
     "demo_mapbox_token": "pk.eyJ1IjoiYWVuZW1hcmsiLCJhIjoiY2prM2JvcWZpMTFicDNrcWx3dzhnNnozeiJ9.uBPhXMKZxB3YWM34JcEH3w",
     "demo_dataset_name": "146M_predictions_v2"

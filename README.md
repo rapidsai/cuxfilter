@@ -17,15 +17,27 @@
 
 Edit the `config.json` file to reflect accurate IP, dataset name, and mapbox token values. While in the directory, run the following commands:
 
-You can skip steps 1&2 if you do not wish to expose the `cuXfilter` demos on port 3004
 1. edit the config.json file in the root directory
-2. add your servel ip address to the `server_ip` property in the format: `http://server.ip.addr`
+2. add your server ip address to the `server_ip` property in the format: `http://server.ip.addr`
 3. `docker build -t user_name/viz .`
 4. `docker run --runtime=nvidia  -d -p 3000:3000 -p 3004:3004 -p 3005:3005 --name rapids_viz -v /folder/with/data:/usr/src/app/node_server/uploads user_name/viz`
 
+Config.json Parameters:
+
+1. `server_ip`: ip address of the server machine, needs to be set before building the docker container
+2. `cuXfilter_port_external`: port on which the cuXfilter api can be accessed externally outside the docker container, default is `3000`. (Internally cuXfilter runs on port `3000`). Port needs to be published while running the container(`-p 3000:3000`).
+3. `demos_serve_port_external`: port on which examples are to be served externally, default is `3004`.(Internally demos are served on port `3004`). Port needs to be published while running the container(`-p 3004:3004`).
+4. `gtc_demo_port_external`: port on which mortgage demo is served externally, default is `3005`. (Internally mortgage demo runs on port `3005`) Port needs to be published while running the container(`-p 3005:3005`).
+5. `flask_server_port_cudf_internal`: flask_server(cudf) runs on this port, internal to the container and can only be accessed by the node_server. *Do not publish this port*
+6. `flask_server_port_pandas_internal`: flask_server(pandas) runs on this port, internal to the container and can only be accessed by the node_server. *Do not publish this port*
+7. `whitelisted_urls_for_clients`: list of whitelisted urls for clients to access node_server. User can add a list of urls(before building the container) he/she plans to develop on as origin, to avoid CORs issues.
+8. `demo_mapbox_token`: mapbox token for the mortgage demo. Can be created for free [here](https://www.mapbox.com/help/define-access-token/)
+9. `demo_dataset_name`: dataset name for the example and mortgage demo. Default value: '146M_predictions_v2'. Can be downloaded from [here](https://drive.google.com/open?id=12HiPwoxmmLsWhQHQMgyzxTk4za_Y7XRh)
+
+
 With the defualt settings:
 
-Access the crossfilter demos at `http://server.ip.addr:3004/demos/examples`
+Access the crossfilter demos at `http://server.ip.addr:3004/demos/examples/index.html`
 
 Access the GTC demos at `http://server.ip.addr:3005/`
 
@@ -83,5 +95,3 @@ A docker container restart might solve the issue temporarily.
 
 ## File Conversion
 Currently, cuXfilter supports only arrow file format as input. The `python_scripts` folder in the root directory provides a helper script to convert csv to arrow file. For more information, follow this [link](python_scripts)
-
-
