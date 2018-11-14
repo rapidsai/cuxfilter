@@ -157,8 +157,8 @@ Functions that trigger the `updateHistEvent`:
 1. [dimension.getHist(num_of_bins)](#8-get-histogram-for-a-dimension)
 2. [dimension.filter()](#4-cumulative-filters-cuxfilter-instance-as-per-a-condition-preserves-previous-filter-requests)
 3. [dimension.resetThenFilter()](#5-non-cumulative-filters-cuxfilter-instance-as-per-a-condition-resets-all-previous-filters-on-the-current-dimension-and-then-applies-new-filter)
-4. [dimension.resetFilters()](#9-clear-all-filters-for-a-dimension)
-5. [cuXfilter.resetAllFilters()](#10-clear-all-filters-for-all-dimensions)
+4. [dimension.resetFilters()](#10-clear-all-filters-for-a-dimension)
+5. [cuXfilter.resetAllFilters()](#11-clear-all-filters-for-all-dimensions)
 
 
 B. `updateDimensionEvent`
@@ -179,8 +179,8 @@ Functions that trigger the `updateDimensionEvent`:
 3. [dimension.all(columns[])](#3-get-all-rows-sorted-as-per-dimension)
 4. [dimension.filter()](#4-cumulative-filters-cuxfilter-instance-as-per-a-condition-preserves-previous-filter-requests)
 5. [dimension.resetThenFilter()](#5-non-cumulative-filters-cuxfilter-instance-as-per-a-condition-resets-all-previous-filters-on-the-current-dimension-and-then-applies-new-filter)
-6. [dimension.resetFilters()](#9-clear-all-filters-for-a-dimension)
-7. [cuXfilter.resetAllFilters()](#10-clear-all-filters-for-all-dimensions)
+6. [dimension.resetFilters()](#10-clear-all-filters-for-a-dimension)
+7. [cuXfilter.resetAllFilters()](#11-clear-all-filters-for-all-dimensions)
 
 
 ### 1. Get top n rows sorted as per dimension
@@ -284,7 +284,7 @@ E.g:
 <pre>
 dimension.filter(120);
 blockInteractionsOnPage();
-	
+
 addEventListener('allUpdatesComplete', (e) => {
 	unblockInteractionsOnPage();
 });
@@ -400,8 +400,9 @@ Functions that trigger the `updateGroupEvent`:
 2. [group.bottom(n_rows, sort_by_column)](#2-get-bottom-n-rows-of-the-group)
 3. [group.all()](#3-get-all-n-rows-of-the-group)
 4. [dimension.filter()](#4-cumulative-filters-cuxfilter-instance-as-per-a-condition-preserves-previous-filter-requests)
-5. [dimension.resetFilters()](#5-non-cumulative-filters-cuxfilter-instance-as-per-a-condition-resets-all-previous-filters-on-the-current-dimension-and-then-applies-new-filter)
-6. [cuXfilter.resetAllFilters()](#10-clear-all-filters-for-all-dimensions)
+5. [dimension.resetThenFilter()](#5-non-cumulative-filters-cuxfilter-instance-as-per-a-condition-resets-all-previous-filters-on-the-current-dimension-and-then-applies-new-filter)
+6. [dimension.resetFilters()](#10-clear-all-filters-for-a-dimension)
+7. [cuXfilter.resetAllFilters()](#11-clear-all-filters-for-all-dimensions)
 
 ### 1. Get Top n rows of the group
 > Returns the top n rows of the group sorted by the descending order of value <br>
