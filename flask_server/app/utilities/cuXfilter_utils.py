@@ -323,7 +323,7 @@ class cuXfilter_utils:
                 res = "groupby not intialized"
             else:
                 #removing the cumulative filters on the current dimension for the groupby
-                temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name)#,include_dim=list(groupby_agg.keys()))
+                temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name,include_dim=list(groupby_agg.keys()))
                 groupby_result = self.groupby(temp_df,dimension_name,groupby_agg,groupby_agg_key)
                 if 'all' == sort_order:
                     temp_df = groupby_result.to_pandas().to_dict() #self.group_by_backups[key].to_pandas().to_dict()
@@ -415,7 +415,7 @@ class cuXfilter_utils:
             if len(self.dimensions_filters.keys()) == 0 or (dimension_name not in self.dimensions_filters) or (dimension_name in self.dimensions_filters and self.dimensions_filters[dimension_name] == ''):
                 return str(self.hist_numba_GPU(self.data_gpu[str(dimension_name)].to_gpu_array(),num_of_bins))
             else:
-                temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name)#, include_dim = [dimension_name])
+                temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim = [dimension_name])
                 return str(self.hist_numba_GPU(temp_df[str(dimension_name)].to_gpu_array(),num_of_bins))
 
         except Exception as e:
