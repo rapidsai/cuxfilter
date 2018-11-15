@@ -33,9 +33,6 @@
 
 ## Installation
 
-### Prerequisite
-
-To build cuXfilter image, you need to have the base image - `cudf` on your system. More information on building `cudf` from source can be found [here](https://github.com/rapidsai/cudf#automated-build-in-docker-container)
 <pre>
 git clone cuXfilter-repo
 cd client_side/library_src
