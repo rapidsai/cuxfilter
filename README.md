@@ -13,6 +13,11 @@
 
 
 ## Installation
+
+### Prerequisite
+
+To build cuXfilter image, you need to have the base image - `cudf` on your system. More information on building `cudf` from source can be found [here](https://github.com/rapidsai/cudf#automated-build-in-docker-container)
+
 **To build using Docker:**
 
 Edit the `config.json` file to reflect accurate IP, dataset name, and mapbox token values. While in the directory, run the following commands:
