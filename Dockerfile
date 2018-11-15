@@ -1,4 +1,4 @@
-FROM rapidsai/rapidsai
+FROM cudf
 
 WORKDIR /usr/src/app
 

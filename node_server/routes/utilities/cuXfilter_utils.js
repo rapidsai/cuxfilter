@@ -20,7 +20,6 @@ const groups = {};
 
 //init connection and set session_id
 function initSession(socket, dataset, engine, usingSessions, cookies){
-  resetParams();
   if(usingSessions){
       let tempSessionId = parseCookie(cookies);
       if(tempSessionId != singleSessionId[engine]){
@@ -34,13 +33,18 @@ function initSession(socket, dataset, engine, usingSessions, cookies){
               }
           });
         }
+      resetParams(tempSessionId, dataset, engine);
       return tempSessionId;
   }else{
+      resetParams(sessionlessID, dataset, engine);
       return sessionlessID;
   }
 }
 
-function resetParams(){
+function resetParams(session_id, dataset, engine){
+  //reset_all_filters
+  cudf_query('reset_all_filters',params({}, session_id, dataset, engine),'reset_all',engine, Date.now());
+
   Object.keys(dimensions).forEach(function (prop) {
     delete dimensions[prop];
   });
