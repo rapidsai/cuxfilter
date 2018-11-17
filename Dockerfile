@@ -1,8 +1,50 @@
-FROM cudf
+ARG CUDA_VERSION=9.2
+ARG LINUX_VERSION=ubuntu16.04
+FROM nvidia/cuda:${CUDA_VERSION}-devel-${LINUX_VERSION}
+
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/lib
+# Needed for cugdf.concat(), avoids "OSError: library nvvm not found"
+ENV NUMBAPRO_NVVM=/usr/local/cuda/nvvm/lib64/libnvvm.so
+ENV NUMBAPRO_LIBDEVICE=/usr/local/cuda/nvvm/libdevice/
+
+ARG CC=5
+ARG CXX=5
+RUN apt update -y --fix-missing && \
+    apt upgrade -y && \
+    apt install -y \
+      git \
+      gcc-${CC} \
+      g++-${CXX} \
+      libboost-all-dev
+
+
+# Install conda
+ADD https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh /miniconda.sh
+RUN sh /miniconda.sh -b -p /conda && /conda/bin/conda update -n base conda
+ENV PATH=${PATH}:/conda/bin
+# Enables "source activate conda"
+SHELL ["/bin/bash", "-c"]
+
+# Build cuDF conda env
+ARG PYTHON_VERSION=3.5
+RUN conda create -n cudf python=${PYTHON_VERSION}
 
 WORKDIR /usr/src/app
 
-RUN conda install -n cudf -y -c conda-forge jupyter flask
+ARG NUMBA_VERSION=0.40.0
+ARG NUMPY_VERSION=1.14.3
+# Locked to Pandas 0.20.3 by https://github.com/rapidsai/cudf/issues/118
+ARG PANDAS_VERSION=0.20.3
+ARG FLASK_VERSION=1.0.2
+ARG PYARROW_VERSION=0.10.0
+RUN conda install -n cudf -c numba -c conda-forge -c rapidsai -c defaults cudf=0.2.0 \
+      flask=${FLASK_VERSION} \
+      numba=${NUMBA_VERSION} \
+      numpy=${NUMPY_VERSION} \
+      pandas=${PANDAS_VERSION} \
+      pyarrow=${PYARROW_VERSION} \
+      nvstrings \
+      cmake
 
 RUN apt-get update -yq && apt-get upgrade -yq && \
     apt-get install -yq curl && curl -sL https://deb.nodesource.com/setup_8.x | bash - && \
