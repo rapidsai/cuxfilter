@@ -55,22 +55,17 @@ class MapChart extends React.Component {
 			chart2Bins: 10,
 			chart3Bins: 10,
 			chart1Data: [],
-			chart1Domain: undefined,
-			chart1BrushDomain: undefined,
 			chart2Data: [],
-			chart2Domain: undefined,
-			chart2BrushDomain: undefined,
 			chart3Data: [],
+			chart1Domain: undefined,
+			chart2Domain: undefined,
 			chart3Domain: undefined,
-			chart3BrushDomain: undefined,
-			externalMutations: undefined,
 			active: true,
 			error: false
 		}
 
 		// event binding
 		// https://reactjs.org/docs/handling-events.html	
-
 
 		this.areaHover = this.areaHover.bind(this)
 		this.mapOpacitySelection = this.mapOpacitySelection.bind(this)
@@ -90,6 +85,8 @@ class MapChart extends React.Component {
 		this.chart3BinUpdate = this.debounce(this.chart3BinUpdate.bind(this), 100)
 
 		this.filterCharts = this.filterCharts.bind(this)
+		this.resetChartFilter = this.debounce(this.resetChartFilter.bind(this), 100)
+
 
 		this.updateSize = this.updateSize.bind(this)
 		this.updateComplete = this.updateComplete.bind(this)
@@ -224,21 +221,18 @@ class MapChart extends React.Component {
 	resetInit(){
 
 		this.setState({
-			active: true,
 			currentZip: undefined,
-			error: false,
 			totalDP: 0,
 			currentDP: 0,
 			selectedBank: "All",
 			chart1Data: [],
-			chart1Domain: undefined,
-			chart1BrushDomain: undefined,
 			chart2Data: [],
-			chart2Domain: undefined,
-			chart2BrushDomain: undefined,
 			chart3Data: [],
+			chart1Domain: undefined,
+			chart2Domain: undefined,
 			chart3Domain: undefined,
-			chart3BrushDomain: undefined
+			active: true,
+			error: false
 		})
 
 		// reset
@@ -428,7 +422,6 @@ class MapChart extends React.Component {
 				}
 			}
 
-			// NOTE: produces bug when 3zip is filtered THEN bank is filtered after - unfiltering 3zip does not update map (force update?)
 			this.setState({
 				geoData: { type: "FeatureCollection", features: geoDataFeatures }, // new obj required since react only does shallow compare for state change
 				error: false
@@ -456,11 +449,26 @@ class MapChart extends React.Component {
 				})
 
 			} else {
+
 				const chartData = this.formatData(this.delDIM.histogram)
-			
-				this.setState({
-					chart1Data: chartData
-				})	
+
+				if(this.state.chart1Domain != undefined){
+
+					this.setState({
+						chart1Data: chartData
+					})	
+
+				} else {
+
+					const max = Math.max(...this.delDIM.histogram.X)
+					const min = Math.min(...this.delDIM.histogram.X)
+
+					this.setState({
+						chart1Data: chartData,
+						chart1Domain: {min:min, max:max}
+					})		
+					
+				}
 		
 			}
 
@@ -478,9 +486,23 @@ class MapChart extends React.Component {
 			} else {
 				const chartData = this.formatData(this.dtiDIM.histogram)
 
-				this.setState({
-					chart2Data: chartData
-				})	
+				if(this.state.chart2Domain != undefined){
+
+					this.setState({
+						chart2Data: chartData
+					})	
+
+				} else {
+
+					const max = Math.max(...this.dtiDIM.histogram.X)
+					const min = Math.min(...this.dtiDIM.histogram.X)
+
+					this.setState({
+						chart2Data: chartData,
+						chart2Domain: {min:min, max:max}
+					})		
+					
+				}
 			}
 		}
 
@@ -496,10 +518,24 @@ class MapChart extends React.Component {
 			} else {
 				const chartData = this.formatData(this.creditDIM.histogram)
 
-				this.setState({
-					chart3Data: chartData
-				})	
-		
+				if(this.state.chart3Domain != undefined){
+
+					this.setState({
+						chart3Data: chartData
+					})	
+
+				} else {
+
+					const max = Math.max(...this.creditDIM.histogram.X)
+					const min = Math.min(...this.creditDIM.histogram.X)
+
+					this.setState({
+						chart3Data: chartData,
+						chart3Domain: {min:min, max:max}
+					})		
+
+				}
+
 			}
 
 		}
@@ -510,11 +546,10 @@ class MapChart extends React.Component {
 	formatData(data){
 
 		let chartData = []
-		for(let i=0; i < data.X.length; i++){
 
+		for(let i=0; i < data.X.length; i++){
 			let item = {x: data.X[i], y: data.Y[i]}
 			chartData.push(item)
-
 		}
 
 		this.setState({
@@ -537,7 +572,7 @@ class MapChart extends React.Component {
 		}
 
 		if(value == undefined){
-			return(this.state.colorRange5[6])
+			return(this.state.colorRange5[5])
 
 		} else if(value <= 0.196){
 			return(this.state.colorRange5[0])
@@ -556,7 +591,7 @@ class MapChart extends React.Component {
 			return(this.state.colorRange5[4])
 
 		} else {
-			return(this.state.colorRange5[6])
+			return(this.state.colorRange5[5])
 		}
 	}
 
@@ -620,95 +655,125 @@ class MapChart extends React.Component {
 	}
 
 	// chart selected filter or reset
-	filterCharts(selectedDomain, props){
-	
-		const name = props.children[0].props.name;
+	filterCharts(selectedDomain, name){
 
 		if(name == "chart1"){
 
-			// set initial data domain
-			if(this.state.chart1Domain === undefined){
-				this.setState({
-					chart1Domain: props.domain.x
-				})
-			}
-
-
 			// manually check if full domain is selected reset filter  
-			if(selectedDomain.x[0] === props.domain.x[0] && selectedDomain.x[1] === props.domain.x[1]){
+			if(selectedDomain.min <= this.state.chart1Domain.min && selectedDomain.max >= this.state.chart1Domain.max){
 
 				console.log("resetting chart1...")
 				this.delDIM.resetFilters()
 
 			} else {
-				console.log("Filtering: ", name, selectedDomain.x, props)
-				this.delDIM.resetThenFilter(selectedDomain.x)
+				//range error checking
+				const min = Math.max(selectedDomain.min, this.state.chart1Domain.min)
+				const max = Math.min(selectedDomain.max, this.state.chart1Domain.max)
+				
+				console.log("Filtering: ", name, min, max)
+
+				// filter
+				this.delDIM.resetThenFilter([min, max])
 			}
 
 			this.setState({
-				active: true,
-				chart1BrushDomain: selectedDomain.x
+				active: true
 			})
 
 		}
 
+
 		if(name == "chart2"){
 			
-			// set initial data domain
-			if(this.state.chart2Domain === undefined){
-				this.setState({
-					chart2Domain: props.domain.x
-				})
-			}
-
 			// manually check if full domain is selected reset filter  
-			if(selectedDomain.x[0] === props.domain.x[0] && selectedDomain.x[1] === props.domain.x[1]){
+			if(selectedDomain.min <= this.state.chart2Domain.min && selectedDomain.max >= this.state.chart2Domain.max){
 
 				console.log("resetting chart2...")
 				this.dtiDIM.resetFilters()
 
 			} else {
-				console.log("Filtering: ", name, selectedDomain.x, props)
-				this.dtiDIM.resetThenFilter(selectedDomain.x)
+				//range error checking
+				const min = Math.max(selectedDomain.min, this.state.chart2Domain.min)
+				const max = Math.min(selectedDomain.max, this.state.chart2Domain.max)
+				
+				console.log("Filtering: ", name, min, max)
+
+				// filter
+				this.dtiDIM.resetThenFilter([min, max])
 			}
 
 			this.setState({
-				active: true,
-				chart2BrushDomain: selectedDomain.x
+				active: true
 			})
 
 		}
 
 		if(name == "chart3"){
 
-			// set initial data domain
-			if(this.state.chart3Domain === undefined){
-				this.setState({
-					chart3Domain: props.domain.x
-				})
-			}
-
 			// manually check if full domain is selected reset filter  
-			if(selectedDomain.x[0] === props.domain.x[0] && selectedDomain.x[1] === props.domain.x[1]){
+			if(selectedDomain.min <= this.state.chart3Domain.min && selectedDomain.max >= this.state.chart3Domain.max){
 
 				console.log("resetting chart3...")
 				this.creditDIM.resetFilters()
 
 			} else {
-				console.log("Filtering: ", name, selectedDomain.x, props)
-				this.creditDIM.resetThenFilter(selectedDomain.x)
+			
+				//range error checking
+				const min = Math.max(selectedDomain.min, this.state.chart3Domain.min)
+				const max = Math.min(selectedDomain.max, this.state.chart3Domain.max)
+				
+				console.log("Filtering: ", name, min, max)
+
+				// filter
+				this.creditDIM.resetThenFilter([min, max])
 			}
 
 			this.setState({
+				active: true
+			})
+
+		}
+		
+	}
+
+	// reset single chart filter
+	resetChartFilter(name){
+
+		if(name == "chart1"){
+			console.log("resetting chart1...")
+			this.delDIM.resetFilters()
+
+			this.setState({
 				active: true,
-				chart3BrushDomain: selectedDomain.x
+				chart1Domain: undefined
+			})
+
+		}
+		
+		if(name == "chart2"){
+			console.log("resetting chart2...")
+			this.dtiDIM.resetFilters()
+
+			this.setState({
+				active: true,
+				chart2Domain: undefined
+			})
+
+		}
+
+		if(name == "chart3"){
+			console.log("resetting chart3...")
+			this.creditDIM.resetFilters()
+
+			this.setState({
+				active: true,
+				chart3Domain: undefined
 			})
 
 		}
 	}
 
 	// reset all cuXfilters 
-	// NOTE: unused
 	resetAllFilters(){
 
 		console.log("clearing all filters...")
@@ -966,13 +1031,13 @@ class MapChart extends React.Component {
 			    		<div className="mapchart-legend-section-2col">
 				    		<div className="mapchart-legend-heading">opacity</div>
 					    	<CircleSlider value={this.state.mapOpacity} onChange={this.mapOpacitySelection} min={10} max={255} stepSize={5} 
-	        			 	 size={80} circleWidth={5} progressWidth={7} knobRadius={7} circleColor={"gray"} progressColor={"#ffffff"} knobColor={"#ffffff"} />
+	        			 	 size={80} circleWidth={5} progressWidth={7} knobRadius={7} circleColor={"gray"} progressColor={"#177be4"} knobColor={"#177be4"} />
 	        			 	 <div className="mapchart-circ-value">{this.state.mapOpacity}</div>
 			    		</div>
 			    		<div className="mapchart-legend-section-2col">
 			    		<div className="mapchart-legend-heading">scale</div>
 					    	<CircleSlider value={this.state.mapScale} onChange={this.mapScaleSelection} min={1} max={100} stepSize={1} 
-	        			 	  size={80} circleWidth={5} progressWidth={7} knobRadius={7} circleColor={"gray"} progressColor={"#ffffff"} knobColor={"#ffffff"} />
+	        			 	  size={80} circleWidth={5} progressWidth={7} knobRadius={7} circleColor={"gray"} progressColor={"#177be4"} knobColor={"#177be4"} />
 	        			 	 <div className="mapchart-circ-value">{this.state.mapScale}</div>
 			    		</div>
 			    	</div>
@@ -981,7 +1046,7 @@ class MapChart extends React.Component {
 			    		<div className="mapchart-legend-section-1col">
 			    			<div className="mapchart-legend-heading">dti bins</div>
 					    	<CircleSlider value={this.state.chart2Bins} onChange={this.chart2BinSelection} min={1} max={100} stepSize={1} 
-	        			 	  size={80} circleWidth={5} progressWidth={7} knobRadius={7} circleColor={"gray"} progressColor={"#ffffff"} knobColor={"#ffffff"} />
+	        			 	  size={80} circleWidth={5} progressWidth={7} knobRadius={7} circleColor={"gray"} progressColor={"#177be4"} knobColor={"#177be4"} />
 	        			 	 <div className="mapchart-circ-value">{this.state.chart2Bins}</div>	
 			    		</div>
 			    	</div>
@@ -990,13 +1055,13 @@ class MapChart extends React.Component {
 			    		<div className="mapchart-legend-section-2col">
 			    			<div className="mapchart-legend-heading">risk bins</div>
 					    	<CircleSlider value={this.state.chart1Bins} onChange={this.chart1BinSelection} min={1} max={100} stepSize={1} 
-	        			 	 size={80} circleWidth={5} progressWidth={7} knobRadius={7} circleColor={"gray"} progressColor={"#ffffff"} knobColor={"#ffffff"} />
+	        			 	 size={80} circleWidth={5} progressWidth={7} knobRadius={7} circleColor={"gray"} progressColor={"#177be4"} knobColor={"#177be4"} />
 	        			 	 <div className="mapchart-circ-value">{this.state.chart1Bins}</div>			    		
 			    		</div>
 			    		<div className="mapchart-legend-section-2col">
 				    		<div className="mapchart-legend-heading">credit bins</div>
 					    	<CircleSlider  value={this.state.chart3Bins} onChange={this.chart3BinSelection} min={1} max={100} stepSize={1} 
-		    			 	 size={80} circleWidth={5} progressWidth={7} knobRadius={7} circleColor={"gray"} progressColor={"#ffffff"} knobColor={"#ffffff"} />
+		    			 	 size={80} circleWidth={5} progressWidth={7} knobRadius={7} circleColor={"gray"} progressColor={"#177be4"} knobColor={"#177be4"} />
 		    			 	 <div className="mapchart-circ-value">{this.state.chart3Bins}</div>	
 			    		</div>
 			    	</div>	
@@ -1039,14 +1104,16 @@ class MapChart extends React.Component {
 
 				<div className="mapchart-chart-body">
 					<div className="mapchart-col3-container">
-						<BarChart name="chart1" label="portfolio risk score histogram" ratio={0.8} width={700} height={400} tickCount={5} data={this.state.chart1Data} domain={this.state.chart1Domain} brushDomain={this.state.chart1BrushDomain} active={this.state.active} onSelection={this.filterCharts}  />
+						<BarChart name="chart1" label="portfolio risk score histogram" ratio={0.8} width={700} height={350} tickCount={5} data={this.state.chart1Data} step={0.01} domain={this.state.chart1Domain}  active={this.state.active} onSelection={this.filterCharts}  />
+						<div className="mapChart-chart-reset" onClick={() => {this.resetChartFilter('chart1')}}> reset </div>
 					</div>
 					<div className="mapchart-col3-container">
-						<BarChart name="chart2" label="debt to income histogram" ratio={0.8} width={700} height={400} tickCount={5} data={this.state.chart2Data} domain={this.state.chart2Domain} brushDomain={this.state.chart2BrushDomain}  active={this.state.active} onSelection={this.filterCharts} />
-
+						<BarChart name="chart2" label="debt to income histogram" ratio={0.8} width={700} height={350} tickCount={5} data={this.state.chart2Data} step={1} domain={this.state.chart2Domain} active={this.state.active} onSelection={this.filterCharts} />
+						<div className="mapChart-chart-reset" onClick={() => {this.resetChartFilter('chart2')}}> reset </div>
 					</div>
 					<div className="mapchart-col3-container">
-						<BarChart name="chart3" label="credit score histogram" ratio={0.8} width={700} height={400} tickCount={5} data={this.state.chart3Data} domain={this.state.chart3Domain} brushDomain={this.state.chart3BrushDomain} active={this.state.active} onSelection={this.filterCharts}  />
+						<BarChart name="chart3" label="credit score histogram" ratio={0.8} width={700} height={350} tickCount={5} data={this.state.chart3Data} step={50} domain={this.state.chart3Domain} active={this.state.active} onSelection={this.filterCharts}  />
+						<div className="mapChart-chart-reset" onClick={() => {this.resetChartFilter('chart3')}}> reset </div>
 					</div>
 				</div>
 

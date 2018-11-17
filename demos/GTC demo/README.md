@@ -20,8 +20,8 @@ The visualization utilizes the speed of the RAPIDS cuDF library to run all group
 * Selecting a bank will filter all data for that bank. Selecting 'all' will remove the filter.
 * Clicking on a 3-zip boundary will filter all data for just that 3-zip. Clicking on it again will remove the filter.
 * Hovering over a 3-zip boundary will show its “Area Details.”
-* Clicking and dragging across a histogram chart will filter all data to that highlighted data range (except for the selected histogram). Clicking will remove its filter.
-* Clicking on a histogram will reset its filter.
+* Clicking and dragging or panning across a range slider will filter all data to that highlighted data range (except for the selected histogram). Clicking reset will remove its filter.
+* Clicking reset below a histogram will reset its filter.
 * Clicking 'reset initialization' will reset and reload all the data (similar to reloading the page).
 * Clicking 'switch to cpu/gpu' will switch between GPU and CPU modes.
 
@@ -54,7 +54,7 @@ The demo backend has extensive hardware requirements including having one Nvidia
 
 
 ## Error Handling
-If the frontend demo appears to hang or the status bar turns orange, check the web browser javascript console for error messages. Often pressing the 'reset initialization' button or refreshing the browser window will fix the issue. Sometimes an OOM error can occur on the backend. Check the [cuXfilter](https://gitlab-master.nvidia.com/ai-infra-ase/RAPIDs/cuXfilter) readme for details on resetting the backend server.
+If the frontend demo appears to hang or the status bar turns orange, check the web browser javascript console for error messages. Often pressing the 'reset initialization' button and/or refreshing the browser window will fix the issue. Sometimes a really really bad OOM error can occur on the backend. Check the [cuXfilter](https://gitlab-master.nvidia.com/ai-infra-ase/RAPIDs/cuXfilter) readme for details on resetting the backend server.
 
 
 ## Featured Libraries

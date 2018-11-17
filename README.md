@@ -1,6 +1,6 @@
 
 # cuXfilter
-> `cuXfilter` is inspired from the Crossfilter library, which is a fast, browser-based filtering mechanism across multiple dimensions and offers features do groupby operations on top of the dimensions. One of the major limitations of using Crossfilter is that it keeps data in-memory on client-side in a browser, making it inefficient for processing large datasets. `cuXfilter` uses `cuDF` on the server-side, while keeping the dataframe in the GPU throughout the session. This results in sub-second response times for histogram calculations, groupby operations and querying datasets in the range of 10M to 200M rows(multiple columns).
+> `cuXfilter` is inspired from the Crossfilter library, which is a fast, browser-based filtering mechanism across multiple dimensions and offers features do groupby operations on top of the dimensions. One of the major limitations of using Crossfilter is that it keeps data in-memory on a client-side browser, making it inefficient for processing large datasets. `cuXfilter` uses `cuDF` on the server-side, while keeping the dataframe in the GPU throughout the session. This results in sub-second response times for histogram calculations, groupby operations and querying datasets in the range of 10M to 200M rows (multiple columns).
 
 ### Table of Contents
 - [Installation](#installation)

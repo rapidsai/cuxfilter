@@ -6,6 +6,7 @@
 	width: 100%;
 	height: 100%;
 	min-width: 1200px;
+	min-height: 800px;
 	overflow: hidden;
 }
 
@@ -257,8 +258,22 @@
 	padding: 0% 2%;
 }
 
+.mapChart-chart-reset{
+	cursor: pointer;
+	width: 100%;
+	text-align: center;
+	margin-top: 1rem;
+	font-variant: small-caps;
+	color: #888888;
+}
+
+.mapChart-chart-reset:hover{
+	color: white;
+}
+
 .VictoryContainer{
 	overflow: hidden;
+	z-index: 99;
 }
 
 
@@ -269,7 +284,7 @@
 		top: 4em;
 		right: 0;
 		margin-left: 0;
-		width: 25%;
+		width: 30%;
 		height: calc(100% - 4rem);
 		background-color: rgba(25, 26, 26, 0.8);
 	}
@@ -290,9 +305,9 @@
 
 	.mapchart-col3-container{
 		position: relative;
-		width: 96%;
-		height: 28%;
-		padding: 2% 2%;
+		width: 80%;
+		height: 22%;
+		padding: 7% 10%;
 	}
 
 }

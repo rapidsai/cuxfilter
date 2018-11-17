@@ -1,7 +1,12 @@
 import React, { Component, PureComponent } from "react";
 
 // https://formidable.com/open-source/victory/docs/victory-chart/
-import { VictoryBar, VictoryChart, VictoryAxis, VictoryBrushContainer } from 'victory';
+import { VictoryBar, VictoryChart, VictoryAxis } from 'victory';
+
+// https://github.com/davidchin/react-input-range
+import InputRange from 'react-input-range';
+
+import './scss/barchart-style'
 
 // Pure component to reduce render calls
 // https://reactjs.org/docs/react-api.html#reactpurecomponent
@@ -9,45 +14,34 @@ class BarChart extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			name: undefined,
+			selection: { min: 0, max: 0 }
 		}
 
-		this.callFilter = this.debounce(this.callFilter.bind(this), 150)
-
 	}
 
-	componentDidMount() {
+	componentDidUpdate(prevProps) {
+	  // Typical usage (don't forget to compare props):
+	  // on ininital load, set selection range to max and min
 
-		this.setState({
-			name: this.props.name
-		})
+	  if (this.props.domain !== prevProps.domain && this.props.domain != undefined ) {
+	    	
+	    	console.log("Range Slider set to max-min domain...", this.props.domain.min, this.props.domain.max)
+	    	this.setState({
+	    		selection: { min: this.props.domain.min, max: this.props.domain.max}
+	    	})
 
-	}
-
-	// Limit calls
-	// https://codeburst.io/throttling-and-debouncing-in-javascript-b01cad5c8edf
-	// https://stackoverflow.com/questions/23123138/perform-debounce-in-react-js
-	debounce (func, delay){
-	  console.log("debounce init")
-	  let inDebounce
-	  return function() {
-	    const context = this
-	    const args = arguments
-	    clearTimeout(inDebounce)
-	    inDebounce = setTimeout(() => func.apply(context, args), delay)
 	  }
-	}
-
-	// call parent chart filter
-	callFilter(domain, props){
-		this.props.onSelection(domain, props)
 	}
 
 
 	render() {
 
-		// Note: active is to prevent interactions while data is selling being processed. Domain is to prevent odd brushDomain behavior. brushDomain is only sent from parent to keep selection domain on bin size update.	
-		const  {name, ratio, width, height, tickCount, label, data, domain, active, brushDomain, onSelection} = this.props	
+		// Note: active is to prevent interactions while data is still being processed.
+		let  {name, ratio, width, height, tickCount, label, data, step, domain, active, onSelection} = this.props
+
+		if(domain === undefined){
+			domain = {min:0, max:1}
+		}
 
 		// Note: gradient just for subtle bar effect
 		return (<div>
@@ -61,22 +55,10 @@ class BarChart extends React.PureComponent {
 					</svg>
 					<br/>
 					<VictoryChart
-						style={{parent:{position:"absolute"}}}
+
 						domainPadding={{x: 40*ratio}}
-						domain={{x:domain}}
 						padding={{left: 60*ratio, right: 40*ratio, top: 20*ratio, bottom: 120*ratio}}
 						width={width} height={height}
-					 	containerComponent={
-					 						<VictoryBrushContainer
-					 						  allowDrag={false}
-					 						  disable={active}
-										      brushDimension="x"
-										      defaultBrushArea="all"
-											  brushDomain={{x: brushDomain}} 
-										      onBrushDomainChange={(domain, props) => { this.callFilter(domain, props) }}
-										      brushStyle={{stroke: "transparent", fill: "white", fillOpacity: 0.1}}
-										    />										
-											} 
 					 	animate={{ duration: 250, easing: "quadInOut" }} >
 						
 						<VictoryBar 
@@ -108,6 +90,18 @@ class BarChart extends React.PureComponent {
 				     	/>
 
 					</VictoryChart>
+				    <InputRange
+				    	name={name}
+				    	step={step}
+				        disabled={active}
+				        formatLabel={selection => selection.toFixed(2)}
+				        draggableTrack={true}
+				        minValue={domain.min}
+				        maxValue={domain.max}
+				        value={this.state.selection}
+				        onChange={selection => this.setState({ selection })}
+				        onChangeComplete={selection => { onSelection(selection, name) }}
+				    />
 				</div>
 			)
 	}
