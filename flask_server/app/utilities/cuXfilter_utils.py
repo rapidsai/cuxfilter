@@ -233,7 +233,7 @@ class cuXfilter_utils:
                 if len(self.dimensions_filters[key])>0:
                     temp_list.append(self.dimensions_filters[key])
             query = ' and '.join(temp_list)
-            if(len(query) >0):
+            if(len(query) > 0):
                 if include_dim[0] == 'all':
                     return data.query(query)
                 else:
@@ -394,7 +394,7 @@ class cuXfilter_utils:
                 max_min_tuple
         '''
         try:
-            max_min_tuple = (float(self.data_gpu[dimension_name].max()), float(self.data_gpu[dimension_name].min()))
+            max_min_tuple = (float(self.data_gpu[dimension_name].min()), float(self.data_gpu[dimension_name].max()))
             return str(max_min_tuple)
 
         except Exception as e:
@@ -494,16 +494,7 @@ class cuXfilter_utils:
                     self.dimensions_filters[dimension_name] = query
                 self.dimensions_filters_response_format[dimension_name] = [value,value]
 
-            # for key in self.dimensions_filters.keys():
-            #     if dimension_name == key and pre_reset == True:
-            #         continue
-            #     if len(self.dimensions_filters[key])>0:
-            #         temp_list.append(self.dimensions_filters[key])
-            # query_temp = ' and '.join(temp_list)
-
             try:
-                # if len(query_temp)>0:
-                #     query = query+' and '+query_temp
                 self.data_gpu = self.data_gpu.query(query)
             except Exception as e:
                 return 'Exception *** in cudf dimension_filter(1):'+str(e)

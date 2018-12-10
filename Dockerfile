@@ -37,7 +37,7 @@ ARG NUMPY_VERSION=1.14.3
 ARG PANDAS_VERSION=0.20.3
 ARG FLASK_VERSION=1.0.2
 ARG PYARROW_VERSION=0.10.0
-RUN conda install -n cudf -c numba -c conda-forge -c rapidsai -c defaults cudf=0.2.0 \
+RUN conda install -n cudf -c numba -c conda-forge -c rapidsai -c nvidia -c defaults cudf=0.2.0 \
       flask=${FLASK_VERSION} \
       numba=${NUMBA_VERSION} \
       numpy=${NUMPY_VERSION} \
@@ -52,13 +52,18 @@ RUN apt-get update -yq && apt-get upgrade -yq && \
     npm update -g npm && \
     rm -rf /var/lib/apt/lists/*
 
+RUN npm install npm@latest -g
+
 COPY . .
 
 WORKDIR /usr/src/app/node_server
 RUN mkdir uploads && npm install && npm install -g pm2
 
-WORKDIR '/usr/src/app/demos/GTC demo'
-RUN npm install
+WORKDIR /usr/src/app/client_side/library_src
+RUN npm install && npm run build
+
+WORKDIR /usr/src/app/demos/GTC\ demo
+RUN npm install && npm run build
 
 WORKDIR /usr/src/app
 ENTRYPOINT ["bash","./entrypoint.sh"]

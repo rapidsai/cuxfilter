@@ -1,8 +1,7 @@
 //Utility functions:
 const config = require('/usr/src/app/config.json');
-const isConnectionEstablished = {}; // key -> session_id; value: socket.id
-const isDataLoaded = {};
-const dataLoaded = {};
+let currentConnection = {}; // key -> session_id; value: socket.id
+// let dataLoaded = {};
 const serverOnTime = {};
 
 const pyServerURLcudf = "http://localhost:"+config.flask_server_port_cudf_internal
@@ -23,7 +22,7 @@ function initSession(socket, dataset, engine, usingSessions, cookies){
   if(usingSessions){
       let tempSessionId = parseCookie(cookies);
       if(tempSessionId != singleSessionId[engine]){
-          endSession(singleSessionId[engine],dataset,engine,(error, message) =>{
+          endConnection(singleSessionId[engine],dataset,engine,(error, message) =>{
               if(!error){
                 singleSessionId[engine] = tempSessionId;
                 console.log("old session replaced with new session, gpu mem cleared");
@@ -36,148 +35,184 @@ function initSession(socket, dataset, engine, usingSessions, cookies){
       resetParams(tempSessionId, dataset, engine);
       return tempSessionId;
   }else{
-      resetParams(sessionlessID, dataset, engine);
+      // resetParams(sessionlessID, dataset, engine);
       return sessionlessID;
   }
 }
 
 function resetParams(session_id, dataset, engine){
   //reset_all_filters
-  cudf_query('reset_all_filters',params({}, session_id, dataset, engine),'reset_all',engine, Date.now());
-
-  Object.keys(dimensions).forEach(function (prop) {
-    delete dimensions[prop];
-  });
-  Object.keys(histograms).forEach(function (prop) {
-    delete histograms[prop];
-  });
-  Object.keys(groups).forEach(function (prop) {
-    delete groups[prop];
-  });
-}
-
-
-function updateClientSideSize(socket,dataset,engine, dataset_size){
-  // console.log('inside updateClientSideSize');
-  socket.emit("update_size", dataset,engine, dataset_size);
-  if(socket.useSessions == false){
-    console.log('broadcasting size');
-    socket.broadcast.emit("update_size", dataset,engine, dataset_size);
+  cudf_query('reset_all_filters',params({}, session_id, dataset, engine),'reset_all',engine, Date.now(), session_id+":::"+dataset+":::"+engine);
+  const key = session_id+":::"+dataset+":::"+engine;
+  if(key in dimensions){
+    Object.keys(dimensions[key]).forEach(function (prop) {
+      delete dimensions[key][prop];
+    });
   }
+  if(key in histograms){
+    Object.keys(histograms[key]).forEach(function (prop) {
+      delete histograms[key][prop];
+    });
+  }
+
+  if(key in groups){
+    Object.keys(groups[key]).forEach(function (prop) {
+      delete groups[key][prop];
+    });
+  }
+
 }
 
-function updateClientSideDimensions(socket, dataset, engine, dimension_name,startTime){
+
+function updateClientSideSize(io, socket,dataset,engine, dataset_size){
+  io.to(socket.session_id).emit("update_size", dataset,engine, dataset_size);
+}
+
+function updateClientSideDimensions(io, socket, dataset, engine, dimension_name,startTime){
+  console.log('updating dimensions started');
   return new Promise((resolve,reject) => {
-    let length_groups = Object.keys(dimensions).length;
-    let i = 0;
-    if(i == length_groups){
+    const key = socket.session_id+":::"+dataset+":::"+engine;
+    if(!(key in dimensions)){
       resolve();
     }
-    for(let dimension in dimensions){
-      if(dimensions.hasOwnProperty(dimension)){// && dimension.indexOf(dimension_name) < 0){
-        i = i+1;
-        let command = 'dimension_filter_order';
-        let query = dimensions[dimension];
-        cudf_query(command,params(query, socket.session_id, dataset, engine),"user has requested "+query.sort_order+" n rows as per the column "+query.dimension_name, engine, startTime, (error, message)=>{
-          if(!error){
-            socket.emit('update_dimension', query.dimension_name, engine, message);
-            if(socket.useSessions == false){
-              console.log('broadcasting dimension');
-              socket.broadcast.emit('update_dimension', query.dimension_name, message);
+    else{
+        let length_dimensions = Object.keys(dimensions[key]).length;
+        let i = 0;
+        if(i === length_dimensions){
+          console.log('updating dimensions ended');
+          resolve();
+        }else{
+          for(let dimension in dimensions[key]){
+            if(dimensions[key].hasOwnProperty(dimension)){// && dimension.indexOf(dimension_name) < 0){
+              i = i+1;
+              let command = 'dimension_filter_order';
+              let query = dimensions[key][dimension];
+              cudf_query(command,params(query, socket.session_id, dataset, engine),"user has requested "+query.sort_order+" n rows as per the column "+query.dimension_name, engine, startTime, socket.session_id+":::"+dataset+":::"+engine, (error, message)=>{
+                if(!error){
+                  io.to(socket.session_id).emit('update_dimension', dataset, engine, query.dimension_name, message);
+                  // console.log('dimensions',i);
+                  if(i == length_dimensions){
+                    // console.log('updating dimensions ended');
+                    resolve();
+                  }
+                }else{
+                  console.log('error in updateClientSideDimensions:');
+                  console.log(message);
+                  reject();
+                }
+              });
             }
-            console.log('dimensions',i);
-            if(i == length_groups){
-              resolve();
-            }
-          }else{
-            console.log('error in updateClientSideDimensions:');
-            console.log(message);
           }
-        });
-      }
+          // console.log('something went wrong in updateClientSideDimensions', dimensions, key);
+          // reject();
+        }
     }
   });
 }
 
-function updateClientSideHistograms(socket, dataset, engine, dimension_name,startTime){
+function updateClientSideHistograms(io, socket, dataset, engine, dimension_name,startTime){
+  console.log('updating hist started');
   return new Promise((resolve,reject) => {
-      let length_groups = Object.keys(histograms).length;
-      let i = 0;
-      if(i == length_groups){
+      const key = socket.session_id+":::"+dataset+":::"+engine;
+      if(!(key in histograms)){
         resolve();
       }
-      for(let histogram in histograms){
-        if(histograms.hasOwnProperty(histogram)){ //&& histogram.indexOf(dimension_name) < 0){
-          i = i+1;
-          let command = 'dimension_hist';
-          let query = histograms[histogram];
-          cudf_query(command,params(query, socket.session_id, dataset, engine),"user requested histogram for "+query.dimension_name, engine,startTime, (error, message)=>{
-            if(!error){
-              socket.emit('update_hist', query.dimension_name, engine, message);
-              if(socket.useSessions == false){
-                console.log('broadcasting histogram');
-                socket.broadcast.emit('update_hist', query.dimension_name, message);
+      else{
+          let length_histograms = Object.keys(histograms[key]).length;
+          let i = 0;
+          if(i == length_histograms){
+            console.log('updating hist ended');
+            resolve();
+          }else{
+            console.log('in update histograms', histograms[key])
+            for(let histogram in histograms[key]){
+              if(histograms[key].hasOwnProperty(histogram)){ //&& histogram.indexOf(dimension_name) < 0){
+                i = i+1;
+                let command = 'dimension_hist';
+                let query = histograms[key][histogram];
+                console.log(query);
+                cudf_query(command,params(query, socket.session_id, dataset, engine),"user requested histogram for "+query.dimension_name, engine,startTime,socket.session_id+":::"+dataset+":::"+engine, (error, message)=>{
+                  if(!error){
+                    console.log('updating hist', i);
+                    io.to(socket.session_id).emit('update_hist', dataset, engine, query.dimension_name, message);
+                    if(i == length_histograms){
+                      console.log('updating hist ended');
+                      resolve();
+                    }
+                  }else{
+                    console.log('error in updateClientSideHistograms:');
+                    console.log(message);
+                    reject();
+                  }
+                });
               }
-              console.log('histograms',i,Object.keys(histograms).length);
-              if(i == length_groups){
-                resolve();
-              }
-            }else{
-              console.log('error in updateClientSideHistograms:');
-              console.log(message);
             }
-          });
-        }
+            // console.log('something went wrong in updateClientSideHistograms', i,length_histograms,Object.keys(histograms[key]).length);
+            // reject();
+          }
       }
     });
 }
 
-function updateClientSideGroups(socket, dataset, engine, dimension_name,startTime){
+function updateClientSideGroups(io, socket, dataset, engine, dimension_name,startTime){
+  console.log('updating groups started');
   return new Promise((resolve,reject) => {
-    let length_groups = Object.keys(groups).length;
-    let i = 0;
-    if(i == length_groups){
+    const key = socket.session_id+":::"+dataset+":::"+engine;
+    if(!(key in groups)){
       resolve();
     }
-    for(let group in groups){
-        if(groups.hasOwnProperty(group)){// && group.indexOf(dimension_name) < 0){
-          i = i+1;
-          let command = 'groupby_filter_order';
-          let query = groups[group];
-          // console.log("query for group",query);
-          cudf_query(command,params(query, socket.session_id, dataset, engine),"updating filter_order for group:"+query.dimension_name, engine,startTime, (error, message)=>{
-            if(!error){
-              socket.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
-              if(socket.useSessions == false){
-                console.log('broadcasting group');
-                socket.broadcast.emit('update_group', query.dimension_name, query.groupby_agg, engine, message);
+    else{
+        let length_groups = Object.keys(groups[key]).length;
+        let i = 0;
+        if(i == length_groups){
+          console.log('updating groups ended');
+          resolve();
+        }else{
+          for(let group in groups[key]){
+              if(groups[key].hasOwnProperty(group)){// && group.indexOf(dimension_name) < 0){
+                i = i+1;
+                let command = 'groupby_filter_order';
+                let query = groups[key][group];
+                // console.log("query for group",query);
+                cudf_query(command,params(query, socket.session_id, dataset, engine),"updating filter_order for group:"+query.dimension_name, engine,startTime,socket.session_id+":::"+dataset+":::"+engine, (error, message)=>{
+                  if(!error){
+                    io.to(socket.session_id).emit('update_group', dataset, engine, query.dimension_name, query.groupby_agg, message);
+
+                    // console.log('groups',i);
+                    if(i == length_groups){
+                      // console.log('updating groups ended');
+                      resolve();
+                    }
+                  }else{
+                    console.log('error in updateClientSideGroups:');
+                    console.log(message);
+                    reject();
+                  }
+                });
               }
-              console.log('groups',i);
-              if(i == length_groups){
-                resolve();
-              }
-            }else{
-              console.log('error in updateClientSideGroups:');
-              console.log(message);
             }
-          });
+           // console.log('something went wrong in updateClientSideGroups');
+           // reject();
         }
-      }
+
+    }
+
     });
 }
 //triggering an update event which broadcasts to all the neighbouring socket connections in case of a multi-tab sessionless access
-function updateClientSideValues(socket, dataset, engine, dataset_size, startTime, dimension_name='null'){
+function updateClientSideValues(io, socket, dataset, engine, dataset_size, startTime, dimension_name='null'){
   // let startTime = Date.now();
-  updateClientSideSize(socket,dataset,engine,dataset_size);
-  Promise.all([updateClientSideDimensions(socket, dataset, engine, dimension_name,startTime),
-              updateClientSideHistograms(socket, dataset, engine, dimension_name,startTime),
-              updateClientSideGroups(socket, dataset, engine, dimension_name,startTime)])
+  updateClientSideSize(io, socket,dataset,engine,dataset_size);
+  console.log('update all started');
+  Promise.all([updateClientSideDimensions(io, socket, dataset, engine, dimension_name,startTime),
+              updateClientSideHistograms(io, socket, dataset, engine, dimension_name,startTime),
+              updateClientSideGroups(io, socket, dataset, engine, dimension_name,startTime)])
               .then(()=> {
                 console.log('all updates complete');
-                socket.emit('all_updates_complete', dataset, engine);
-                if(socket.useSessions == false){
-                  socket.broadcast.emit('all_updates_complete', dataset, engine);
-                }
+                io.to(socket.session_id).emit('all_updates_complete', dataset, engine);
+              })
+              .catch(() => {
+                console.log('clientSideUpdate failed');
               });
 }
 
@@ -191,7 +226,7 @@ function groupbyMessageCustomParse(message){
 }
 
 //calling the python server(pandas or cudf) with the command and query
-function callPyServer(command,query, engine, startTime){
+function callPyServer(command, query, engine, startTime, currentConnection_key){
   return new Promise((resolve, reject) => {
        // let startTime = Date.now();
        let url = pyServerURLcudf+'/'+command+'?'+query
@@ -210,9 +245,7 @@ function callPyServer(command,query, engine, startTime){
           if(response.data.indexOf('Exception') > -1){
             response.data = response.data.split('***')[1];
             if(response.data.indexOf('out of memory') > -1  || response.data.indexOf('thrust::system::system_error') > -1){
-              isDataLoaded[session_id+dataset+engine] = false;
-              isConnectionEstablished[session_id+dataset+engine] = false;
-              // endSession(session_id,dataset,engine,(err,message)=>{});
+              currentConnection[currentConnection_key] = false;
             }
             reject(JSON.stringify(response));
           }else{
@@ -240,8 +273,8 @@ function params(data, session_id, dataset, engine) {
 }
 
 //handle queries by calling the python server and returning the results directly to the socket-io-client on the front-end
-function cudf_query(command,query, comments, engine, startTime, callback){
-    callPyServer(command,query, engine, startTime)
+function cudf_query(command, query, comments, engine, startTime, currentConnection_key, callback){
+    callPyServer(command, query, engine, startTime, currentConnection_key)
       .then((message) => {
               console.log(comments);
               // socket.broadcast.emit(command,false,message);
@@ -253,7 +286,8 @@ function cudf_query(command,query, comments, engine, startTime, callback){
 }
 
 //end session and remove the dataframe from the gpu memory
-function endSession(session_id,dataset,engine,callback){
+function endConnection(session_id,dataset,engine,callback){
+  resetParams(session_id,dataset,engine);
   let startTime = Date.now()
   let url = pyServerURLcudf+'/end_connection?session_id='+session_id+'&dataset='+dataset+'&engine='+engine
   if(engine == 'pandas'){
@@ -263,15 +297,14 @@ function endSession(session_id,dataset,engine,callback){
   got(url)
    .then(val => {
      console.log("session is being ended");
-     isDataLoaded[session_id+dataset+engine] = false;
-     isConnectionEstablished[session_id+dataset+engine] = false;
+     currentConnection[session_id+":::"+dataset+":::"+engine] = false;
      var pyresponse = Buffer.from(val.body).toString('utf8').split("&");
      var response = {
                    data: pyresponse[0],
                    pythonScriptTime: parseFloat(pyresponse[1]),
                    nodeServerTime: ((Date.now() - startTime)/1000) - parseFloat(pyresponse[1])
                }
-     callback(false,JSON.stringify(response));
+     typeof callback === 'function' && callback(false,JSON.stringify(response));
    }).catch(error => {
      console.log(error);
      var response = {
@@ -279,7 +312,7 @@ function endSession(session_id,dataset,engine,callback){
                      pythonScriptTime: parseFloat(0),
                      nodeServerTime: ((Date.now() - startTime)/1000)
                    }
-     callback(true,JSON.stringify(response));
+     typeof callback === 'function' && callback(true,JSON.stringify(response));
    });
 }
 
@@ -295,14 +328,17 @@ function parseCookie(cookie){
 }
 
 //clear gpu memory
-function clearGPUMem(){
-    console.log(Object.keys(serverOnTime));
-
-    for(var key in serverOnTime){
-        console.log("clearing "+key);
-            isDataLoaded[key] = false;
-            isConnectionEstablished[key] = false;
-    }
+function clearGPUMem(session_id){
+  //clear gpu memory for a particular session, by ending all dataset+engine connections using the endConnection function
+    Object.keys(currentConnection).map((key) => {
+      currentConnection[key] = false;
+      current_session_id = key.split(":::")[0];
+      if(current_session_id === session_id){
+        dataset = key.split(":::")[1];
+        engine = key.split(":::")[2];
+        endConnection(session_id,dataset,engine);
+      }
+    });
 };
 
 //reset last active time for a session
@@ -310,7 +346,7 @@ function resetServerTime(dataset, session_id, engine){
   console.log(dataset);
   console.log(session_id);
     var server_dataset = dataset.split("&")[0];
-    var server_key = session_id+"&"+server_dataset+"&"+engine;
+    var server_key = session_id+engine;
     serverOnTime[server_key] = Date.now();
 }
 
@@ -336,7 +372,8 @@ function create_query(list_of_args){
 }
 
 //initialize connection with pyServer by creating a cudf/pandas object
-function initConnection(session_id,dataset,engine, callback){
+function initConnection(session_id, dataset, engine, callback){
+  console.log('inside initConnection', session_id, dataset, engine)
     let startTime = Date.now()
     // let url = pyServerURL+'/'+'init_connection'+'?'+query
     let url = pyServerURLcudf+'/init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset
@@ -346,7 +383,8 @@ function initConnection(session_id,dataset,engine, callback){
     got(url)
       .then(val => {
         console.log(val.body)
-        isConnectionEstablished[session_id+dataset+engine] = true
+        // currentConnection[session_id+":::"+dataset+":::"+engine] = true
+        console.log('successful init', currentConnection)
         var pyresponse = Buffer.from(val.body).toString('utf8').split("&");
         var response = {
                       data: pyresponse[0],
@@ -357,7 +395,7 @@ function initConnection(session_id,dataset,engine, callback){
         callback(false,JSON.stringify(response));
       }).catch(error => {
         console.log(error);
-        isConnectionEstablished[session_id+dataset+engine] = false;
+        currentConnection[session_id+":::"+dataset+":::"+engine] = false
         var response = {
                         data: error.toString(),
                         pythonScriptTime: parseFloat(0),
@@ -370,9 +408,8 @@ function initConnection(session_id,dataset,engine, callback){
 
 module.exports = {
 
-  isConnectionEstablished: isConnectionEstablished,
-  isDataLoaded: isDataLoaded,
-  dataLoaded: dataLoaded,
+  currentConnection: currentConnection,
+  // dataLoaded: dataLoaded,
   serverOnTime: serverOnTime,
   pyServerURLcudf: pyServerURLcudf,
   pyServerURLPandas: pyServerURLPandas,
@@ -398,7 +435,7 @@ module.exports = {
   cudf_query: cudf_query,
 
   //end session and remove the dataframe from the gpu memory
-  endSession: endSession,
+  endConnection: endConnection,
 
   //Utility functions:
 

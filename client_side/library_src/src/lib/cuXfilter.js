@@ -83,31 +83,33 @@ export class cuXfilter{
             }
         });
 
-        this.socket.on('session_ended', (dimension_name, engine, message) => {
-            if(engine == this.engine){
+        this.socket.on('session_ended', (dataset, engine) => {
+            if(engine == this.engine && this.dataset === dataset){
                 this.connected = false;
                 console.log("connection ended by neighboring tab");
+                this.socket.emit('disconnect');
+                dispatchEvent(new CustomEvent('connectionClosed', {detail:'connection closed by a neighbor tab'}));
             }
         });
 
-        this.socket.on('update_hist', (dimension_name, engine, message) => {
-            if(engine == this.engine){
+        this.socket.on('update_hist', (dataset, engine, dimension_name, message) => {
+            if(engine == this.engine && this.dataset === dataset && dimension_name in this.childDimension){
                 this.childDimension[dimension_name].histogram = JSON.parse(JSON.parse(message)['data']);
-                this.childDimension[dimension_name].updateMaxMin();
+                // this.childDimension[dimension_name].updateMaxMin();
                 dispatchEvent(new CustomEvent('updateHistEvent', {detail: {'column': dimension_name}}));
             }
         });
 
-        this.socket.on('update_dimension', (dimension_name, engine, message) => {
-            if(engine == this.engine){
+        this.socket.on('update_dimension', (dataset, engine, dimension_name, message) => {
+            if(engine == this.engine && this.dataset === dataset && dimension_name in this.childDimension){
                 this.childDimension[dimension_name].value = JSON.parse(JSON.parse(message)['data']);
                 this.childDimension[dimension_name].updateMaxMin();
                 dispatchEvent(new CustomEvent('updateDimensionEvent', {detail: {'column': dimension_name}}));
             }
         });
 
-        this.socket.on('update_group', (dimension_name, agg, engine, message) => {
-            if(engine == this.engine){
+        this.socket.on('update_group', (dataset, engine, dimension_name, agg,  message) => {
+            if(engine == this.engine && this.dataset === dataset && dimension_name in this.childDimension){
                 this.childDimension[dimension_name].childGroup[dimension_name+agg].value = JSON.parse(JSON.parse(message)['data']);
                 dispatchEvent(new CustomEvent('updateGroupEvent', {detail: {column:dimension_name, aggregate:JSON.parse(agg)}}));
             }
