@@ -14,29 +14,31 @@ module.exports = (io) => {
         socket.on('init', (dataset, engine, usingSessions, callback) => {
             try{
                   console.log("connection init requested");
-                  socket.session_id = utils.initSession(socket, dataset, engine, usingSessions, socket.handshake.headers.cookie)
                   socket.useSessions = usingSessions;
-
-                  if(utils.isConnectionEstablished[socket.session_id+dataset+engine] === true){
-                      typeof callback === 'function' && callback(false,'connection already established');
+                  socket.session_id = utils.initSession(socket, dataset, engine, usingSessions, socket.handshake.headers.cookie)
+                  socket.join(socket.session_id);
+                  if(utils.currentConnection[socket.session_id+":::"+dataset+":::"+engine] === true){
+                     console.log('connection already established')
+                     typeof callback === 'function' && callback(false,'connection already established');
                   }else{
-                      utils.initConnection(socket.session_id,dataset, engine,callback);
+                     utils.initConnection(socket.session_id, dataset, engine, callback);
                   }
+
             }catch(ex){
                 console.log(ex);
-                utils.clearGPUMem();
+                utils.clearGPUMem(socket.session_id);
+                io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
         //loads the data in GPU memory
-        socket.on('load_data', (dataset,engine, load_type, callback) => {
+        socket.on('load_data', (dataset, engine, load_type, callback) => {
             try{
                 console.log("user tried to load data from "+dataset);
 
-                if(utils.isDataLoaded[socket.session_id+dataset+engine] && utils.dataLoaded[socket.session_id+dataset+engine] == dataset){
+                if(utils.currentConnection[socket.session_id+":::"+dataset+":::"+engine] === true){
                       console.log('data already loaded');
                       let startTime = Date.now();
-
                       var response = {
                                     data: 'data already loaded',
                                     pythonScriptTime: 0,
@@ -45,23 +47,24 @@ module.exports = (io) => {
 
                       callback(false, JSON.stringify(response));
                 }else{
+                      utils.currentConnection[socket.session_id+":::"+dataset+":::"+engine] = false
                       console.log("loading new data in gpu mem");
                       let command = 'read_data';
                       let query = {
                           'load_type': load_type
                       };
 
-                      utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),'read_data',engine,Date.now(), (error, message) => {
+                      utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),'read_data',engine,Date.now(),socket.session_id+":::"+dataset+":::"+engine, (error, message) => {
                           if(!error){
-                            utils.isDataLoaded[socket.session_id+dataset+engine] = true
-                            utils.dataLoaded[socket.session_id+dataset+engine] = dataset
+                            utils.currentConnection[socket.session_id+":::"+dataset+":::"+engine] = true
+                            console.log('loaded new data', utils.currentConnection[socket.session_id+":::"+dataset+":::"+engine]);
                           }
                           typeof callback === 'function' && callback(error, message);
                       });
                     }
             }catch(ex){
                 console.log(ex);
-                utils.clearGPUMem();
+                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine); socket.broadcast.emit('session_ended', dataset, engine);
             }
         });
 
@@ -70,10 +73,10 @@ module.exports = (io) => {
             let command = 'reset_all_filters';
             let query = {};
             let startTime = Date.now();
-            utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),'reset_all',engine, startTime,  (error, message) => {
+            utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),'reset_all',engine, Date.now(),socket.session_id+":::"+dataset+":::"+engine,  (error, message) => {
                 if(!error){
                   let dataset_size = JSON.parse(message)['data'];
-                  utils.updateClientSideValues(socket, dataset, engine, dataset_size,startTime);
+                  utils.updateClientSideValues(io, socket, dataset, engine, dataset_size,startTime);
                 }
                 typeof callback === 'function' && callback(error, message);
             });
@@ -85,12 +88,12 @@ module.exports = (io) => {
                 let command = 'get_schema';
                 let query = {};
 
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting schema of the dataset",engine,Date.now(),  callback);
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting schema of the dataset",engine,Date.now(),socket.session_id+":::"+dataset+":::"+engine,  callback);
 
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem();
+                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
 
         });
@@ -102,13 +105,14 @@ module.exports = (io) => {
                 let query = {
                     'dimension_name': dimension_name
                 };
+                utils.dimensions[socket.session_id+":::"+dataset+":::"+engine] = {};
 
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting loading a new dimension:"+dimension_name, engine,Date.now(),  callback);
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting loading a new dimension:"+dimension_name, engine,Date.now(),socket.session_id+":::"+dataset+":::"+engine,  callback);
 
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem();
+                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
@@ -123,10 +127,10 @@ module.exports = (io) => {
                     'pre_reset': pre_reset
                 };
                 let startTime = Date.now()
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset", engine, startTime,  (error, message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset", engine, Date.now(), socket.session_id+":::"+dataset+":::"+engine,  (error, message) => {
                     if(!error){
                       let dataset_size = JSON.parse(message)['data'];
-                      utils.updateClientSideValues(socket, dataset, engine, dataset_size,startTime, dimension_name);
+                      utils.updateClientSideValues(io, socket, dataset, engine, dataset_size,startTime, dimension_name);
                     }
                     typeof callback === 'function' && callback(error, message);
                 });
@@ -134,7 +138,8 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem();
+                utils.clearGPUMem(socket.session_id);
+                io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
@@ -146,15 +151,16 @@ module.exports = (io) => {
                     'dimension_name': dimension_name,
                     'groupby_agg':agg
                 };
-
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting groupby for the dimension:"+dimension_name,engine,Date.now(),  (error,message) => {
+                utils.groups[socket.session_id+":::"+dataset+":::"+engine] = {}
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting groupby for the dimension:"+dimension_name,engine,Date.now(),socket.session_id+":::"+dataset+":::"+engine,  (error,message) => {
                      callback(error,message);
                 });
 
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem();
+                utils.clearGPUMem(socket.session_id);
+                io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
@@ -170,15 +176,15 @@ module.exports = (io) => {
                     'num_rows': n,
                     'sort_column': sort_column
                 };
+                const key = socket.session_id+":::"+dataset+":::"+engine;
+                if(!(key in utils.groups)){
+                  utils.groups[key] = {};
+                }
+                utils.groups[key][dimension_name+agg] = query;
 
-                utils.groups[dimension_name+agg] = query;
-
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested filter_order rows for the groupby operation for dimension:"+dimension_name, engine,Date.now(),  (error,message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested filter_order rows for the groupby operation for dimension:"+dimension_name, engine,Date.now(),socket.session_id+":::"+dataset+":::"+engine,  (error,message) => {
                   if(!error){
-                    socket.emit('update_group', dimension_name, agg, engine, message);
-                    if(socket.session_id === 111){
-                      socket.broadcast.emit('update_group', dimension_name, agg, engine, message);
-                    }
+                    io.to(socket.session_id).emit('update_group', dataset, engine, dimension_name, agg, message);
                   }else{
                     console.log('groupby filter order error',error);
                   }
@@ -187,7 +193,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem();
+                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
@@ -202,10 +208,10 @@ module.exports = (io) => {
                     'pre_reset': pre_reset
                 };
                 let startTime = Date.now();
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset as per a range of rows",engine, startTime, (error, message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting filtering of the dataset as per a range of rows",engine, Date.now(),socket.session_id+":::"+dataset+":::"+engine, (error, message) => {
                     if(!error){
                       let dataset_size = JSON.parse(message)['data'];
-                      utils.updateClientSideValues(socket, dataset, engine, dataset_size, startTime, dimension_name);
+                      utils.updateClientSideValues(io, socket, dataset, engine, dataset_size, startTime, dimension_name);
                     }
                     typeof callback === 'function' && callback(error, message);
                 });
@@ -213,7 +219,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem();
+                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
@@ -225,17 +231,17 @@ module.exports = (io) => {
                     'dimension_name': dimension_name
                 };
                 let startTime = Date.now();
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting resetting filters on the current dimension",engine, startTime, (error, message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting resetting filters on the current dimension",engine, Date.now(),socket.session_id+":::"+dataset+":::"+engine, (error, message) => {
                     if(!error){
                       let dataset_size = JSON.parse(message)['data'];
-                      utils.updateClientSideValues(socket, dataset, engine, dataset_size,startTime, dimension_name);
+                      utils.updateClientSideValues(io, socket, dataset, engine, dataset_size,startTime, dimension_name);
                     }
                     typeof callback === 'function' && callback(error, message);
                 });
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem();
+                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
@@ -245,7 +251,7 @@ module.exports = (io) => {
                 let command = 'get_size';
                 let query = {};
 
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting size of the dataset",engine,Date.now(),  (error,message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requesting size of the dataset",engine,Date.now(),socket.session_id+":::"+dataset+":::"+engine,  (error,message) => {
                   if(!error){
                       let dataset_size = JSON.parse(message)['data'];
                       utils.updateClientSideSize(socket,dataset,engine, dataset_size);
@@ -255,7 +261,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem();
+                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
@@ -270,20 +276,22 @@ module.exports = (io) => {
                     'num_rows': num_rows,
                     'columns': columns
                 };
-                utils.dimensions[dimension_name] = query;
+                const key = socket.session_id+":::"+dataset+":::"+engine;
+                if(!(key in utils.dimensions)){
+                  utils.dimensions[key] = {};
+                }
+                utils.dimensions[key][dimension_name] = query;
 
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested "+sort_order+" n rows as per the column "+dimension_name, engine,Date.now(),  (error,message) => {
+
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user has requested "+sort_order+" n rows as per the column "+dimension_name, engine,Date.now(),socket.session_id+":::"+dataset+":::"+engine,  (error,message) => {
                       if(!error){
-                        socket.emit('update_dimension', dimension_name, engine, message);
-                        if(socket.session_id === 111){
-                          socket.broadcast.emit('update_dimension', dimension_name, engine, message);
-                        }
+                        io.to(socket.session_id).emit('update_dimension', dataset, engine, dimension_name, message);
                       }
                   });
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem();
+                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
@@ -295,20 +303,23 @@ module.exports = (io) => {
                     'dimension_name': dimension_name,
                     'num_of_bins': num_of_bins
                 };
+                const key = socket.session_id+":::"+dataset+":::"+engine;
+                if(!(key in utils.histograms)){
+                  utils.histograms[key] = {};
+                }
+                utils.histograms[key][dimension_name] = query;
 
-                utils.histograms[dimension_name] = query;
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requested histogram for "+dimension_name, engine,Date.now(),  (error,message) => {
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),"user requested histogram for "+dimension_name, engine,Date.now(),socket.session_id+":::"+dataset+":::"+engine,  (error,message) => {
                   if(!error){
-                    socket.emit('update_hist', dimension_name, engine, message);
-                    if(socket.session_id === 111){
-                      socket.broadcast.emit('update_hist', dimension_name, engine, message);
-                    }
+                    // io.to(socket.session_id).emit('update_hist', dataset, engine, dimension_name, message);
+                    socket.emit('update_hist', dataset, engine, dimension_name, message);
                   }
                 });
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem();
+                utils.clearGPUMem(socket.session_id);
+                io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
 
         });
@@ -323,26 +334,26 @@ module.exports = (io) => {
                 };
                 let comment = "user requested max-min values for "+dimension_name+" for data="+dataset;
 
-                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),comment,engine,Date.now(),  callback);
+                utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),comment,engine,Date.now(),socket.session_id+":::"+dataset+":::"+engine,  callback);
 
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem();
+                utils.clearGPUMem(socket.session_id);
+                io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
         //executes when socket connection disconnects
         socket.on('disconnect', () => {
+          socket.disconnect();
         });
 
         //onClose
         socket.on('endSession', (dataset,engine,callback) => {
-            utils.endSession(socket.session_id,dataset,engine, (error, message) => {
+            utils.endConnection(socket.session_id,dataset,engine, (error, message) => {
+                io.to(socket.session_id).emit('session_ended', dataset, engine);
                 typeof callback === 'function' && callback(error,message);
-                if(socket.useSessions == false){
-                  socket.broadcast.emit('session_ended', dataset, engine);
-                }
             });
         });
     });

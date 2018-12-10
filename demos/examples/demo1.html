@@ -52,7 +52,7 @@
 
         <span class='bar1-set'>
         <label for="bar1_slider">number of bins</label>
-        <input type="range" id="bar1_slider" name="bar1_slider" onclick="updateBins('bar1')"
+        <input type="range" id="bar1_slider" name="bar1_slider" oninput="updateBins('bar1')"
            min="1" max="100" value="50" step="2" />
 
         <div id="bar1"><!-- Plotly chart will be drawn inside this DIV --></div>
@@ -60,7 +60,7 @@
 
         <span class='bar2-set'>
         <label for="bar2_slider">number of bins</label>
-        <input type="range" id="bar2_slider" name="bar2_slider"  onclick="updateBins('bar2')"
+        <input type="range" id="bar2_slider" name="bar2_slider"  oninput="updateBins('bar2')"
            min="1" max="100" value="50" step="1" />
 
         <div id="bar2"><!-- Plotly chart will be drawn inside this DIV --></div>
