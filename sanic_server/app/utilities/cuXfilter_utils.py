@@ -13,6 +13,9 @@ import gc
 import pickle
 from numba import cuda
 from app import app
+from librmm_cffi import librmm_config as rmm_cfg
+from librmm_cffi import librmm as rmm
+
 
 def default(o):
     if isinstance(o, np.int8) or isinstance(o, np.int16) or isinstance(o, np.int32) or isinstance(o, np.int64): return int(o)
@@ -31,6 +34,9 @@ class cuXfilter_utils:
         self.dimensions_filters = {}
         self.dimensions_filters_response_format = {}
         self.group_by_backups = {}
+        rmm_cfg.use_pool_allocator = True # default is False
+        rmm.finalize()
+        rmm.initialize()
 
     def hist_numba_GPU(self,data,bins):
         '''
@@ -239,10 +245,12 @@ class cuXfilter_utils:
                 else:
                     column_list = list(set(list(self.dimensions_filters.keys())+include_dim))
                     try:
-                        return_val = data.loc[:,column_list].query(query)
+                        #app.logger.debug(query)
+                        #app.logger.debug('executing the query command now')
+                        return data.loc[:,column_list].query(query)
                     except Exception as e:
                         return 'Exception *** in cudf reset_filters():'+str(e)
-                    return return_val
+                    # return return_val
             else:
                 return data
 
@@ -323,6 +331,8 @@ class cuXfilter_utils:
                 res = "groupby not intialized"
             else:
                 #removing the cumulative filters on the current dimension for the groupby
+                #app.logger.debug(dimension_name)
+                #app.logger.debug(list(groupby_agg.keys()))
                 temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name,include_dim=list(groupby_agg.keys()))
                 groupby_result = self.groupby(temp_df,dimension_name,groupby_agg,groupby_agg_key)
                 if 'all' == sort_order:
@@ -416,7 +426,9 @@ class cuXfilter_utils:
                 return str(self.hist_numba_GPU(self.data_gpu[str(dimension_name)].to_gpu_array(),num_of_bins))
             else:
                 temp_df = self.reset_filters(self.back_up_dimension, omit=dimension_name, include_dim = [dimension_name])
-                return str(self.hist_numba_GPU(temp_df[str(dimension_name)].to_gpu_array(),num_of_bins))
+                return_val = str(self.hist_numba_GPU(temp_df[str(dimension_name)].to_gpu_array(),num_of_bins))
+                del temp_df
+                return return_val
 
         except Exception as e:
             return 'Exception *** in cudf dimension_hist():'+str(e)

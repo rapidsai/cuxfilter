@@ -1,15 +1,12 @@
 //Utility functions:
 const config = require('/usr/src/app/config.json');
-let currentConnection = {}; // key -> session_id; value: socket.id
-// let dataLoaded = {};
+let currentConnection = {}; // key -> session_id+":::"+dataset+":::"+engine; value: true/false
+let currentDataLoaded = {}; // key -> session_id+":::"+dataset+":::"+engine; value: true/false
 const serverOnTime = {};
 
-const pyServerURLcudf = "http://localhost:"+config.flask_server_port_cudf_internal
-const pyServerURLPandas = "http://localhost:"+config.flask_server_port_pandas_internal
-let singleSessionId = {
-  'cudf': '',
-  'pandas': ''
-};
+const pyServerURLcudf = "http://localhost:"+config.sanic_server_port_cudf_internal
+const pyServerURLPandas = "http://localhost:"+config.sanic_server_port_pandas_internal
+
 const sessionlessID = 111;
 const got = require('got');
 
@@ -18,21 +15,16 @@ const histograms = {};
 const groups = {};
 
 //init connection and set session_id
-function initSession(socket, dataset, engine, usingSessions, cookies){
+function initSession(io, socket, dataset, engine, usingSessions, cookies){
   if(usingSessions){
       let tempSessionId = parseCookie(cookies);
-      if(tempSessionId != singleSessionId[engine]){
-          endConnection(singleSessionId[engine],dataset,engine,(error, message) =>{
-              if(!error){
-                singleSessionId[engine] = tempSessionId;
-                console.log("old session replaced with new session, gpu mem cleared");
-              }else{
-                singleSessionId[engine] = tempSessionId;
-                console.log("old session replaced with new session, failed:",message);
-              }
-          });
-        }
-      resetParams(tempSessionId, dataset, engine);
+      clearGPUMem(io, tempSessionId);
+
+      let temp_key = tempSessionId+":::"+dataset+":::"+engine;
+      //
+      if(currentConnection.hasOwnProperty(temp_key) && currentConnection[temp_key] == false){
+          resetParams(tempSessionId, dataset, engine);
+      }
       return tempSessionId;
   }else{
       // resetParams(sessionlessID, dataset, engine);
@@ -42,7 +34,9 @@ function initSession(socket, dataset, engine, usingSessions, cookies){
 
 function resetParams(session_id, dataset, engine){
   //reset_all_filters
-  cudf_query('reset_all_filters',params({}, session_id, dataset, engine),'reset_all',engine, Date.now(), session_id+":::"+dataset+":::"+engine);
+  // if(clear_filters){
+  //   cudf_query('reset_all_filters',params({}, session_id, dataset, engine),'reset_all',engine, Date.now(), session_id+":::"+dataset+":::"+engine);
+  // }
   const key = session_id+":::"+dataset+":::"+engine;
   if(key in dimensions){
     Object.keys(dimensions[key]).forEach(function (prop) {
@@ -328,15 +322,19 @@ function parseCookie(cookie){
 }
 
 //clear gpu memory
-function clearGPUMem(session_id){
+function clearGPUMem(io, omit_session=''){
   //clear gpu memory for a particular session, by ending all dataset+engine connections using the endConnection function
     Object.keys(currentConnection).map((key) => {
-      currentConnection[key] = false;
-      current_session_id = key.split(":::")[0];
-      if(current_session_id === session_id){
-        dataset = key.split(":::")[1];
-        engine = key.split(":::")[2];
-        endConnection(session_id,dataset,engine);
+      if(currentConnection[key] == true){
+        let current_session_id = key.split(":::")[0];
+        if(current_session_id !== omit_session){
+          currentConnection[key] = false;
+          let dataset = key.split(":::")[1];
+          let engine = key.split(":::")[2];
+          let message = 'your session has ended(and dataframe kicked of GPU Memory), as someone else established a new session(only one session allowed per container)';
+          io.to(current_session_id).emit('session_ended',dataset, engine, message);
+          endConnection(current_session_id,dataset,engine);
+        }
       }
     });
 };
@@ -376,15 +374,15 @@ function initConnection(session_id, dataset, engine, callback){
   console.log('inside initConnection', session_id, dataset, engine)
     let startTime = Date.now()
     // let url = pyServerURL+'/'+'init_connection'+'?'+query
-    let url = pyServerURLcudf+'/init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset
+    let url = pyServerURLcudf+'/init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset;
     if(engine == 'pandas'){
-      url = pyServerURLPandas+'/init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset
+      url = pyServerURLPandas+'/init_connection?session_id='+session_id+'&engine='+engine+'&dataset='+dataset;
     }
     got(url)
       .then(val => {
-        console.log(val.body)
-        // currentConnection[session_id+":::"+dataset+":::"+engine] = true
-        console.log('successful init', currentConnection)
+        currentConnection[session_id+":::"+dataset+":::"+engine] = true;
+        currentDataLoaded[session_id+":::"+dataset+":::"+engine] = false; //data not loaded yet
+        console.log('successful init', currentConnection);
         var pyresponse = Buffer.from(val.body).toString('utf8').split("&");
         var response = {
                       data: pyresponse[0],
@@ -395,7 +393,8 @@ function initConnection(session_id, dataset, engine, callback){
         callback(false,JSON.stringify(response));
       }).catch(error => {
         console.log(error);
-        currentConnection[session_id+":::"+dataset+":::"+engine] = false
+        currentConnection[session_id+":::"+dataset+":::"+engine] = false;
+        currentDataLoaded[session_id+":::"+dataset+":::"+engine] = false; //data not loaded yet
         var response = {
                         data: error.toString(),
                         pythonScriptTime: parseFloat(0),
@@ -409,11 +408,10 @@ function initConnection(session_id, dataset, engine, callback){
 module.exports = {
 
   currentConnection: currentConnection,
-  // dataLoaded: dataLoaded,
+  currentDataLoaded: currentDataLoaded,
   serverOnTime: serverOnTime,
   pyServerURLcudf: pyServerURLcudf,
   pyServerURLPandas: pyServerURLPandas,
-  singleSessionId: singleSessionId,
   sessionlessID: sessionlessID,
 
   dimensions: dimensions,

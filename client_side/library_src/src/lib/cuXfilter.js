@@ -83,12 +83,12 @@ export class cuXfilter{
             }
         });
 
-        this.socket.on('session_ended', (dataset, engine) => {
+        this.socket.on('session_ended', (dataset, engine, message) => {
             if(engine == this.engine && this.dataset === dataset){
                 this.connected = false;
-                console.log("connection ended by neighboring tab");
+                console.log(message);
                 this.socket.emit('disconnect');
-                dispatchEvent(new CustomEvent('connectionClosed', {detail:'connection closed by a neighbor tab'}));
+                dispatchEvent(new CustomEvent('connectionClosed', {detail:message}));
             }
         });
 
