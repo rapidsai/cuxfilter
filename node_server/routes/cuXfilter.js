@@ -15,7 +15,7 @@ module.exports = (io) => {
             try{
                   console.log("connection init requested");
                   socket.useSessions = usingSessions;
-                  socket.session_id = utils.initSession(socket, dataset, engine, usingSessions, socket.handshake.headers.cookie)
+                  socket.session_id = utils.initSession(io, socket, dataset, engine, usingSessions, socket.handshake.headers.cookie)
                   socket.join(socket.session_id);
                   if(utils.currentConnection[socket.session_id+":::"+dataset+":::"+engine] === true){
                      console.log('connection already established')
@@ -26,7 +26,7 @@ module.exports = (io) => {
 
             }catch(ex){
                 console.log(ex);
-                utils.clearGPUMem(socket.session_id);
+                utils.clearGPUMem(io);
                 io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
@@ -36,7 +36,7 @@ module.exports = (io) => {
             try{
                 console.log("user tried to load data from "+dataset);
 
-                if(utils.currentConnection[socket.session_id+":::"+dataset+":::"+engine] === true){
+                if(utils.currentConnection[socket.session_id+":::"+dataset+":::"+engine] === true && utils.currentDataLoaded[socket.session_id+":::"+dataset+":::"+engine] === true){
                       console.log('data already loaded');
                       let startTime = Date.now();
                       var response = {
@@ -47,7 +47,7 @@ module.exports = (io) => {
 
                       callback(false, JSON.stringify(response));
                 }else{
-                      utils.currentConnection[socket.session_id+":::"+dataset+":::"+engine] = false
+                      utils.currentDataLoaded[socket.session_id+":::"+dataset+":::"+engine] = false
                       console.log("loading new data in gpu mem");
                       let command = 'read_data';
                       let query = {
@@ -56,7 +56,7 @@ module.exports = (io) => {
 
                       utils.cudf_query(command,utils.params(query, socket.session_id, dataset, engine),'read_data',engine,Date.now(),socket.session_id+":::"+dataset+":::"+engine, (error, message) => {
                           if(!error){
-                            utils.currentConnection[socket.session_id+":::"+dataset+":::"+engine] = true
+                            utils.currentDataLoaded[socket.session_id+":::"+dataset+":::"+engine] = true
                             console.log('loaded new data', utils.currentConnection[socket.session_id+":::"+dataset+":::"+engine]);
                           }
                           typeof callback === 'function' && callback(error, message);
@@ -64,7 +64,7 @@ module.exports = (io) => {
                     }
             }catch(ex){
                 console.log(ex);
-                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine); socket.broadcast.emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine); socket.broadcast.emit('session_ended', dataset, engine);
             }
         });
 
@@ -93,7 +93,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
 
         });
@@ -112,7 +112,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
@@ -138,7 +138,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(socket.session_id);
+                utils.clearGPUMem(io);
                 io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
@@ -159,7 +159,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(socket.session_id);
+                utils.clearGPUMem(io);
                 io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
@@ -193,7 +193,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
@@ -219,7 +219,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
@@ -241,7 +241,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
@@ -261,7 +261,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
@@ -291,7 +291,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(socket.session_id);io.to(socket.session_id).emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });
 
@@ -318,7 +318,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(socket.session_id);
+                utils.clearGPUMem(io);
                 io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
 
@@ -339,7 +339,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(socket.session_id);
+                utils.clearGPUMem(io);
                 io.to(socket.session_id).emit('session_ended', dataset, engine);
             }
         });

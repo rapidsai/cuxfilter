@@ -12,6 +12,7 @@
 	3. [Get Data schema](#3-get-data-schema)
 	4. [End session](#4-end-session)
 	5. [Update Size Event](#5-update-size-event)
+	6. [Connection Closed Event](#6-connection-closed-event)
 - [Dimensions](#dimensions)
 	1. [Get top n rows sorted as per dimension](#1-get-top-n-rows-sorted-as-per-dimension)
 	2. [Get bottom n rows sorted as per dimension](#2-get-bottom-n-rows-sorted-as-per-dimension)
@@ -106,6 +107,17 @@ A. `updateSizeEvent`
 		let your_size_variable = myData.size; //updated size
 });
 </pre>
+
+### 6. Connection Closed Event
+
+Since only one session is allowed per container(can have multiple datasets), a `connectionClosed` event is dispatched if a new session replaces the current session and can be handled in the following manner:
+
+ <pre>
+addEventListener('connectionClosed', (e) => {
+		console.log(e.detail);
+		// code to reset on page charts after a connection resets
+});
+ </pre>
 
 
 ##  Dimensions
