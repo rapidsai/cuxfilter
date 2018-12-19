@@ -69,7 +69,6 @@ export class cuXfilter{
     }
 
     initSocketListeners(){
-
         this.socket.on('update_size', (dataset,engine, size) => {
             if(this.dataset === dataset && this.engine === engine){
                 this.size = parseInt(size);
@@ -87,7 +86,6 @@ export class cuXfilter{
             if(engine == this.engine && this.dataset === dataset){
                 this.connected = false;
                 console.log(message);
-                this.socket.emit('disconnect');
                 dispatchEvent(new CustomEvent('connectionClosed', {detail:message}));
             }
         });
@@ -191,6 +189,7 @@ export class cuXfilter{
                     message = JSON.parse(message);
                     message['browserTime'] = (Date.now() - startTime)/1000;
                     this.connected = false;
+                    this.socket.emit('disconnect');
                     resolve(message);
                 }
             });

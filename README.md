@@ -17,12 +17,13 @@
 
 **To build using Docker:**
 
-Edit the `config.json` file to reflect accurate IP, dataset name, and mapbox token values. While in the directory, run the following commands:
 
-1. edit the config.json file in the root directory
-2. add your server ip address to the `server_ip` property in the format: `http://server.ip.addr`
+1. Edit the `config.json` file to reflect accurate IP, dataset name, and mapbox token values. 
+    1. add your server ip address to the `server_ip` property in the format: `http://server.ip.addr`
+    2. add `demo_mapbox_token` for running the GTC demo
+    3. download the dataset `146M_predictions_v2.arrow` from [here](https://rapidsai.github.io/demos/datasets)
 3. `docker build -t user_name/viz .`
-4. `docker run --runtime=nvidia  -d -p 3000:3000 -p 3004:3004 -p 3005:3005 --name rapids_viz -v /folder/with/data:/usr/src/app/node_server/uploads user_name/viz`
+4. `docker run --runtime=nvidia  -d -p 3000:3000 -p 3004:3004 -p 3005:3005 -p 3009:3009 --name rapids_viz -v /folder/with/data:/usr/src/app/node_server/uploads user_name/viz`
 
 Config.json Parameters:
 
@@ -33,15 +34,18 @@ Config.json Parameters:
 5. `sanic_server_port_cudf_internal`: sanic_server(cudf) runs on this port, internal to the container and can only be accessed by the node_server. *Do not publish this port*
 6. `sanic_server_port_pandas_internal`: sanic_server(pandas) runs on this port, internal to the container and can only be accessed by the node_server. *Do not publish this port*
 7. `whitelisted_urls_for_clients`: list of whitelisted urls for clients to access node_server. User can add a list of urls(before building the container) he/she plans to develop on as origin, to avoid CORs issues.
-8. `demo_mapbox_token`: mapbox token for the mortgage demo. Can be created for free [here](https://www.mapbox.com/help/define-access-token/)
-9. `demo_dataset_name`: dataset name for the example and mortgage demo. Default value: '146M_predictions_v2'. Can be downloaded from [here](https://drive.google.com/open?id=12HiPwoxmmLsWhQHQMgyzxTk4za_Y7XRh)
+8. `jupyter_port`: port on which the jupyter integration example with cuXfilter will run
+9. `demo_mapbox_token`: mapbox token for the mortgage demo. Can be created for free [here](https://www.mapbox.com/help/define-access-token/)
+10. `demo_dataset_name`: dataset name for the example and mortgage demo. Default value: '146M_predictions_v2'. Can be downloaded from [here](https://rapidsai.github.io/demos/datasets)
 
 
-With the defualt settings:
+With the default settings:
 
 Access the crossfilter demos at `http://server.ip.addr:3004/demos/examples/index.html`
 
 Access the GTC demos at `http://server.ip.addr:3005/`
+
+Access jupyter integration demo at `http://server.ip.addr:3009/`
 
 
 ## Architecture
