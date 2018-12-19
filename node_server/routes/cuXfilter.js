@@ -27,7 +27,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 utils.clearGPUMem(io);
-                io.to(socket.session_id).emit('session_ended', dataset, engine);
+                io.to(socket.session_id).emit('session_ended', dataset, engine, 'session ended by user');
             }
         });
 
@@ -64,7 +64,7 @@ module.exports = (io) => {
                     }
             }catch(ex){
                 console.log(ex);
-                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine); socket.broadcast.emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine, 'session ended by user'); socket.broadcast.emit('session_ended', dataset, engine, 'session ended by user');
             }
         });
 
@@ -93,7 +93,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine, 'session ended by user');
             }
 
         });
@@ -112,7 +112,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine, 'session ended by user');
             }
         });
 
@@ -139,7 +139,7 @@ module.exports = (io) => {
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem(io);
-                io.to(socket.session_id).emit('session_ended', dataset, engine);
+                io.to(socket.session_id).emit('session_ended', dataset, engine, 'session ended by user');
             }
         });
 
@@ -160,7 +160,7 @@ module.exports = (io) => {
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem(io);
-                io.to(socket.session_id).emit('session_ended', dataset, engine);
+                io.to(socket.session_id).emit('session_ended', dataset, engine, 'session ended by user');
             }
         });
 
@@ -193,7 +193,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine, 'session ended by user');
             }
         });
 
@@ -219,7 +219,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine, 'session ended by user');
             }
         });
 
@@ -241,7 +241,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine, 'session ended by user');
             }
         });
 
@@ -261,7 +261,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine, 'session ended by user');
             }
         });
 
@@ -291,7 +291,7 @@ module.exports = (io) => {
             }catch(ex){
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
-                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine);
+                utils.clearGPUMem(io);io.to(socket.session_id).emit('session_ended', dataset, engine, 'session ended by user');
             }
         });
 
@@ -319,7 +319,7 @@ module.exports = (io) => {
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem(io);
-                io.to(socket.session_id).emit('session_ended', dataset, engine);
+                io.to(socket.session_id).emit('session_ended', dataset, engine, 'session ended by user');
             }
 
         });
@@ -340,7 +340,7 @@ module.exports = (io) => {
                 console.log(ex);
                 typeof callback === 'function' && callback(true,-1);
                 utils.clearGPUMem(io);
-                io.to(socket.session_id).emit('session_ended', dataset, engine);
+                io.to(socket.session_id).emit('session_ended', dataset, engine, 'session ended by user');
             }
         });
 
@@ -352,8 +352,9 @@ module.exports = (io) => {
         //onClose
         socket.on('endSession', (dataset,engine,callback) => {
             utils.endConnection(socket.session_id,dataset,engine, (error, message) => {
-                io.to(socket.session_id).emit('session_ended', dataset, engine);
+                io.to(socket.session_id).emit('session_ended', dataset, engine, 'session ended by user');
                 typeof callback === 'function' && callback(error,message);
+                socket.disconnect();
             });
         });
     });

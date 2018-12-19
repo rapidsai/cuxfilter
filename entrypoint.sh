@@ -7,6 +7,7 @@ source activate cudf
 
 cudf_port=`cat config.json | jq --raw-output '.sanic_server_port_cudf_internal'`
 pandas_port=`cat config.json | jq --raw-output '.sanic_server_port_pandas_internal'`
+jupyter_port=`cat config.json | jq --raw-output '.jupyter_port'`
 demos_serve_port_internal=3004
 
 cd ./sanic_server
@@ -23,6 +24,10 @@ pm2 start npm -- start --watch
 
 cd '../demos/GTC demo/'
 npm run start &
+
+cd ../Jupyter_Integration
+jupyter notebook --ip 0.0.0.0 --port $jupyter_port --allow-root --NotebookApp.token='' &
+
 
 cd ../../
 pm2 serve --port=$demos_serve_port_internal

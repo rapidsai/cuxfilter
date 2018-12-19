@@ -24,7 +24,7 @@ app.io = require('socket.io')({
 let whitelist = config.whitelisted_urls_for_clients;
 whitelist.push(config.server_ip+":"+config.demos_serve_port_external);
 whitelist.push(config.server_ip+":"+config.gtc_demo_port_external);
-
+whitelist.push(config.server_ip+":"+config.jupyter_port);
 console.log("Whitelist: ",whitelist);
 
 let corsOptions = {

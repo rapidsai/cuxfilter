@@ -49,6 +49,7 @@ class cuXfilter_utils:
         '''
         try:
             df1 = numba_gpu_histogram(data,int(bins))
+            del data
             dict_temp ={}
 
             dict_temp['X'] = list(df1[1].astype(float))
