@@ -1,5 +1,8 @@
 # RAPIDS Mortgage Visualization Demo
 
+![Visualization Demo](/src/img/RAPIDScuXfilter-demo.gif)
+
+
 [RAPIDS](https://rapids.ai/) is an open source platform for data scientist to accelerate Big Data workflows with GPU optimized libraries. The home loan visualization uses the RAPIDS [cuDF](https://github.com/rapidsai/cudf) powered cuXfilter - pronounced "koo-cross-filter" - library to provide a real time, interactive interface to the data. RAPIDS libraries are designed to fit within data scientist's existing workflows and tool kits, as well as be easily extensible. This web based data visualization demo, produced from a RAPIDS accelerated end to end workflow illustrates one such example. 
 
 
@@ -31,7 +34,7 @@ The raw data comes from 2006-2017 [Fannie Mae public loan data](http://fanniemae
 
 146 million active and non-delinquent loans are given a score from 0-1 to indicate the likelihood of the loan being risky for purchase as part of a loan portfolio. Riskiness could mean a chance of delinquency during the lifetime of the loan, or that the loan will be paid off soon and cease generating interest payments.
 
-The data is visualized wit the following features:
+The data is visualized with the following features:
 * 3-zip boundary: postal zip code with the last 2 digests removed for privacy (951XX)
 * 3-zip boundary bar height: total unpaid balance of all loans in that 3-zip area
 * 3-zip boundary color: mean risk score of all loans in the 3-zip area
@@ -50,11 +53,11 @@ Note: the demo requires a *Mapbox Access Token*, [details here](https://www.mapb
 ## Hardware Requirements
 The web demo frontend itself does not have extensive hardware requirements and can often be run from a laptop, but having a good graphics card improves the experience. The demo is responsive to both large wide screens and smaller single screens. It is *not* suitable for mobile. 
 
-The demo backend has extensive hardware requirements including having one Nvidia card with at least *32GB of GPU memory*. To run the CPU option of the demo requires at least *64GB of system memory*. 
+The demo backend has extensive hardware requirements including having one Nvidia card with at least *16GB of GPU memory*. To run the CPU option of the demo requires at least *64GB of system memory*. 
 
 
 ## Error Handling
-If the frontend demo appears to hang or the status bar turns orange, check the web browser javascript console for error messages. Often pressing the 'reset initialization' button and/or refreshing the browser window will fix the issue. Sometimes a really really bad OOM error can occur on the backend. Check the [cuXfilter](https://gitlab-master.nvidia.com/ai-infra-ase/RAPIDs/cuXfilter) readme for details on resetting the backend server.
+If the frontend demo appears to hang or the status bar turns orange, check the web browser javascript console for error messages. Often pressing the 'reset initialization' button and/or refreshing the browser window will fix the issue. Sometimes a really really bad OOM error can occur on the backend. Check the cuXfilter readme for details on resetting the backend server.
 
 
 ## Featured Libraries
@@ -66,7 +69,7 @@ If the frontend demo appears to hang or the status bar turns orange, check the w
 
 ## Installation
 ### RAPIDS Mortgage Visualization Demo Docker Install (recommended)
-To install the fully encapsulated demo via docker, please refer to the [cuXfilter](https://gitlab-master.nvidia.com/RAPIDS/cuXfilter) readme. Note: Be sure to setup the ```/config.json``` file *before* running the docker command.
+To install the fully encapsulated demo via docker, please refer to the cuXfilter readme. Note: Be sure to setup the ```/config.json``` file *before* running the docker command.
 
 ### RAPIDS Mortgage Visualization Frontend Only Source Install
 To install and run the frontend demo from source, follow the typical node + webpack procure. Note: assumes that the backend has been already setup. 
