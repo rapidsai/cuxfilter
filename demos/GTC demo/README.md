@@ -1,6 +1,6 @@
 # RAPIDS Mortgage Visualization Demo
 
-![Visualization Demo](/src/img/RAPIDScuXfilter-demo.gif)
+![Visualization Demo](src/img/RAPIDScuXfilter-demo.gif)
 
 
 [RAPIDS](https://rapids.ai/) is an open source platform for data scientist to accelerate Big Data workflows with GPU optimized libraries. The home loan visualization uses the RAPIDS [cuDF](https://github.com/rapidsai/cudf) powered cuXfilter - pronounced "koo-cross-filter" - library to provide a real time, interactive interface to the data. RAPIDS libraries are designed to fit within data scientist's existing workflows and tool kits, as well as be easily extensible. This web based data visualization demo, produced from a RAPIDS accelerated end to end workflow illustrates one such example. 
