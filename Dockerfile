@@ -31,14 +31,13 @@ RUN conda create -n cudf python=${PYTHON_VERSION}
 
 WORKDIR /usr/src/app
 
-ARG NUMBA_VERSION=0.40.0
-ARG NUMPY_VERSION=1.14.3
-# Locked to Pandas 0.20.3 by https://github.com/rapidsai/cudf/issues/118
-ARG PANDAS_VERSION=0.20.3
+ARG NUMBA_VERSION>=0.40.0
+ARG NUMPY_VERSION>=1.14.3
+ARG PANDAS_VERSION>=0.23.4
 ARG FLASK_VERSION=1.0.2
-ARG PYARROW_VERSION=0.10.0
+ARG PYARROW_VERSION=0.12.0
 ARG SANIC_VERSION=0.8.3
-RUN conda install -n cudf -c numba -c conda-forge -c rapidsai -c nvidia -c defaults cudf=0.4.0 jupyter \
+RUN conda install -n cudf -c numba -c conda-forge -c rapidsai -c nvidia -c defaults cudf=0.5.0 jupyter \
       flask=${FLASK_VERSION} \
       sanic=${SANIC_VERSION} \
       numba=${NUMBA_VERSION} \
