@@ -50,8 +50,11 @@ RUN conda install -n cudf -c numba -c conda-forge -c rapidsai -c nvidia -c defau
 RUN apt-get update -yq && apt-get upgrade -yq && \
     apt-get install -yq curl && curl -sL https://deb.nodesource.com/setup_8.x | bash - && \
     apt-get install -yq nodejs build-essential jq && \
+    apt-get install -yq nginx && \
     npm update -g npm && \
     rm -rf /var/lib/apt/lists/*
+
+COPY ./default /etc/nginx/sites-enabled/
 
 RUN npm install npm@latest -g
 
