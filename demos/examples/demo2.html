@@ -3,7 +3,7 @@
   <head>
     <title>cuXfilter: Demo 2</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script type="text/javascript" src="../../client_side/dist/cuXfilter-client.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/rapidsai/cuxfilter@master/client_side/dist/cuXfilter-client.js"></script>
     <link href="./styles/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="./styles/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
     <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
@@ -80,10 +80,10 @@
 
 var cuObj;
 
-$.getJSON('../../config.json', function(data){
+//$.getJSON('../../config.json', function(data){
 
-var ip_addr = data.server_ip+":"+data.cuXfilter_port_external;
-var dataset_name = data.demo_dataset_name;
+var ip_addr = "http://"+window.location.hostname; //data.server_ip+":"+data.cuXfilter_port;
+var dataset_name = '146M_predictions_v2'; //data.demo_dataset_name;
 console.log(ip_addr);
 cuObj = new cuXfilter(dataset_name,ip_addr,'cudf',true,'arrow');
 cuObj.init().then((status) => {
@@ -109,7 +109,7 @@ cuObj.init().then((status) => {
       //initializing all charts and event listeners
       init();
   });
-});
+//});
 
 //intialize a cuXfilter object for a dataset called predictions-v1 (arrow format), with cudf engine and useSessions=true at the url
 var pie1 = document.getElementById('pie1');

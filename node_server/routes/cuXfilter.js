@@ -4,7 +4,7 @@ const router = express.Router();
 
 module.exports = (io) => {
     router.get('/', (req, res) => {
-        res.end("ok");
+        res.send("ok");
     });
 
     //SOCKET.IO

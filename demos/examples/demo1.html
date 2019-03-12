@@ -3,7 +3,7 @@
   <head>
     <title>cuXfilter: Demo 1</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script type="text/javascript" src="../../client_side/dist/cuXfilter-client.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/rapidsai/cuxfilter@master/client_side/dist/cuXfilter-client.js"></script>
     <link href="./styles/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="./styles/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
     <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
@@ -85,10 +85,9 @@
 
 var cuObj;
 
-$.getJSON('../../config.json', function(data){
-    var ip_addr = data.server_ip+":"+data.cuXfilter_port_external;
-    var dataset_name = data.demo_dataset_name;
-    console.log(data.cuXfilter_port);
+//$.getJSON('../../config.json', function(data){
+    var ip_addr = "http://"+window.location.hostname; //data.server_ip+":"+data.cuXfilter_port;
+    var dataset_name = '146M_predictions_v2'; //data.demo_dataset_name;
 
     //intialize a cuXfilter object for a dataset called predictions-v1 (arrow format), with cudf engine and useSessions=true at the url
     cuObj = new cuXfilter(dataset_name,ip_addr,'cudf',true,'arrow');
@@ -107,7 +106,7 @@ $.getJSON('../../config.json', function(data){
         dimension2.getHist(100);
         init();
     });
-});
+//});
 
 var bar1 = document.getElementById('bar1');
 var bar2 = document.getElementById('bar2');
