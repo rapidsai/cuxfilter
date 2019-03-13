@@ -18,7 +18,7 @@ export class cuXfilter{
     }
     init(callback){
         return new Promise((resolve,reject) => {
-            fetch(this.url+"/cuXfilter",{
+            fetch(this.url+"/cuXfilter?transport=polling",{
                 method: 'GET',
                 credentials: 'include'
             }).then(res => {

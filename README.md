@@ -18,38 +18,40 @@
 **To build using Docker:**
 
 
-1. Edit the `config.json` file to reflect accurate IP, dataset name, and mapbox token values. 
+1. Edit the `config.env` file to reflect accurate IP, dataset name, and mapbox token values.
     1. add your server ip address to the `server_ip` property in the format: `http://server.ip.addr`
     2. add `demo_mapbox_token` for running the GTC demo
     3. download the dataset `146M_predictions_v2.arrow` from [here](https://rapidsai.github.io/demos/datasets)
 3. `docker build -t user_name/viz .`
-4. `docker run --runtime=nvidia  -d -p 3000:3000 -p 3004:3004 -p 3005:3005 -p 3009:3009 --name rapids_viz -v /folder/with/data:/usr/src/app/node_server/uploads user_name/viz`
+4. `docker run --runtime=nvidia  -d --env-file ./config.env -p 80:80 --name rapids_viz -v /folder/with/data:/usr/src/app/node_server/uploads user_name/viz`
 
 Config.json Parameters:
 
 1. `server_ip`: ip address of the server machine, needs to be set before building the docker container
-2. `cuXfilter_port_external`: port on which the cuXfilter api can be accessed externally outside the docker container, default is `3000`. (Internally cuXfilter runs on port `3000`). Port needs to be published while running the container(`-p 3000:3000`).
-3. `demos_serve_port_external`: port on which examples are to be served externally, default is `3004`.(Internally demos are served on port `3004`). Port needs to be published while running the container(`-p 3004:3004`).
-4. `gtc_demo_port_external`: port on which mortgage demo is served externally, default is `3005`. (Internally mortgage demo runs on port `3005`) Port needs to be published while running the container(`-p 3005:3005`).
-5. `sanic_server_port_cudf_internal`: sanic_server(cudf) runs on this port, internal to the container and can only be accessed by the node_server. *Do not publish this port*
-6. `sanic_server_port_pandas_internal`: sanic_server(pandas) runs on this port, internal to the container and can only be accessed by the node_server. *Do not publish this port*
+2. `cuXfilter_port`: internal port at which cuXfilter server runs. No need to change this.*Do not publish this port*
+3. `demos_serve_port`: internal port at which demos run. No need to change this.*Do not publish this port*
+4. `gtc_demo_port`: internal port at which gtc demo server runs. No need to change this.*Do not publish this port*
+5. `sanic_server_port_cudf`: sanic_server(cudf) runs on this port, internal to the container and can only be accessed by the node_server. *Do not publish this port*
+6. `sanic_server_port_pandas`: sanic_server(pandas) runs on this port, internal to the container and can only be accessed by the node_server. *Do not publish this port*
 7. `whitelisted_urls_for_clients`: list of whitelisted urls for clients to access node_server. User can add a list of urls(before building the container) he/she plans to develop on as origin, to avoid CORs issues.
-8. `jupyter_port`: port on which the jupyter integration example with cuXfilter will run
+8. `jupyter_port`: internal port at which jupyter notebook server runs. No need to change this.*Do not publish this port*
 9. `demo_mapbox_token`: mapbox token for the mortgage demo. Can be created for free [here](https://www.mapbox.com/help/define-access-token/)
 10. `demo_dataset_name`: dataset name for the example and mortgage demo. Default value: '146M_predictions_v2'. Can be downloaded from [here](https://rapidsai.github.io/demos/datasets)
 
 
 With the default settings:
 
-Access the crossfilter demos at `http://server.ip.addr:3004/demos/examples/index.html`
+Access the crossfilter demos at `http://server.ip.addr/demos/examples/`
 
-Access the GTC demos at `http://server.ip.addr:3005/`
+Access the GTC demos at `http://server.ip.addr/demos/gtc_demo`
 
-Access jupyter integration demo at `http://server.ip.addr:3009/`
+Access jupyter integration demo at `http://server.ip.addr/jupyter`
 
 
 ## Architecture
 > **Docker container(python_sanic <--> node) SERVER  <<<===(socket.io)===>>> browser(client-side JS)**
+
+![Architecture](./cuxfilter.png)
 
 ### Server-side
 1. [Sanic server](sanic_server)

@@ -78,7 +78,7 @@ Note: any update to cuXfilter-client.js requires the frontend be rebuilt as well
 
 Note: installing on a Windows machine may require some additional steps, such as making sure the Python environment is setup correctly.
 
-Note: running the demo locally with a remote backend requires the local ```/config.json``` gtc_demo_port_external value to be set to port 3000, *not port 3005*.
+Note: running the demo locally with a remote backend requires the local ```/config.json``` gtc_demo_port value to be set to port 3000, *not port 3005*.
 
 
 Clone repo.
