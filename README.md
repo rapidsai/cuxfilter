@@ -51,6 +51,8 @@ Access jupyter integration demo at `http://server.ip.addr/jupyter`
 ## Architecture
 > **Docker container(python_sanic <--> node) SERVER  <<<===(socket.io)===>>> browser(client-side JS)**
 
+![Architecture](./cuxfilter.png)
+
 ### Server-side
 1. [Sanic server](sanic_server)
 
