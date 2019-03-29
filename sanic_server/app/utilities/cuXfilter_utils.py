@@ -14,8 +14,6 @@ import pickle
 from numba import cuda
 from app import app
 from librmm_cffi import librmm_config as rmm_cfg
-from librmm_cffi import librmm as rmm
-
 
 def default(o):
     if isinstance(o, np.int8) or isinstance(o, np.int16) or isinstance(o, np.int32) or isinstance(o, np.int64): return int(o)
@@ -28,15 +26,23 @@ class cuXfilter_utils:
     dimensions_filters = {}
     group_by_backups = {}
 
+    def init_rmm(self):
+        cudf._gdf.rmm_finalize()
+        rmm_cfg.use_pool_allocator = True # default is False
+        cudf._gdf.rmm_initialize()
+
     def __init__(self):
         self.data_gpu = None
         self.back_up_dimension = None
         self.dimensions_filters = {}
         self.dimensions_filters_response_format = {}
         self.group_by_backups = {}
-        rmm_cfg.use_pool_allocator = True # default is False
-        rmm.finalize()
-        rmm.initialize()
+        try:
+            if os.environ['rmm'] == 'true':
+                self.init_rmm()
+        except KeyError:
+            print('No environment variable named rmm set(boolean), using rmm=False')
+        
 
     def hist_numba_GPU(self,data,bins):
         '''
@@ -70,7 +76,7 @@ class cuXfilter_utils:
                 json -> {A:[__values_of_colName_with_max_64_bins__], B:[__frequencies_per_bin__]}
         '''
         try:
-            group_appl = data.groupby(by=[column_name]).agg(groupby_agg)
+            group_appl = data.groupby(by=[column_name], as_index=False).agg(groupby_agg)
             key = column_name+"_"+groupby_agg_key
             self.group_by_backups[key] = True
         except Exception as e:

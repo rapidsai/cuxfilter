@@ -25,7 +25,7 @@
 3. `docker build -t user_name/viz .`
 4. `docker run --runtime=nvidia  -d --env-file ./config.env -p 80:80 --name rapids_viz -v /folder/with/data:/usr/src/app/node_server/uploads user_name/viz`
 
-Config.json Parameters:
+Config.env Parameters:
 
 1. `server_ip`: ip address of the server machine, needs to be set before building the docker container
 2. `cuXfilter_port`: internal port at which cuXfilter server runs. No need to change this.*Do not publish this port*
@@ -37,6 +37,7 @@ Config.json Parameters:
 8. `jupyter_port`: internal port at which jupyter notebook server runs. No need to change this.*Do not publish this port*
 9. `demo_mapbox_token`: mapbox token for the mortgage demo. Can be created for free [here](https://www.mapbox.com/help/define-access-token/)
 10. `demo_dataset_name`: dataset name for the example and mortgage demo. Default value: '146M_predictions_v2'. Can be downloaded from [here](https://rapidsai.github.io/demos/datasets)
+11. `rmm`: using the experimental memory pool allocator(https://github.com/rapidsai/rmm) gives better performance, but may throw out of memory errors.
 
 
 With the default settings:
