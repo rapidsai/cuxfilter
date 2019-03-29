@@ -6,7 +6,7 @@ var logger = require('morgan');
 var cors = require('cors');
 //using the session variable to track unique user sessions
 var session = require('express-session');
-const config = require('/usr/src/app/config.json');
+// const config = require('/usr/src/app/process.env.json');
 
 var sessionMiddleware = session({
   secret: 'cudf',
@@ -21,12 +21,9 @@ app.io = require('socket.io')({
 });
 
 // enable cors
-let whitelist = config.whitelisted_urls_for_clients;
-whitelist.push(config.server_ip+":"+config.demos_serve_port_external);
-whitelist.push(config.server_ip+":"+config.gtc_demo_port_external);
-whitelist.push(config.server_ip+":"+config.jupyter_port);
+let whitelist = eval(process.env.whitelisted_urls_for_clients);
+whitelist.push(process.env.server_ip);
 console.log("Whitelist: ",whitelist);
-
 let corsOptions = {
     origin: (origin, callback)=>{
         if (whitelist.indexOf(origin) !== -1) {

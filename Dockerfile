@@ -35,9 +35,10 @@ ARG NUMBA_VERSION>=0.40.0
 ARG NUMPY_VERSION>=1.14.3
 ARG PANDAS_VERSION>=0.23.4
 ARG FLASK_VERSION=1.0.2
-ARG PYARROW_VERSION=0.12.0
+ #pyarrow 0.12.0 for cudf=0.5.0
+ARG PYARROW_VERSION=0.12.1
 ARG SANIC_VERSION=0.8.3
-RUN conda install -n cudf -c numba -c conda-forge -c rapidsai -c nvidia -c defaults cudf=0.5.0 jupyter \
+RUN conda install -n cudf -c numba -c conda-forge -c rapidsai -c nvidia -c defaults cudf=0.6.0 jupyter \
       flask=${FLASK_VERSION} \
       sanic=${SANIC_VERSION} \
       numba=${NUMBA_VERSION} \
@@ -50,8 +51,11 @@ RUN conda install -n cudf -c numba -c conda-forge -c rapidsai -c nvidia -c defau
 RUN apt-get update -yq && apt-get upgrade -yq && \
     apt-get install -yq curl && curl -sL https://deb.nodesource.com/setup_8.x | bash - && \
     apt-get install -yq nodejs build-essential jq && \
+    apt-get install -yq nginx && \
     npm update -g npm && \
     rm -rf /var/lib/apt/lists/*
+
+COPY ./default /etc/nginx/sites-enabled/
 
 RUN npm install npm@latest -g
 

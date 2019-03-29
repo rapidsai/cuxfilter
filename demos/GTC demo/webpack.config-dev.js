@@ -2,8 +2,8 @@ const path = require("path");
 const webpack = require("webpack");
 
 // import config
-const config = require('../../config.json')
-console.log("Config: ", config)
+// const config = require('../../config.json')
+// console.log("Config: ", config)
 
 module.exports = {
     entry: path.resolve(__dirname, "src/index.jsx"),
@@ -55,11 +55,16 @@ module.exports = {
     },
     devServer: {
         contentBase: [path.join(__dirname, "src/"), path.resolve('../../')],
-        port: config.gtc_demo_port_external,
-        publicPath: "http://localhost:" + config.gtc_demo_port_external,
+        port: process.env.gtc_demo_port,
+        publicPath: "http://localhost:" + process.env.gtc_demo_port,
         hotOnly: true,
         open: false,
 
     },
-    plugins: [new webpack.HotModuleReplacementPlugin()]
+    plugins: [new webpack.HotModuleReplacementPlugin(),
+      new webpack.DefinePlugin({
+        'process.env.REACT_APP_server_ip': JSON.stringify(process.env.server_ip),
+        'process.env.REACT_APP_demo_dataset_name': JSON.stringify(process.env.demo_dataset_name),
+        'process.env.REACT_APP_demo_mapbox_token': JSON.stringify(process.env.demo_mapbox_token)      })
+    ]
 };

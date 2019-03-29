@@ -2,7 +2,9 @@ const path = require("path");
 const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const dotenv = require('dotenv').config({path:'/usr/src/app/config.env'});
 
+console.log(dotenv.parsed);
 
 module.exports = {
     entry: path.resolve(__dirname, "src/index.jsx"),
@@ -20,6 +22,11 @@ module.exports = {
           favicon: './src/favicon.png',
           template: './src/index-template.html',
           inject: true
+        }),
+        new webpack.DefinePlugin({
+          'process.env.REACT_APP_server_ip': JSON.stringify(process.env.server_ip),
+          'process.env.REACT_APP_demo_dataset_name': JSON.stringify(process.env.demo_dataset_name),
+          'process.env.REACT_APP_demo_mapbox_token': JSON.stringify(process.env.demo_mapbox_token)
         })
     ],
     optimization: {
@@ -70,7 +77,7 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, "public"),
-        publicPath: path.resolve(__dirname, "/"),
+        publicPath: "./",
         filename: "bundle.js"
     }
 }

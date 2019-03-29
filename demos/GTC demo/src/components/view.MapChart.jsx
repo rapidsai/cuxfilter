@@ -7,14 +7,14 @@ import DeckGL, {ScatterplotLayer, GeoJsonLayer} from 'deck.gl';
 import {StaticMap} from 'react-map-gl';
 import './scss/mapbox-gl';
 
-import BarChart from './component.BarChart' 
+import BarChart from './component.BarChart'
 
 // https://github.com/dmitrymorozoff/react-circle-slider
-import { CircleSlider } from "react-circle-slider"; 
+import { CircleSlider } from "react-circle-slider";
 
 
 // EXTERNAL
-// RAPIDS cuXFilter 
+// RAPIDS cuXFilter
 // NOTE: if cuXfilter-client.js is updated, MUST rebuild GTC demo from source
 import cuXfilter from "../../../../client_side/dist/cuXfilter-client.js"
 
@@ -33,7 +33,7 @@ class MapChart extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			configURL: '/config.json', // EXTERNAL 
+			// configURL: '/config.json', // EXTERNAL
 			xFilter: undefined,
 			engine: 'cudf',
 			ip: undefined,
@@ -65,12 +65,12 @@ class MapChart extends React.Component {
 		}
 
 		// event binding
-		// https://reactjs.org/docs/handling-events.html	
+		// https://reactjs.org/docs/handling-events.html
 
 		this.areaHover = this.areaHover.bind(this)
 		this.mapOpacitySelection = this.mapOpacitySelection.bind(this)
 		this.mapScaleSelection = this.mapScaleSelection.bind(this)
-		
+
 		this.filterZip3 = this.filterZip3.bind(this)
 
 		this.bankSelection = this.bankSelection.bind(this)
@@ -94,7 +94,7 @@ class MapChart extends React.Component {
 		this.resetAllFilters = this.resetAllFilters.bind(this)
 		this.resetInit = this.resetInit.bind(this)
 		this.switchMode = this.switchMode.bind(this)
-		
+
 	}
 
 	// Limit calls
@@ -121,7 +121,7 @@ class MapChart extends React.Component {
 		// add data update event listener
 		window.addEventListener('updateGroupEvent', (e) => {console.log("Triggered updateGroupEvent: ", e.detail.column); this.parseMapData(e)} )
 
-		// add data update event listener 
+		// add data update event listener
 		window.addEventListener('updateHistEvent', (e) => {console.log("Triggered updateHistEvent: ", e.detail.column); this.parseChartData(e)} )
 
 		// add updated filtered data size listener
@@ -133,7 +133,11 @@ class MapChart extends React.Component {
 
 		// START
 		// Start init loading chain (loadConfig -> initCuXFilter -> loadGeoJson -> setMapChartDimensions)
-		this.loadConfig();
+		this.loadConfig().then(() => {
+			this.initCuXFilter();
+		}).catch((err) => {
+			console.log(err);
+		});
 	}
 
 	componentWillUnmount(){
@@ -153,51 +157,76 @@ class MapChart extends React.Component {
 
 	// load external configuration file containing dataset name and cuXfilter ip
 	loadConfig(){
+		return new Promise((resolve, reject) => {
+			console.log('env variable 1',process.env.REACT_APP_demo_mapbox_token);
+			console.log('env variable 2', process.env.REACT_APP_server_ip);
+			if(process.env.REACT_APP_server_ip === '' || process.env.REACT_APP_demo_dataset_name  === ''){
 
-		fetch(this.state.configURL).then((response) => {
-		  if(response.ok) {
-		    return response.json();
-		  }
-		  throw new Error('Network response was not ok.');
-		}).then((json) => { 
-			
-			console.log("xFilter Config data loaded.", json)
-
-			// NOTE: check if config.json is filled out correctly
-			if(json.server_ip === '' || json.dataset  === '' || json.cuXfilter_port_external === ''){
-				
 				this.setState({
 					error: true
 				})
 
-				console.log('config.json error. Make sure the config file is fill out correctly');
+				reject('config.env error. Make sure the environment variables are set correctly');
 			} else{
-
-
-				if(json.demo_mapbox_token === ''){
-					console.log('WARNING: no mapbox token token configured, there will be NO map base layer!')
-				}
-
-				// set state
-				this.setState({
-					ip: json.server_ip + ':' + json.cuXfilter_port_external,
-					dataset: json.demo_dataset_name,
-					mapboxtoken: json.demo_mapbox_token
-
-				})
-
-				// kick off initialization 
-				this.initCuXFilter();
+						if(process.env.REACT_APP_demo_mapbox_token === ''){
+							console.log('WARNING: no mapbox token token configured, there will be NO map base layer!')
+						}
+						console.log("config env loaded successfully");
+						// set state
+						this.setState({
+							ip: process.env.REACT_APP_server_ip, //+ cuXfilter_port,
+							dataset: process.env.REACT_APP_demo_dataset_name,
+							mapboxtoken: process.env.REACT_APP_demo_mapbox_token
+						})
+					resolve();
 			}
+		})
 
-		}).catch((err) => {
-			
-			this.setState({
-				error: true
-			})
 
-			console.log('config.json fetch error. Make sure the config file is setup correctly: ', err);
-		});
+		// fetch(this.state.configURL).then((response) => {
+		//   if(response.ok) {
+		//     return response.json();
+		//   }
+		//   throw new Error('Network response was not ok.');
+		// }).then((json) => {
+		//
+		// 	console.log("xFilter Config data loaded.", json)
+		//
+		// 	// NOTE: check if config.json is filled out correctly
+		// 	if(json.server_ip === '' || json.dataset  === '' || json.cuXfilter_port === ''){
+		//
+		// 		this.setState({
+		// 			error: true
+		// 		})
+		//
+		// 		console.log('config.json error. Make sure the config file is fill out correctly');
+		// 	} else{
+		//
+		//
+		// 		if(json.demo_mapbox_token === ''){
+		// 			console.log('WARNING: no mapbox token token configured, there will be NO map base layer!')
+		// 		}
+		//
+		// 		// set state
+		// 		this.setState({
+		// 			ip: json.server_ip + ':' + json.cuXfilter_port,
+		// 			dataset: json.demo_dataset_name,
+		// 			mapboxtoken: json.demo_mapbox_token
+		//
+		// 		})
+		//
+		// 		// kick off initialization
+		// 		this.initCuXFilter();
+		// 	}
+
+		// }).catch((err) => {
+		//
+		// 	this.setState({
+		// 		error: true
+		// 	})
+		//
+		// 	console.log('config.json fetch error. Make sure the config file is setup correctly: ', err);
+		// });
 	}
 
 	// switch mode between CPU / GPU
@@ -217,7 +246,7 @@ class MapChart extends React.Component {
 
 	}
 
-	// end session and reinitialize 
+	// end session and reinitialize
 	resetInit(){
 
 		this.setState({
@@ -244,7 +273,7 @@ class MapChart extends React.Component {
 			this.initCuXFilter();
 
 		}).catch((err) => {
-			
+
 			this.setState({
 				error: true
 			})
@@ -257,7 +286,7 @@ class MapChart extends React.Component {
 	// setup cuXFilter w/ passed parameters: dataset name (string), cuXfilter ip (often localhost), engine ('cudf' / 'pandas') , use sessions ( true / false ), load type ('ipc' / 'arrow')
 	// loads data frame into back end GPU memory
 	initCuXFilter(){
-		
+
 		const xFilter = new cuXfilter(this.state.dataset, this.state.ip, this.state.engine, this.state.sessions, this.state.memformat)
 		console.log("initializing xFilter to: ", xFilter)
 
@@ -274,13 +303,13 @@ class MapChart extends React.Component {
 			this.loadGeoJson();
 
 		}).catch((err) => {
-			
+
 			this.setState({
 				error: true
 			})
 
 			console.log("xFilter Error: ", err)
-		})		
+		})
 	}
 
 	// Load USA zip3 geoJSON boundaries from file
@@ -291,18 +320,18 @@ class MapChart extends React.Component {
 		    return response.json();
 		  }
 		  throw new Error('Network response was not ok.');
-		}).then((json) => { 
-			
+		}).then((json) => {
+
 			console.log("GeoJSON data loaded.", json)
 			this.setState({
 				geoData: json
 			})
 
-			// dependent on geoJson and cuXfilter before able to set dimensions	
+			// dependent on geoJson and cuXfilter before able to set dimensions
 			this.setMapChartDimensions()
 
 		}).catch((err) => {
-			
+
 			this.setState({
 				error: true
 			})
@@ -311,7 +340,7 @@ class MapChart extends React.Component {
 		});
 	}
 
-	// initialize dimensions for cross filtering 
+	// initialize dimensions for cross filtering
 	setMapChartDimensions(){
 
 		this.setState({
@@ -333,12 +362,12 @@ class MapChart extends React.Component {
 		// once all dimensions are initialized
 		Promise.all([this.zip3DIM.loadDimension(), this.delDIM.loadDimension(), this.creditDIM.loadDimension(), this.dtiDIM.loadDimension(), this.orgDIM.loadDimension()]).then((status) =>{
 			console.log("Dims loaded", status)
-			const params = { 
-							'delinquency_12_prediction': ['mean'], 
+			const params = {
+							'delinquency_12_prediction': ['mean'],
 							'current_actual_upb': ['sum']
 							}
 
-			// initialize groupBy w/ above parameters to zip3 dimension 
+			// initialize groupBy w/ above parameters to zip3 dimension
 			this.zip3GROUP = this.zip3DIM.group(params)
 
 			return(Promise.all([this.zip3GROUP.loadGroup()]))
@@ -381,14 +410,14 @@ class MapChart extends React.Component {
 			if(this.state.totalDP === 0){
 				this.setState({
 					currentDP: this.state.xFilter.size,
-					totalDP: this.state.xFilter.size 
-				})	
+					totalDP: this.state.xFilter.size
+				})
 			} else {
 				this.setState({
 					currentDP: this.state.xFilter.size // update filtered data frame size
-				})					
+				})
 			}
-	
+
 		}
 	}
 
@@ -400,7 +429,7 @@ class MapChart extends React.Component {
 		console.log("parsing to map data: ", data)
 
 		let geoDataFeatures = this.state.geoData.features
-		
+
 		// merge with geoJson counts
 		if(geoDataFeatures.length != undefined){
 
@@ -418,7 +447,7 @@ class MapChart extends React.Component {
 					// required for filtered of incomplete data
 					console.log(zip3 + " not found in geoJSON")
 					geoDataFeatures[i].properties.sum_upb = undefined
-					geoDataFeatures[i].properties.delinquency = undefined	
+					geoDataFeatures[i].properties.delinquency = undefined
 				}
 			}
 
@@ -443,7 +472,7 @@ class MapChart extends React.Component {
 
 			// calc data for histogram
 			if(this.delDIM === undefined){
-				
+
 				this.setState({
 					error: true
 				})
@@ -456,7 +485,7 @@ class MapChart extends React.Component {
 
 					this.setState({
 						chart1Data: chartData
-					})	
+					})
 
 				} else {
 
@@ -466,10 +495,10 @@ class MapChart extends React.Component {
 					this.setState({
 						chart1Data: chartData,
 						chart1Domain: {min:min, max:max}
-					})		
-					
+					})
+
 				}
-		
+
 			}
 
 		}
@@ -478,10 +507,10 @@ class MapChart extends React.Component {
 
 			// calc data for histogram
 			if(this.dtiDIM === undefined){
-				
+
 				this.setState({
 					error: true
-				})			
+				})
 
 			} else {
 				const chartData = this.formatData(this.dtiDIM.histogram)
@@ -490,7 +519,7 @@ class MapChart extends React.Component {
 
 					this.setState({
 						chart2Data: chartData
-					})	
+					})
 
 				} else {
 
@@ -500,8 +529,8 @@ class MapChart extends React.Component {
 					this.setState({
 						chart2Data: chartData,
 						chart2Domain: {min:min, max:max}
-					})		
-					
+					})
+
 				}
 			}
 		}
@@ -510,7 +539,7 @@ class MapChart extends React.Component {
 
 			// calc data for histogram
 			if(this.creditDIM === undefined){
-				
+
 				this.setState({
 					error: true
 				})
@@ -522,7 +551,7 @@ class MapChart extends React.Component {
 
 					this.setState({
 						chart3Data: chartData
-					})	
+					})
 
 				} else {
 
@@ -532,7 +561,7 @@ class MapChart extends React.Component {
 					this.setState({
 						chart3Data: chartData,
 						chart3Domain: {min:min, max:max}
-					})		
+					})
 
 				}
 
@@ -604,13 +633,13 @@ class MapChart extends React.Component {
 			return(value / 100000)
 		} else {
 			return(100)
-		} 
+		}
 	}
 
 
 	// call cuXfilter for selected zip3
 	filterZip3(object){
-		const zip = object.object.properties.ZIP3 
+		const zip = object.object.properties.ZIP3
 		console.log("filtering", zip)
 
 		// reset if clicked on again
@@ -659,7 +688,7 @@ class MapChart extends React.Component {
 
 		if(name == "chart1"){
 
-			// manually check if full domain is selected reset filter  
+			// manually check if full domain is selected reset filter
 			if(selectedDomain.min <= this.state.chart1Domain.min && selectedDomain.max >= this.state.chart1Domain.max){
 
 				console.log("resetting chart1...")
@@ -669,7 +698,7 @@ class MapChart extends React.Component {
 				//range error checking
 				const min = Math.max(selectedDomain.min, this.state.chart1Domain.min)
 				const max = Math.min(selectedDomain.max, this.state.chart1Domain.max)
-				
+
 				console.log("Filtering: ", name, min, max)
 
 				// filter
@@ -684,8 +713,8 @@ class MapChart extends React.Component {
 
 
 		if(name == "chart2"){
-			
-			// manually check if full domain is selected reset filter  
+
+			// manually check if full domain is selected reset filter
 			if(selectedDomain.min <= this.state.chart2Domain.min && selectedDomain.max >= this.state.chart2Domain.max){
 
 				console.log("resetting chart2...")
@@ -695,7 +724,7 @@ class MapChart extends React.Component {
 				//range error checking
 				const min = Math.max(selectedDomain.min, this.state.chart2Domain.min)
 				const max = Math.min(selectedDomain.max, this.state.chart2Domain.max)
-				
+
 				console.log("Filtering: ", name, min, max)
 
 				// filter
@@ -710,18 +739,18 @@ class MapChart extends React.Component {
 
 		if(name == "chart3"){
 
-			// manually check if full domain is selected reset filter  
+			// manually check if full domain is selected reset filter
 			if(selectedDomain.min <= this.state.chart3Domain.min && selectedDomain.max >= this.state.chart3Domain.max){
 
 				console.log("resetting chart3...")
 				this.creditDIM.resetFilters()
 
 			} else {
-			
+
 				//range error checking
 				const min = Math.max(selectedDomain.min, this.state.chart3Domain.min)
 				const max = Math.min(selectedDomain.max, this.state.chart3Domain.max)
-				
+
 				console.log("Filtering: ", name, min, max)
 
 				// filter
@@ -733,7 +762,7 @@ class MapChart extends React.Component {
 			})
 
 		}
-		
+
 	}
 
 	// reset single chart filter
@@ -749,7 +778,7 @@ class MapChart extends React.Component {
 			})
 
 		}
-		
+
 		if(name == "chart2"){
 			console.log("resetting chart2...")
 			this.dtiDIM.resetFilters()
@@ -773,12 +802,12 @@ class MapChart extends React.Component {
 		}
 	}
 
-	// reset all cuXfilters 
+	// reset all cuXfilters
 	resetAllFilters(){
 
 		console.log("clearing all filters...")
 
-		// Note: still bug that filter domain hilight wont reset 
+		// Note: still bug that filter domain hilight wont reset
 
 		this.setState({
 			active: true,
@@ -804,9 +833,9 @@ class MapChart extends React.Component {
 
 		this.delDIM.getHist(this.state.chart1Bins)
 	}
-	
+
 	// chart bin size on change
-	chart2BinSelection(value){		
+	chart2BinSelection(value){
 		this.setState({
 			chart2Bins: value
 		})
@@ -821,7 +850,7 @@ class MapChart extends React.Component {
 	}
 
 	// chart bin size on change
-	chart3BinSelection(value){		
+	chart3BinSelection(value){
 		this.setState({
 			chart3Bins: value
 		})
@@ -831,7 +860,7 @@ class MapChart extends React.Component {
 	// chart bin size cuXfilter histogram update
 	// NOTE: update should be debounced
 	chart3BinUpdate(){
-		
+
 		this.creditDIM.getHist(this.state.chart3Bins)
 	}
 
@@ -897,17 +926,17 @@ class MapChart extends React.Component {
 			if(this.state.hover.ZIP3 != undefined){
 				zip3 = this.state.hover.ZIP3
 			}
-			
+
 			if(this.state.hover.delinquency != undefined){
 				score = this.state.hover.delinquency.toFixed(3)
 			}
-			
+
 			if(this.state.hover.sum_upb != undefined){
 				upb = this.state.hover.sum_upb.toLocaleString()
 			}
 
 			return(<div className={"mapchar-selected-area"}>3zip: {zip3}xx <br/> score: {score} <br/> upb: {upb} </div>)
-		
+
 		} else {
 			return(<div className={"mapchart-selected-area"}>none</div>)
 		}
@@ -963,11 +992,11 @@ class MapChart extends React.Component {
 			elevationScale: this.state.mapScale / 100,
 			lineWidthScale: 10, // only if extrude false
 			lineWidthMinPixels: 1,
-			getFillColor: (d) => { return( this.calcZip3BinColors(d) ) }, 
+			getFillColor: (d) => { return( this.calcZip3BinColors(d) ) },
 			getLineColor: [0, 188, 212, 100],
 			getRadius: 100, // only if points
 			getLineWidth: 10,
-			getElevation: (d) => { return( this.getElevation(d) ) }, 
+			getElevation: (d) => { return( this.getElevation(d) ) },
 			updateTriggers: { getFillColor: [this.state.mapOpacity, this.state.geoData] }, // https://deck.gl/#/documentation/deckgl-api-reference/layers/layer?section=data-properties
 			onClick: (object) => { if(!this.state.active){this.filterZip3(object)} },
 			onHover: (object) => { this.areaHover(object) }
@@ -983,12 +1012,12 @@ class MapChart extends React.Component {
 
 	}
 
-	// 1k lines in a single .jsx, ooops. 
+	// 1k lines in a single .jsx, ooops.
 	///// REACT RENDER /////
 	render() {
 
 	 	const headerStatus = this.buildHeaderStatus();
-	 	
+
 	 	const bankselection = this.buildBankList()
 
 	 	const hoveredArea = this.buildAreaHover();
@@ -1015,28 +1044,28 @@ class MapChart extends React.Component {
 	 	}
 
 		return (
-			
+
 			<main className="mapchart">
 
-			    <div className="mapchart-legend-container">	
-			    	
+			    <div className="mapchart-legend-container">
+
 			    	<div className="mapchart-legend-button" onClick={this.switchMode}>switch to {switchTo} engine</div>
 
 	  			    <div className="mapchart-legend-section">
 			    		<div className="mapchart-legend-heading">selected bank</div>
-						{bankselection}		    		
-			    	</div>  
+						{bankselection}
+			    	</div>
 
 			    	<div className="mapchart-legend-section-dial">
 			    		<div className="mapchart-legend-section-2col">
 				    		<div className="mapchart-legend-heading">opacity</div>
-					    	<CircleSlider value={this.state.mapOpacity} onChange={this.mapOpacitySelection} min={10} max={255} stepSize={5} 
+					    	<CircleSlider value={this.state.mapOpacity} onChange={this.mapOpacitySelection} min={10} max={255} stepSize={5}
 	        			 	 size={80} circleWidth={5} progressWidth={7} knobRadius={7} circleColor={"gray"} progressColor={"#177be4"} knobColor={"#177be4"} />
 	        			 	 <div className="mapchart-circ-value">{this.state.mapOpacity}</div>
 			    		</div>
 			    		<div className="mapchart-legend-section-2col">
 			    		<div className="mapchart-legend-heading">scale</div>
-					    	<CircleSlider value={this.state.mapScale} onChange={this.mapScaleSelection} min={1} max={100} stepSize={1} 
+					    	<CircleSlider value={this.state.mapScale} onChange={this.mapScaleSelection} min={1} max={100} stepSize={1}
 	        			 	  size={80} circleWidth={5} progressWidth={7} knobRadius={7} circleColor={"gray"} progressColor={"#177be4"} knobColor={"#177be4"} />
 	        			 	 <div className="mapchart-circ-value">{this.state.mapScale}</div>
 			    		</div>
@@ -1045,26 +1074,26 @@ class MapChart extends React.Component {
 	    			<div className="mapchart-legend-section-dial">
 			    		<div className="mapchart-legend-section-1col">
 			    			<div className="mapchart-legend-heading">dti bins</div>
-					    	<CircleSlider value={this.state.chart2Bins} onChange={this.chart2BinSelection} min={1} max={100} stepSize={1} 
+					    	<CircleSlider value={this.state.chart2Bins} onChange={this.chart2BinSelection} min={1} max={100} stepSize={1}
 	        			 	  size={80} circleWidth={5} progressWidth={7} knobRadius={7} circleColor={"gray"} progressColor={"#177be4"} knobColor={"#177be4"} />
-	        			 	 <div className="mapchart-circ-value">{this.state.chart2Bins}</div>	
+	        			 	 <div className="mapchart-circ-value">{this.state.chart2Bins}</div>
 			    		</div>
 			    	</div>
 
 	    			<div className="mapchart-legend-section-dial">
 			    		<div className="mapchart-legend-section-2col">
 			    			<div className="mapchart-legend-heading">risk bins</div>
-					    	<CircleSlider value={this.state.chart1Bins} onChange={this.chart1BinSelection} min={1} max={100} stepSize={1} 
+					    	<CircleSlider value={this.state.chart1Bins} onChange={this.chart1BinSelection} min={1} max={100} stepSize={1}
 	        			 	 size={80} circleWidth={5} progressWidth={7} knobRadius={7} circleColor={"gray"} progressColor={"#177be4"} knobColor={"#177be4"} />
-	        			 	 <div className="mapchart-circ-value">{this.state.chart1Bins}</div>			    		
+	        			 	 <div className="mapchart-circ-value">{this.state.chart1Bins}</div>
 			    		</div>
 			    		<div className="mapchart-legend-section-2col">
 				    		<div className="mapchart-legend-heading">credit bins</div>
-					    	<CircleSlider  value={this.state.chart3Bins} onChange={this.chart3BinSelection} min={1} max={100} stepSize={1} 
+					    	<CircleSlider  value={this.state.chart3Bins} onChange={this.chart3BinSelection} min={1} max={100} stepSize={1}
 		    			 	 size={80} circleWidth={5} progressWidth={7} knobRadius={7} circleColor={"gray"} progressColor={"#177be4"} knobColor={"#177be4"} />
-		    			 	 <div className="mapchart-circ-value">{this.state.chart3Bins}</div>	
+		    			 	 <div className="mapchart-circ-value">{this.state.chart3Bins}</div>
 			    		</div>
-			    	</div>	
+			    	</div>
 
 			    	<div className="mapchart-legend-section">
 			    		<div className="mapchart-legend-heading">portfolio risk score</div>
@@ -1077,7 +1106,7 @@ class MapChart extends React.Component {
 			    		</ul>
 			    		<br/>
 			    		<div className="mapchart-legend-heading">total unpaid balance</div>
-			    		<span className="mapchart-perf"> <img src="/img/legend-height.png" className="legend-img"/> </span> <div className="mapchart-perf-cube">bar height</div>
+			    		<span className="mapchart-perf"> <img src="./img/legend-height.png" className="legend-img"/> </span> <div className="mapchart-perf-cube">bar height</div>
 			    	</div>
 
 			    	<div className="mapchart-legend-section">
@@ -1092,7 +1121,7 @@ class MapChart extends React.Component {
 			    </div>
 
 		   		<div className="mapchart-heading-body">
-		   			<div className="mapchart-heading-container">	
+		   			<div className="mapchart-heading-container">
 		   				<div className="mapchart-header-title">	{engineType} aggregated {percentDP}<span className="percent">%</span> of {parseFloat(this.state.totalDP).toLocaleString()} mortgages </div>
 		   				{headerStatus}
 		   			</div>
@@ -1124,4 +1153,3 @@ class MapChart extends React.Component {
 }
 
 export default MapChart;
-

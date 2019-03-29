@@ -1,11 +1,11 @@
 //Utility functions:
-const config = require('/usr/src/app/config.json');
+// const config = require('/usr/src/app/config.json');
 let currentConnection = {}; // key -> session_id+":::"+dataset+":::"+engine; value: true/false
 let currentDataLoaded = {}; // key -> session_id+":::"+dataset+":::"+engine; value: true/false
 const serverOnTime = {};
 
-const pyServerURLcudf = "http://localhost:"+config.sanic_server_port_cudf_internal
-const pyServerURLPandas = "http://localhost:"+config.sanic_server_port_pandas_internal
+const pyServerURLcudf = "http://localhost:"+process.env.sanic_server_port_cudf
+const pyServerURLPandas = "http://localhost:"+process.env.sanic_server_port_pandas
 
 const sessionlessID = 111;
 const got = require('got');
