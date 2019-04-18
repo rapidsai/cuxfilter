@@ -26,7 +26,7 @@ whitelist.push(process.env.server_ip);
 console.log("Whitelist: ",whitelist);
 let corsOptions = {
     origin: (origin, callback)=>{
-        if (origin === undefined || whitelist.indexOf(origin) !== -1) {
+        if (whitelist.indexOf(origin) !== -1) {
             callback(null, true)
         } else {
             callback(new Error('Not allowed by CORS'))
@@ -63,7 +63,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.json({ error: err.message });
+  res.json({ error: 'err' });
 });
 
 
