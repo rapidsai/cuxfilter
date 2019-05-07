@@ -36,7 +36,7 @@ Config.env Parameters:
 7. `whitelisted_urls_for_clients`: list of whitelisted urls for clients to access node_server. User can add a list of urls(before building the container) he/she plans to develop on as origin, to avoid CORs issues.
 8. `jupyter_port`: internal port at which jupyter notebook server runs. No need to change this.*Do not publish this port*
 9. `demo_mapbox_token`: mapbox token for the mortgage demo. Can be created for free [here](https://www.mapbox.com/help/define-access-token/)
-10. `demo_dataset_name`: dataset name for the example and mortgage demo. Default value: '146M_predictions_v2'. Can be downloaded from [here](https://rapidsai.github.io/demos/datasets)
+10. `demo_dataset_name`: dataset name for the example and mortgage demo. Default value: '146M_predictions_v2'. Can be downloaded from [here](https://docs.rapids.ai/datasets/mortgage-data)
 11. `rmm`: using the experimental memory pool allocator(https://github.com/rapidsai/rmm) gives better performance, but may throw out of memory errors.
 
 
