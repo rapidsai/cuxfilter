@@ -4,7 +4,7 @@ FROM nvidia/cuda:${CUDA_VERSION}-devel-${LINUX_VERSION}
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/lib
 # Needed for cugdf.concat(), avoids "OSError: library nvvm not found"
-ENV NUMBAPRO_NVVM=/usr/local/cuda/nvvm/lib64/libnvvm.so
+ENV NUMBAPRO_NVVM=/usr/local/cuda/nvvm/lib64/
 ENV NUMBAPRO_LIBDEVICE=/usr/local/cuda/nvvm/libdevice/
 
 ARG CC=5
@@ -26,7 +26,7 @@ ENV PATH=${PATH}:/conda/bin
 SHELL ["/bin/bash", "-c"]
 
 # Build cuDF conda env
-ARG PYTHON_VERSION=3.5
+ARG PYTHON_VERSION=3.6
 RUN conda create -n cudf python=${PYTHON_VERSION}
 
 WORKDIR /usr/src/app
@@ -38,7 +38,7 @@ ARG FLASK_VERSION=1.0.2
  #pyarrow 0.12.0 for cudf=0.5.0
 ARG PYARROW_VERSION=0.12.1
 ARG SANIC_VERSION=0.8.3
-RUN conda install -n cudf -c numba -c conda-forge -c rapidsai -c nvidia -c defaults cudf=0.6.0 jupyter \
+RUN conda install -n cudf -c numba -c conda-forge -c rapidsai -c nvidia -c defaults cudf=0.7.0 jupyter \
       flask=${FLASK_VERSION} \
       sanic=${SANIC_VERSION} \
       numba=${NUMBA_VERSION} \
