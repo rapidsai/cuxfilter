@@ -21,7 +21,7 @@
 1. Edit the `config.env` file to reflect accurate IP, dataset name, and mapbox token values.
     1. add your server ip address to the `server_ip` property in the format: `http://server.ip.addr`
     2. add `demo_mapbox_token` for running the GTC demo
-    3. download the dataset `146M_predictions_v2.arrow` from [here](https://rapidsai.github.io/demos/datasets)
+    3. download the dataset `146M_predictions_v2.arrow` from [here](https://docs.rapids.ai/datasets/mortgage-viz-data)
 3. `docker build -t user_name/viz .`
 4. `docker run --runtime=nvidia  -d --env-file ./config.env -p 80:80 --name rapids_viz -v /folder/with/data:/usr/src/app/node_server/uploads user_name/viz`
 
@@ -36,7 +36,7 @@ Config.env Parameters:
 7. `whitelisted_urls_for_clients`: list of whitelisted urls for clients to access node_server. User can add a list of urls(before building the container) he/she plans to develop on as origin, to avoid CORs issues.
 8. `jupyter_port`: internal port at which jupyter notebook server runs. No need to change this.*Do not publish this port*
 9. `demo_mapbox_token`: mapbox token for the mortgage demo. Can be created for free [here](https://www.mapbox.com/help/define-access-token/)
-10. `demo_dataset_name`: dataset name for the example and mortgage demo. Default value: '146M_predictions_v2'. Can be downloaded from [here](https://rapidsai.github.io/demos/datasets)
+10. `demo_dataset_name`: dataset name for the example and mortgage demo. Default value: '146M_predictions_v2'. Can be downloaded from [here](https://docs.rapids.ai/datasets/mortgage-viz-data)
 11. `rmm`: using the experimental memory pool allocator(https://github.com/rapidsai/rmm) gives better performance, but may throw out of memory errors.
 
 
@@ -75,12 +75,12 @@ Access jupyter integration demo at `http://server.ip.addr/jupyter`
     1. `routes/cuXfilter.js` -> handles all socket-io routes, and appends each response with the amount of time spent by the node_server for each request
     2. `routes/utilities/cuXfilter_utils.js` -> utility functions for communicating with the sanic_server and handling the responses
 
-### Client-side
+### Client-side API
 1. [cuXfilter-client.js](client_side)
 
     > A javascript(es6) client library that provides crossfilter functionality to create interactive vizualizations right from the browser
 
-    Documentation and examples can be found [here](client_side)
+   **[Full client-side API documentation and examples are here](client_side)**
 
 
 
