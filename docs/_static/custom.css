@@ -1,0 +1,49 @@
+.rst-content dl:not(.docutils) dt {
+    background: #f1eeff;
+    color: #491dc3;
+    border-top: solid 3px #7253ed;
+}
+
+.wy-nav-content {
+    max-width: 1000px;
+}
+
+.wy-nav-side {
+  border-right: 1px solid #eeebee;
+  background-color: #f5f6fa;
+}
+
+
+.wy-side-nav-search>a, .wy-side-nav-search .wy-dropdown>a {
+  color: #7253ed;
+}
+
+.wy-breadcrumbs li a:first-child {
+  padding-left: 0;
+}
+
+.wy-side-nav-search {
+  background-color: #f5f6fa;
+}
+
+.wy-side-nav-search input[type=text] {
+  border-radius: 0;
+  border-color: #7253ed;
+}
+
+.wy-menu-vertical header, .wy-menu-vertical p.caption {
+  color: #7253ed;
+}
+
+.wy-menu-vertical a {
+  color: #5d5962;
+}
+
+.highlight{
+  background: #eeffcc;
+}
+
+.highlight .gp {
+  color: #c65d09;
+  font-weight: bold;
+}
