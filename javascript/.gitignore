@@ -1,0 +1,9 @@
+node_modules
+.idea
+uploads
+/data
+*arrow
+__pycache__
+*ipynb
+*.csv
+.ipynb_checkpoints
