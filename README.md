@@ -55,7 +55,7 @@ d = cux_df.dashboard(charts, title='Custom dashboard', data_size_widget=True)
 d.show()
 ```
 
-Full documentation [here](rapidsai.github.io/cuxfilter).
+Full documentation [here](https://rapidsai.github.io/cuxfilter/index.html).
 
 
 ## Dependecies
@@ -92,7 +92,7 @@ jupyter notebook
 ```
 
 ## Guides and Layout Templates
-Currently supported layout templates can be found [here](rapidsai.github.io/cuxfilter/layouts/Layouts.html)
+Currently supported layout templates can be found [here](https://rapidsai.github.io/cuxfilter/layouts/Layouts.html)
 
 ### Currently Supported Charts
 | Library  | Chart type |
@@ -118,7 +118,7 @@ Open a feature request for requesting support for libraries other than the above
 For more details, check out the [contributing guide](./CONTRIBUTING.md).
 
 ## Troubleshooting
-Troubleshooting help can be found [here](rapidsai.github.io/cuxfilter/installation.html#troubleshooting).
+Troubleshooting help can be found [here](https://rapidsai.github.io/cuxfilter/installation.html#troubleshooting).
 
 ## Future Work
 CuXfilter development is in early stages and on going. See what we are planning to do on the [projects page](https://github.com/rapidsai/cuxfilter/projects).
