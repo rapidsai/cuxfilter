@@ -1,106 +1,125 @@
-
 # cuXfilter
-> `cuXfilter` is inspired from the Crossfilter library, which is a fast, browser-based filtering mechanism across multiple dimensions and offers features do groupby operations on top of the dimensions. One of the major limitations of using Crossfilter is that it keeps data in-memory on a client-side browser, making it inefficient for processing large datasets. `cuXfilter` uses `cuDF` on the server-side, while keeping the dataframe in the GPU throughout the session. This results in sub-second response times for histogram calculations, groupby operations and querying datasets in the range of 10M to 200M rows (multiple columns).
 
-### Table of Contents
-- [Installation](#installation)
-- [Architecture](#architecture)
-    - [Server-side](#server-side)
-    - [Client-side](#client-side)
-- [Memory Limitations](#memory-limitations)
-- [Troubleshooting](#troubleshooting)
-- [File Conversion](#file-conversion)
+cuXfilter ( ku-cross-filter ) is a [RAPIDS](https://github.com/rapidsai) framework to connect web visualizations to GPU accelerated crossfiltering. Inspired by the javascript version of the [original]( https://github.com/crossfilter/crossfilter), it enables interactive and super fast multi-dimensional filtering of 100 million+ row tabular datasets via [cuDF](https://github.com/rapidsai/cudf). 
+RAPIDS Viz
+cuXfilter is one of the core projects of the “RAPIDS viz” team. Taking the axiom that “a slider is worth a thousand queries” from @lmeyerov to heart, we want to enable fast exploratory data analytics through an easier-to-use pythonic notebook interface. 
 
+As there are many fantastic visualization libraries available for the web, our general principle is not to create our own viz library, but to enhance others with faster acceleration, larger datasets, and better dev UX. Basically, we want to take the headache out of interconnecting multiple charts to a GPU backend, so you can get to visually exploring data faster.
+
+cuXfilter is best used to interact with large (1 million+) tabular datasets. GPU’s are fast, but accessing that speedup requires some architecture overhead that isn’t worthwhile for small datasets. 
+
+For more detailed requirements, see below.
+
+## cuXfilter (python) General Architecture
+
+
+### What is cuDataTiles?
+
+cuXfilter implements cuDataTiles, a GPU accelerated version of data tiles based on the work of [Falcon](https://github.com/uwdata/falcon). When starting to interact with specific charts in a cuXfilter dashboard, values for the other charts are precomputed to allow for fast slider scrubbing without having to recalculate values. 
+
+## Open Source Projects
+
+cuXfilter wouldn’t be possible without using some of these other great open source projects:
+
+- [Bokeh](https://bokeh.pydata.org/en/latest/)
+- [DataShader](http://datashader.org/)
+- [Panel](https://panel.pyviz.org/)
+- [Falcon](https://github.com/uwdata/falcon)
+- [Jupyter](https://jupyter.org/about)
+
+
+### Where is the original cuXfilter and Mortgage Viz Demo?
+
+The original version of cuXfilter, most known for the backend powering the Mortgage Viz Demo, has been moved into the /javascript folder. As it has a much more complicated backend and javascript API, we’ve decided to focus more on the streamlined notebook focused version in the /python folder for the foreseeable future. 
+
+## Get Started
+
+```python
+from cuXfilter import charts, DataFrame
+from cuXfilter.layouts import layout_1, layout_2
+import cudf
+
+df = cudf.DataFrame({'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]})
+
+#create cuXfilter DataFrame
+cux_df = DataFrame.from_dataframe(df)
+line_chart = charts.bokeh.line('key', 'val', data_points=5)
+bar_chart = charts.bokeh.bar('key', 'val', data_points=5)
+
+charts = [line_chart, bar_chart]
+
+#create the dashboard object
+d = cux_df.dashboard(charts, title='Custom dashboard', data_size_widget=True)
+
+#display the dashboard as a web-app
+d.show()
+```
+
+Full documentation [here](rapidsai.github.io/cuxfilter).
+
+
+## Dependecies
+
+- [cudf](https://github.com/rapidsai/cudf)
+- [panel](https://github.com/pyviz/panel)
+- [bokeh](https://github.com/bokeh/bokeh)
+- [cuDatashader](https://github.com/rapidsai/cudatashader)
 
 ## Installation
 
+```bash
 
-**To build using Docker:**
+git clone https://github.com/rapidsai/cuxfilter
+cd python
 
+#if you want to install it in an isolated environment
+conda create -n test_env
+source activate test_env
 
-1. Edit the `config.env` file to reflect accurate IP, dataset name, and mapbox token values.
-    1. add your server ip address to the `server_ip` property in the format: `http://server.ip.addr`
-    2. add `demo_mapbox_token` for running the GTC demo
-    3. download the dataset `146M_predictions_v2.arrow` from [here](https://docs.rapids.ai/datasets/mortgage-viz-data)
-3. `docker build -t user_name/viz .`
-4. `docker run --runtime=nvidia  -d --env-file ./config.env -p 80:80 --name rapids_viz -v /folder/with/data:/usr/src/app/node_server/uploads user_name/viz`
+#install dependencies
+make
 
-Config.env Parameters:
+#install cuXfilter-py, while in the root folder
+pip install -e .
 
-1. `server_ip`: ip address of the server machine, needs to be set before building the docker container
-2. `cuXfilter_port`: internal port at which cuXfilter server runs. No need to change this.*Do not publish this port*
-3. `demos_serve_port`: internal port at which demos run. No need to change this.*Do not publish this port*
-4. `gtc_demo_port`: internal port at which gtc demo server runs. No need to change this.*Do not publish this port*
-5. `sanic_server_port_cudf`: sanic_server(cudf) runs on this port, internal to the container and can only be accessed by the node_server. *Do not publish this port*
-6. `sanic_server_port_pandas`: sanic_server(pandas) runs on this port, internal to the container and can only be accessed by the node_server. *Do not publish this port*
-7. `whitelisted_urls_for_clients`: list of whitelisted urls for clients to access node_server. User can add a list of urls(before building the container) he/she plans to develop on as origin, to avoid CORs issues.
-8. `jupyter_port`: internal port at which jupyter notebook server runs. No need to change this.*Do not publish this port*
-9. `demo_mapbox_token`: mapbox token for the mortgage demo. Can be created for free [here](https://www.mapbox.com/help/define-access-token/)
-10. `demo_dataset_name`: dataset name for the example and mortgage demo. Default value: '146M_predictions_v2'. Can be downloaded from [here](https://docs.rapids.ai/datasets/mortgage-viz-data)
-11. `rmm`: using the experimental memory pool allocator(https://github.com/rapidsai/rmm) gives better performance, but may throw out of memory errors.
+#install cuDatashader
+git clone https://github.com/rapidsai/cudatashader
+cd cuviz
+pip install -e .
 
+#run notebooks
+jupyter notebook
+```
 
-With the default settings:
+## Guides and Layout Templates
+Currently supported layout templates can be found [here](rapidsai.github.io/cuxfilter/layouts/Layouts.html)
 
-Access the crossfilter demos at `http://server.ip.addr/demos/examples/`
+### Currently Supported Charts
+| Library  | Chart type |
+| ------------- | ------------- |
+| bokeh  | bar, line, choropleth  |
+| cudatashader  | scatter, scatter_geo, line, heatmap  |
+| panel_widgets  | range_slider, float_slider, int_slider, drop_down, multi_select  |
+| custom    | view_dataframe |
 
-Access the GTC demos at `http://server.ip.addr/demos/gtc_demo`
+## Contributing Developers Guide
 
-Access jupyter integration demo at `http://server.ip.addr/jupyter`
+cuXfilter.py acts like a connector library and it is easy to add support for new libraries. The cuxfilter/charts/core directory has all the core chart classes which can be inherited and used to implement a few (viz related) functions and support dashboarding in cuXfilter directly.
 
+You can see the examples to implement viz libraries in the bokeh and cudatashader directories. 
 
-## Architecture
-> **Docker container(python_sanic <--> node) SERVER  <<<===(socket.io)===>>> browser(client-side JS)**
+Current plan is to add support for the following libraries apart from bokeh and cudatashader:
+1. plotly
+2. altair
+3. pydeck
 
-![Architecture](./cuxfilter.png)
+Open a feature request for requesting support for libraries other than the above mentioned ones.
 
-### Server-side
-1. [Sanic server](sanic_server)
-
-    > The sanic server interacts with the node_server, and maintains dataframe objects in memory, throughout the user session. There are two instances of the sanic_server running all the time, one at port 3002 (handling all cudf dataframe queries) and the other at port 3003 (handling all pandas dataframe queries, incase anyone wants to compare performance). This server is not exposed to the cuXfilter-client.js library, and is accessable only to the node-server, which acts as a load-balancer between cuXfilter-client.js library and the sanic server.
-
-    Files:
-    1. `app/views.py` -> handles all routes, and appends each response with calculation time
-    2. `app/utilities/cuXfilter_utils.py` -> all cudf crossfilter functions
-    3. `app/utilities/numbaHistinMem.py` -> histogram calculations using numba for a cudf.Series(ndarray)
-    4. `app/utilities/pandas_utils.py` -> all pandas crossfilter functions
-
-
-
-2. [Node server](node_server)
-
-    > The Node server is exposed to the cuXfilter-client.js library and handles socket.io incoming requests and responses. It handles user-sessions, and gives an option to the client-side to perform cross-browser/cross-tab crossfiltering too.
-
-    Files:
-    1. `routes/cuXfilter.js` -> handles all socket-io routes, and appends each response with the amount of time spent by the node_server for each request
-    2. `routes/utilities/cuXfilter_utils.js` -> utility functions for communicating with the sanic_server and handling the responses
-
-### Client-side API
-1. [cuXfilter-client.js](client_side)
-
-    > A javascript(es6) client library that provides crossfilter functionality to create interactive vizualizations right from the browser
-
-   **[Full client-side API documentation and examples are here](client_side)**
-
-
-
-## Memory Limitations
-Currently, there are a few memory limitations for running cuXfilter.
-
-- Dataset size should be half the size of total GPU memory available. This is because the GPU memory usage spikes around 2X, in case of groupby operations.
-
->  This will not be an issue once dask_gdf engine is implemented(assuming the user has access to multiple GPUs)
-
-
+For more details, check out the [contributing guide](./CONTRIBUTING.md).
 
 ## Troubleshooting
-In case the server becomes unresponsive, here are the steps you can take to resolve it:
+Troubleshooting help can be found [here](rapidsai.github.io/cuxfilter/installation.html#troubleshooting).
 
-1. Check if the gpu memory is full, using the `nvidia-smi` command. If the gpu memory usage seems full and frozen, this may be due to the cudf out of memory error, which may happen if the dataset is too large to fit into the GPU memory. Please refer `Memory limitations` while choosing datasets
+## Future Work
+CuXfilter development is in early stages and on going. See what we are planning to do on the [projects page](https://github.com/rapidsai/cuxfilter/projects).
 
-A docker container restart might solve the issue temporarily.
-
-
-
-## File Conversion
-Currently, cuXfilter supports only arrow file format as input. The `python_scripts` folder in the root directory provides a helper script to convert csv to arrow file. For more information, follow this [link](python_scripts)
