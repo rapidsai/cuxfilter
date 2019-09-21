@@ -1,0 +1,412 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Layouts &mdash; cuXfilter 0.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script type="text/javascript" src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Examples" href="../examples/examples.html" />
+    <link rel="prev" title="CuDataShader Charts" href="../charts/cudatashader_charts.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> cuXfilter
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataframe.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../10 minutes to cuXfilter.html">10 minutes to cuXfilter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../charts/charts.html">Charts</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Layouts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#load-cuxfilter-and-data">Load cuXfilter and data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#declare-charts">Declare charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout-0">layout_0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout-1">layout_1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout-2">layout_2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout-3">layout_3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout-4">layout_4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout-5">layout_5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout-6">layout_6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout-7">layout_7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout-8">layout_8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout-9">layout_9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout-10">layout_10</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout-11">layout_11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout-12">layout_12</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/examples.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cuXfilter</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Layouts</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/layouts/Layouts.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="layouts">
+<h1>Layouts<a class="headerlink" href="#layouts" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="load-cuxfilter-and-data">
+<h2>Load cuXfilter and data<a class="headerlink" href="#load-cuxfilter-and-data" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cuXfilter</span> <span class="kn">import</span> <span class="n">charts</span>
+<span class="kn">import</span> <span class="nn">cuXfilter</span>
+<span class="kn">from</span> <span class="nn">bokeh</span> <span class="kn">import</span> <span class="n">palettes</span>
+<span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuXfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_arrow</span><span class="p">(</span><span class="s1">&#39;/data/146M_predictions_v2.arrow&#39;</span><span class="p">)</span>
+<span class="n">cux_df</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;loan_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;loan_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+<span class="n">cux_df</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;current_actual_upb&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;current_actual_upb&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+<span class="n">cux_df</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;loan_id&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="declare-charts">
+<h2>Declare charts<a class="headerlink" href="#declare-charts" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">chart0</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">choropleth</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;zip&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;delinquency_12_prediction&#39;</span><span class="p">,</span> <span class="n">aggregate_fn</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span>
+                              <span class="n">geo_color_palette</span><span class="o">=</span><span class="n">palettes</span><span class="o">.</span><span class="n">Purples9</span><span class="p">,</span>
+                              <span class="n">geoJSONSource</span> <span class="o">=</span> <span class="s1">&#39;https://raw.githubusercontent.com/rapidsai/cuxfilter/master/demos/GTC</span><span class="si">%20d</span><span class="s1">emo/src/data/zip3-ms-rhs-lessprops.json&#39;</span><span class="p">,</span>
+                              <span class="n">data_points</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">x_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">126</span><span class="p">,</span> <span class="o">-</span><span class="mi">66</span><span class="p">),</span> <span class="n">y_range</span><span class="o">=</span><span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+                              <span class="n">nan_color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+<span class="n">chart1</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="s1">&#39;borrower_credit_score&#39;</span><span class="p">,</span><span class="n">step_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">chart2</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="s1">&#39;dti&#39;</span><span class="p">)</span>
+<span class="n">chart3</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="s1">&#39;delinquency_12_prediction&#39;</span><span class="p">)</span>
+<span class="n">chart4</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="s1">&#39;seller_name&#39;</span><span class="p">,</span><span class="n">data_points</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">chart5</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;loan_id&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;current_actual_upb&#39;</span><span class="p">)</span>
+<span class="n">chart6</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="s1">&#39;dti&#39;</span><span class="p">)</span>
+<span class="n">chart7</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="s1">&#39;delinquency_12_prediction&#39;</span><span class="p">)</span>
+<span class="n">chart8</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="s1">&#39;borrower_credit_score&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="layout-0">
+<h2>layout_0<a class="headerlink" href="#layout-0" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/layout_0.png"><img alt="../_images/layout_0.png" class="align-center" src="../_images/layout_0.png" style="width: 350px;" /></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cuXfilter</span> <span class="kn">import</span> <span class="n">layouts</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">chart0</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">layouts</span><span class="o">.</span><span class="n">layout_0</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/layout0.png" src="../_images/layout0.png" />
+</div>
+<div class="section" id="layout-1">
+<h2>layout_1<a class="headerlink" href="#layout-1" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/layout_1.png"><img alt="../_images/layout_1.png" class="align-center" src="../_images/layout_1.png" style="width: 350px;" /></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cuXfilter</span> <span class="kn">import</span> <span class="n">layouts</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">chart0</span><span class="p">,</span> <span class="n">chart1</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">layouts</span><span class="o">.</span><span class="n">layout_1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/layout1.png" src="../_images/layout1.png" />
+</div>
+<div class="section" id="layout-2">
+<h2>layout_2<a class="headerlink" href="#layout-2" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/layout_2.png"><img alt="../_images/layout_2.png" class="align-center" src="../_images/layout_2.png" style="width: 350px;" /></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cuXfilter</span> <span class="kn">import</span> <span class="n">layouts</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">chart0</span><span class="p">,</span> <span class="n">chart1</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">layouts</span><span class="o">.</span><span class="n">layout_2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/layout2.png" src="../_images/layout2.png" />
+</div>
+<div class="section" id="layout-3">
+<h2>layout_3<a class="headerlink" href="#layout-3" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/layout_3.png"><img alt="../_images/layout_3.png" class="align-center" src="../_images/layout_3.png" style="width: 350px;" /></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cuXfilter</span> <span class="kn">import</span> <span class="n">layouts</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">chart0</span><span class="p">,</span> <span class="n">chart1</span><span class="p">,</span> <span class="n">chart2</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">layouts</span><span class="o">.</span><span class="n">layout_3</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/layout3.png" src="../_images/layout3.png" />
+</div>
+<div class="section" id="layout-4">
+<h2>layout_4<a class="headerlink" href="#layout-4" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/layout_4.png"><img alt="../_images/layout_4.png" class="align-center" src="../_images/layout_4.png" style="width: 350px;" /></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cuXfilter</span> <span class="kn">import</span> <span class="n">layouts</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">chart0</span><span class="p">,</span> <span class="n">chart1</span><span class="p">,</span> <span class="n">chart2</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">layouts</span><span class="o">.</span><span class="n">layout_4</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/layout4.png" src="../_images/layout4.png" />
+</div>
+<div class="section" id="layout-5">
+<h2>layout_5<a class="headerlink" href="#layout-5" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/layout_5.png"><img alt="../_images/layout_5.png" class="align-center" src="../_images/layout_5.png" style="width: 350px;" /></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cuXfilter</span> <span class="kn">import</span> <span class="n">layouts</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">chart0</span><span class="p">,</span> <span class="n">chart1</span><span class="p">,</span> <span class="n">chart2</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">layouts</span><span class="o">.</span><span class="n">layout_5</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/layout5.png" src="../_images/layout5.png" />
+</div>
+<div class="section" id="layout-6">
+<h2>layout_6<a class="headerlink" href="#layout-6" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/layout_6.png"><img alt="../_images/layout_6.png" class="align-center" src="../_images/layout_6.png" style="width: 350px;" /></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cuXfilter</span> <span class="kn">import</span> <span class="n">layouts</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">chart0</span><span class="p">,</span> <span class="n">chart1</span><span class="p">,</span> <span class="n">chart2</span><span class="p">,</span> <span class="n">chart3</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">layouts</span><span class="o">.</span><span class="n">layout_6</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/layout6.png" src="../_images/layout6.png" />
+</div>
+<div class="section" id="layout-7">
+<h2>layout_7<a class="headerlink" href="#layout-7" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/layout_7.png"><img alt="../_images/layout_7.png" class="align-center" src="../_images/layout_7.png" style="width: 350px;" /></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cuXfilter</span> <span class="kn">import</span> <span class="n">layouts</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">chart0</span><span class="p">,</span> <span class="n">chart1</span><span class="p">,</span> <span class="n">chart2</span><span class="p">,</span> <span class="n">chart3</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">layouts</span><span class="o">.</span><span class="n">layout_7</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/layout7.png" src="../_images/layout7.png" />
+</div>
+<div class="section" id="layout-8">
+<h2>layout_8<a class="headerlink" href="#layout-8" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/layout_8.png"><img alt="../_images/layout_8.png" class="align-center" src="../_images/layout_8.png" style="width: 350px;" /></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cuXfilter</span> <span class="kn">import</span> <span class="n">layouts</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">chart0</span><span class="p">,</span> <span class="n">chart1</span><span class="p">,</span> <span class="n">chart2</span><span class="p">,</span> <span class="n">chart3</span><span class="p">,</span> <span class="n">chart4</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">layouts</span><span class="o">.</span><span class="n">layout_8</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/layout8.png" src="../_images/layout8.png" />
+</div>
+<div class="section" id="layout-9">
+<h2>layout_9<a class="headerlink" href="#layout-9" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/layout_9.png"><img alt="../_images/layout_9.png" class="align-center" src="../_images/layout_9.png" style="width: 350px;" /></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cuXfilter</span> <span class="kn">import</span> <span class="n">layouts</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">chart0</span><span class="p">,</span> <span class="n">chart1</span><span class="p">,</span> <span class="n">chart2</span><span class="p">,</span> <span class="n">chart3</span><span class="p">,</span> <span class="n">chart4</span><span class="p">,</span> <span class="n">chart5</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">layouts</span><span class="o">.</span><span class="n">layout_9</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/layout9.png" src="../_images/layout9.png" />
+</div>
+<div class="section" id="layout-10">
+<h2>layout_10<a class="headerlink" href="#layout-10" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/layout_10.png"><img alt="../_images/layout_10.png" class="align-center" src="../_images/layout_10.png" style="width: 350px;" /></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cuXfilter</span> <span class="kn">import</span> <span class="n">layouts</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">chart0</span><span class="p">,</span> <span class="n">chart1</span><span class="p">,</span> <span class="n">chart2</span><span class="p">,</span> <span class="n">chart3</span><span class="p">,</span> <span class="n">chart4</span><span class="p">,</span> <span class="n">chart5</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">layouts</span><span class="o">.</span><span class="n">layout_10</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/layout10.png" src="../_images/layout10.png" />
+</div>
+<div class="section" id="layout-11">
+<h2>layout_11<a class="headerlink" href="#layout-11" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/layout_11.png"><img alt="../_images/layout_11.png" class="align-center" src="../_images/layout_11.png" style="width: 350px;" /></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cuXfilter</span> <span class="kn">import</span> <span class="n">layouts</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">chart0</span><span class="p">,</span> <span class="n">chart1</span><span class="p">,</span> <span class="n">chart2</span><span class="p">,</span> <span class="n">chart3</span><span class="p">,</span> <span class="n">chart4</span><span class="p">,</span> <span class="n">chart5</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">layouts</span><span class="o">.</span><span class="n">layout_11</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/layout11.png" src="../_images/layout11.png" />
+</div>
+<div class="section" id="layout-12">
+<h2>layout_12<a class="headerlink" href="#layout-12" title="Permalink to this headline">¶</a></h2>
+<a class="reference internal image-reference" href="../_images/layout_12.png"><img alt="../_images/layout_12.png" class="align-center" src="../_images/layout_12.png" style="width: 350px;" /></a>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cuXfilter</span> <span class="kn">import</span> <span class="n">layouts</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">chart0</span><span class="p">,</span> <span class="n">chart1</span><span class="p">,</span> <span class="n">chart2</span><span class="p">,</span> <span class="n">chart3</span><span class="p">,</span> <span class="n">chart4</span><span class="p">,</span> <span class="n">chart5</span><span class="p">,</span> <span class="n">chart6</span><span class="p">,</span> <span class="n">chart7</span><span class="p">,</span> <span class="n">chart8</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">layouts</span><span class="o">.</span><span class="n">layout_12</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Dashboard&quot;</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img alt="../_images/layout12.png" src="../_images/layout12.png" />
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../examples/examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../charts/cudatashader_charts.html" class="btn btn-neutral float-left" title="CuDataShader Charts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, ajay thorve
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
