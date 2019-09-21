@@ -9,8 +9,8 @@ Steps
 
 .. code-block:: bash
     
-    git clone https://gitlab-master.nvidia.com/athorve/cuxfilter_refactor
-    git clone https://gitlab-master.nvidia.com/viclafargue/cuviz
+    git clone https://github.com/rapidsai/cuxfilter
+    git clone https://github.com/rapidsai/cudatashader
 
 
 2. If you want to install it in an isolated environment
@@ -90,6 +90,8 @@ Running in a remote jupyter notebook
 Download datasets
 -----------------
 
-Download the mortgage dataset: https://docs.rapids.ai/datasets/mortgage-viz-data
+- Download the mortgage dataset from [here](https://docs.rapids.ai/datasets/mortgage-viz-data)
 
-Nyc taxi dataset: https://drive.google.com/file/d/1mTvl66VLzHwQJPcgnGBdmZTNEdNp1tYo/view?usp=sharing
+- Nyc taxi dataset from [here](https://drive.google.com/file/d/1mTvl66VLzHwQJPcgnGBdmZTNEdNp1tYo/view?usp=sharing)
+
+- Auto dataset from [here](https://drive.google.com/file/d/1jxySYJ9e32hI8PQ5QPr9_xrsu37N5fOM/view?usp=sharing)
