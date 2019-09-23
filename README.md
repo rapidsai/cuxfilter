@@ -15,7 +15,7 @@ For more detailed requirements, see below.
 
 The python version of cuXfilter leverage jupyter notebook and bokeh server to greatly reduce backend complexity. Currently we are focusing development efforts on the python version instead of the older javascript version.
 
-![architecture](docs/_images/RAPIDS Viz EcoSystem v2.png)
+<img src="https://github.com/rapidsai/cuxfilter/blob/master/docs/_images/RAPIDS%20Viz%20EcoSystem%20v2.png" />
 
 ### What is cuDataTiles?
 
