@@ -1,25 +1,29 @@
 # <div align="left"><img src="https://rapids.ai/assets/images/rapids_logo.png" width="90px"/>&nbsp; cuXfilter
 
 cuXfilter ( ku-cross-filter ) is a [RAPIDS](https://github.com/rapidsai) framework to connect web visualizations to GPU accelerated crossfiltering. Inspired by the javascript version of the [original]( https://github.com/crossfilter/crossfilter), it enables interactive and super fast multi-dimensional filtering of 100 million+ row tabular datasets via [cuDF](https://github.com/rapidsai/cudf). 
-RAPIDS Viz
+
+## RAPIDS Viz
 cuXfilter is one of the core projects of the “RAPIDS viz” team. Taking the axiom that “a slider is worth a thousand queries” from @lmeyerov to heart, we want to enable fast exploratory data analytics through an easier-to-use pythonic notebook interface. 
 
-As there are many fantastic visualization libraries available for the web, our general principle is not to create our own viz library, but to enhance others with faster acceleration, larger datasets, and better dev UX. Basically, we want to take the headache out of interconnecting multiple charts to a GPU backend, so you can get to visually exploring data faster.
+As there are many fantastic visualization libraries available for the web, our general principle is not to create our own viz library, but to enhance others with faster acceleration, larger datasets, and better dev UX. **Basically, we want to take the headache out of interconnecting multiple charts to a GPU backend, so you can get to visually exploring data faster.**
 
-cuXfilter is best used to interact with large (1 million+) tabular datasets. GPU’s are fast, but accessing that speedup requires some architecture overhead that isn’t worthwhile for small datasets. 
+By the way, cuXfilter is best used to interact with large (1 million+) tabular datasets. GPU’s are fast, but accessing that speedup requires some architecture overhead that isn’t worthwhile for small datasets. 
 
 For more detailed requirements, see below.
 
-## cuXfilter (python) General Architecture
+## cuXfilter.py Architecture
 
+The python version of cuXfilter leverage jupyter notebook and bokeh server to greatly reduce backend complexity. Currently we are focusing development efforts on the python version instead of the older javascript version.
+
+![architecture](docs/_images/RAPIDS Viz EcoSystem v2.png)
 
 ### What is cuDataTiles?
 
-cuXfilter implements cuDataTiles, a GPU accelerated version of data tiles based on the work of [Falcon](https://github.com/uwdata/falcon). When starting to interact with specific charts in a cuXfilter dashboard, values for the other charts are precomputed to allow for fast slider scrubbing without having to recalculate values. 
+cuXfilter.py implements cuDataTiles, a GPU accelerated version of data tiles based on the work of [Falcon](https://github.com/uwdata/falcon). When starting to interact with specific charts in a cuXfilter dashboard, values for the other charts are precomputed to allow for fast slider scrubbing without having to recalculate values. 
 
-## Open Source Projects
+### Open Source Projects
 
-cuXfilter wouldn’t be possible without using some of these other great open source projects:
+cuXfilter wouldn’t be possible without using these great open source projects:
 
 - [Bokeh](https://bokeh.pydata.org/en/latest/)
 - [DataShader](http://datashader.org/)
@@ -30,7 +34,7 @@ cuXfilter wouldn’t be possible without using some of these other great open so
 
 ### Where is the original cuXfilter and Mortgage Viz Demo?
 
-The original version of cuXfilter, most known for the backend powering the Mortgage Viz Demo, has been moved into the /javascript folder. As it has a much more complicated backend and javascript API, we’ve decided to focus more on the streamlined notebook focused version in the /python folder for the foreseeable future. 
+The original version (0.1) of cuXfilter, most known for the backend powering the Mortgage Viz Demo, has been moved into the `/javascript` folder. As it has a much more complicated backend and javascript API, we’ve decided to focus more on the streamlined notebook focused version in the `/python` folder.
 
 ## Get Started
 
@@ -55,8 +59,11 @@ d = cux_df.dashboard(charts, title='Custom dashboard', data_size_widget=True)
 d.show()
 ```
 
-Full documentation [here](https://rapidsai.github.io/cuxfilter/index.html).
+## Documentation
 
+Full documentation can be found [here](https://rapidsai.github.io/cuxfilter/index.html).
+
+Troubleshooting help can be found [here](https://rapidsai.github.io/cuxfilter/installation.html#troubleshooting).
 
 ## Dependecies
 
@@ -92,7 +99,8 @@ jupyter notebook
 ```
 
 ## Guides and Layout Templates
-Currently supported layout templates can be found [here](https://rapidsai.github.io/cuxfilter/layouts/Layouts.html)
+
+Currently supported layout templates and example code can be found [here](https://rapidsai.github.io/cuxfilter/layouts/Layouts.html)
 
 ### Currently Supported Charts
 | Library  | Chart type |
@@ -102,24 +110,19 @@ Currently supported layout templates can be found [here](https://rapidsai.github
 | panel_widgets  | range_slider, float_slider, int_slider, drop_down, multi_select  |
 | custom    | view_dataframe |
 
-## Contributing Developers Guide
-
-cuXfilter.py acts like a connector library and it is easy to add support for new libraries. The cuxfilter/charts/core directory has all the core chart classes which can be inherited and used to implement a few (viz related) functions and support dashboarding in cuXfilter directly.
-
-You can see the examples to implement viz libraries in the bokeh and cudatashader directories. 
-
-Current plan is to add support for the following libraries apart from bokeh and cudatashader:
+Our plan is to **add support in the future** for the following libraries:
 1. plotly
 2. altair
 3. pydeck
 
-Open a feature request for requesting support for libraries other than the above mentioned ones.
+## Contributing Developers Guide
+
+cuXfilter.py acts like a connector library and it is easy to add support for new libraries. The `python/cuxfilter/charts/core` directory has all the core chart classes which can be inherited and used to implement a few (viz related) functions and support dashboarding in cuXfilter directly.
+
+You can see the examples to implement viz libraries in the bokeh and cudatashader directories. Let us know if you would like to add a chart by opening a feature request issue or submitting a PR.
 
 For more details, check out the [contributing guide](./CONTRIBUTING.md).
 
-## Troubleshooting
-Troubleshooting help can be found [here](https://rapidsai.github.io/cuxfilter/installation.html#troubleshooting).
-
 ## Future Work
-CuXfilter development is in early stages and on going. See what we are planning to do on the [projects page](https://github.com/rapidsai/cuxfilter/projects).
+cuXfilter development is in early stages and on going. See what we are planning next on the [projects page](https://github.com/rapidsai/cuxfilter/projects).
 
