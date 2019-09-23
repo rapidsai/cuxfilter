@@ -3,7 +3,7 @@
   <head>
     <title>cuXfilter: Demo 2</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/rapidsai/cuxfilter@master/client_side/dist/cuXfilter-client.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/rapidsai/cuxfilter@master/javascript/client_side/dist/cuXfilter-client.js"></script>
     <link href="./styles/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
     <link href="./styles/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
     <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
@@ -177,7 +177,7 @@ addEventListener('updateGroupEvent', (e) => {
         pie_colors = Array(pie_categories).fill(0);
     }
     Plotly.restyle(pie1,'labels', [seller_name_mappings]);
-    Plotly.restyle(pie1,'values', [group1.value.count_seller_name]);
+    Plotly.restyle(pie1,'values', [group1.value.seller_name]);
     Plotly.restyle(pie1,'marker', {colors:pie_colors});
 });
 
