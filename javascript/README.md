@@ -1,5 +1,6 @@
 
-# cuXfilter
+# cuXfilter .js
+~ NOTE: current development is focusing on the python version ~
 A client-server architecture with a javascript api to do  cross-filtering viz dashboards powered by cudf.
 
 
