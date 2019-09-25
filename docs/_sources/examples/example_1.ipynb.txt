@@ -17,7 +17,7 @@
     "from cuXfilter import charts\n",
     "import cuXfilter\n",
     "from bokeh import palettes\n",
-    "from cuXfilter.layouts import layout_1, layout_2\n",
+    "from cuXfilter.layouts import layout_1\n",
     "import warnings\n",
     "warnings.filterwarnings('ignore')"
    ]
@@ -53,7 +53,7 @@
    "source": [
     "chart0 = charts.bokeh.choropleth(x='zip', y='delinquency_12_prediction', aggregate_fn='mean', \n",
     "                                  geo_color_palette=palettes.Inferno256,\n",
-    "                                  geoJSONSource = 'https://raw.githubusercontent.com/rapidsai/cuxfilter/master/demos/GTC%20demo/src/data/zip3-ms-rhs-lessprops.json',\n",
+    "                                  geoJSONSource = 'https://raw.githubusercontent.com/rapidsai/cuxfilter/master/javascript/demos/GTC%20demo/src/data/zip3-ms-rhs-lessprops.json',\n",
     "                                  data_points=1000, width=1100, x_range=(-126, -66), y_range=(23, 50))\n",
     "chart2 = charts.bokeh.bar('delinquency_12_prediction',data_points=50, width=400, height=400)\n",
     "chart3 = charts.panel_widgets.range_slider('borrower_credit_score',data_points=50,width=400, height=400)\n"
@@ -94,7 +94,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "d = cux_df.dashboard([chart0, chart1], layout=layout_2, title=\"Ajay's Dashboard\")"
+    "d = cux_df.dashboard([chart0, chart1], layout=layout_1, title=\"Ajay's Dashboard\")"
    ]
   },
   {
@@ -117,8 +117,8 @@
     "# d.app('10.110.47.43:8888') within the notebook: If you are using jupyter remotely, use this line instead of second, and replace url with current notebook url\n",
     "#d.app() for local interactive behavior\n",
     "\n",
-    "#d.view() for just a view of the dashboard, interaciton not available. Recommended way to generate when uploading to git remote site\n",
-    "d.view()"
+    "#d.preview() for just a view of the dashboard, interaciton not available. Recommended way to generate when uploading to git remote site\n",
+    "await d.preview()"
    ]
   },
   {

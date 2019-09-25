@@ -30,4 +30,5 @@ dependencies:
   - sphinx-markdown-tables
   - nose
   - flake8
+  - pyppeteer
  

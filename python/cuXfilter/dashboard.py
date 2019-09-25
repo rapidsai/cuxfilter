@@ -1,14 +1,17 @@
 from typing import List, Dict, Type
+import bokeh.embed.util as u
+from panel.io.notebook import show_server
+from panel.util import param_reprs
+import panel as pn
+from panel.io.server import StoppableThread, get_server
+import asyncio
+
 from .charts.core.core_chart import BaseChart
 from .datatile import DataTile
 from .layouts import layout_1
 from .charts.panel_widgets import data_size_indicator
-import bokeh.embed.util as u
-
-from panel.io.notebook import show_server
-from panel.util import param_reprs
-import panel as pn
 from .layouts import chart_view
+from .assets import screengrab, get_open_port
 
 
 _server_info = (
@@ -287,9 +290,14 @@ class DashBoard:
         
         return pn.Column(str_repr, server_info, button, button_in_notebook, width=800)._repr_mimebundle_(include,exclude)
 
-    def preview(self):
+    def _get_server(self, port=0, websocket_origin=None, loop=None,
+                   show=False, start=False, **kwargs):
+        return get_server(self._dashboard.generate_dashboard(self._title, self._charts), port, websocket_origin, loop, show,
+                          start, **kwargs)
+
+    async def preview(self):
         """
-        Preview all the charts in a jupyter cell, non interactive(no backend server). Mostly intended to save notebook state for blogs, documentation while still rendering the dashboard.
+        Preview(Async) all the charts in a jupyter cell, non interactive(no backend server). Mostly intended to save notebook state for blogs, documentation while still rendering the dashboard.
 
         Notes
         -----
@@ -306,16 +314,18 @@ class DashBoard:
         >>> line_chart_1 = charts.bokeh.line('key', 'val', data_points=5, add_interaction=False)
         >>> line_chart_2 = charts.bokeh.bar('val', 'key', data_points=5, add_interaction=False)
         >>> d = cux_df.dashboard([line_chart_1, line_chart_2])
-        >>> d.preview()
+        >>> await d.preview()
         displays charts in the dashboard
         """
-        chart_views = []
-        for chart in self._charts.values():
-            chart_views.append(chart.view())
-        return chart_view(*chart_views)
+        port = get_open_port()
+        url = 'localhost:'+str(port)
+        temp_server = self._get_server(port=port, websocket_origin=url, show=False, start=True)
+        await screengrab('http://'+url)
+        temp_server.stop()
+        from IPython.core.display import Image, display
+        display(Image('temp.png'))
 
-
-    
+        
     def app(self, url='', port:int=0):
         """
         Run the dashboard with a bokeh backend server within the notebook.
@@ -350,7 +360,7 @@ class DashBoard:
             app(self._dashboard.generate_dashboard(self._title, self._charts))
 
 
-    def show(self, url=''):
+    def show(self, url='', threaded=False):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
@@ -378,9 +388,9 @@ class DashBoard:
         
         if len(url) > 0:
             port = url.split(':')[-1]
-            self._dashboard.generate_dashboard(self._title, self._charts).show(port=int(port), websocket_origin=url)
+            return self._dashboard.generate_dashboard(self._title, self._charts).show(port=int(port), websocket_origin=url, threaded=threaded)
         else:
-            self._dashboard.generate_dashboard(self._title, self._charts).show()
+            return self._dashboard.generate_dashboard(self._title, self._charts).show(threaded=threaded)
 
 
     def _reload_charts(self, data=None, include_cols = [], ignore_cols=[]):
