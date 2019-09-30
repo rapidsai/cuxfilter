@@ -55,9 +55,16 @@ charts = [line_chart, bar_chart]
 #create the dashboard object
 d = cux_df.dashboard(charts, title='Custom dashboard', data_size_widget=True)
 
-#display the dashboard as a web-app
+#display the dashboard as a web-app(interactive)
 d.show()
+
+#view the interactive dashboard(without layouts) inside the notebook
+d.app()
+
+#preview the dashboard inside the notebook(non-interactive) with layout
+await d.preview()
 ```
+![output dashboard](./docs/_images/readme_sample.png)
 
 ## Documentation
 
