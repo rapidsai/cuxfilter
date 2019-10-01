@@ -102,7 +102,7 @@ class InteractiveImage(object):
 
     _callbacks = {}
 
-    def __init__(self, bokeh_plot, callback, delay=200, timeout=0.2, **kwargs):
+    def __init__(self, bokeh_plot, callback, delay=200, timeout=0.4, **kwargs):
         self.p = bokeh_plot
         self.callback = callback
         self.kwargs = kwargs

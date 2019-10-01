@@ -113,7 +113,7 @@ Currently supported layout templates and example code can be found [here](https:
 | Library  | Chart type |
 | ------------- | ------------- |
 | bokeh  | bar, line, choropleth  |
-| cudatashader  | scatter, scatter_geo, line, heatmap  |
+| cudatashader  | scatter, scatter_geo, line, stacked_lines, heatmap |
 | panel_widgets  | range_slider, float_slider, int_slider, drop_down, multi_select  |
 | custom    | view_dataframe |
 

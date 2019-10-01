@@ -71,3 +71,28 @@ Example
 
     d = cux_df.dashboard([scatter_chart])
     scatter_chart.view()
+
+
+Stacked_Lines chart
+-------------------
+
+.. automethod:: cudatashader.stacked_lines
+
+
+Example
+~~~~~~~
+.. jupyter-execute::
+
+    from cuXfilter.sampledata import signals_data
+    import cuXfilter
+
+    cux_df = cuXfilter.DataFrame.from_dataframe(signals_data)
+
+    stacked_lines_chart = cuXfilter.charts.cudatashader.stacked_lines(x='Time', y=['a', 'b', 'c', 'd', 'e', 'f', 'g', 'x', 'y', 'z'],
+                                                        colors = ["red", "grey", "black", "purple", "pink",
+                                                                "yellow", "brown", "green", "orange", "blue"]
+                                                        )
+
+    d = cux_df.dashboard([stacked_lines_chart])
+
+    stacked_lines_chart.view()

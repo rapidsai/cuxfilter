@@ -10,9 +10,9 @@ def scatter_geo(x, y=None, x_range=None, y_range=None, add_interaction=True, col
         x-axis column name from the gpu dataframe
     y: str, default None
         y-axis column name from the gpu dataframe
-    x_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].min())
+    x_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].max())
         (min, max) x-dimensions of the geo-scatter plot to be displayed
-    y_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].min())
+    y_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].max())
         (min, max) x-dimensions of the geo-scatter plot to be displayed
             
     add_interaction: {True, False},  default True
@@ -66,9 +66,9 @@ def scatter(x, y, x_range=None, y_range=None, add_interaction=True, color_palett
         x-axis column name from the gpu dataframe
     y: str, default None
         y-axis column name from the gpu dataframe
-    x_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].min())
+    x_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].max())
         (min, max) x-dimensions of the geo-scatter plot to be displayed
-    y_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].min())
+    y_range: tuple, default(gpu_dataframe[y].min(), gpu_dataframe[y].max())
         (min, max) x-dimensions of the geo-scatter plot to be displayed
             
     add_interaction: {True, False},  default True
@@ -123,9 +123,9 @@ def heatmap(x, y, x_range=None, y_range=None, add_interaction=True, color_palett
         x-axis column name from the gpu dataframe
     y: str, default None
         y-axis column name from the gpu dataframe
-    x_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].min())
+    x_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].max())
         (min, max) x-dimensions of the geo-scatter plot to be displayed
-    y_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].min())
+    y_range: tuple, default(gpu_dataframe[y].min(), gpu_dataframe[y].max())
         (min, max) x-dimensions of the geo-scatter plot to be displayed
             
     add_interaction: {True, False},  default True
@@ -163,7 +163,7 @@ def heatmap(x, y, x_range=None, y_range=None, add_interaction=True, color_palett
     """
     return plots.Scatter(x, y, x_range, y_range, add_interaction, color_palette, aggregate_col, aggregate_fn, point_size, point_shape, 'linear', 1, 'spread',  width, height, **library_specific_params)
 
-def line(x, y=None, data_points=100, add_interaction=True, aggregate_fn='count', pixel_shade_type='linear', width=400, height=400,step_size=None, step_size_type=int, **library_specific_params):
+def line(x, y=None, data_points=100, add_interaction=True, pixel_shade_type='linear', color = 'rapidspurple', step_size=None, step_size_type=int, width=800, height=400, **library_specific_params):
     """
     
     Parameters
@@ -173,9 +173,9 @@ def line(x, y=None, data_points=100, add_interaction=True, aggregate_fn='count',
         x-axis column name from the gpu dataframe
     y: str, default None
         y-axis column name from the gpu dataframe
-    x_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].min())
+    x_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].max())
         (min, max) x-dimensions of the geo-scatter plot to be displayed
-    y_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].min())
+    y_range: tuple, default(gpu_dataframe[y].min(), gpu_dataframe[y].max())
         (min, max) x-dimensions of the geo-scatter plot to be displayed
             
     add_interaction: {True, False},  default True
@@ -183,16 +183,22 @@ def line(x, y=None, data_points=100, add_interaction=True, aggregate_fn='count',
     aggregate_col: str, default None
         column from the gpu dataframe on which the aggregate_fn will be run on, if None, aggregate_fn is run on y-column
 
-    aggregate_fn: {'count', 'mean', 'max', 'min'},  default 'count'
-
     pixel_shade_type: str, default 'linear'
         The "how" parameter in cudatashader.transfer_functions.shade() function.
         Available options: eq_hist, linear, log, cbrt
 
+    color: str,  default rapidspurple
+    
+    step_size: int, default None
+        for the range_slider below the chart
+
+    step_size_type: type, default int
+        for the range_slider below the chart
+
     width: int,  default 800
         
     height: int,  default 400
-        
+
     **library_specific_params:
         additional library specific keyword arguments to be passed to the function
 
@@ -200,4 +206,41 @@ def line(x, y=None, data_points=100, add_interaction=True, aggregate_fn='count',
     -------
     A cudashader scatter plot. Type cuXfilter.charts.cudatashader.custom_extensions.InteractiveImage
     """
-    return plots.Line(x, y, data_points, add_interaction, aggregate_fn, pixel_shade_type, width, height,  step_size, step_size_type, **library_specific_params)
+    return plots.Line(x, y, data_points, add_interaction, pixel_shade_type, color, step_size, step_size_type, width, height, **library_specific_params)
+
+
+def stacked_lines(x, y=[], data_points=100, add_interaction=True,  colors=[], step_size=None, step_size_type=int, width=800, height=400, **library_specific_params):
+    """
+    stacked lines chart
+    
+    Parameters
+    ----------
+
+    x: str 
+        x-axis column name from the gpu dataframe
+    y: list, default None
+        y-axis column names from the gpu dataframe for the stacked lines
+    
+    add_interaction: {True, False},  default True
+
+    colors: list, default [rapidspurple, rapidspurple, ....]
+    
+    step_size: int, default None
+        for the range_slider below the chart
+
+    step_size_type: type, default int
+        for the range_slider below the chart
+
+    width: int,  default 800
+        
+    height: int,  default 400
+
+    **library_specific_params:
+        additional library specific keyword arguments to be passed to the function
+
+    Returns
+    -------
+    A cudashader stacked_lines plot. Type cuXfilter.charts.cudatashader.custom_extensions.InteractiveImage
+    """
+    return plots.StackedLines(x, y, data_points, add_interaction,  colors, step_size, step_size_type, width, height, **library_specific_params)
+
