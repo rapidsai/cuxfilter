@@ -16,7 +16,7 @@ css = '''
 }
 .panel-df td{
     white-space: nowrap;
-    overflow: hidden;
+    overflow: auto;
     text-overflow: ellipsis;
 }
 '''
@@ -70,7 +70,7 @@ class ViewDataFrame:
     def generate_chart(self, data):
         if self.columns is None:
             self.columns = list(data.columns)
-        self.chart = pn.Column(pn.pane.HTML(data[self.columns], style={'width':'100%', 'height':'100%', 'overflow-y':'hidden', 'font-size':'0.5vw','overflow-x':'auto'}), css_classes=['panel-df'])
+        self.chart = pn.Column(pn.pane.HTML(data[self.columns], style={'width':'100%', 'height':'100%', 'overflow-y':'auto', 'font-size':'0.5vw','overflow-x':'auto'}), css_classes=['panel-df'])
         self.chart.sizing_mode = 'scale_both'
 
     def view(self):

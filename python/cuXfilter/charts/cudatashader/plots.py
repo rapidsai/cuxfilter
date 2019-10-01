@@ -1,4 +1,4 @@
-from ..core.non_aggregate import BaseScatterGeo, BaseScatter, BaseLine
+from ..core.non_aggregate import BaseScatterGeo, BaseScatter, BaseLine, BaseStackedLine
 from .custom_extensions import InteractiveImage
 
 import cudatashader as cds
@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from typing import Type
 import re
-
+from collections import OrderedDict
 from bokeh import events
 from bokeh.plotting import figure
 from bokeh.models import ColumnDataSource, BoxSelectTool
@@ -377,6 +377,161 @@ class Line(BaseLine):
                             x_range=self.x_range, y_range = self.y_range, width=self.width, height=self.height)
 
         self.chart.add_tools(BoxSelectTool())
+        # self.chart.add_tile(self.tile_provider)
+        # self.chart.axis.visible = False
+
+        self.chart.xgrid.grid_line_color = None
+        self.chart.ygrid.grid_line_color = None
+
+        self.interactive_image = InteractiveImage(self.chart, self.generate_InteractiveImage_callback(), data_source=self.source)
+        
+    def update_dimensions(self, width=None, height=None):
+        """
+        Description:
+
+        
+        Input:
+
+        
+
+        Ouput:
+        """
+        if width is not None:
+            self.chart.plot_width = width
+        if height is not None:
+            self.chart.plot_height = height
+
+    def reload_chart(self, data, update_source=False):
+        '''
+        Description: 
+
+        -------------------------------------------
+        Input:
+
+        -------------------------------------------
+
+        Ouput:
+        '''
+        if data is not None:        
+            self.interactive_image.update_chart(data_source=data)
+            if update_source:
+                self.format_source_data(data)
+
+    def reset_chart_geometry_ranges(self):
+        '''
+        Description:
+        
+        -------------------------------------------
+        Input:
+
+        -------------------------------------------
+
+        Ouput:
+        '''
+        # self.chart.x_range.start,self.chart.x_range.end = self.chart.x_range.reset_start,self.chart.x_range.reset_end
+        # self.chart.y_range.start,self.chart.y_range.end = self.chart.y_range.reset_start,self.chart.y_range.reset_end
+        # self.get_selection_geometry_callback()(self.chart.x_range.start,self.chart.x_range.end, self.chart.y_range.start,self.chart.y_range.end)
+        # self.source = self.interactive_image.kwargs['data_source']
+
+    def add_selection_geometry_event(self, callback):
+        '''
+        Description:
+        
+        -------------------------------------------
+        Input:
+
+        -------------------------------------------
+
+        Ouput:
+        '''
+        def temp_callback(event):
+            xmin, xmax, ymin, ymax = event.geometry['x0'], event.geometry['x1'],event.geometry['y0'],event.geometry['y1']
+            callback(xmin, xmax, ymin, ymax)
+        
+        self.chart.on_event(events.SelectionGeometry, temp_callback)
+
+
+class StackedLines(BaseStackedLine):
+    """
+        Description:
+    """
+    reset_event = events.Reset
+    data_y_axis = 'y'
+    data_x_axis = 'x'
+    use_data_tiles = False
+
+    def calculate_source(self, data):
+        '''
+        Description:
+        
+        -------------------------------------------
+        Input:
+        data = cudf.DataFrame
+        -------------------------------------------
+
+        Ouput:
+        '''
+        self.format_source_data(data)
+
+    def format_source_data(self, data):
+        '''
+        Description:
+            format source
+        -------------------------------------------
+        Input:
+        source_dict = {
+            'X': [],
+            'Y': []
+        }
+        -------------------------------------------
+
+        Ouput:
+        '''
+        self.source = data
+        if self.x_range is None:
+            self.x_range = (self.source[self.x].min(), self.source[self.x].max())
+        if self.y_range is None:
+            #cudf_df[['a','b','c']].min().min() gives min value between all values in columns a,b and c
+
+            self.y_range = (self.source[self.y].min().min(), self.source[self.y].max().max())
+
+    def generate_InteractiveImage_callback(self):
+        '''
+        Description:
+
+        -------------------------------------------
+        Input:
+
+        -------------------------------------------
+
+        Ouput:
+        '''
+        def viewInteractiveImage(x_range, y_range, w, h, data_source):
+            cvs = cds.Canvas(plot_width=w, plot_height=h, x_range=x_range, y_range=y_range)
+            aggs= dict((_y, cvs.line(data_source, x=self.x, y=_y)) for _y in self.y)
+            imgs = [tf.shade(aggs[_y], cmap=['white',color]) for _y, color in zip(self.y, self.colors)]
+            return tf.stack(*imgs)
+    
+        return viewInteractiveImage
+            
+    def generate_chart(self):
+        '''
+        Description:
+
+        -------------------------------------------
+        Input:
+
+        -------------------------------------------
+
+        Ouput:
+        '''
+        if self.colors == []:
+            self.color = ['rapidspurple'] * len(self.y)
+        
+        self.chart = figure(title="Line plot for "+self.aggregate_fn, toolbar_location="right", tools="pan, xwheel_zoom, reset", active_scroll='xwheel_zoom', active_drag='pan',
+                            x_range=self.x_range, y_range = self.y_range, width=self.width, height=self.height, **self.library_specific_params)
+
+        self.chart.add_tools(BoxSelectTool(dimensions='width'))
         # self.chart.add_tile(self.tile_provider)
         # self.chart.axis.visible = False
 

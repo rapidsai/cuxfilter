@@ -10,23 +10,9 @@ class BaseLine(BaseNonAggregate):
     chart_type: str = 'line'
     stride = 0.0
     reset_event = None
-    _datatile_loaded_state: bool = False
     filter_widget = None
     
-    @property
-    def datatile_loaded_state(self):
-        return self._datatile_loaded_state
-
-    @datatile_loaded_state.setter
-    def datatile_loaded_state(self, state: bool):
-        self._datatile_loaded_state = state
-        if self.add_interaction:
-            if state:
-                self.filter_widget.bar_color = '#8ab4f7'
-            else:
-                self.filter_widget.bar_color = '#d3d9e2'
-
-    def __init__(self, x, y=None, data_points=100, add_interaction=True, aggregate_fn='count', pixel_shade_type='linear',  width=400, height=400, step_size=None, step_size_type=int,  **library_specific_params):
+    def __init__(self, x, y=None, data_points=100, add_interaction=True, pixel_shade_type='linear',  color='rapidspurple', step_size=None, step_size_type=int,  width=800, height=400, **library_specific_params):
         '''
         Description:
         
@@ -43,6 +29,8 @@ class BaseLine(BaseNonAggregate):
             step_size_type
             x_label_map
             y_label_map
+            width
+            height
             **library_specific_params
         -------------------------------------------
 
@@ -53,13 +41,13 @@ class BaseLine(BaseNonAggregate):
         self.y = y
         self.data_points = data_points
         self.add_interaction = add_interaction
-        self.aggregate_fn = aggregate_fn
-        self.height = height
-        self.width = width
+        self.color = color
         self.stride = step_size
         self.stride_type = step_size_type
         self.pixel_shade_type = pixel_shade_type
         self.library_specific_params = library_specific_params
+        self.width = width
+        self.height = height
 
     def initiate_chart(self, dashboard_cls):
         '''
