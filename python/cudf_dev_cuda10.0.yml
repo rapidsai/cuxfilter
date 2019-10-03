@@ -31,4 +31,5 @@ dependencies:
   - nose
   - flake8
   - pyppeteer
+  - geopandas
  
