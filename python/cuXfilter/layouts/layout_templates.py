@@ -1,11 +1,10 @@
-from .base_layout_template import layout_head
-
-layout_0 = layout_head + '''
+layout_0 = '''
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
-    <div class="nav-container"> Widgets </div>
+    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -17,12 +16,12 @@ layout_0 = layout_head + '''
 {% endblock %}
 '''
 
-layout_1 = layout_head + '''
+layout_1 = '''
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
-    <div class="nav-container"> Widgets </div>
+    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -39,12 +38,12 @@ layout_1 = layout_head + '''
 {% endblock %}
 '''
 
-layout_2 = layout_head + '''
+layout_2 = '''
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
-    <div class="nav-container"> Widgets </div>
+    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -59,12 +58,12 @@ layout_2 = layout_head + '''
 {% endblock %}
 '''
 
-layout_3 = layout_head + '''
+layout_3 = '''
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
-    <div class="nav-container"> Widgets </div>
+    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
     
 </nav>
 <div class="container">
@@ -86,12 +85,12 @@ layout_3 = layout_head + '''
 {% endblock %}
 '''
 
-layout_4 = layout_head + '''
+layout_4 = '''
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
-    <div class="nav-container"> Widgets </div>
+    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
 </nav>
 <div class="container">
     <div class="pure-g vertical-3-center" >
@@ -110,12 +109,12 @@ layout_4 = layout_head + '''
 '''
 
 
-layout_5 = layout_head + '''
+layout_5 = '''
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
-    <div class="nav-container"> Widgets </div>
+    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
     
 </nav>
 <div class="container">
@@ -138,12 +137,12 @@ layout_5 = layout_head + '''
 
 
 
-layout_6 = layout_head + '''
+layout_6 = '''
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
-    <div class="nav-container"> Widgets </div>
+    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
     
 </nav>
 <div class="container">
@@ -168,12 +167,12 @@ layout_6 = layout_head + '''
 '''
 
 
-layout_7 = layout_head + '''
+layout_7 = '''
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
-    <div class="nav-container"> Widgets </div>
+    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
     
 </nav>
 <div class="container">
@@ -198,12 +197,12 @@ layout_7 = layout_head + '''
 '''
 
 
-layout_8 = layout_head + '''
+layout_8 = '''
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
-    <div class="nav-container"> Widgets </div>
+    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
     
 </nav>
 <div class="container">
@@ -231,12 +230,12 @@ layout_8 = layout_head + '''
 '''
 
 
-layout_9 = layout_head + '''
+layout_9 = '''
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
-    <div class="nav-container"> Widgets </div>
+    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
     
 </nav>
 <div class="container">
@@ -269,12 +268,12 @@ layout_9 = layout_head + '''
 '''
 
 
-layout_10 = layout_head + '''
+layout_10 = '''
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
-    <div class="nav-container"> Widgets </div>
+    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
     
 </nav>
 <div class="container">
@@ -305,12 +304,12 @@ layout_10 = layout_head + '''
 '''
 
 
-layout_11 = layout_head + '''
+layout_11 = '''
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
-    <div class="nav-container"> Widgets </div>
+    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
     
 </nav>
 <div class="container">
@@ -342,12 +341,12 @@ layout_11 = layout_head + '''
 '''
 
 
-layout_12 = layout_head + '''
+layout_12 = '''
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
-    <div class="nav-container"> Widgets </div>
+    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
     
 </nav>
 <div class="container">

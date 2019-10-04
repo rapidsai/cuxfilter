@@ -12,7 +12,7 @@ from .layouts import layout_1
 from .charts.panel_widgets import data_size_indicator
 from .layouts import chart_view
 from .assets import screengrab, get_open_port
-
+from .themes import light, dark
 
 _server_info = (
     '<b>Running server:</b> <a target="_blank" href="https://localhost:{port}">'
@@ -61,8 +61,9 @@ class DashBoard:
     _query_str_dict: Dict[str, str]
     _active_view: str = ''
     _dashboard = None
+    _theme = None
 
-    def __init__(self,charts=[],data=None, layout=layout_1, title='Dashboard', data_size_widget=True, warnings=False):
+    def __init__(self,charts=[],data=None, layout=layout_1, theme = light, title='Dashboard', data_size_widget=True, warnings=False):
         self._backup_data = data
         self._data = self._backup_data
         self._charts = dict()
@@ -81,7 +82,7 @@ class DashBoard:
         
         self._title = title
         self._dashboard = layout()
-
+        self._theme = theme
         #handle dashboard warnings
         if not warnings:
             u.log.disabled = True
@@ -292,7 +293,7 @@ class DashBoard:
 
     def _get_server(self, port=0, websocket_origin=None, loop=None,
                    show=False, start=False, **kwargs):
-        return get_server(self._dashboard.generate_dashboard(self._title, self._charts), port, websocket_origin, loop, show,
+        return get_server(self._dashboard.generate_dashboard(self._title, self._charts, self._theme), port, websocket_origin, loop, show,
                           start, **kwargs)
 
     async def preview(self):
@@ -355,9 +356,9 @@ class DashBoard:
         
         """
         if len(url) > 0:
-            app(self._dashboard.generate_dashboard(self._title, self._charts), notebook_url=url, port=port)
+            app(self._dashboard.generate_dashboard(self._title, self._charts, self._theme), notebook_url=url, port=port)
         else:
-            app(self._dashboard.generate_dashboard(self._title, self._charts))
+            app(self._dashboard.generate_dashboard(self._title, self._charts, self._theme))
 
 
     def show(self, url='', threaded=False):
@@ -388,9 +389,9 @@ class DashBoard:
         
         if len(url) > 0:
             port = url.split(':')[-1]
-            return self._dashboard.generate_dashboard(self._title, self._charts).show(port=int(port), websocket_origin=url, threaded=threaded)
+            return self._dashboard.generate_dashboard(self._title, self._charts, self._theme).show(port=int(port), websocket_origin=url, threaded=threaded)
         else:
-            return self._dashboard.generate_dashboard(self._title, self._charts).show(threaded=threaded)
+            return self._dashboard.generate_dashboard(self._title, self._charts, self._theme).show(threaded=threaded)
 
 
     def _reload_charts(self, data=None, include_cols = [], ignore_cols=[]):
