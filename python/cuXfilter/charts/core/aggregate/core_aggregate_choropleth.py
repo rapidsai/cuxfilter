@@ -29,7 +29,7 @@ class BaseChoropleth(BaseAggregateChart):
         #     else:
         #         self.filter_widget.bar_color = '#d3d9e2'
 
-    def __init__(self, x, y=None, data_points=100, add_interaction=True, aggregate_fn='count', width=800, height=400, step_size=None, step_size_type=int, geoJSONSource=None, geoJSONProperty=None, geo_color_palette=None, **library_specific_params):
+    def __init__(self, x, y=None, data_points=100, add_interaction=True, aggregate_fn='count', width=800, height=400, step_size=None, step_size_type=int, geoJSONSource=None, geoJSONProperty=None, geo_color_palette=None, tile_provider=None, **library_specific_params):
         '''
         Description:
         
@@ -50,6 +50,7 @@ class BaseChoropleth(BaseAggregateChart):
             nan_color
             x_label_map
             y_label_map
+            tile_provider
             **library_specific_params
         -------------------------------------------
 
@@ -69,14 +70,22 @@ class BaseChoropleth(BaseAggregateChart):
             
         self.geo_color_palette = geo_color_palette
         self.geoJSONProperty = geoJSONProperty
-        self.geo_mapper = geo_json_mapper(self.geoJSONSource, self.geoJSONProperty)
+        self.geo_mapper, x_range, y_range = geo_json_mapper(self.geoJSONSource, self.geoJSONProperty)
         self.height = height
         self.width = width
 
         self.stride = step_size
         self.stride_type = step_size_type
+        self.tile_provider = tile_provider
 
         self.library_specific_params = library_specific_params
+        
+        if 'x_range' not in self.library_specific_params:
+            self.library_specific_params['x_range'] = x_range
+        
+        if 'y_range' not in self.library_specific_params:
+            self.library_specific_params['y_range'] = y_range
+        
         if 'nan_color' in self.library_specific_params:
             self.nan_color = self.library_specific_params['nan_color']
             self.library_specific_params.pop('nan_color')
