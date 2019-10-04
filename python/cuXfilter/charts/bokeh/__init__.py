@@ -1,1 +1,1 @@
-from .bokeh import bar, choropleth, line, data_size_indicator
+from .bokeh import bar, choropleth, line

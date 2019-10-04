@@ -78,7 +78,7 @@ def line(x, y=None, data_points=100, add_interaction=True, aggregate_fn='count',
     """
     return plots.Line(x, y, data_points, add_interaction, aggregate_fn, width, height,  step_size, step_size_type, **library_specific_params)
 
-def choropleth(x, y=None, data_points=100, add_interaction=True, aggregate_fn='count', width=800, height=400, step_size=None, step_size_type=int, geoJSONSource=None, geoJSONProperty=None, geo_color_palette=None, **library_specific_params):
+def choropleth(x, y=None, data_points=100, add_interaction=True, aggregate_fn='count', width=800, height=400, step_size=None, step_size_type=int, geoJSONSource=None, geoJSONProperty=None, geo_color_palette=None, tile_provider=None, **library_specific_params):
     """
     
     Parameters
@@ -118,6 +118,9 @@ def choropleth(x, y=None, data_points=100, add_interaction=True, aggregate_fn='c
         
     nan_color: str, default white
         color of the patches of value NaN in the map
+
+    tile_provider: bokeh.tile_provider object or cuXfilter.assets.custom_tiles.get_provider object, default None
+
     **library_specific_params:
         additional library specific keyword arguments to be passed to the function
 
@@ -125,7 +128,4 @@ def choropleth(x, y=None, data_points=100, add_interaction=True, aggregate_fn='c
     -------
     A bokeh chart object of type choropleth
     """
-    return plots.Choropleth(x, y, data_points, add_interaction, aggregate_fn, width, height, step_size, step_size_type, geoJSONSource, geoJSONProperty, geo_color_palette, **library_specific_params)
-
-def data_size_indicator(width=400, height=50, **library_specific_params):
-    return plots.DataSizeIndicator(width, height, **library_specific_params)
+    return plots.Choropleth(x, y, data_points, add_interaction, aggregate_fn, width, height, step_size, step_size_type, geoJSONSource, geoJSONProperty, geo_color_palette, tile_provider, **library_specific_params)
