@@ -116,7 +116,7 @@ class BaseDataSizeIndicator(BaseAggregateChart):
             datatile_result = self.get_source_y_axis()
 
         for index in calc_new:
-            index = int(round((index - active_chart.min_value)/active_chart.stride))            
+            index = int(round((index - active_chart.min_value)/active_chart.stride))
             datatile_result += datatile.loc[int(index)][0]
             
         for index in remove_old:

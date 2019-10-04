@@ -8,20 +8,27 @@ from .layout_templates import *
 
 class Layout0:
 
-    def generate_dashboard(self, title, charts):
+    def generate_dashboard(self, title, charts, theme):
         """
         layout 0
         [1]
         """
-
-        tmpl = pn.Template(layout_0)
         
+        tmpl = pn.Template(theme.layout_head + layout_0)
         tmpl.add_panel('title', '<div class="nav-title"> '+str(title)+'</div>')
 
         num_of_charts_added = 0
 
+        widgets = pn.Column()
+        
+
         for chart in charts.values():
+            if hasattr(chart, 'apply_theme'):
+                    chart.apply_theme(theme.chart_properties)
             if 'widget' in chart.chart_type or chart.chart_type == 'datasize_indicator':
+                chart.chart.sizing_mode = 'scale_both'
+                chart.chart.width = 280
+                widgets.append(chart.view())
                 continue
             num_of_charts_added +=1
             if num_of_charts_added == 1:
@@ -31,26 +38,32 @@ class Layout0:
                 tmpl.add_panel('chart1', chart.view())
             else:
                 break
-
+        tmpl.add_panel('widgets', widgets)
         return tmpl
 
 class Layout1:
 
-    def generate_dashboard(self, title, charts):
+    def generate_dashboard(self, title, charts, theme):
         """
         layout 1
         [1]
         [2]
         """
 
-        tmpl = pn.Template(layout_1)
-        
+        tmpl = pn.Template(theme.layout_head+layout_1)
         tmpl.add_panel('title', '<div class="nav-title"> '+str(title)+'</div>')
 
         num_of_charts_added = 0
 
+        widgets = pn.Column()
+        
         for chart in charts.values():
+            if hasattr(chart, 'apply_theme'):
+                    chart.apply_theme(theme.chart_properties)
             if 'widget' in chart.chart_type or chart.chart_type == 'datasize_indicator':
+                chart.chart.sizing_mode = 'scale_both'
+                chart.chart.width = 280
+                widgets.append(chart.view())
                 continue
             num_of_charts_added +=1
             if num_of_charts_added == 1:
@@ -71,26 +84,32 @@ class Layout1:
         for i in range(n):
             chart = 2-i
             tmpl.add_panel('chart'+str(chart),'')
-
+        tmpl.add_panel('widgets', widgets)
         return tmpl
 
 
 class Layout2:
-    def generate_dashboard(self, title, charts):
+    def generate_dashboard(self, title, charts, theme):
         """
         layout 2
 
         [1 2]
         """
 
-        tmpl = pn.Template(layout_2)
+        tmpl = pn.Template(theme.layout_head+layout_2)
         
         tmpl.add_panel('title', '<div class="nav-title"> '+str(title)+'</div>')
 
         num_of_charts_added = 0
+        widgets = pn.Column()
 
         for chart in charts.values():
+            if hasattr(chart, 'apply_theme'):
+                    chart.apply_theme(theme.chart_properties)
             if 'widget' in chart.chart_type or chart.chart_type == 'datasize_indicator':
+                chart.chart.sizing_mode = 'scale_both'
+                chart.chart.width = 280
+                widgets.append(chart.view())
                 continue
             num_of_charts_added +=1
             if num_of_charts_added == 1:
@@ -112,24 +131,31 @@ class Layout2:
             chart = 2-i
             tmpl.add_panel('chart'+str(chart),'')
 
+        tmpl.add_panel('widgets', widgets)
         return tmpl
 
 class Layout3:
-    def generate_dashboard(self, title, charts):
+    def generate_dashboard(self, title, charts, theme):
         """
         layout 3
         [1   2]
         [1   3]
         """
 
-        tmpl = pn.Template(layout_3)
+        tmpl = pn.Template(theme.layout_head+layout_3)
         
         tmpl.add_panel('title', '<div class="nav-title"> '+str(title)+'</div>')
 
         num_of_charts_added = 0
+        widgets = pn.Column()
 
         for chart in charts.values():
+            if hasattr(chart, 'apply_theme'):
+                    chart.apply_theme(theme.chart_properties)
             if 'widget' in chart.chart_type or chart.chart_type == 'datasize_indicator':
+                chart.chart.sizing_mode = 'scale_both'
+                chart.chart.width = 280
+                widgets.append(chart.view())
                 continue
             num_of_charts_added +=1
             if num_of_charts_added == 1:
@@ -156,24 +182,31 @@ class Layout3:
             chart = 3-i
             tmpl.add_panel('chart'+str(chart),'')
 
+        tmpl.add_panel('widgets', widgets)
         return tmpl
 
 
 class Layout4:
-    def generate_dashboard(self, title, charts):
+    def generate_dashboard(self, title, charts, theme):
         """
         layout 4
         [1 2 3]
         """
 
-        tmpl = pn.Template(layout_4)
+        tmpl = pn.Template(theme.layout_head+layout_4)
         
         tmpl.add_panel('title', '<div class="nav-title"> '+str(title)+'</div>')
 
         num_of_charts_added = 0
+        widgets = pn.Column()
 
         for chart in charts.values():
+            if hasattr(chart, 'apply_theme'):
+                    chart.apply_theme(theme.chart_properties)
             if 'widget' in chart.chart_type or chart.chart_type == 'datasize_indicator':
+                chart.chart.sizing_mode = 'scale_both'
+                chart.chart.width = 280
+                widgets.append(chart.view())
                 continue
             num_of_charts_added +=1
             if num_of_charts_added == 1:
@@ -200,24 +233,31 @@ class Layout4:
             chart = 3-i
             tmpl.add_panel('chart'+str(chart),'')
 
+        tmpl.add_panel('widgets', widgets)
         return tmpl
 
 class Layout5:
-    def generate_dashboard(self, title, charts):
+    def generate_dashboard(self, title, charts, theme):
         """
         layout 5
         [  1  ]
         [2   3]
         """
 
-        tmpl = pn.Template(layout_5)
+        tmpl = pn.Template(theme.layout_head+layout_5)
         
         tmpl.add_panel('title', '<div class="nav-title"> '+str(title)+'</div>')
 
         num_of_charts_added = 0
+        widgets = pn.Column()
 
         for chart in charts.values():
+            if hasattr(chart, 'apply_theme'):
+                    chart.apply_theme(theme.chart_properties)
             if 'widget' in chart.chart_type or chart.chart_type == 'datasize_indicator':
+                chart.chart.sizing_mode = 'scale_both'
+                chart.chart.width = 280
+                widgets.append(chart.view())
                 continue
             num_of_charts_added +=1
             if num_of_charts_added == 1:
@@ -244,11 +284,12 @@ class Layout5:
             chart = 3-i
             tmpl.add_panel('chart'+str(chart),'')
 
+        tmpl.add_panel('widgets', widgets)
         return tmpl
 
 
 class Layout6:
-    def generate_dashboard(self, title, charts):
+    def generate_dashboard(self, title, charts, theme):
         """
         layout 6
 
@@ -256,14 +297,20 @@ class Layout6:
         [3  4]
         """
 
-        tmpl = pn.Template(layout_6)
+        tmpl = pn.Template(theme.layout_head+layout_6)
         
         tmpl.add_panel('title', '<div class="nav-title"> '+str(title)+'</div>')
 
         num_of_charts_added = 0
+        widgets = pn.Column()
 
         for chart in charts.values():
+            if hasattr(chart, 'apply_theme'):
+                    chart.apply_theme(theme.chart_properties)
             if 'widget' in chart.chart_type or chart.chart_type == 'datasize_indicator':
+                chart.chart.sizing_mode = 'scale_both'
+                chart.chart.width = 280
+                widgets.append(chart.view())
                 continue
             num_of_charts_added +=1
             if num_of_charts_added == 1:
@@ -295,11 +342,12 @@ class Layout6:
             chart = 4-i
             tmpl.add_panel('chart'+str(chart),'')
 
+        tmpl.add_panel('widgets', widgets)
         return tmpl
 
 
 class Layout7:
-    def generate_dashboard(self, title, charts):
+    def generate_dashboard(self, title, charts, theme):
         """
         layout 7
 
@@ -307,14 +355,20 @@ class Layout7:
         [2  3  4]
         """
 
-        tmpl = pn.Template(layout_7)
+        tmpl = pn.Template(theme.layout_head+layout_7)
         
         tmpl.add_panel('title', '<div class="nav-title"> '+str(title)+'</div>')
 
         num_of_charts_added = 0
+        widgets = pn.Column()
 
         for chart in charts.values():
+            if hasattr(chart, 'apply_theme'):
+                    chart.apply_theme(theme.chart_properties)
             if 'widget' in chart.chart_type or chart.chart_type == 'datasize_indicator':
+                chart.chart.sizing_mode = 'scale_both'
+                chart.chart.width = 280
+                widgets.append(chart.view())
                 continue
             num_of_charts_added +=1
             if num_of_charts_added == 1:
@@ -346,11 +400,12 @@ class Layout7:
             chart = 4-i
             tmpl.add_panel('chart'+str(chart),'')
 
+        tmpl.add_panel('widgets', widgets)
         return tmpl
 
 
 class Layout8:
-    def generate_dashboard(self, title, charts):
+    def generate_dashboard(self, title, charts, theme):
         """
         layout 8
 
@@ -358,14 +413,20 @@ class Layout8:
         [2  3   4  5]
         """
 
-        tmpl = pn.Template(layout_8)
+        tmpl = pn.Template(theme.layout_head+layout_8)
         
         tmpl.add_panel('title', '<div class="nav-title"> '+str(title)+'</div>')
 
         num_of_charts_added = 0
+        widgets = pn.Column()
 
         for chart in charts.values():
+            if hasattr(chart, 'apply_theme'):
+                    chart.apply_theme(theme.chart_properties)
             if 'widget' in chart.chart_type or chart.chart_type == 'datasize_indicator':
+                chart.chart.sizing_mode = 'scale_both'
+                chart.chart.width = 280
+                widgets.append(chart.view())
                 continue
             num_of_charts_added +=1
             if num_of_charts_added == 1:
@@ -402,11 +463,12 @@ class Layout8:
             chart = 5-i
             tmpl.add_panel('chart'+str(chart),'')
 
+        tmpl.add_panel('widgets', widgets)
         return tmpl
 
 
 class Layout9:
-    def generate_dashboard(self, title, charts):
+    def generate_dashboard(self, title, charts, theme):
         """
         layout 9
 
@@ -415,14 +477,20 @@ class Layout9:
         [4  5  6]
         """
 
-        tmpl = pn.Template(layout_9)
+        tmpl = pn.Template(theme.layout_head+layout_9)
         
         tmpl.add_panel('title', '<div class="nav-title"> '+str(title)+'</div>')
 
         num_of_charts_added = 0
+        widgets = pn.Column()
 
         for chart in charts.values():
+            if hasattr(chart, 'apply_theme'):
+                    chart.apply_theme(theme.chart_properties)
             if 'widget' in chart.chart_type or chart.chart_type == 'datasize_indicator':
+                chart.chart.sizing_mode = 'scale_both'
+                chart.chart.width = 280
+                widgets.append(chart.view())
                 continue
             num_of_charts_added +=1
             if num_of_charts_added == 1:
@@ -464,10 +532,11 @@ class Layout9:
             chart = 6-i
             tmpl.add_panel('chart'+str(chart),'')
 
+        tmpl.add_panel('widgets', widgets)
         return tmpl
 
 class Layout10:
-    def generate_dashboard(self, title, charts):
+    def generate_dashboard(self, title, charts, theme):
         """
         layout 10
 
@@ -475,14 +544,20 @@ class Layout10:
         [4  5  6]
         """
 
-        tmpl = pn.Template(layout_10)
+        tmpl = pn.Template(theme.layout_head+layout_10)
         
         tmpl.add_panel('title', '<div class="nav-title"> '+str(title)+'</div>')
 
         num_of_charts_added = 0
+        widgets = pn.Column()
 
         for chart in charts.values():
+            if hasattr(chart, 'apply_theme'):
+                    chart.apply_theme(theme.chart_properties)
             if 'widget' in chart.chart_type or chart.chart_type == 'datasize_indicator':
+                chart.chart.sizing_mode = 'scale_both'
+                chart.chart.width = 280
+                widgets.append(chart.view())
                 continue
             num_of_charts_added +=1
             if num_of_charts_added == 1:
@@ -524,11 +599,12 @@ class Layout10:
             chart = 6-i
             tmpl.add_panel('chart'+str(chart),'')
 
+        tmpl.add_panel('widgets', widgets)
         return tmpl
 
 
 class Layout11:
-    def generate_dashboard(self, title, charts):
+    def generate_dashboard(self, title, charts, theme):
         """
         layout 11
 
@@ -536,14 +612,20 @@ class Layout11:
         [3   4  5   6]
         """
 
-        tmpl = pn.Template(layout_11)
+        tmpl = pn.Template(theme.layout_head+layout_11)
         
         tmpl.add_panel('title', '<div class="nav-title"> '+str(title)+'</div>')
 
         num_of_charts_added = 0
+        widgets = pn.Column()
 
         for chart in charts.values():
+            if hasattr(chart, 'apply_theme'):
+                    chart.apply_theme(theme.chart_properties)
             if 'widget' in chart.chart_type or chart.chart_type == 'datasize_indicator':
+                chart.chart.sizing_mode = 'scale_both'
+                chart.chart.width = 280
+                widgets.append(chart.view())
                 continue
             num_of_charts_added +=1
             if num_of_charts_added == 1:
@@ -585,10 +667,11 @@ class Layout11:
             chart = 6-i
             tmpl.add_panel('chart'+str(chart),'')
 
+        tmpl.add_panel('widgets', widgets)
         return tmpl
 
 class Layout12:
-    def generate_dashboard(self, title, charts):
+    def generate_dashboard(self, title, charts, theme):
         """
         layout 12
 
@@ -597,14 +680,20 @@ class Layout12:
         [7  8  9]
         """
 
-        tmpl = pn.Template(layout_12)
+        tmpl = pn.Template(theme.layout_head+layout_12)
         
         tmpl.add_panel('title', '<div class="nav-title"> '+str(title)+'</div>')
 
         num_of_charts_added = 0
+        widgets = pn.Column()
 
         for chart in charts.values():
+            if hasattr(chart, 'apply_theme'):
+                    chart.apply_theme(theme.chart_properties)
             if 'widget' in chart.chart_type or chart.chart_type == 'datasize_indicator':
+                chart.chart.sizing_mode = 'scale_both'
+                chart.chart.width = 280
+                widgets.append(chart.view())
                 continue
             num_of_charts_added +=1
             if num_of_charts_added == 1:
@@ -661,4 +750,5 @@ class Layout12:
             chart = 9-i
             tmpl.add_panel('chart'+str(chart),'')
 
+        tmpl.add_panel('widgets', widgets)
         return tmpl

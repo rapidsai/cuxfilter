@@ -4,7 +4,7 @@ import pyarrow as pa
 from typing import Type
 from .dashboard import DashBoard
 from .layouts import layout_1
-
+from .themes import light, dark
 
 def read_arrow(source):
     # print('reading arrow file as arrow table from disk')
@@ -78,7 +78,7 @@ class DataFrame:
         self.backup = data
         self.data = data.copy()
 
-    def dashboard(self, charts:list, layout=layout_1, title='Dashboard', data_size_widget=True, warnings=False):
+    def dashboard(self, charts:list, layout=layout_1, theme = light, title='Dashboard', data_size_widget=True, warnings=False):
         """
         Creates a cuXfilter.DashBoard object
         
@@ -116,4 +116,4 @@ class DataFrame:
         cuXfilter.DashBoard object
 
         """
-        return DashBoard(charts, self.data, layout, title, data_size_widget, warnings)
+        return DashBoard(charts, self.data, layout, theme, title, data_size_widget, warnings)

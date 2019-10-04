@@ -14,6 +14,7 @@ class BaseBar(BaseAggregateChart):
     _datatile_loaded_state: bool = False
     filter_widget = None
     use_data_tiles = True
+    datatile_active_color = '#8ab4f7'
     
     @property
     def datatile_loaded_state(self):
@@ -24,7 +25,7 @@ class BaseBar(BaseAggregateChart):
         self._datatile_loaded_state = state
         if self.add_interaction:
             if state:
-                self.filter_widget.bar_color = '#8ab4f7'
+                self.filter_widget.bar_color = self.datatile_active_color
             else:
                 self.filter_widget.bar_color = '#d3d9e2'
 

@@ -10,7 +10,7 @@ import numpy as np
 class RangeSlider(BaseWidget):
     chart_type: str = 'widget_range_slider'
     _datatile_loaded_state: bool = False
-
+    datatile_active_color = '#8ab4f7'
 
     @property
     def datatile_loaded_state(self):
@@ -20,7 +20,7 @@ class RangeSlider(BaseWidget):
     def datatile_loaded_state(self, state: bool):
         self._datatile_loaded_state = state
         if state:
-            self.chart.bar_color = '#8ab4f7'
+            self.chart.bar_color = self.datatile_active_color
         else:
             self.chart.bar_color = '#d3d9e2'
 
@@ -56,8 +56,17 @@ class RangeSlider(BaseWidget):
 
         Ouput:
         '''
-        self.chart = pn.widgets.RangeSlider(name=self.x, start=self.min_value, end=self.max_value, value=(self.min_value, self.max_value), step=self.stride, width=self.width, height=self.height, **self.params)
+        self.chart = pn.widgets.RangeSlider(name=self.x, start=self.min_value, end=self.max_value, value=(self.min_value, self.max_value), step=self.stride, **self.params)
 
+
+    def apply_theme(self, properties_dict):
+        """
+        apply thematic changes to the chart based on the input properties dictionary
+
+        """
+
+        #interactive slider
+        self.datatile_active_color = properties_dict['widgets']['datatile_active_color']
 
     
     def add_events(self, dashboard_cls):
@@ -103,6 +112,7 @@ class IntSlider(BaseWidget):
     chart_type: str = 'widget_int_slider'
     _datatile_loaded_state: bool = False
     value = None
+    datatile_active_color = '#8ab4f7'
 
     @property
     def datatile_loaded_state(self):
@@ -112,7 +122,7 @@ class IntSlider(BaseWidget):
     def datatile_loaded_state(self, state: bool):
         self._datatile_loaded_state = state
         if state:
-            self.chart.bar_color = '#8ab4f7'
+            self.chart.bar_color = self.datatile_active_color
         else:
             self.chart.bar_color = '#d3d9e2'
 
@@ -153,6 +163,14 @@ class IntSlider(BaseWidget):
         self.chart = pn.widgets.IntSlider(name=self.x, start=self.min_value, end=self.max_value, value=self.value, step=self.stride, width=self.width, height=self.height, **self.params)
 
 
+    def apply_theme(self, properties_dict):
+        """
+        apply thematic changes to the chart based on the input properties dictionary
+
+        """
+
+        #interactive slider
+        self.datatile_active_color = properties_dict['widgets']['datatile_active_color']
     
     def add_events(self, dashboard_cls):
         '''
@@ -195,6 +213,7 @@ class FloatSlider(BaseWidget):
     chart_type: str = 'widget_float_slider'
     _datatile_loaded_state: bool = False
     value = None
+    datatile_active_color = '#8ab4f7'
 
     @property
     def datatile_loaded_state(self):
@@ -204,7 +223,7 @@ class FloatSlider(BaseWidget):
     def datatile_loaded_state(self, state: bool):
         self._datatile_loaded_state = state
         if state:
-            self.chart.bar_color = '#8ab4f7'
+            self.chart.bar_color = self.datatile_active_color
         else:
             self.chart.bar_color = '#d3d9e2'
     
@@ -243,6 +262,14 @@ class FloatSlider(BaseWidget):
             self.value = self.min_value 
         self.chart = pn.widgets.FloatSlider(name=self.x, start=self.min_value, end=self.max_value, value=self.value, step=self.stride, width=self.width, height=self.height, **self.params)
 
+    def apply_theme(self, properties_dict):
+        """
+        apply thematic changes to the chart based on the input properties dictionary
+
+        """
+
+        #interactive slider
+        self.datatile_active_color = properties_dict['widgets']['datatile_active_color']
 
     
     def add_events(self, dashboard_cls):
@@ -284,20 +311,7 @@ class FloatSlider(BaseWidget):
 
 class DropDown(BaseWidget):
     chart_type: str = 'widget_dropdown'
-    _datatile_loaded_state: bool = False
     value = None
-
-    @property
-    def datatile_loaded_state(self):
-        return self._datatile_loaded_state
-
-    @datatile_loaded_state.setter
-    def datatile_loaded_state(self, state: bool):
-        self._datatile_loaded_state = state
-        if state:
-            self.chart.color = '#8ab4f7'
-        else:
-            self.chart.color = '#d3d9e2'
 
     def initiate_chart(self, dashboard_cls):
         '''
@@ -366,7 +380,20 @@ class DropDown(BaseWidget):
         '''
         self.chart = pn.widgets.Select(name=self.x, options=self.list_of_values, value='', width=self.width, height=self.height, **self.params)
 
+    def apply_theme(self, properties_dict):
+        """
+        apply thematic changes to the chart based on the input properties dictionary
 
+        """
+        css = '''
+            .custom-dropdown select, .custom-dropdown option {{
+                background-color: {0} !important;
+            }}
+            '''
+        css = css.format(properties_dict['widgets']['background_color'])
+        pn.extension(raw_css=[css])
+
+        self.chart.css_classes = ['custom-dropdown']
     
     def add_events(self, dashboard_cls):
         '''
@@ -407,20 +434,7 @@ class DropDown(BaseWidget):
 
 class MultiSelect(BaseWidget):
     chart_type: str = 'widget_multi_select'
-    _datatile_loaded_state: bool = False
     value = None
-
-    @property
-    def datatile_loaded_state(self):
-        return self._datatile_loaded_state
-
-    @datatile_loaded_state.setter
-    def datatile_loaded_state(self, state: bool):
-        self._datatile_loaded_state = state
-        if state:
-            self.chart.color = '#8ab4f7'
-        else:
-            self.chart.color = '#d3d9e2'
 
     def initiate_chart(self, dashboard_cls):
         '''
@@ -487,8 +501,26 @@ class MultiSelect(BaseWidget):
 
         self.chart = pn.widgets.MultiSelect(name=self.x, options=self.list_of_values, value=[''], width=self.width, height=self.height, **self.params)
 
+    def apply_theme(self, properties_dict):
+        """
+        apply thematic changes to the chart based on the input properties dictionary
 
-    
+        """ 
+        css = '''
+            .custom-dropdown select, .custom-dropdown option {{
+                background-color: {0} !important;
+                
+            }}
+            .custom-dropdown {{
+                font-size: 15px !important;
+                margin-bottom: 5px;
+            }}
+            '''
+        css = css.format(properties_dict['widgets']['background_color'])
+        pn.extension(raw_css=[css])
+
+        self.chart.css_classes = ['custom-dropdown']
+
     def add_events(self, dashboard_cls):
         '''
         Description:
@@ -592,7 +624,13 @@ class DataSizeIndicator(BaseDataSizeIndicator):
         Ouput:
         '''
         self.chart = pn.widgets.FloatSlider(name='Data Points selected', width=self.width, start=0, end=self.max_value, value=self.max_value)
-        self.chart.bar_color = '#5742f5'
+
+    def apply_theme(self, properties_dict):
+        """
+        apply thematic changes to the chart based on the input properties dictionary
+        """
+
+        self.chart.bar_color = properties_dict['data_size_indicator_color']
 
     def reload_chart(self, data, patch_update=True):
         '''
