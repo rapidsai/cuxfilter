@@ -21,6 +21,7 @@ class ScatterGeo(BaseScatterGeo):
     reset_event = events.Reset
     data_y_axis = 'y'
     data_x_axis = 'x'
+    no_colors_set = False
 
         
     def format_source_data(self, data):
@@ -73,6 +74,7 @@ class ScatterGeo(BaseScatterGeo):
         Ouput:
         '''
         if self.color_palette is None:
+            self.no_colors_set = True
             self.color_palette = Hot
         
         if type(self.tile_provider) == str:
@@ -161,7 +163,8 @@ class ScatterGeo(BaseScatterGeo):
         apply thematic changes to the chart based on the input properties dictionary
 
         """
-        
+        if self.no_colors_set:
+            self.color_palette = properties_dict['chart_color']['color_palette']
         self.chart.xgrid.grid_line_color = properties_dict['geo_charts_grids']['xgrid']
         self.chart.ygrid.grid_line_color = properties_dict['geo_charts_grids']['ygrid']
         
@@ -205,6 +208,7 @@ class Scatter(BaseScatter):
     reset_event = events.Reset
     data_y_axis = 'y'
     data_x_axis = 'x'
+    no_colors_set = False
 
 
     def format_source_data(self, data):
@@ -257,6 +261,7 @@ class Scatter(BaseScatter):
         Ouput:
         '''
         if self.color_palette is None:
+            self.no_colors_set = True
             self.color_palette = Hot
         
         
@@ -342,7 +347,8 @@ class Scatter(BaseScatter):
         apply thematic changes to the chart based on the input properties dictionary
 
         """
-        
+        if self.no_colors_set:
+            self.color_palette = properties_dict['chart_color']['color_palette']
         self.chart.xgrid.grid_line_color = properties_dict['geo_charts_grids']['xgrid']
         self.chart.ygrid.grid_line_color = properties_dict['geo_charts_grids']['ygrid']
         
@@ -387,7 +393,7 @@ class Line(BaseLine):
     data_y_axis = 'y'
     data_x_axis = 'x'
     use_data_tiles = False
-
+    no_color_set = False
     def calculate_source(self, data):
         '''
         Description:
@@ -450,11 +456,13 @@ class Line(BaseLine):
         Ouput:
         '''
         if self.color == '#8735fb':
+            self.no_color_set = True
             self.color = 'rapidspurple'
         
-        elif re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', self.color):
-            print('enter color name instead of hex')
-            self.color = 'rapidspurple'
+        elif self.color is not None:
+            if re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', self.color):
+                print('enter color name instead of hex')
+                self.color = 'rapidspurple'
 
         self.chart = figure(title="Line plot for "+self.aggregate_fn, toolbar_location="right", tools="pan, wheel_zoom, reset", active_scroll='wheel_zoom', active_drag='pan',
                             x_range=self.x_range, y_range = self.y_range, width=self.width, height=self.height)
@@ -538,7 +546,8 @@ class Line(BaseLine):
         apply thematic changes to the chart based on the input properties dictionary
 
         """
-        
+        if self.no_color_set:
+            self.color = properties_dict['chart_color']['color']
         self.chart.xgrid.grid_line_color = properties_dict['geo_charts_grids']['xgrid']
         self.chart.ygrid.grid_line_color = properties_dict['geo_charts_grids']['ygrid']
         
@@ -583,6 +592,7 @@ class StackedLines(BaseStackedLine):
     data_y_axis = 'y'
     data_x_axis = 'x'
     use_data_tiles = False
+    no_colors_set = False
 
     def calculate_source(self, data):
         '''
@@ -649,8 +659,10 @@ class StackedLines(BaseStackedLine):
 
         Ouput:
         '''
+        
         if self.colors == []:
-            self.color = ['rapidspurple'] * len(self.y)
+            self.no_colors_set = True
+            self.colors = ['rapidspurple'] * len(self.y)
         
         self.chart = figure(title="Line plot for "+self.aggregate_fn, toolbar_location="right", tools="pan, xwheel_zoom, reset", active_scroll='xwheel_zoom', active_drag='pan',
                             x_range=self.x_range, y_range = self.y_range, width=self.width, height=self.height, **self.library_specific_params)
@@ -734,7 +746,8 @@ class StackedLines(BaseStackedLine):
         apply thematic changes to the chart based on the input properties dictionary
 
         """
-        
+        if self.no_colors_set:
+            self.colors = [properties_dict['chart_color']['color']]*len(self.y)
         self.chart.xgrid.grid_line_color = properties_dict['geo_charts_grids']['xgrid']
         self.chart.ygrid.grid_line_color = properties_dict['geo_charts_grids']['ygrid']
         

@@ -8,7 +8,7 @@ import asyncio
 
 from .charts.core.core_chart import BaseChart
 from .datatile import DataTile
-from .layouts import layout_1
+from .layouts import single_feature
 from .charts.panel_widgets import data_size_indicator
 from .layouts import chart_view
 from .assets import screengrab, get_open_port
@@ -63,7 +63,7 @@ class DashBoard:
     _dashboard = None
     _theme = None
 
-    def __init__(self,charts=[],data=None, layout=layout_1, theme = light, title='Dashboard', data_size_widget=True, warnings=False):
+    def __init__(self,charts=[],data=None, layout=single_feature, theme = light, title='Dashboard', data_size_widget=True, warnings=False):
         self._backup_data = data
         self._data = self._backup_data
         self._charts = dict()
@@ -257,7 +257,7 @@ class DashBoard:
 
 
     def __repr__(self):
-        template_obj = self._dashboard.generate_dashboard(self._title, self._charts)
+        template_obj = self._dashboard.generate_dashboard(self._title, self._charts, self._theme)
         cls = '#### cuXfilter '+type(self).__name__
         spacer = '\n    '
         objs = ['[%s] %s' % (name, obj.__repr__(1))
@@ -267,7 +267,7 @@ class DashBoard:
             cls=cls, objs=('%s' % spacer).join(objs), spacer=spacer)
 
     def _repr_mimebundle_(self, include=None, exclude=None):
-        template_obj = self._dashboard.generate_dashboard(self._title, self._charts)
+        template_obj = self._dashboard.generate_dashboard(self._title, self._charts, self._theme)
         str_repr = self.__repr__()
         server_info = pn.pane.HTML('')
         button = pn.widgets.Button(name='Launch server')
@@ -418,10 +418,10 @@ class DashBoard:
         if 'scatter' not in self._active_view:
             for chart in list(self._charts.values()):
                 if not chart.use_data_tiles:
-                    if chart.chart_type == 'view_dataframe':
-                        self._data_tiles[chart.name] = self._data
-                    else:
-                        self._data_tiles[chart.name] = None
+                    # if chart.chart_type == 'view_dataframe':
+                    #     self._data_tiles[chart.name] = self._data
+                    # else:
+                    self._data_tiles[chart.name] = None
                 elif self._active_view != chart.name:
                     temp_query_str = self._generate_query_str(ignore_chart=chart)
                     

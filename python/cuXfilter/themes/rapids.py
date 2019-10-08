@@ -1,3 +1,5 @@
+from bokeh import palettes
+
 class Theme:
     layout_head = '''
     {% extends base %}
@@ -23,7 +25,6 @@ class Theme:
         {% endblock %}
         {% block postamble %}
             <style>
-            
                 body {
                     margin:0;
                     padding:0;
@@ -95,6 +96,11 @@ class Theme:
             "ygrid": None,
         },
         
+        "chart_color":{
+            'color': '#8735fb',
+            'color_palette': palettes.Purples[9]
+        },
+
         #title
         "title": {
             "text_color": "#a0a0a0",

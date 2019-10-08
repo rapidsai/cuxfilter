@@ -179,7 +179,7 @@ def calc_data_tile(df, active_view: Type[BaseChart], passive_view: Type[BaseChar
     groupby_results = []
     for i in aggregate_dict[key]:
         agg = {key: i}
-        groupby_results.append(df.groupby(check_list, method='hash',as_index=False).agg(agg))
+        groupby_results.append(df.groupby(check_list, method='hash',sort=False, as_index=False).agg(agg))
     
     del(df)
     gc.collect()
