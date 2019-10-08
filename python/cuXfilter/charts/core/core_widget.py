@@ -58,8 +58,9 @@ class BaseWidget:
         self.height = height
         self.params = params
         self.data_points = data_points
-        self.stride = step_size
         self.stride_type = step_size_type
+        self.stride = step_size
+       
         if 'value' in params:
             self.value = params['value']
             params.pop('value')

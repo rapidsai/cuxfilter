@@ -38,10 +38,6 @@ class RangeSlider(BaseWidget):
         '''
         self.min_value = dashboard_cls._data[self.x].min()
         self.max_value = dashboard_cls._data[self.x].max()
-        if self.stride is None:
-            if self.max_value < 1 and self.stride_type == int:
-                self.stride_type = float
-            self.stride = self.stride_type((self.max_value - self.min_value) / self.data_points)
         self.generate_widget()
         self.add_events(dashboard_cls)
 
@@ -56,7 +52,10 @@ class RangeSlider(BaseWidget):
 
         Ouput:
         '''
-        self.chart = pn.widgets.RangeSlider(name=self.x, start=self.min_value, end=self.max_value, value=(self.min_value, self.max_value), step=self.stride, **self.params)
+        if self.stride is None:
+            self.chart = pn.widgets.RangeSlider(name=self.x, start=self.min_value, end=self.max_value, value=(self.min_value, self.max_value), **self.params)
+        else:
+            self.chart = pn.widgets.RangeSlider(name=self.x, start=self.min_value, end=self.max_value, value=(self.min_value, self.max_value), step=self.stride, **self.params)
 
 
     def apply_theme(self, properties_dict):
@@ -140,10 +139,6 @@ class IntSlider(BaseWidget):
         '''
         self.min_value = int(dashboard_cls._data[self.x].min())
         self.max_value = int(dashboard_cls._data[self.x].max())
-        if self.stride is None:
-            if self.max_value < 1 and self.stride_type == int:
-                self.stride_type = float
-            self.stride = self.stride_type( (self.max_value - self.min_value) / self.data_points)
         self.generate_widget()
         self.add_events(dashboard_cls)
 
@@ -159,7 +154,7 @@ class IntSlider(BaseWidget):
         Ouput:
         '''
         if self.value is None:
-            self.value = self.min_value 
+            self.value = self.min_value
         self.chart = pn.widgets.IntSlider(name=self.x, start=self.min_value, end=self.max_value, value=self.value, step=self.stride, width=self.width, height=self.height, **self.params)
 
 
@@ -240,10 +235,6 @@ class FloatSlider(BaseWidget):
         '''
         self.min_value = dashboard_cls._data[self.x].min()
         self.max_value = dashboard_cls._data[self.x].max()
-        if self.stride is None:
-            if self.max_value < 1 and self.stride_type == int:
-                self.stride_type = float
-            self.stride = self.stride_type( (self.max_value - self.min_value) / self.data_points)
         self.generate_widget()
         self.add_events(dashboard_cls)
 
@@ -260,7 +251,10 @@ class FloatSlider(BaseWidget):
         '''
         if self.value is None:
             self.value = self.min_value 
-        self.chart = pn.widgets.FloatSlider(name=self.x, start=self.min_value, end=self.max_value, value=self.value, step=self.stride, width=self.width, height=self.height, **self.params)
+        if self.stride is None:
+            self.chart = pn.widgets.FloatSlider(name=self.x, start=self.min_value, end=self.max_value, value=self.value, width=self.width, height=self.height, **self.params)
+        else:
+            self.chart = pn.widgets.FloatSlider(name=self.x, start=self.min_value, end=self.max_value, value=self.value, step=self.stride, width=self.width, height=self.height, **self.params)
 
     def apply_theme(self, properties_dict):
         """

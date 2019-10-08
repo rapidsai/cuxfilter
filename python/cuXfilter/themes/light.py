@@ -1,5 +1,6 @@
 # Layout Head Section style CSS
 # NOTE may move to remote CSS file later
+from bokeh import palettes
 
 class Theme:
     layout_head = '''
@@ -88,7 +89,7 @@ class Theme:
 
     
     chart_properties = {
-        "data_size_indicator_color": '#8735fb',
+        "data_size_indicator_color": '#4292c6',
         "agg_charts_grids":{
             "xgrid": None,
             "ygrid": "#efefef",
@@ -96,6 +97,11 @@ class Theme:
         "geo_charts_grids":{
             "xgrid": None,
             "ygrid": None,
+        },
+
+        "chart_color":{
+            'color': '#4292c6',
+            'color_palette': palettes.Blues[9]
         },
         
         #title
@@ -152,6 +158,6 @@ class Theme:
 
         "widgets":{
             "background_color" : '#fcfcfc',
-            "datatile_active_color": '#8735fb'
+            "datatile_active_color": '#4292c6'
         }
     }

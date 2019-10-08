@@ -5,8 +5,8 @@ async def screengrab(url):
     browser = await launch()
     page = await browser.newPage()
     await page.setViewport({
-        'width': 1600,
-        'height': 900,
+        'width': 1920,
+        'height': 1080,
         'deviceScaleFactor': 1,
     })
     await page.goto(url, waitUntil='networkidle2')

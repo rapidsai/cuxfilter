@@ -7,3 +7,4 @@ Charts
 
    bokeh_charts.rst
    cudatashader_charts.rst
+   panel_widgets.rst

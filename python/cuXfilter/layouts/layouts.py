@@ -165,12 +165,12 @@ class Layout3:
                 tmpl.add_panel('chart1', chart.view())
             elif num_of_charts_added == 2:
                 chart.chart.sizing_mode = 'scale_both'
-                chart.width = 900
+                chart.width = 800
                 chart.height = 450
                 tmpl.add_panel('chart2', chart.view())
             elif num_of_charts_added == 3:
                 chart.chart.sizing_mode = 'scale_both'
-                chart.width = 900
+                chart.width = 800
                 chart.height = 450
                 tmpl.add_panel('chart3', chart.view())
             else:

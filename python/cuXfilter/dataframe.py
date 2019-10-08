@@ -3,7 +3,7 @@ import cudf
 import pyarrow as pa
 from typing import Type
 from .dashboard import DashBoard
-from .layouts import layout_1
+from .layouts import single_feature
 from .themes import light, dark
 
 def read_arrow(source):
@@ -78,7 +78,7 @@ class DataFrame:
         self.backup = data
         self.data = data.copy()
 
-    def dashboard(self, charts:list, layout=layout_1, theme = light, title='Dashboard', data_size_widget=True, warnings=False):
+    def dashboard(self, charts:list, layout=single_feature, theme = light, title='Dashboard', data_size_widget=True, warnings=False):
         """
         Creates a cuXfilter.DashBoard object
         

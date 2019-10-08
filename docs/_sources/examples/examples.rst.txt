@@ -5,5 +5,6 @@ Examples
    :maxdepth: 1
    :caption: Contents:
 
-   example_1.ipynb
-   example_2.ipynb
+   auto_accidents_example.ipynb
+   Mortgage_example.ipynb
+   NYC_taxi_example.ipynb

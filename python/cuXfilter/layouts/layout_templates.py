@@ -47,10 +47,10 @@ layout_2 = '''
 </nav>
 <div class="container">
     <div class="pure-g">
-        <div class="pure-u-1 pure-u-md-1-2">
+        <div class="pure-u-1 pure-u-md-1-2" >
             {{ embed(roots.chart1) }}
         </div>
-        <div class="pure-u-1 pure-u-md-1-2">
+        <div class="pure-u-1 pure-u-md-1-2" >
             {{ embed(roots.chart2) }}
         </div>
     </div>
@@ -68,10 +68,10 @@ layout_3 = '''
 </nav>
 <div class="container">
     <div class="pure-g">
-        <div class="pure-u-1 pure-u-md-1-2">
+        <div class="pure-u-1 pure-u-md-3-5">
             {{ embed(roots.chart1) }}
         </div>
-        <div class="pure-u-1 pure-u-md-1-2">
+        <div class="pure-u-1 pure-u-md-2-5" style="align-self:center">
             <div class="pure-u-1">
                 {{ embed(roots.chart2) }}
             </div>

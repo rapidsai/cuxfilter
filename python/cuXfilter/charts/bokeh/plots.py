@@ -84,7 +84,10 @@ class Bar(BaseBar):
         Ouput:
         """
         self.chart = figure(title=self.x, tools="pan, wheel_zoom, reset", active_scroll='wheel_zoom', active_drag='pan')
-        self.chart.vbar(x=self.data_x_axis, top=self.data_y_axis, width=0.9, source = self.source, color=self.color)
+        if self.color is None:
+            self.sub_chart = self.chart.vbar(x=self.data_x_axis, top=self.data_y_axis, width=0.9, source = self.source)
+        else:
+            self.sub_chart = self.chart.vbar(x=self.data_x_axis, top=self.data_y_axis, width=0.9, source = self.source, color=self.color)
         self.chart.xaxis.axis_label = self.x
         self.chart.yaxis.axis_label = self.y if self.y != self.x else self.aggregate_fn
 
@@ -163,6 +166,10 @@ class Bar(BaseBar):
         apply thematic changes to the chart based on the input properties dictionary
 
         """
+        if self.color is None:
+            self.sub_chart.glyph.fill_color = properties_dict['chart_color']['color']
+            self.sub_chart.glyph.line_color = properties_dict['chart_color']['color']
+
         self.chart.xgrid.grid_line_color = properties_dict['agg_charts_grids']['xgrid']
         self.chart.ygrid.grid_line_color = properties_dict['agg_charts_grids']['ygrid']
         
@@ -282,7 +289,10 @@ class Line(BaseLine):
         """
 
         self.chart = figure(title=self.x, tools=" pan, wheel_zoom, reset", active_scroll='wheel_zoom', active_drag='pan')
-        self.chart.line(x=self.data_x_axis, y=self.data_y_axis, source = self.source, color=self.color)
+        if self.color is None:
+            self.sub_chart = self.chart.line(x=self.data_x_axis, y=self.data_y_axis, source = self.source)
+        else:
+            self.sub_chart = self.chart.line(x=self.data_x_axis, y=self.data_y_axis, source = self.source, color=self.color)
 
     def update_dimensions(self, width=None, height=None):
         """
@@ -359,6 +369,8 @@ class Line(BaseLine):
         apply thematic changes to the chart based on the input properties dictionary
 
         """
+        if self.color is None:
+            self.sub_chart.glyph.line_color = properties_dict['chart_color']['color']
         self.chart.xgrid.grid_line_color = properties_dict['agg_charts_grids']['xgrid']
         self.chart.ygrid.grid_line_color = properties_dict['agg_charts_grids']['ygrid']
         
@@ -492,9 +504,9 @@ class Choropleth(BaseChoropleth):
         ---
         """
         if self.geo_color_palette is None:
-            self.geo_color_palette = bokeh.palettes.Purples9
-
-        mapper = LinearColorMapper(palette=self.geo_color_palette, nan_color=self.nan_color, low=np.nanmin(self.source.data[self.data_y_axis]),high=np.nanmax(self.source.data[self.data_y_axis]))
+            mapper = LinearColorMapper(palette=bokeh.palettes.Purples9, nan_color=self.nan_color, low=np.nanmin(self.source.data[self.data_y_axis]),high=np.nanmax(self.source.data[self.data_y_axis]))
+        else:
+            mapper = LinearColorMapper(palette=self.geo_color_palette, nan_color=self.nan_color, low=np.nanmin(self.source.data[self.data_y_axis]),high=np.nanmax(self.source.data[self.data_y_axis]))
 
         tooltips_r = [
             (self.x,"@"+self.data_x_axis),
@@ -510,7 +522,7 @@ class Choropleth(BaseChoropleth):
         if self.tile_provider is not None:
             self.chart.add_tile(self.tile_provider)
 
-        patch = self.chart.patches(xs='xs', ys='ys',source=self.source,line_width=0.5,
+        self.sub_chart = self.chart.patches(xs='xs', ys='ys',source=self.source,line_width=0.5,
                         fill_alpha=0.7,
                         fill_color={'field':self.data_y_axis, 'transform':mapper})
  
@@ -524,7 +536,7 @@ class Choropleth(BaseChoropleth):
         
 
         self.chart.sizing_mode = 'scale_both'
-        self.source = patch.data_source
+        self.source = self.sub_chart.data_source
         self.source_backup = self.source.data.copy()
 
     def update_dimensions(self, width=None, height=None):
@@ -647,7 +659,11 @@ class Choropleth(BaseChoropleth):
         apply thematic changes to the chart based on the input properties dictionary
 
         """
-        
+        if self.geo_color_palette is None:
+            mapper = LinearColorMapper(palette=properties_dict['chart_color']['color_palette'], nan_color=self.nan_color, low=np.nanmin(self.source.data[self.data_y_axis]),high=np.nanmax(self.source.data[self.data_y_axis]))
+            self.sub_chart.glyph.fill_color['transform'] = mapper
+            self.color_bar.color_mapper = mapper
+
         self.chart.xgrid.grid_line_color = properties_dict['geo_charts_grids']['xgrid']
         self.chart.ygrid.grid_line_color = properties_dict['geo_charts_grids']['ygrid']
         
