@@ -23,7 +23,7 @@ Example
     bar_chart_1.view()
 
 Line Chart
-----------------
+----------
 .. automethod:: bokeh.line
 
 Example
@@ -54,7 +54,7 @@ Example
     cux_df = DataFrame.from_dataframe(cudf.DataFrame({'states': [i for i in range(57)], 'val':[float(i + 10) for i in range(57)]}))
     choropleth_chart_1 = charts.bokeh.choropleth(x = 'states', y = 'val', aggregate_fn='mean', data_points=57, add_interaction=False,
                                         geoJSONSource= 'https://eric.clst.org/assets/wiki/uploads/Stuff/gz_2010_us_040_00_500k.json', geoJSONProperty='STATE',
-                                                x_range=(-126, -66), y_range=(23, 50))
+                                        )
 
     d = cux_df.dashboard([choropleth_chart_1])
     #view the individual bar chart part of the dashboard d

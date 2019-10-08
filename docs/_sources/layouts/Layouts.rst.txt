@@ -35,8 +35,11 @@ Declare charts
     chart8 = charts.bokeh.bar('borrower_credit_score', data_points=100)
 
 
+Layout types
+------------
+
 layout_0
---------
+~~~~~~~~
 
 .. image:: ./layout_thumbnails/layout_0.png
     :width: 350px
@@ -51,7 +54,7 @@ layout_0
 .. image:: ./layout_samples/layout0.png
 
 layout_1
---------
+~~~~~~~~
 
 .. image:: ./layout_thumbnails/layout_1.png
     :width: 350px
@@ -66,7 +69,7 @@ layout_1
 .. image:: ./layout_samples/layout1.png
 
 layout_2
---------
+~~~~~~~~
 
 .. image:: ./layout_thumbnails/layout_2.png
     :width: 350px
@@ -81,7 +84,7 @@ layout_2
 .. image:: ./layout_samples/layout2.png
 
 layout_3
---------
+~~~~~~~~
 
 .. image:: ./layout_thumbnails/layout_3.png
     :width: 350px
@@ -97,7 +100,7 @@ layout_3
 
 
 layout_4
---------
+~~~~~~~~
 
 .. image:: ./layout_thumbnails/layout_4.png
     :width: 350px
@@ -113,7 +116,7 @@ layout_4
 
 
 layout_5
---------
+~~~~~~~~
 
 .. image:: ./layout_thumbnails/layout_5.png
     :width: 350px
@@ -128,7 +131,7 @@ layout_5
 .. image:: ./layout_samples/layout5.png
 
 layout_6
---------
+~~~~~~~~
 
 .. image:: ./layout_thumbnails/layout_6.png
     :width: 350px
@@ -144,7 +147,7 @@ layout_6
 
 
 layout_7
---------
+~~~~~~~~
 
 .. image:: ./layout_thumbnails/layout_7.png
     :width: 350px
@@ -159,7 +162,7 @@ layout_7
 .. image:: ./layout_samples/layout7.png
 
 layout_8
---------
+~~~~~~~~
 
 .. image:: ./layout_thumbnails/layout_8.png
     :width: 350px
@@ -174,7 +177,7 @@ layout_8
 .. image:: ./layout_samples/layout8.png
 
 layout_9
---------
+~~~~~~~~
 
 .. image:: ./layout_thumbnails/layout_9.png
     :width: 350px
@@ -189,7 +192,7 @@ layout_9
 .. image:: ./layout_samples/layout9.png
 
 layout_10
----------
+~~~~~~~~~
 
 .. image:: ./layout_thumbnails/layout_10.png
     :width: 350px
@@ -204,7 +207,7 @@ layout_10
 .. image:: ./layout_samples/layout10.png
 
 layout_11
----------
+~~~~~~~~~
 
 .. image:: ./layout_thumbnails/layout_11.png
     :width: 350px
@@ -219,7 +222,7 @@ layout_11
 .. image:: ./layout_samples/layout11.png
 
 layout_12
----------
+~~~~~~~~~
 
 .. image:: ./layout_thumbnails/layout_12.png
     :width: 350px

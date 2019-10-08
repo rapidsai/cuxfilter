@@ -89,6 +89,7 @@
 <li class="toctree-l1"><a class="reference internal" href="10 minutes to cuXfilter.html">10 minutes to cuXfilter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="charts/charts.html">Charts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="layouts/Layouts.html">Layouts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="themes/Themes.html">Themes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples.html">Examples</a></li>
 </ul>
 
@@ -180,7 +181,6 @@
 </style>
 <div class="section" id="welcome-to-cuxfilter-s-documentation">
 <h1>Welcome to cuXfilter’s documentation!<a class="headerlink" href="#welcome-to-cuxfilter-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>cuXfilter solves the issues by leveraging the power of the rapids.ai stack, mainly cudf. The data is maintained in a gpu as a GPU DataFrame and operations like groupby aggregations, sorting and querying are done on the gpu itself, only returning the result as the output to the charts.</p>
 <p>cuXfilter acts as a connector library, which provides the connections between different visualization libraries and a GPU dataframe without much hassle. This also allows the user to use charts from different libraries in a single dashboard, while also providing the interaction.</p>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
@@ -205,29 +205,25 @@
 <li class="toctree-l1"><a class="reference internal" href="charts/charts.html">Charts</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="charts/bokeh_charts.html">Bokeh Charts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="charts/cudatashader_charts.html">CuDataShader Charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="charts/panel_widgets.html">Panel Widgets</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="layouts/Layouts.html">Layouts</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#load-cuxfilter-and-data">Load cuXfilter and data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#declare-charts">Declare charts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#layout-0">layout_0</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#layout-1">layout_1</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#layout-2">layout_2</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#layout-3">layout_3</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#layout-4">layout_4</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#layout-5">layout_5</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#layout-6">layout_6</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#layout-7">layout_7</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#layout-8">layout_8</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#layout-9">layout_9</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#layout-10">layout_10</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#layout-11">layout_11</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#layout-12">layout_12</a></li>
+<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#Load-cuXfilter-and-data">Load cuXfilter and data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#Declare-charts">Declare charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="layouts/Layouts.html#Layout-Types">Layout Types</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="themes/Themes.html">Themes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="themes/Themes.html#Load-cuXfilter-and-data">Load cuXfilter and data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="themes/Themes.html#Declare-charts">Declare charts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="themes/Themes.html#Themes-Types">Themes Types</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples.html">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples/example_1.html">Mortgage Demo Example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examples/example_2.html">Cudatashader Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/auto_accidents_example.html">Auto Accidents(1975-2017)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/Mortgage_example.html">Fannie Mae mortgage data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/NYC_taxi_example.html">NYC Taxi data</a></li>
 </ul>
 </li>
 </ul>

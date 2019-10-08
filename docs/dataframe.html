@@ -94,6 +94,7 @@
 <li class="toctree-l1"><a class="reference internal" href="10 minutes to cuXfilter.html">10 minutes to cuXfilter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="charts/charts.html">Charts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="layouts/Layouts.html">Layouts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="themes/Themes.html">Themes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples.html">Examples</a></li>
 </ul>
 
@@ -205,7 +206,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#cuXfilter.dataframe.DataFrame.dashboard" title="cuXfilter.dataframe.DataFrame.dashboard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dashboard</span></code></a>(self, charts[, layout, title, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cuXfilter.dataframe.DataFrame.dashboard" title="cuXfilter.dataframe.DataFrame.dashboard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dashboard</span></code></a>(self, charts[, layout, theme, …])</p></td>
 <td><p>Creates a cuXfilter.DashBoard object</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#cuXfilter.dataframe.DataFrame.from_arrow" title="cuXfilter.dataframe.DataFrame.from_arrow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_arrow</span></code></a>(dataframe_location)</p></td>
@@ -218,7 +219,7 @@
 </table>
 <dl class="method">
 <dt id="cuXfilter.dataframe.DataFrame.dashboard">
-<code class="sig-name descname">dashboard</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">charts: list</em>, <em class="sig-param">layout=&lt;class 'cuXfilter.layouts.layouts.Layout1'&gt;</em>, <em class="sig-param">title='Dashboard'</em>, <em class="sig-param">data_size_widget=True</em>, <em class="sig-param">warnings=False</em><span class="sig-paren">)</span><a class="headerlink" href="#cuXfilter.dataframe.DataFrame.dashboard" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">dashboard</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">charts: list</em>, <em class="sig-param">layout=&lt;class 'cuXfilter.layouts.layouts.Layout0'&gt;</em>, <em class="sig-param">theme=&lt;class 'cuXfilter.themes.light.Theme'&gt;</em>, <em class="sig-param">title='Dashboard'</em>, <em class="sig-param">data_size_widget=True</em>, <em class="sig-param">warnings=False</em><span class="sig-paren">)</span><a class="headerlink" href="#cuXfilter.dataframe.DataFrame.dashboard" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a cuXfilter.DashBoard object</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -312,7 +313,7 @@
 <h2>DashBoard<a class="headerlink" href="#dashboard" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="cuXfilter.dashboard.DashBoard">
-<em class="property">class </em><code class="sig-prename descclassname">cuXfilter.dashboard.</code><code class="sig-name descname">DashBoard</code><span class="sig-paren">(</span><em class="sig-param">charts=[]</em>, <em class="sig-param">data=None</em>, <em class="sig-param">layout=&lt;class 'cuXfilter.layouts.layouts.Layout1'&gt;</em>, <em class="sig-param">title='Dashboard'</em>, <em class="sig-param">data_size_widget=True</em>, <em class="sig-param">warnings=False</em><span class="sig-paren">)</span><a class="headerlink" href="#cuXfilter.dashboard.DashBoard" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">cuXfilter.dashboard.</code><code class="sig-name descname">DashBoard</code><span class="sig-paren">(</span><em class="sig-param">charts=[]</em>, <em class="sig-param">data=None</em>, <em class="sig-param">layout=&lt;class 'cuXfilter.layouts.layouts.Layout0'&gt;</em>, <em class="sig-param">theme=&lt;class 'cuXfilter.themes.light.Theme'&gt;</em>, <em class="sig-param">title='Dashboard'</em>, <em class="sig-param">data_size_widget=True</em>, <em class="sig-param">warnings=False</em><span class="sig-paren">)</span><a class="headerlink" href="#cuXfilter.dashboard.DashBoard" title="Permalink to this definition">¶</a></dt>
 <dd><p>A cuXfilter GPU DashBoard object.
 Examples
 ——–</p>

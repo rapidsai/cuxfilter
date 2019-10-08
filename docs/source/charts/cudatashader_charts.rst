@@ -96,3 +96,30 @@ Example
     d = cux_df.dashboard([stacked_lines_chart])
 
     stacked_lines_chart.view()
+
+
+Heat Map chart
+--------------
+
+.. automethod:: cudatashader.heatmap
+
+
+Example
+~~~~~~~
+.. jupyter-execute::
+
+    from cuXfilter import charts, layouts, themes, DataFrame
+    from cuXfilter.sampledata import unemployment_data
+
+    cux_df = DataFrame.from_dataframe(unemployment_data)
+
+    # this is the colormap from the original NYTimes plot
+    colors = ["#75968f", "#a5bab7", "#c9d9d3", "#e2e2e2", "#dfccce", "#ddb7b1", "#cc7878", "#933b41", "#550b1d"]
+
+    chart1 = charts.cudatashader.heatmap(x='Year', y='Month', aggregate_col='rate',
+                                color_palette=colors, point_size=20)
+
+
+    d = cux_df.dashboard([chart1], layout=layouts.single_feature, theme=themes.dark)
+
+    chart1.view()
