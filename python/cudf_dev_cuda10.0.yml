@@ -33,4 +33,4 @@ dependencies:
   - nose
   - flake8
   - geopandas
- 
+  - xarray
