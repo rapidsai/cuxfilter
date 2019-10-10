@@ -99,7 +99,7 @@ Troubleshooting help can be found [here](https://rapidsai.github.io/cuxfilter/in
 > You need to have RAPIDS (cudf) installed for cuXfilter to work
 
 
-1. If installing within the rapidai DOCKER container, follow the following instructions
+### 1. If installing within the rapidai DOCKER container, follow the following instructions
 
 ```bash
 
@@ -153,7 +153,7 @@ d.show('ip.addr:bokeh_port')
 
 
 
-2. If installing in a conda environment
+### 2. If installing in a conda environment
 
 
 ```bash
