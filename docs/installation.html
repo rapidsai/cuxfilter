@@ -86,7 +86,10 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#installing-in-a-rapids-docker-container">1. Installing in a rapids docker container</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-in-a-rapids-docker-container">1. Installing in a rapids docker container</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#to-run-the-bokeh-server-in-a-jupyter-lab">To run the bokeh server in a jupyter lab</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#if-installing-in-a-conda-environment">2. If installing in a conda environment</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#download-datasets">Download datasets</a></li>
 </ul>
@@ -215,26 +218,27 @@ pip install -e .
 
 <span class="c1"># start a jupyter lab environment</span>
 jupyter lab
-
-<span class="c1">#To run the bokeh server in a jupyter lab</span>
-
-: <span class="s1">&#39;</span>
-<span class="s1">1. expose an additional port for server, lets call it bokeh_port.</span>
-<span class="s1">2. Install jupyterlab dependencies</span>
-<span class="s1">&#39;</span>
-conda install -c conda-forge jupyterlab
+</pre></div>
+</div>
+<div class="section" id="to-run-the-bokeh-server-in-a-jupyter-lab">
+<h3>To run the bokeh server in a jupyter lab<a class="headerlink" href="#to-run-the-bokeh-server-in-a-jupyter-lab" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li><p>expose an additional port for server, lets call it bokeh_port.</p></li>
+<li><p>Install jupyterlab dependencies</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge jupyterlab
 jupyter labextension install @pyviz/jupyterlab_pyviz
 jupyter labextension install jupyterlab_bokeh
-
-: <span class="s1">&#39;</span>
-<span class="s1">3.running the server</span>
-<span class="s1">&#39;</span>
-<span class="c1">#enter ip address without http://</span>
+</pre></div>
+</div>
+<p>3.running the server</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1">#enter ip address without http://</span>
 <span class="c1">#current port is the port at which jupyterlab is running</span>
 d.app<span class="o">(</span><span class="nv">url</span><span class="o">=</span><span class="s1">&#39;ip.addr:current_port&#39;</span>, <span class="nv">port</span><span class="o">=</span>bokeh_port<span class="o">)</span>
 <span class="c1"># OR for a separate web app</span>
 d.show<span class="o">(</span><span class="s1">&#39;ip.addr:bokeh_port&#39;</span><span class="o">)</span>
 </pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="if-installing-in-a-conda-environment">

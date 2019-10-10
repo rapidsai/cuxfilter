@@ -35,19 +35,21 @@ Note: You need to have RAPIDS (cudf) installed for cuXfilter to work
     # start a jupyter lab environment
     jupyter lab
 
-    #To run the bokeh server in a jupyter lab
+To run the bokeh server in a jupyter lab
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1. expose an additional port for server, lets call it bokeh_port.
+2. Install jupyterlab dependencies
 
-    : '
-    1. expose an additional port for server, lets call it bokeh_port.
-    2. Install jupyterlab dependencies
-    '
+.. code-block:: bash
+
     conda install -c conda-forge jupyterlab
     jupyter labextension install @pyviz/jupyterlab_pyviz
     jupyter labextension install jupyterlab_bokeh
 
-    : '
-    3.running the server
-    '
+3.running the server
+
+.. code-block:: bash
+
     #enter ip address without http://
     #current port is the port at which jupyterlab is running
     d.app(url='ip.addr:current_port', port=bokeh_port)
