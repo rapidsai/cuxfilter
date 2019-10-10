@@ -122,26 +122,27 @@ cd /rapids
 #clone cudatashader
 git clone https://github.com/rapidsai/cudatashader
 
-Drop into cudatashader folder and install
+#Drop into cudatashader folder and install
 cd cudatashader
 pip install -e .
 
 # start a jupyter lab environment
 jupyter lab
+```
 
-#To run the bokeh server in a jupyter lab
+To run the bokeh server in a jupyter lab
 
-: '
 1. expose an additional port for server, lets call it bokeh_port.
 2. Install jupyterlab dependencies
-'
+
+```bash
 conda install -c conda-forge jupyterlab
 jupyter labextension install @pyviz/jupyterlab_pyviz
 jupyter labextension install jupyterlab_bokeh
+```
 
-: '
 3.running the server
-'
+```bash
 #enter ip address without http://
 #current port is the port at which jupyterlab is running
 d.app(url='ip.addr:current_port', port=bokeh_port)
