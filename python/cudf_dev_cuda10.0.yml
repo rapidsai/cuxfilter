@@ -25,11 +25,12 @@ dependencies:
 - cudatoolkit=10.0
 - panel=0.6.0
 - bokeh
+- pyppeteer
 - pip
+- geopandas
 - pip:
   - sphinx-markdown-tables
   - nose
   - flake8
-  - pyppeteer
   - geopandas
- 
+  - xarray
