@@ -72,7 +72,7 @@ def download_dataset(downloaded_filename, filename, url):
 
 def datasets_check(*args, base_dir='./'):
 
-    dir_name = base_dir+'data'
+    dir_name = base_dir
 
     check_folder(dir_name)
 
