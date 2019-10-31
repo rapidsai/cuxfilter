@@ -113,7 +113,7 @@ git clone https://github.com/rapidsai/cuxfilter
 
 #Drop into cuxfilter's python library folder, make, and install
 cd cuxfilter/python
-make
+conda env update cudf_dev_rapids_container.yml
 pip install -e .
 
 #Get back to /rapidsai folder
