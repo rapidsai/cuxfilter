@@ -113,8 +113,8 @@ git clone https://github.com/rapidsai/cuxfilter
 
 #Drop into cuxfilter's python library folder, make, and install
 cd cuxfilter/python
-conda env update cudf_dev_rapids_container.yml
-pip install -e .
+/opt/conda/envs/rapids/bin/python -m pip install -U -r requirements.txt
+/opt/conda/envs/rapids/bin/python -m pip install -e .
 
 #Get back to /rapidsai folder
 cd /rapids
@@ -124,10 +124,10 @@ git clone https://github.com/rapidsai/cudatashader
 
 #Drop into cudatashader folder and install
 cd cudatashader
-pip install -e .
+/opt/conda/envs/rapids/bin/python -m pip install -e .
 
 # start a jupyter lab environment
-jupyter lab
+# visit localhost:8888/
 ```
 
 To run the bokeh server in a jupyter lab
