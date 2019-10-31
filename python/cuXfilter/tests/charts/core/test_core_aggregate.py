@@ -1,5 +1,7 @@
 import pytest ; pytest
 
+import pandas as pd
+import numpy as np
 from cuXfilter.charts.core.aggregate.core_aggregate import BaseAggregateChart
 
 class TestCoreAggregateChart():
@@ -63,8 +65,26 @@ class TestCoreAggregateChart():
 
     def test_query_chart_by_range(self):
         active_chart = BaseAggregateChart()
-        query_tuple =
-        datatile = 
         
+        active_chart.stride = 8
+        active_chart.min_value = 10.0
 
-    
+        self.result = ''
+        
+        def reset_chart(datatile_result):
+            self.result = datatile_result
+
+        active_chart.reset_chart = reset_chart
+
+        query_tuple = (10,26)
+
+        datatile = pd.DataFrame({0: {0: 0.0, 1: 0.0, 2: 0.0, 4: 0.0, 5: 4.0},
+                        1: {0: 0.0, 1: 0.0, 2: 0.0, 4: 3.0, 5: 4.0},
+                        2: {0: 0.0, 1: 0.0, 2: 2.0, 4: 3.0, 5: 4.0},
+                        3: {0: 0.0, 1: 1.0, 2: 2.0, 4: 3.0, 5: 4.0},
+                        4: {0: 0.0, 1: 1.0, 2: 2.0, 4: 3.0, 5: 4.0},
+                        5: {0: 0.0, 1: 1.0, 2: 2.0, 4: 3.0, 5: 4.0}})
+
+        active_chart.query_chart_by_range(active_chart, query_tuple, datatile)
+
+        assert all([0.0, 0.0, 0.0,  3.0,  4.0] == self.result)
