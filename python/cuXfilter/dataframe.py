@@ -76,7 +76,7 @@ class DataFrame:
     def __init__(self, data):
         pn.extension()
         self.backup = data
-        self.data = data.copy()
+        self.data = data
 
     def dashboard(self, charts:list, layout=single_feature, theme = light, title='Dashboard', data_size_widget=True, warnings=False):
         """
