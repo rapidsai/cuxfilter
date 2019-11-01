@@ -78,6 +78,10 @@ class BaseLine(BaseAggregateChart):
         '''
         self.min_value = dashboard_cls._data[self.x].min()
         self.max_value = dashboard_cls._data[self.x].max()
+        
+        if self.data_points > dashboard_cls._data[self.x].shape[0]:
+            self.data_points = dashboard_cls._data[self.x].shape[0]
+        
         if self.stride is None:
             if self.max_value < 1 and self.stride_type == int:
                 self.stride_type = float

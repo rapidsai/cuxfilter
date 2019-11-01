@@ -1,5 +1,6 @@
 import numpy as np
 from numba import cuda
+import cudf
 import numba
 import pyarrow as pa
 import pandas as pd
@@ -27,11 +28,16 @@ def calc_cumsum_data_tile(x, arr1):
     stride = cuda.gridsize(1)
 
     for i in range(start, x.shape[0], stride):
+        col1_i = int(round(x[i][0]))
+        col2_i = int(round(x[i][1]))
+        freq_i = x[i][2]
+        
         if int(x[i][0]) != -1:
-            if arr1[int(x[i][1])][int(x[i][0])] == float(0):
-                arr1[int(x[i][1])][int(x[i][0])] = x[i][2]
+            if arr1[col2_i][col1_i] == float(0):
+                arr1[col2_i][col1_i] = freq_i
             else:
-                arr1[int(x[i][1])][int(x[i][0])] = (arr1[int(x[i][1])][int(x[i][0])]+x[i][2])/2
+                arr1[col2_i][col1_i] = (arr1[col2_i][col1_i]+freq_i)/2
+            
 
 @cuda.jit
 def calc_binwise_reduced_column(x, stride, a_range):
@@ -47,11 +53,9 @@ def calc_binwise_reduced_column(x, stride, a_range):
     a_max = a_range[1]
     start = cuda.grid(1)
     s = cuda.gridsize(1)
-    # if a_max <= 1:
-    #     balancer = 100
     for i in range(start, x.shape[0],s):
         if x[i]>= a_min and x[i]<=a_max:
-            x[i] = np.int32((x[i] - a_min)/stride)
+            x[i] = np.int32(round((x[i] - a_min)/stride))
         else:
             x[i] = -1
 
@@ -127,8 +131,6 @@ def calc_data_tile_for_size(df, col_1, min_1, max_1, stride_1, cumsum:bool=True,
     else:
         result_np = result
     return format_result(result_np, return_format)
-    # result_pa = pa.RecordBatch.from_pandas(pd.DataFrame(result_np,dtype=np.float64),preserve_index=True)
-    # return get_arrow_stream(result_pa)
 
 def calc_data_tile(df, active_view: Type[BaseChart], passive_view: Type[BaseChart], aggregate_fn:str='', cumsum:bool=True, return_format = 'pandas'):
     '''
@@ -174,20 +176,21 @@ def calc_data_tile(df, active_view: Type[BaseChart], passive_view: Type[BaseChar
         df[col_2] = get_binwise_reduced_column(df[col_2].copy().to_gpu_array(), stride_2, a2_range)
         check_list.append(col_2)
 
-    # print(df[col_2+'_mod']).to_pandas()
-    
     groupby_results = []
     for i in aggregate_dict[key]:
         agg = {key: i}
         groupby_results.append(df.groupby(check_list, method='hash',sort=False, as_index=False).agg(agg))
+    
     
     del(df)
     gc.collect()
 
     results = []
     for groupby_result in groupby_results:
-        
+
+        list_of_indices = list(np.unique(groupby_result[check_list[-1]].to_array().astype(int)))
         groupby_as_ndarray = cuda.to_device(groupby_result.to_pandas().values.astype(float))
+        
         del(groupby_result)
         gc.collect()
         max_s = int((max_1-min_1)/stride_1) + 1
@@ -203,8 +206,11 @@ def calc_data_tile(df, active_view: Type[BaseChart], passive_view: Type[BaseChar
         else:
             result_np = np.cumsum(result.copy_to_host(),axis=1)
 
-        results.append(format_result(result_np, return_format))
-    
+        result_temp = format_result(result_np, return_format)
+        
+        results.append(result_temp[result_temp.index.isin(list_of_indices)])
+
     if len(results) == 1:
         return results[0]
+
     return results

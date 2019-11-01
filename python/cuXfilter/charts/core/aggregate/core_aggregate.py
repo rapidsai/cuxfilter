@@ -21,8 +21,8 @@ class BaseAggregateChart(BaseChart):
         '''
         min_val, max_val = query_tuple
         datatile_index_min = int(round((min_val - active_chart.min_value)/active_chart.stride))
-        datatile_index_max = int(round((max_val - active_chart.min_value)/active_chart.stride))
-        
+        datatile_index_max = int(round((max_val - active_chart.min_value)/active_chart.stride)) - 1
+
         if datatile_index_min == 0:
             
             if self.aggregate_fn == 'mean':
@@ -58,9 +58,11 @@ class BaseAggregateChart(BaseChart):
             datatile_result = np.array( datatile[0].sum(axis=1, skipna=True)) / np.array( datatile[1].sum(axis=1, skipna=True))
             return datatile_result
 
-        datatile_result = np.zeros(shape=(len(self.get_source_y_axis()),), dtype=np.float64)
-        value_sum = np.zeros(shape=(len(self.get_source_y_axis()),), dtype=np.float64)
-        value_count = np.zeros(shape=(len(self.get_source_y_axis()),), dtype=np.float64)
+        len_y_axis = datatile[0][0][:self.data_points].shape[0]
+
+        datatile_result = np.zeros(shape=(len_y_axis,), dtype=np.float64)
+        value_sum = np.zeros(shape=(len_y_axis,), dtype=np.float64)
+        value_count = np.zeros(shape=(len_y_axis,), dtype=np.float64)
         
         for index in new_indices:
             index = int(round((index - active_chart.min_value)/active_chart.stride))
@@ -87,9 +89,11 @@ class BaseAggregateChart(BaseChart):
             return datatile_result
 
         if len(old_indices) == 0 or old_indices == ['']:
-            datatile_result = np.zeros(shape=(len(self.get_source_y_axis()),), dtype=np.float64)
-        else:    
-            datatile_result = np.array(self.get_source_y_axis(), dtype=np.float64)
+            len_y_axis = datatile[0][:self.data_points].shape[0]
+            datatile_result = np.zeros(shape=(len_y_axis,), dtype=np.float64)
+        else:
+            len_y_axis = datatile[0][:self.data_points].shape[0]
+            datatile_result = np.array(self.get_source_y_axis(), dtype=np.float64)[:len_y_axis]
 
         for index in calc_new:
             index = int(round((index - active_chart.min_value)/active_chart.stride))

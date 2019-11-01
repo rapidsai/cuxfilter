@@ -97,34 +97,42 @@ class BaseChart:
     def view(self):
         return self.chart
 
-    def update_dimensions(self, width=None, height=None):
-        print('base calc source function, to over-ridden by delegated classes')
-
-    def calculate_source(self, data):
-        print('base calc source function, to over-ridden by delegated classes')
-    
-    def generate_chart(self):
-        print('base calc source function, to over-ridden by delegated classes')
-
-    def add_reset_event(self, callback=None):
-        print('base calc source function, to over-ridden by delegated classes')
-
     def add_event(self, event, callback):
         self.chart.on_event(event, callback)
 
+    def update_dimensions(self, width=None, height=None):
+        print('base calc source function, to over-ridden by delegated classes')
+        return -1
+
+    def calculate_source(self, data):
+        print('base calc source function, to over-ridden by delegated classes')
+        return -1
+    
+    def generate_chart(self):
+        print('base calc source function, to over-ridden by delegated classes')
+        return -1
+
+    def add_reset_event(self, callback=None):
+        print('base calc source function, to over-ridden by delegated classes')
+        return -1
+
     def compute_query_dict(self, query_dict):
         print('base calc source function, to over-ridden by delegated classes')
+        return -1
 
     def reset_chart(self, data:list=[]):
         print('base calc source function, to over-ridden by delegated classes')
+        return -1
 
     def reload_chart(self, data, patch_update:bool):
         print('base calc source function, to over-ridden by delegated classes')
+        return -1
 
     def format_source_data(self, source_dict, patch_update= False):
         '''
         '''
         # print('function to be overridden by library specific extensions')
+        return -1
 
     def get_source_y_axis(self):
         # print('function to be overridden by library specific extensions')
@@ -134,5 +142,6 @@ class BaseChart:
         '''
         '''
         # print('function to be overridden by library specific extensions')
+        return -1
 
     
