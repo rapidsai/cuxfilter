@@ -30,6 +30,11 @@ def bar(x, y=None, data_points=100, add_interaction=True, aggregate_fn='count', 
     y_label_map: dict,  default None
         label maps for y axis
         {value: mapped_str}
+
+    title: str,
+
+        chart title
+
     **library_specific_params:
         additional library specific keyword arguments to be passed to the function
 
@@ -69,6 +74,10 @@ def line(x, y=None, data_points=100, add_interaction=True, aggregate_fn='count',
     y_label_map: dict,  default None
         label maps for y axis
         {value: mapped_str}
+    
+    title: str,
+
+        chart title
     **library_specific_params:
         additional library specific keyword arguments to be passed to the function
 
@@ -121,6 +130,10 @@ def choropleth(x, y=None, data_points=100, add_interaction=True, aggregate_fn='c
 
     tile_provider: bokeh.tile_provider object or cuXfilter.assets.custom_tiles.get_provider object, default None
 
+    title: str,
+
+        chart title
+        
     **library_specific_params:
         additional library specific keyword arguments to be passed to the function
 
