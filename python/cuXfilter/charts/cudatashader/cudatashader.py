@@ -47,6 +47,11 @@ def scatter_geo(x, y=None, x_range=None, y_range=None, add_interaction=True, col
         
     tile_provider: str, default 'CARTODBPOSITRON'
         Underlying map type. See https://bokeh.pydata.org/en/latest/docs/reference/tile_providers.html
+
+    title: str,
+
+        chart title
+
     **library_specific_params:
         additional library specific keyword arguments to be passed to the function
 
@@ -100,7 +105,11 @@ def scatter(x, y, x_range=None, y_range=None, add_interaction=True, color_palett
     width: int,  default 800
         
     height: int,  default 400
-        
+    
+    title: str,
+
+        chart title
+
     **library_specific_params:
         additional library specific keyword arguments to be passed to the function
 
@@ -153,7 +162,11 @@ def heatmap(x, y, x_range=None, y_range=None, add_interaction=True, color_palett
     width: int,  default 800
         
     height: int,  default 400
-        
+    
+    title: str,
+
+        chart title
+
     **library_specific_params:
         additional library specific keyword arguments to be passed to the function
 
@@ -180,9 +193,6 @@ def line(x, y=None, data_points=100, add_interaction=True, pixel_shade_type='lin
             
     add_interaction: {True, False},  default True
 
-    aggregate_col: str, default None
-        column from the gpu dataframe on which the aggregate_fn will be run on, if None, aggregate_fn is run on y-column
-
     pixel_shade_type: str, default 'linear'
         The "how" parameter in cudatashader.transfer_functions.shade() function.
         Available options: eq_hist, linear, log, cbrt
@@ -198,6 +208,10 @@ def line(x, y=None, data_points=100, add_interaction=True, pixel_shade_type='lin
     width: int,  default 800
         
     height: int,  default 400
+
+    title: str,
+
+        chart title
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to the function
@@ -234,6 +248,10 @@ def stacked_lines(x, y=[], data_points=100, add_interaction=True,  colors=[], st
     width: int,  default 800
         
     height: int,  default 400
+
+    title: str,
+
+        chart title
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to the function

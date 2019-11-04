@@ -83,7 +83,12 @@ class Bar(BaseBar):
 
         Ouput:
         """
-        self.chart = figure(title=self.x, tools="pan, wheel_zoom, reset", active_scroll='wheel_zoom', active_drag='pan')
+        if 'title' in self.library_specific_params:
+            self.title = self.library_specific_params['title']
+        else:
+            self.title = self.x
+
+        self.chart = figure(title=self.title, tools="pan, wheel_zoom, reset", active_scroll='wheel_zoom', active_drag='pan')
         if self.color is None:
             self.sub_chart = self.chart.vbar(x=self.data_x_axis, top=self.data_y_axis, width=0.9, source = self.source)
         else:
@@ -288,7 +293,12 @@ class Line(BaseLine):
         Ouput:
         """
 
-        self.chart = figure(title=self.x, tools=" pan, wheel_zoom, reset", active_scroll='wheel_zoom', active_drag='pan')
+        if 'title' in self.library_specific_params:
+            self.title = self.library_specific_params['title']
+        else:
+            self.title = self.x
+
+        self.chart = figure(title=self.title, tools=" pan, wheel_zoom, reset", active_scroll='wheel_zoom', active_drag='pan')
         if self.color is None:
             self.sub_chart = self.chart.line(x=self.data_x_axis, y=self.data_y_axis, source = self.source)
         else:
@@ -513,8 +523,12 @@ class Choropleth(BaseChoropleth):
             (self.data_y_axis, "@"+self.data_y_axis)
         ]
 
+        if 'title' in self.library_specific_params:
+            self.title = self.library_specific_params['title']
+        else:
+            self.title = "Geo Choropleth Map for "+self.y
 
-        self.chart = figure(title="Geo Map for "+self.name, toolbar_location="right", tooltips=tooltips_r,
+        self.chart = figure(title=self.title, toolbar_location="right", tooltips=tooltips_r,
                             tools="hover, pan, wheel_zoom, tap, reset",
                             active_scroll='wheel_zoom', active_drag='pan',
                            **self.library_specific_params)

@@ -80,7 +80,12 @@ class ScatterGeo(BaseScatterGeo):
         if type(self.tile_provider) == str:
             self.tile_provider = get_provider(self.tile_provider)
         
-        self.chart = figure(title="Geo Scatter plot for "+self.aggregate_fn, toolbar_location="right", tools="pan, wheel_zoom, reset", active_scroll='wheel_zoom', active_drag='pan',
+        if 'title' in self.library_specific_params:
+            self.title = self.library_specific_params['title']
+        else:
+            self.title = "Geo Scatter plot for "+self.aggregate_col+" "+self.aggregate_fn
+
+        self.chart = figure(title=self.title, toolbar_location="right", tools="pan, wheel_zoom, reset", active_scroll='wheel_zoom', active_drag='pan',
                             x_range=self.x_range, y_range = self.y_range, width=self.width, height=self.height)
 
         self.chart.add_tools(BoxSelectTool())
@@ -264,8 +269,12 @@ class Scatter(BaseScatter):
             self.no_colors_set = True
             self.color_palette = Hot
         
+        if 'title' in self.library_specific_params:
+            self.title = self.library_specific_params['title']
+        else:
+            self.title = "Scatter plot for "+self.aggregate_col+" "+self.aggregate_fn
         
-        self.chart = figure(title="Geo Scatter plot for "+self.aggregate_fn, toolbar_location="right", tools="pan, wheel_zoom, reset", active_scroll='wheel_zoom', active_drag='pan',
+        self.chart = figure(title=self.title, toolbar_location="right", tools="pan, wheel_zoom, reset", active_scroll='wheel_zoom', active_drag='pan',
                             x_range=self.x_range, y_range = self.y_range, width=self.width, height=self.height)
 
         self.chart.add_tools(BoxSelectTool())
@@ -464,7 +473,15 @@ class Line(BaseLine):
                 print('enter color name instead of hex')
                 self.color = 'rapidspurple'
 
-        self.chart = figure(title="Line plot for "+self.aggregate_fn, toolbar_location="right", tools="pan, wheel_zoom, reset", active_scroll='wheel_zoom', active_drag='pan',
+        if 'title' in self.library_specific_params:
+            self.title = self.library_specific_params['title']
+        else:
+            if self.x == self.y:
+                self.title = "Line plot for "+self.x
+            else:
+                self.title = "Line plot for ("+self.x+","+self.y+")"
+
+        self.chart = figure(title=self.title, toolbar_location="right", tools="pan, wheel_zoom, reset", active_scroll='wheel_zoom', active_drag='pan',
                             x_range=self.x_range, y_range = self.y_range, width=self.width, height=self.height)
 
         self.chart.add_tools(BoxSelectTool())
@@ -664,7 +681,12 @@ class StackedLines(BaseStackedLine):
             self.no_colors_set = True
             self.colors = ['rapidspurple'] * len(self.y)
         
-        self.chart = figure(title="Line plot for "+self.aggregate_fn, toolbar_location="right", tools="pan, xwheel_zoom, reset", active_scroll='xwheel_zoom', active_drag='pan',
+        if 'title' in self.library_specific_params:
+            self.title = self.library_specific_params['title']
+        else:
+            self.title = "Stacked Line plots on x-axis: "+self.x
+
+        self.chart = figure(title=self.title, toolbar_location="right", tools="pan, xwheel_zoom, reset", active_scroll='xwheel_zoom', active_drag='pan',
                             x_range=self.x_range, y_range = self.y_range, width=self.width, height=self.height, **self.library_specific_params)
 
         self.chart.add_tools(BoxSelectTool(dimensions='width'))
