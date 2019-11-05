@@ -10,7 +10,6 @@ class TestDataFrame():
             {'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}
             )
     cux_df = cuXfilter.DataFrame.from_dataframe(df)
-
     dashboard = cux_df.dashboard(charts=[], title='test_title')
 
     def test_variables(self):
@@ -26,10 +25,8 @@ class TestDataFrame():
 
     
     def test_add_charts(self):
-        
         bac = cuXfilter.charts.bokeh.bar('key')
         bac.chart_type = 'chart_1'
-
         for _ in range(3):
             bac = cuXfilter.charts.bokeh.bar('key')
             bac.chart_type = 'chart_'+str(_+1)
@@ -47,9 +44,7 @@ class TestDataFrame():
             {'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}
             )
         cux_df = cuXfilter.DataFrame.from_dataframe(df.copy())
-
         dashboard = cux_df.dashboard(charts=[], title='test_title')
-
         query_res = dashboard._query(query_str=query, inplace=inplace)
 
         if query_res is not None:
@@ -79,12 +74,23 @@ class TestDataFrame():
     def test_export(self, active_view, result):
         bac = cuXfilter.charts.bokeh.bar('key')
         bac.chart_type = 'chart_1'
-
         self.dashboard.add_charts([bac])
         self.dashboard._query_str_dict = {'key_chart_1': '0<=key<=3'}
-
         self.dashboard._active_view = active_view
         
         assert self.dashboard.export().to_string() == result
 
-    #datatile and query unit tests are already present in core_aggregate and core_non_aggregate test files
+    #unit tests for datatile and query functions are already present in core_aggregate and core_non_aggregate test files
+
+    #integrated tests
+
+    def test_calc_data_tiles(self):
+        df = cudf.DataFrame(
+            {'key': [0, 1, 2, 2, 2], 'val':[float(i + 10) for i in range(5)]}
+            )
+        cux_df = cuXfilter.DataFrame.from_dataframe(df)
+        bac = cuXfilter.charts.bokeh.bar('key')
+        bac1 = cuXfilter.charts.bokeh.bar('val')
+        dashboard = cux_df.dashboard(charts=[bac, bac1], title='test_title', layout=cuXfilter.layouts.double_feature)
+
+

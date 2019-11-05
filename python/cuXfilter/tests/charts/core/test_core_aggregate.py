@@ -89,10 +89,11 @@ class TestCoreAggregateChart():
 
         assert all([0.0, 0.0, 0.0,  3.0,  4.0] == self.result)
 
-    @pytest.mark.parametrize('old_indices, new_indices, prev_result,result', [([], [4.0, 8.0], [0.0, 0.0, 0.0, 0.0], [5.0, 5.0, 0.0, 0.0]),
-                            ([4.0], [4.0, 8.0], [0.0, 5.0, 0.0, 0.0], [5.0, 5.0, 0.0, 0.0]),
-                            ([], [4.0], [0.0, 0.0, 0.0, 0.0], [0.0, 5.0, 0.0, 0.0]),
-                            ([4.0], [8.0], [0.0, 5.0, 0.0, 0.0], [5.0, 0.0, 0.0, 0.0])])
+    @pytest.mark.parametrize('old_indices, new_indices, prev_result,result', [
+        ([], [4.0, 8.0], [0.0, 0.0, 0.0, 0.0], [5.0, 5.0, 0.0, 0.0]),
+        ([4.0], [4.0, 8.0], [0.0, 5.0, 0.0, 0.0], [5.0, 5.0, 0.0, 0.0]),
+        ([], [4.0], [0.0, 0.0, 0.0, 0.0], [0.0, 5.0, 0.0, 0.0]),
+        ([4.0], [8.0], [0.0, 5.0, 0.0, 0.0], [5.0, 0.0, 0.0, 0.0])])
     def test_query_chart_by_indices(self, old_indices, new_indices, prev_result, result):
         active_chart = BaseAggregateChart()
         
