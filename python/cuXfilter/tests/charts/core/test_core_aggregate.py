@@ -62,8 +62,13 @@ class TestCoreAggregateChart():
         bac = BaseAggregateChart()
         bac.chart = chart
         assert bac.view() == _chart
-
-    def test_query_chart_by_range(self):
+    
+    @pytest.mark.parametrize( 'query_tuple, result', [
+        ((10,26), [0.0, 0.0, 2.0,  3.0,  4.0]),
+        ((10,10), [0.0, 0.0, 0.0,  0.0,  4.0]),
+        ((10,21), [0.0, 0.0, 0.0,  3.0,  4.0]),
+    ])
+    def test_query_chart_by_range(self, query_tuple, result):
         active_chart = BaseAggregateChart()
         
         active_chart.stride = 8
@@ -87,7 +92,7 @@ class TestCoreAggregateChart():
 
         active_chart.query_chart_by_range(active_chart, query_tuple, datatile)
 
-        assert all([0.0, 0.0, 0.0,  3.0,  4.0] == self.result)
+        assert all([0.0, 0.0, 2.0,  3.0,  4.0] == self.result)
 
     @pytest.mark.parametrize('old_indices, new_indices, prev_result,result', [
         ([], [4.0, 8.0], [0.0, 0.0, 0.0, 0.0], [5.0, 5.0, 0.0, 0.0]),

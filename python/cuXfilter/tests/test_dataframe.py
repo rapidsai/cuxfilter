@@ -11,8 +11,8 @@ class TestDataFrame():
         )
     def test_init(self, cux_df):
         assert type(cux_df.data) == type(cudf.DataFrame())
-        assert cux_df.data.to_string() == cudf.DataFrame().to_string()
-        assert cux_df.data.to_string() == cux_df.backup.to_string()
+        assert cux_df.data.equals(cudf.DataFrame())
+        assert cux_df.data.equals(cux_df.backup)
 
     def test_dashboard(self):
         df = cudf.DataFrame(
@@ -22,7 +22,7 @@ class TestDataFrame():
 
         dashboard = cux_df.dashboard(charts=[], title='test_title')
 
-        assert dashboard._data.to_string() == df.to_string()
+        assert dashboard._data.equals(df)
         assert dashboard.title == 'test_title'
         assert dashboard._dashboard.__class__ == cuXfilter.layouts.single_feature
         assert dashboard._theme == cuXfilter.themes.light

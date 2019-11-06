@@ -103,7 +103,7 @@ class TestCoreAggregateChart():
 
         t = bnac.get_selection_geometry_callback(dashboard)
         t(xmin=1, xmax=2, ymin=3, ymax=4)
-        assert self.result.to_string() == df.query('1<=a<=2 and 3<=b<=4').to_string()
+        assert self.result.equals(df.query('1<=a<=2 and 3<=b<=4'))
     
     @pytest.mark.parametrize('data, _data',[(cudf.DataFrame(), cudf.DataFrame()),(cudf.DataFrame([('a', [1, 2, 2]), ('b', [3, 4, 5])]), cudf.DataFrame([('a', [1, 2, 2]), ('b', [3, 4, 5])]))])
     def test_calculate_source(self, data, _data):
@@ -120,7 +120,7 @@ class TestCoreAggregateChart():
         bnac.format_source_data = t_function
 
         bnac.calculate_source(data)
-        assert self.result.to_string() == _data.to_string()
+        assert self.result.equals(_data)
 
     @pytest.mark.parametrize('x_range, y_range, query',[((1,2), (3,4), '1<=a <= 2 and 3<=b <= 4'), ((0,2), (3,5), '0<=a <= 2 and 3<=b <= 5')])
     def test_compute_query_dict(self, x_range, y_range, query):
