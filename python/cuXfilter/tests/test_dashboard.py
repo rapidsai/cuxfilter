@@ -6,7 +6,7 @@ import cudf
 import pandas as pd
 import numpy as np
 
-class TestDataFrame():
+class TestDashBoard():
 
     df = cudf.DataFrame(
             {'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}
