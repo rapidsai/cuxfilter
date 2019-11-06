@@ -85,7 +85,10 @@ class BaseLine(BaseAggregateChart):
         if self.stride is None:
             if self.max_value < 1 and self.stride_type == int:
                 self.stride_type = float
-            self.stride = self.stride_type( round((self.max_value - self.min_value)/self.data_points))
+            if self.stride_type == int:
+                self.stride = int( round((self.max_value - self.min_value)/self.data_points))
+            else:
+                self.stride = float((self.max_value - self.min_value)/self.data_points)
 
         self.calculate_source(dashboard_cls._data)
         self.generate_chart()
