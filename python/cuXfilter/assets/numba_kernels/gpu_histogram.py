@@ -128,16 +128,13 @@ def calc_binwise_reduced_column(x, stride, a_range):
     '''
     a_min= a_range[0]
     a_max = a_range[1]
-    _balancer = 1
-    if a_max <= 1:
-        _balancer = 100
     start = cuda.grid(1)
     s = cuda.gridsize(1)
     for i in range(start, x.shape[0],s):
         if x[i]>= a_min and x[i]<=a_max:
-            x[i] = stride*np.int32((x[i])/stride)/_balancer
+            x[i] = np.int32(round((x[i] - a_min)/stride))
         else:
-            x[i] = -1/_balancer
+            x[i] = -1
 
 def get_binwise_reduced_column(a_gpu, stride, a_range):
     '''
