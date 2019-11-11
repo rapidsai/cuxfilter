@@ -3,7 +3,10 @@ from urllib.request import urlopen
 import geopandas as gpd
 
 def geo_json_mapper(url, prop=None):
-    data = urlopen(url).read().decode()
+    try:
+        data = urlopen(url).read().decode()
+    except:
+        data = open(url, 'r').read()
     temp_gpd_df = gpd.read_file(data)
     if temp_gpd_df.crs['init'] != 'epsg:3857':
         temp_gpd_df = temp_gpd_df.to_crs(epsg=3857)
