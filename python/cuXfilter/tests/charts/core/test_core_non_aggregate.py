@@ -9,7 +9,7 @@ from cuXfilter.charts.core.non_aggregate.core_non_aggregate import BaseNonAggreg
 from cuXfilter.dashboard import DashBoard
 from cuXfilter.layouts import chart_view
 
-class TestCoreAggregateChart():
+class TestCoreNonAggregateChart():
     
     def test_variables(self):
         bnac = BaseNonAggregate()
@@ -105,7 +105,10 @@ class TestCoreAggregateChart():
         t(xmin=1, xmax=2, ymin=3, ymax=4)
         assert self.result.equals(df.query('1<=a<=2 and 3<=b<=4'))
     
-    @pytest.mark.parametrize('data, _data',[(cudf.DataFrame(), cudf.DataFrame()),(cudf.DataFrame([('a', [1, 2, 2]), ('b', [3, 4, 5])]), cudf.DataFrame([('a', [1, 2, 2]), ('b', [3, 4, 5])]))])
+    @pytest.mark.parametrize('data, _data',[
+        (cudf.DataFrame(), cudf.DataFrame()),
+        (cudf.DataFrame([('a', [1, 2, 2]), ('b', [3, 4, 5])]), cudf.DataFrame([('a', [1, 2, 2]), ('b', [3, 4, 5])]))
+    ])
     def test_calculate_source(self, data, _data):
         '''
         Calculate source just calls to the format_source_data function 

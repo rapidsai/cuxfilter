@@ -81,8 +81,6 @@ class TestCoreAggregateChart():
 
         active_chart.reset_chart = reset_chart
 
-        query_tuple = (10,26)
-
         datatile = pd.DataFrame({0: {0: 0.0, 1: 0.0, 2: 0.0, 4: 0.0, 5: 4.0},
                         1: {0: 0.0, 1: 0.0, 2: 0.0, 4: 3.0, 5: 4.0},
                         2: {0: 0.0, 1: 0.0, 2: 2.0, 4: 3.0, 5: 4.0},
@@ -92,7 +90,7 @@ class TestCoreAggregateChart():
 
         active_chart.query_chart_by_range(active_chart, query_tuple, datatile)
 
-        assert all([0.0, 0.0, 2.0,  3.0,  4.0] == self.result)
+        assert all(result == self.result)
 
     @pytest.mark.parametrize('old_indices, new_indices, prev_result,result', [
         ([], [4.0, 8.0], [0.0, 0.0, 0.0, 0.0], [5.0, 5.0, 0.0, 0.0]),

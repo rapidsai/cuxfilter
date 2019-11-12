@@ -54,7 +54,7 @@ class TestBaseCholorpleth:
 
         assert bc.min_value == 0.0
         assert bc.max_value == 4.0
-        assert bc.data_points == 4
+        assert bc.data_points == 5
         assert bc.stride == 1
         assert bc.stride_type == int
 
@@ -69,7 +69,7 @@ class TestBaseCholorpleth:
 
     @pytest.mark.parametrize('bc, aggregate_fn, result',[
         (BaseChoropleth(x='key',y='val', geoJSONSource='./test.geojson', nan_color='white'), 'mean', {'X': [0.0, 1.0, 2.0, 3.0, 4.0], 'Y': [10.0, 11.0, 12.0, 13.0, 14.0]}),
-        (BaseChoropleth(x='key', geoJSONSource='./test.geojson', nan_color='white'), 'count', {'X': [0.0, 1.0, 2.0, 4.0], 'Y': [1, 1, 1, 2]})
+        (BaseChoropleth(x='key', geoJSONSource='./test.geojson', nan_color='white'), 'count', {'X': [0.0, 0.8, 1.6, 2.4000000000000004, 4.0], 'Y': [1, 1, 1, 1, 1]})
     ])
     def test_calculate_source(self, bc, aggregate_fn, result):
         self.result = None
