@@ -176,7 +176,7 @@ def heatmap(x, y, x_range=None, y_range=None, add_interaction=True, color_palett
     """
     return plots.Scatter(x, y, x_range, y_range, add_interaction, color_palette, aggregate_col, aggregate_fn, point_size, point_shape, 'linear', 1, 'spread',  width, height, **library_specific_params)
 
-def line(x, y=None, data_points=100, add_interaction=True, pixel_shade_type='linear', color = 'rapidspurple', step_size=None, step_size_type=int, width=800, height=400, **library_specific_params):
+def line(x, y, data_points=100, add_interaction=True, pixel_shade_type='linear', color = 'rapidspurple', step_size=None, step_size_type=int, width=800, height=400, **library_specific_params):
     """
     
     Parameters
@@ -184,7 +184,7 @@ def line(x, y=None, data_points=100, add_interaction=True, pixel_shade_type='lin
 
     x: str 
         x-axis column name from the gpu dataframe
-    y: str, default None
+    y: str
         y-axis column name from the gpu dataframe
     x_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].max())
         (min, max) x-dimensions of the geo-scatter plot to be displayed
@@ -223,7 +223,7 @@ def line(x, y=None, data_points=100, add_interaction=True, pixel_shade_type='lin
     return plots.Line(x, y, data_points, add_interaction, pixel_shade_type, color, step_size, step_size_type, width, height, **library_specific_params)
 
 
-def stacked_lines(x, y=[], data_points=100, add_interaction=True,  colors=[], step_size=None, step_size_type=int, width=800, height=400, **library_specific_params):
+def stacked_lines(x, y, data_points=100, add_interaction=True,  colors=[], step_size=None, step_size_type=int, width=800, height=400, **library_specific_params):
     """
     stacked lines chart
     
@@ -232,7 +232,7 @@ def stacked_lines(x, y=[], data_points=100, add_interaction=True,  colors=[], st
 
     x: str 
         x-axis column name from the gpu dataframe
-    y: list, default None
+    y: list
         y-axis column names from the gpu dataframe for the stacked lines
     
     add_interaction: {True, False},  default True
@@ -260,5 +260,7 @@ def stacked_lines(x, y=[], data_points=100, add_interaction=True,  colors=[], st
     -------
     A cudashader stacked_lines plot. Type cuXfilter.charts.cudatashader.custom_extensions.InteractiveImage
     """
+    if type(y) is not list or len(y) == 0:
+        raise ValueError('y must be a list of atleast one column name')
     return plots.StackedLines(x, y, data_points, add_interaction,  colors, step_size, step_size_type, width, height, **library_specific_params)
 

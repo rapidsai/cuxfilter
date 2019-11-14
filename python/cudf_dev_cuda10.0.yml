@@ -9,6 +9,7 @@ dependencies:
 - rapids=0.10
 - pytest
 - geopandas
+- pyproj=1.9.6
 - sphinx
 - sphinx_rtd_theme
 - jupyter_sphinx
@@ -22,11 +23,11 @@ dependencies:
 - bokeh
 - pyppeteer
 - jupyterlab
+- recommonmark=0.6.0
 - pip
 - pip:
   - sphinx-markdown-tables
   - nose
   - flake8
-  - geopandas
   - xarray
   - cupy-cuda100

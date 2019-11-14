@@ -21,7 +21,7 @@ class BaseAggregateChart(BaseChart):
         '''
         min_val, max_val = query_tuple
         datatile_index_min = int(round((min_val - active_chart.min_value)/active_chart.stride))
-        datatile_index_max = int(round((max_val - active_chart.min_value)/active_chart.stride)) - 1
+        datatile_index_max = int(round((max_val - active_chart.min_value)/active_chart.stride))
 
         if datatile_index_min == 0:
             
