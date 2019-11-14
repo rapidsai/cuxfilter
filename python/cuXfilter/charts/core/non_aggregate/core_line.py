@@ -10,10 +10,11 @@ class BaseLine(BaseNonAggregate):
     stride = 0.0
     reset_event = None
     filter_widget = None
-
+    no_color_set = False
+    
     def __init__(
         self, x, y=None, data_points=100, add_interaction=True,
-        pixel_shade_type='linear', color='rapidspurple', step_size=None,
+        pixel_shade_type='linear', color=None, step_size=None,
         step_size_type=int, width=800, height=400, **library_specific_params
     ):
         '''
@@ -44,7 +45,12 @@ class BaseLine(BaseNonAggregate):
         self.y = y
         self.data_points = data_points
         self.add_interaction = add_interaction
-        self.color = color
+        if color is None:
+            self.color = 'rapidspurple'
+            self.no_color_set = True
+        else:
+            self.color = color
+
         self.stride = step_size
         self.stride_type = step_size_type
         self.pixel_shade_type = pixel_shade_type
