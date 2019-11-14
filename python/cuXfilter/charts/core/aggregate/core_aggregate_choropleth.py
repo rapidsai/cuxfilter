@@ -8,11 +8,11 @@ from ....assets import geo_json_mapper
 
 class BaseChoropleth(BaseAggregateChart):
 
-    chart_type: str = 'choropleth'
+    chart_type: str = "choropleth"
     reset_event = None
     _datatile_loaded_state: bool = False
     geo_mapper: Dict[str, str] = {}
-    nan_color = 'white'
+    nan_color = "white"
     use_data_tiles = True
 
     @property
@@ -29,12 +29,23 @@ class BaseChoropleth(BaseAggregateChart):
         #         self.filter_widget.bar_color = '#d3d9e2'
 
     def __init__(
-        self, x, y=None, data_points=100, add_interaction=True,
-        aggregate_fn='count', width=800, height=400, step_size=None,
-        step_size_type=int, geoJSONSource=None, geoJSONProperty=None,
-        geo_color_palette=None, tile_provider=None, **library_specific_params
+        self,
+        x,
+        y=None,
+        data_points=100,
+        add_interaction=True,
+        aggregate_fn="count",
+        width=800,
+        height=400,
+        step_size=None,
+        step_size_type=int,
+        geoJSONSource=None,
+        geoJSONProperty=None,
+        geo_color_palette=None,
+        tile_provider=None,
+        **library_specific_params
     ):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -60,7 +71,7 @@ class BaseChoropleth(BaseAggregateChart):
 
         Ouput:
 
-        '''
+        """
         self.x = x
         self.y = y
         self.data_points = data_points
@@ -86,18 +97,18 @@ class BaseChoropleth(BaseAggregateChart):
 
         self.library_specific_params = library_specific_params
 
-        if 'x_range' not in self.library_specific_params:
-            self.library_specific_params['x_range'] = x_range
+        if "x_range" not in self.library_specific_params:
+            self.library_specific_params["x_range"] = x_range
 
-        if 'y_range' not in self.library_specific_params:
-            self.library_specific_params['y_range'] = y_range
+        if "y_range" not in self.library_specific_params:
+            self.library_specific_params["y_range"] = y_range
 
-        if 'nan_color' in self.library_specific_params:
-            self.nan_color = self.library_specific_params['nan_color']
-            self.library_specific_params.pop('nan_color')
+        if "nan_color" in self.library_specific_params:
+            self.nan_color = self.library_specific_params["nan_color"]
+            self.library_specific_params.pop("nan_color")
 
     def initiate_chart(self, dashboard_cls):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -107,7 +118,7 @@ class BaseChoropleth(BaseAggregateChart):
 
         Ouput:
 
-        '''
+        """
         self.min_value = dashboard_cls._data[self.x].min()
         self.max_value = dashboard_cls._data[self.x].max()
 
@@ -136,7 +147,7 @@ class BaseChoropleth(BaseAggregateChart):
         return chart_view(self.chart, width=self.width)
 
     def calculate_source(self, data, patch_update=False):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -145,7 +156,7 @@ class BaseChoropleth(BaseAggregateChart):
         -------------------------------------------
 
         Ouput:
-        '''
+        """
         if self.y == self.x or self.y is None:
             # it's a histogram
             df = calc_value_counts(
@@ -155,14 +166,14 @@ class BaseChoropleth(BaseAggregateChart):
             df = calc_groupby(self, data)
 
         dict_temp = {
-            'X': list(df[0].astype(df[0].dtype)),
-            'Y': list(df[1].astype(df[1].dtype))
+            "X": list(df[0].astype(df[0].dtype)),
+            "Y": list(df[1].astype(df[1].dtype)),
         }
 
         self.format_source_data(dict_temp, patch_update)
 
     def get_selection_callback(self, dashboard_cls):
-        '''
+        """
         Description: generate callback for choropleth selection evetn
         -------------------------------------------
         Input:
@@ -170,7 +181,8 @@ class BaseChoropleth(BaseAggregateChart):
         -------------------------------------------
 
         Ouput:
-        '''
+        """
+
         def selection_callback(old, new):
             if dashboard_cls._active_view != self.name:
                 dashboard_cls._reset_current_view(new_active_view=self)
@@ -180,7 +192,7 @@ class BaseChoropleth(BaseAggregateChart):
         return selection_callback
 
     def compute_query_dict(self, query_str_dict):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -189,9 +201,9 @@ class BaseChoropleth(BaseAggregateChart):
         -------------------------------------------
 
         Ouput:
-        '''
+        """
         list_of_indices = self.get_selected_indices()
-        if len(list_of_indices) == 0 or list_of_indices == ['']:
+        if len(list_of_indices) == 0 or list_of_indices == [""]:
             query_str_dict.pop(self.name, None)
         elif len(list_of_indices) == 1:
             query_str_dict[self.name] = self.x + "==" + str(list_of_indices[0])
@@ -200,7 +212,7 @@ class BaseChoropleth(BaseAggregateChart):
             query_str_dict[self.name] = self.x + " in (" + indices_string + ")"
 
     def add_events(self, dashboard_cls):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -209,7 +221,7 @@ class BaseChoropleth(BaseAggregateChart):
         -------------------------------------------
 
         Ouput:
-        '''
+        """
         if self.add_interaction:
             self.add_selection_event(
                 self.get_selection_callback(dashboard_cls)
@@ -218,7 +230,7 @@ class BaseChoropleth(BaseAggregateChart):
             self.add_reset_event(dashboard_cls)
 
     def add_reset_event(self, dashboard_cls):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -227,7 +239,8 @@ class BaseChoropleth(BaseAggregateChart):
         -------------------------------------------
 
         Ouput:
-        '''
+        """
+
         def reset_callback(event):
             if dashboard_cls._active_view != self.name:
                 # reset previous active view and set current chart as
@@ -239,7 +252,7 @@ class BaseChoropleth(BaseAggregateChart):
         self.add_event(self.reset_event, reset_callback)
 
     def get_selected_indices(self):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -248,12 +261,12 @@ class BaseChoropleth(BaseAggregateChart):
         -------------------------------------------
 
         Ouput:
-        '''
-        print('function to be overridden by library specific extensions')
+        """
+        print("function to be overridden by library specific extensions")
         return []
 
     def add_selection_event(self, callback):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -262,5 +275,5 @@ class BaseChoropleth(BaseAggregateChart):
         -------------------------------------------
 
         Ouput:
-        '''
-        print('function to be overridden by library specific extensions')
+        """
+        print("function to be overridden by library specific extensions")

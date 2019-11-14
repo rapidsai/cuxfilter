@@ -39,10 +39,16 @@ class BaseWidget:
             self._stride = value
 
     def __init__(
-        self, x, width=400, height=10, data_points=100, step_size=None,
-        step_size_type=int, **params
+        self,
+        x,
+        width=400,
+        height=10,
+        data_points=100,
+        step_size=None,
+        step_size_type=int,
+        **params
     ):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -51,7 +57,7 @@ class BaseWidget:
         -------------------------------------------
 
         Ouput:
-        '''
+        """
         self.x = x
         self.width = width
         self.height = height
@@ -60,13 +66,13 @@ class BaseWidget:
         self.stride_type = step_size_type
         self.stride = step_size
 
-        if 'value' in params:
-            self.value = params['value']
-            params.pop('value')
-        if 'label_map' in params:
-            self.label_map = params['label_map']
+        if "value" in params:
+            self.value = params["value"]
+            params.pop("value")
+        if "label_map" in params:
+            self.label_map = params["label_map"]
             self.label_map = {v: k for k, v in self.label_map.items()}
-            params.pop('label_map')
+            params.pop("label_map")
 
     def view(self):
         return self.chart
@@ -75,7 +81,7 @@ class BaseWidget:
         self.chart.on_event(event, callback)
 
     def compute_query_dict(self, query_dict):
-        print('base calc source function, to over-ridden by delegated classes')
+        print("base calc source function, to over-ridden by delegated classes")
 
     def reload_chart(self, *args, **kwargs):
         # No reload functionality, added function for consistency

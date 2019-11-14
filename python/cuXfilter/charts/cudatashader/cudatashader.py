@@ -2,11 +2,23 @@ from . import plots
 
 
 def scatter_geo(
-    x, y=None, x_range=None, y_range=None, add_interaction=True,
-    color_palette=None, aggregate_col=None, aggregate_fn='count',
-    point_size=1, point_shape='circle', pixel_shade_type='eq_hist',
-    pixel_density=0.5, pixel_spread='dynspread', width=800, height=400,
-    tile_provider='CARTODBPOSITRON', **library_specific_params
+    x,
+    y=None,
+    x_range=None,
+    y_range=None,
+    add_interaction=True,
+    color_palette=None,
+    aggregate_col=None,
+    aggregate_fn="count",
+    point_size=1,
+    point_shape="circle",
+    pixel_shade_type="eq_hist",
+    pixel_density=0.5,
+    pixel_spread="dynspread",
+    width=800,
+    height=400,
+    tile_provider="CARTODBPOSITRON",
+    **library_specific_params
 ):
     """
     Parameters
@@ -74,17 +86,43 @@ def scatter_geo(
     Type cuXfilter.charts.cudatashader.custom_extensions.InteractiveImage
     """
     return plots.ScatterGeo(
-        x, y, x_range, y_range, add_interaction, color_palette, aggregate_col,
-        aggregate_fn, point_size, point_shape, pixel_shade_type, pixel_density,
-        pixel_spread, width, height, tile_provider, **library_specific_params
+        x,
+        y,
+        x_range,
+        y_range,
+        add_interaction,
+        color_palette,
+        aggregate_col,
+        aggregate_fn,
+        point_size,
+        point_shape,
+        pixel_shade_type,
+        pixel_density,
+        pixel_spread,
+        width,
+        height,
+        tile_provider,
+        **library_specific_params
     )
 
 
 def scatter(
-    x, y, x_range=None, y_range=None, add_interaction=True, color_palette=None,
-    aggregate_col=None, aggregate_fn='count', point_size=1,
-    point_shape='circle', pixel_shade_type='eq_hist', pixel_density=0.5,
-    pixel_spread='dynspread', width=800, height=400, **library_specific_params
+    x,
+    y,
+    x_range=None,
+    y_range=None,
+    add_interaction=True,
+    color_palette=None,
+    aggregate_col=None,
+    aggregate_fn="count",
+    point_size=1,
+    point_shape="circle",
+    pixel_shade_type="eq_hist",
+    pixel_density=0.5,
+    pixel_spread="dynspread",
+    width=800,
+    height=400,
+    **library_specific_params
 ):
     """
     Parameters
@@ -148,16 +186,38 @@ def scatter(
     Type cuXfilter.charts.cudatashader.custom_extensions.InteractiveImage
     """
     return plots.Scatter(
-        x, y, x_range, y_range, add_interaction, color_palette, aggregate_col,
-        aggregate_fn, point_size, point_shape, pixel_shade_type, pixel_density,
-        pixel_spread, width, height, **library_specific_params
+        x,
+        y,
+        x_range,
+        y_range,
+        add_interaction,
+        color_palette,
+        aggregate_col,
+        aggregate_fn,
+        point_size,
+        point_shape,
+        pixel_shade_type,
+        pixel_density,
+        pixel_spread,
+        width,
+        height,
+        **library_specific_params
     )
 
 
 def heatmap(
-    x, y, x_range=None, y_range=None, add_interaction=True, color_palette=None,
-    aggregate_col=None, aggregate_fn='mean', point_size=10,
-    point_shape='rect_vertical', width=800, height=400,
+    x,
+    y,
+    x_range=None,
+    y_range=None,
+    add_interaction=True,
+    color_palette=None,
+    aggregate_col=None,
+    aggregate_fn="mean",
+    point_size=10,
+    point_shape="rect_vertical",
+    width=800,
+    height=400,
     **library_specific_params
 ):
     """
@@ -221,16 +281,37 @@ def heatmap(
     Type cuXfilter.charts.cudatashader.custom_extensions.InteractiveImage
     """
     return plots.Scatter(
-        x, y, x_range, y_range, add_interaction, color_palette, aggregate_col,
-        aggregate_fn, point_size, point_shape, 'linear', 1, 'spread', width,
-        height, **library_specific_params
+        x,
+        y,
+        x_range,
+        y_range,
+        add_interaction,
+        color_palette,
+        aggregate_col,
+        aggregate_fn,
+        point_size,
+        point_shape,
+        "linear",
+        1,
+        "spread",
+        width,
+        height,
+        **library_specific_params
     )
 
 
 def line(
-    x, y, data_points=100, add_interaction=True, pixel_shade_type='linear',
-    color=None, step_size=None, step_size_type=int, width=800,
-    height=400, **library_specific_params
+    x,
+    y,
+    data_points=100,
+    add_interaction=True,
+    pixel_shade_type="linear",
+    color=None,
+    step_size=None,
+    step_size_type=int,
+    width=800,
+    height=400,
+    **library_specific_params
 ):
     """
 
@@ -279,14 +360,31 @@ def line(
     Type cuXfilter.charts.cudatashader.custom_extensions.InteractiveImage
     """
     return plots.Line(
-        x, y, data_points, add_interaction, pixel_shade_type, color, step_size,
-        step_size_type, width, height, **library_specific_params
+        x,
+        y,
+        data_points,
+        add_interaction,
+        pixel_shade_type,
+        color,
+        step_size,
+        step_size_type,
+        width,
+        height,
+        **library_specific_params
     )
 
 
 def stacked_lines(
-    x, y, data_points=100, add_interaction=True, colors=[], step_size=None,
-    step_size_type=int, width=800, height=400, **library_specific_params
+    x,
+    y,
+    data_points=100,
+    add_interaction=True,
+    colors=[],
+    step_size=None,
+    step_size_type=int,
+    width=800,
+    height=400,
+    **library_specific_params
 ):
     """
     stacked lines chart
@@ -327,8 +425,16 @@ def stacked_lines(
     Type cuXfilter.charts.cudatashader.custom_extensions.InteractiveImage
     """
     if type(y) is not list or len(y) == 0:
-        raise ValueError('y must be a list of atleast one column name')
+        raise ValueError("y must be a list of atleast one column name")
     return plots.StackedLines(
-        x, y, data_points, add_interaction, colors, step_size, step_size_type,
-        width, height, **library_specific_params
+        x,
+        y,
+        data_points,
+        add_interaction,
+        colors,
+        step_size,
+        step_size_type,
+        width,
+        height,
+        **library_specific_params
     )

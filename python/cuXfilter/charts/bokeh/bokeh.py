@@ -2,8 +2,15 @@ from . import plots
 
 
 def bar(
-    x, y=None, data_points=100, add_interaction=True, aggregate_fn='count',
-    width=400, height=400, step_size=None, step_size_type=int,
+    x,
+    y=None,
+    data_points=100,
+    add_interaction=True,
+    aggregate_fn="count",
+    width=400,
+    height=400,
+    step_size=None,
+    step_size_type=int,
     **library_specific_params
 ):
     """
@@ -48,15 +55,29 @@ def bar(
     A bokeh chart object of type vbar
     """
     return plots.Bar(
-        x, y, data_points, add_interaction, aggregate_fn, width,
-        height, step_size, step_size_type,
+        x,
+        y,
+        data_points,
+        add_interaction,
+        aggregate_fn,
+        width,
+        height,
+        step_size,
+        step_size_type,
         **library_specific_params
     )
 
 
 def line(
-    x, y=None, data_points=100, add_interaction=True, aggregate_fn='count',
-    width=400, height=400, step_size=None, step_size_type=int,
+    x,
+    y=None,
+    data_points=100,
+    add_interaction=True,
+    aggregate_fn="count",
+    width=400,
+    height=400,
+    step_size=None,
+    step_size_type=int,
     **library_specific_params
 ):
     """
@@ -101,16 +122,34 @@ def line(
     A bokeh chart object of type line
     """
     return plots.Line(
-        x, y, data_points, add_interaction, aggregate_fn, width, height,
-        step_size, step_size_type, **library_specific_params
+        x,
+        y,
+        data_points,
+        add_interaction,
+        aggregate_fn,
+        width,
+        height,
+        step_size,
+        step_size_type,
+        **library_specific_params
     )
 
 
 def choropleth(
-    x, y=None, data_points=100, add_interaction=True, aggregate_fn='count',
-    width=800, height=400, step_size=None, step_size_type=int,
-    geoJSONSource=None, geoJSONProperty=None, geo_color_palette=None,
-    tile_provider=None, **library_specific_params
+    x,
+    y=None,
+    data_points=100,
+    add_interaction=True,
+    aggregate_fn="count",
+    width=800,
+    height=400,
+    step_size=None,
+    step_size_type=int,
+    geoJSONSource=None,
+    geoJSONProperty=None,
+    geo_color_palette=None,
+    tile_provider=None,
+    **library_specific_params
 ):
     """
 
@@ -168,7 +207,18 @@ def choropleth(
     A bokeh chart object of type choropleth
     """
     return plots.Choropleth(
-        x, y, data_points, add_interaction, aggregate_fn, width, height,
-        step_size, step_size_type, geoJSONSource, geoJSONProperty,
-        geo_color_palette, tile_provider, **library_specific_params
+        x,
+        y,
+        data_points,
+        add_interaction,
+        aggregate_fn,
+        width,
+        height,
+        step_size,
+        step_size_type,
+        geoJSONSource,
+        geoJSONProperty,
+        geo_color_palette,
+        tile_provider,
+        **library_specific_params
     )

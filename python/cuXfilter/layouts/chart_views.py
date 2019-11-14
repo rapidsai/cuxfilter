@@ -2,7 +2,7 @@ import panel as pn
 
 
 def chart_view(*charts, **params):
-    '''
+    """
     Parameters:
     -----------
     - charts
@@ -11,8 +11,8 @@ def chart_view(*charts, **params):
     Ouput:
     ------
     layout view
-    '''
-    view = pn.Column(**params, sizing_mode='scale_both')
+    """
+    view = pn.Column(**params, sizing_mode="scale_both")
     for chart in charts:
         if chart is not None:
             view.append(chart)

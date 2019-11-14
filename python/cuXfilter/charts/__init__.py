@@ -1,6 +1,7 @@
 # from .charts import Bar, Line, Scatter, Choropleth
 # import .bokeh
 import panel as pn
+
 pn.extension()
 
 from .bokeh import bokeh

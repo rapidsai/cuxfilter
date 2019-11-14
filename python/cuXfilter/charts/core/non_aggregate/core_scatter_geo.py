@@ -4,29 +4,42 @@ from .core_non_aggregate import BaseNonAggregate
 
 
 class BaseScatterGeo(BaseNonAggregate):
-    '''
+    """
         No datatiles support in scatter plot charts
 
         If dataset size is greater than a few thousand points,
         scatter geos can crash the browser tabs, and is only recommended
         with cudatashader plugin, in which case an image is
         rendered instead of points on canvas
-    '''
-    chart_type: str = 'scatter-geo'
+    """
+
+    chart_type: str = "scatter-geo"
     reset_event = None
     x_range: Tuple = None
     y_range: Tuple = None
     aggregate_col = None
 
     def __init__(
-        self, x, y=None, x_range=None, y_range=None,
-        add_interaction=True, color_palette=None, aggregate_col=None,
-        aggregate_fn='count', point_size=1, point_shape='circle',
-        pixel_shade_type='eq_hist', pixel_density=0.5,
-        pixel_spread='dynspread', width=800, height=400,
-        tile_provider='CARTODBPOSITRON', **library_specific_params
+        self,
+        x,
+        y=None,
+        x_range=None,
+        y_range=None,
+        add_interaction=True,
+        color_palette=None,
+        aggregate_col=None,
+        aggregate_fn="count",
+        point_size=1,
+        point_shape="circle",
+        pixel_shade_type="eq_hist",
+        pixel_density=0.5,
+        pixel_spread="dynspread",
+        width=800,
+        height=400,
+        tile_provider="CARTODBPOSITRON",
+        **library_specific_params
     ):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -47,7 +60,7 @@ class BaseScatterGeo(BaseNonAggregate):
 
         Ouput:
 
-        '''
+        """
         self.x = x
         self.y = y
         self.x_range = x_range

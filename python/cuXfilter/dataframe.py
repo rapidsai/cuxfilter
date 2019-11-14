@@ -2,6 +2,7 @@ import panel as pn
 import cudf
 import pyarrow as pa
 from typing import Type
+
 from .dashboard import DashBoard
 from .layouts import single_feature
 from .themes import light
@@ -19,6 +20,7 @@ class DataFrame:
     """
     A cuXfilter GPU DataFrame object
     """
+
     data: Type[cudf.DataFrame] = None
 
     @classmethod
@@ -85,8 +87,13 @@ class DataFrame:
         self.data = data
 
     def dashboard(
-        self, charts: list, layout=single_feature, theme=light,
-        title='Dashboard', data_size_widget=True, warnings=False
+        self,
+        charts: list,
+        layout=single_feature,
+        theme=light,
+        title="Dashboard",
+        data_size_widget=True,
+        warnings=False,
     ):
         """
         Creates a cuXfilter.DashBoard object

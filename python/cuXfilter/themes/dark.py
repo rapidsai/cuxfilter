@@ -2,7 +2,7 @@ from bokeh import palettes
 
 
 class Theme:
-    layout_head = '''
+    layout_head = """
 `    {% extends base %}
 
     {% block head %}
@@ -91,30 +91,22 @@ class Theme:
         {% endblock %}
     </head>
     {% endblock %}
-    '''
+    """
 
     chart_properties = {
-        "data_size_indicator_color": '#8735fb',
-        "agg_charts_grids": {
-            "xgrid": None,
-            "ygrid": "#505050",
-        },
-        "geo_charts_grids": {
-            "xgrid": None,
-            "ygrid": None,
-        },
-
+        "data_size_indicator_color": "#8735fb",
+        "agg_charts_grids": {"xgrid": None, "ygrid": "#505050"},
+        "geo_charts_grids": {"xgrid": None, "ygrid": None},
         "chart_color": {
-            'color': '#8735fb',
-            'color_palette': palettes.Purples[9]
+            "color": "#8735fb",
+            "color_palette": palettes.Purples[9],
         },
-
         # title
         "title": {
             "text_color": "#a0a0a0",
             "text_font": "helvetica",
             "text_font_style": "bold",
-            "text_font_size": "18px"
+            "text_font_size": "18px",
         },
         # background
         "background_fill_color": "#181818",
@@ -123,7 +115,6 @@ class Theme:
         "outline_line_width": 0,
         "outline_line_alpha": 1,
         "outline_line_color": "#181818",
-
         # x axis title
         "xaxis": {
             "axis_label": "X Axis",
@@ -132,9 +123,8 @@ class Theme:
             "axis_label_standoff": 15,
             "major_label_text_color": "#E2E2E2",
             "axis_line_width": 1,
-            "axis_line_color": '#E2E2E2'
+            "axis_line_color": "#E2E2E2",
         },
-
         # y axis title
         "yaxis": {
             "axis_label": "Y Axis",
@@ -143,26 +133,20 @@ class Theme:
             "axis_label_standoff": 15,
             "major_label_text_color": "#E2E2E2",
             "axis_line_width": 0,
-            "axis_line_color": "#181818"
+            "axis_line_color": "#181818",
         },
-
         # axis ticks
         "axis": {
             "major_tick_line_color": "#E2E2E2",
             "minor_tick_line_color": "#A2A2A2",
             "minor_tick_out": 2,
             "major_tick_out": 5,
-            "major_tick_in": 0
+            "major_tick_in": 0,
         },
-
         # legend
-        "legend": {
-            "background_color": '#181818',
-            "text_color": '#a0a0a0',
-        },
-
+        "legend": {"background_color": "#181818", "text_color": "#a0a0a0"},
         "widgets": {
-            "background_color": '#2c2b2b',
-            "datatile_active_color": '#8735fb'
-        }
+            "background_color": "#2c2b2b",
+            "datatile_active_color": "#8735fb",
+        },
     }

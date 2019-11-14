@@ -7,8 +7,11 @@ from bokeh import events
 from bokeh.plotting import figure
 import bokeh
 from bokeh.models import (
-    ColumnDataSource, LinearColorMapper, ColorBar,
-    BasicTicker, PrintfTickFormatter
+    ColumnDataSource,
+    LinearColorMapper,
+    ColorBar,
+    BasicTicker,
+    PrintfTickFormatter,
 )
 
 
@@ -16,9 +19,10 @@ class Bar(BaseBar):
     """
         Description:
     """
+
     reset_event = events.Reset
-    data_y_axis = 'top'
-    data_x_axis = 'x'
+    data_y_axis = "top"
+    data_x_axis = "x"
 
     def format_source_data(self, source_dict, patch_update=False):
         """
@@ -28,7 +32,7 @@ class Bar(BaseBar):
         -----------
         source_dict: {'X': [], 'Y': []}
         """
-        range_x_origin = [round(x, 4) for x in source_dict['X']]
+        range_x_origin = [round(x, 4) for x in source_dict["X"]]
         range_x = []
 
         if self.max_value < 1:
@@ -40,26 +44,26 @@ class Bar(BaseBar):
                 temp_mapper_index = list(
                     range(
                         int(round(self.min_value)),
-                        int(round(self.max_value)) * 100 + 1
+                        int(round(self.max_value)) * 100 + 1,
                     )
                 )
                 temp_mapper_value = [str(x / 100) for x in temp_mapper_index]
-                self.x_label_map = dict(zip(
-                    temp_mapper_index, temp_mapper_value)
+                self.x_label_map = dict(
+                    zip(temp_mapper_index, temp_mapper_value)
                 )
         else:
             range_x = range_x_origin
 
         if patch_update is False:
             self.source = ColumnDataSource(
-                dict(x=np.array(range_x), top=np.array(source_dict['Y']))
+                dict(x=np.array(range_x), top=np.array(source_dict["Y"]))
             )
             self.source_backup = self.source.to_df()
         else:
             patch_dict = {
-                self.data_y_axis: [(slice(len(source_dict['Y'])), np.array(
-                    source_dict['Y'])
-                )]
+                self.data_y_axis: [
+                    (slice(len(source_dict["Y"])), np.array(source_dict["Y"]))
+                ]
             }
             self.source.patch(patch_dict)
 
@@ -75,24 +79,31 @@ class Bar(BaseBar):
         """
         generate chart
         """
-        if 'title' in self.library_specific_params:
-            self.title = self.library_specific_params['title']
+        if "title" in self.library_specific_params:
+            self.title = self.library_specific_params["title"]
         else:
             self.title = self.x
 
         self.chart = figure(
-            title=self.title, tools="pan, wheel_zoom, reset",
-            active_scroll='wheel_zoom', active_drag='pan'
+            title=self.title,
+            tools="pan, wheel_zoom, reset",
+            active_scroll="wheel_zoom",
+            active_drag="pan",
         )
         if self.color is None:
             self.sub_chart = self.chart.vbar(
-                x=self.data_x_axis, top=self.data_y_axis, width=0.9,
-                source=self.source
+                x=self.data_x_axis,
+                top=self.data_y_axis,
+                width=0.9,
+                source=self.source,
             )
         else:
             self.sub_chart = self.chart.vbar(
-                x=self.data_x_axis, top=self.data_y_axis, width=0.9,
-                source=self.source, color=self.color
+                x=self.data_x_axis,
+                top=self.data_y_axis,
+                width=0.9,
+                source=self.source,
+                color=self.color,
             )
         self.chart.xaxis.axis_label = self.x
         if self.y != self.x:
@@ -150,84 +161,110 @@ class Bar(BaseBar):
         properties dictionary.
         """
         if self.color is None:
-            self.sub_chart.glyph.fill_color = (
-                properties_dict['chart_color']['color'])
-            self.sub_chart.glyph.line_color = (
-                properties_dict['chart_color']['color'])
+            self.sub_chart.glyph.fill_color = properties_dict["chart_color"][
+                "color"
+            ]
+            self.sub_chart.glyph.line_color = properties_dict["chart_color"][
+                "color"
+            ]
 
-        self.chart.xgrid.grid_line_color = (
-            properties_dict['agg_charts_grids']['xgrid'])
-        self.chart.ygrid.grid_line_color = (
-            properties_dict['agg_charts_grids']['ygrid'])
+        self.chart.xgrid.grid_line_color = properties_dict["agg_charts_grids"][
+            "xgrid"
+        ]
+        self.chart.ygrid.grid_line_color = properties_dict["agg_charts_grids"][
+            "ygrid"
+        ]
 
         # title
-        self.chart.title.text_color = properties_dict['title']['text_color']
-        self.chart.title.text_font = properties_dict['title']['text_font']
-        self.chart.title.text_font_style = (
-            properties_dict['title']['text_font_style'])
-        self.chart.title.text_font_size = (
-            properties_dict['title']['text_font_size'])
+        self.chart.title.text_color = properties_dict["title"]["text_color"]
+        self.chart.title.text_font = properties_dict["title"]["text_font"]
+        self.chart.title.text_font_style = properties_dict["title"][
+            "text_font_style"
+        ]
+        self.chart.title.text_font_size = properties_dict["title"][
+            "text_font_size"
+        ]
 
         # background, border, padding
-        self.chart.background_fill_color = (
-            properties_dict['background_fill_color'])
-        self.chart.border_fill_color = properties_dict['border_fill_color']
-        self.chart.min_border = properties_dict['min_border']
-        self.chart.outline_line_width = properties_dict['outline_line_width']
-        self.chart.outline_line_alpha = properties_dict['outline_line_alpha']
-        self.chart.outline_line_color = properties_dict['outline_line_color']
+        self.chart.background_fill_color = properties_dict[
+            "background_fill_color"
+        ]
+        self.chart.border_fill_color = properties_dict["border_fill_color"]
+        self.chart.min_border = properties_dict["min_border"]
+        self.chart.outline_line_width = properties_dict["outline_line_width"]
+        self.chart.outline_line_alpha = properties_dict["outline_line_alpha"]
+        self.chart.outline_line_color = properties_dict["outline_line_color"]
 
         # x axis title
-        self.chart.xaxis.axis_label_text_font_style = (
-            properties_dict['xaxis']['axis_label_text_font_style'])
-        self.chart.xaxis.axis_label_text_color = (
-            properties_dict['xaxis']['axis_label_text_color'])
-        self.chart.xaxis.axis_label_standoff = (
-            properties_dict['xaxis']['axis_label_standoff'])
-        self.chart.xaxis.major_label_text_color = (
-            properties_dict['xaxis']['major_label_text_color'])
-        self.chart.xaxis.axis_line_width = (
-            properties_dict['xaxis']['axis_line_width'])
-        self.chart.xaxis.axis_line_color = (
-            properties_dict['xaxis']['axis_line_color'])
+        self.chart.xaxis.axis_label_text_font_style = properties_dict["xaxis"][
+            "axis_label_text_font_style"
+        ]
+        self.chart.xaxis.axis_label_text_color = properties_dict["xaxis"][
+            "axis_label_text_color"
+        ]
+        self.chart.xaxis.axis_label_standoff = properties_dict["xaxis"][
+            "axis_label_standoff"
+        ]
+        self.chart.xaxis.major_label_text_color = properties_dict["xaxis"][
+            "major_label_text_color"
+        ]
+        self.chart.xaxis.axis_line_width = properties_dict["xaxis"][
+            "axis_line_width"
+        ]
+        self.chart.xaxis.axis_line_color = properties_dict["xaxis"][
+            "axis_line_color"
+        ]
         # y axis title
-        self.chart.yaxis.axis_label_text_font_style = (
-            properties_dict['yaxis']['axis_label_text_font_style'])
-        self.chart.yaxis.axis_label_text_color = (
-            properties_dict['yaxis']['axis_label_text_color'])
-        self.chart.yaxis.axis_label_standoff = (
-            properties_dict['yaxis']['axis_label_standoff'])
-        self.chart.yaxis.major_label_text_color = (
-            properties_dict['yaxis']['major_label_text_color'])
-        self.chart.yaxis.axis_line_width = (
-            properties_dict['yaxis']['axis_line_width'])
-        self.chart.yaxis.axis_line_color = (
-            properties_dict['yaxis']['axis_line_color'])
+        self.chart.yaxis.axis_label_text_font_style = properties_dict["yaxis"][
+            "axis_label_text_font_style"
+        ]
+        self.chart.yaxis.axis_label_text_color = properties_dict["yaxis"][
+            "axis_label_text_color"
+        ]
+        self.chart.yaxis.axis_label_standoff = properties_dict["yaxis"][
+            "axis_label_standoff"
+        ]
+        self.chart.yaxis.major_label_text_color = properties_dict["yaxis"][
+            "major_label_text_color"
+        ]
+        self.chart.yaxis.axis_line_width = properties_dict["yaxis"][
+            "axis_line_width"
+        ]
+        self.chart.yaxis.axis_line_color = properties_dict["yaxis"][
+            "axis_line_color"
+        ]
 
         # axis ticks
-        self.chart.axis.major_tick_line_color = (
-            properties_dict['axis']['major_tick_line_color'])
-        self.chart.axis.minor_tick_line_color = (
-            properties_dict['axis']['minor_tick_line_color'])
-        self.chart.axis.minor_tick_out = (
-            properties_dict['axis']['minor_tick_out'])
-        self.chart.axis.major_tick_out = (
-            properties_dict['axis']['major_tick_out'])
-        self.chart.axis.major_tick_in = (
-            properties_dict['axis']['major_tick_in'])
+        self.chart.axis.major_tick_line_color = properties_dict["axis"][
+            "major_tick_line_color"
+        ]
+        self.chart.axis.minor_tick_line_color = properties_dict["axis"][
+            "minor_tick_line_color"
+        ]
+        self.chart.axis.minor_tick_out = properties_dict["axis"][
+            "minor_tick_out"
+        ]
+        self.chart.axis.major_tick_out = properties_dict["axis"][
+            "major_tick_out"
+        ]
+        self.chart.axis.major_tick_in = properties_dict["axis"][
+            "major_tick_in"
+        ]
 
         # interactive slider
-        self.datatile_active_color = (
-            properties_dict['widgets']['datatile_active_color'])
+        self.datatile_active_color = properties_dict["widgets"][
+            "datatile_active_color"
+        ]
 
 
 class Line(BaseLine):
     """
         Description:
     """
+
     reset_event = events.Reset
-    data_y_axis = 'y'
-    data_x_axis = 'x'
+    data_y_axis = "y"
+    data_x_axis = "x"
 
     def format_source_data(self, source_dict, patch_update=False):
         """
@@ -237,7 +274,7 @@ class Line(BaseLine):
         -----------
         source_dict: {'X': [], 'Y': []}
         """
-        range_x_origin = [round(x, 4) for x in source_dict['X']]
+        range_x_origin = [round(x, 4) for x in source_dict["X"]]
         range_x = []
 
         if self.max_value < 1:
@@ -249,7 +286,7 @@ class Line(BaseLine):
                 temp_mapper_index = list(
                     range(
                         int(round(self.min_value)),
-                        int(round(self.max_value)) * 100 + 1
+                        int(round(self.max_value)) * 100 + 1,
                     )
                 )
                 temp_mapper_value = [str(x / 100) for x in temp_mapper_index]
@@ -261,14 +298,14 @@ class Line(BaseLine):
 
         if patch_update is False:
             self.source = ColumnDataSource(
-                dict(x=np.array(range_x), y=np.array(source_dict['Y']))
+                dict(x=np.array(range_x), y=np.array(source_dict["Y"]))
             )
             self.source_backup = self.source.to_df()
         else:
             patch_dict = {
-                self.data_y_axis: [(slice(len(source_dict['Y'])), np.array(
-                    source_dict['Y'])
-                )]
+                self.data_y_axis: [
+                    (slice(len(source_dict["Y"])), np.array(source_dict["Y"]))
+                ]
             }
             self.source.patch(patch_dict)
 
@@ -284,14 +321,16 @@ class Line(BaseLine):
         """
         generate chart
         """
-        if 'title' in self.library_specific_params:
-            self.title = self.library_specific_params['title']
+        if "title" in self.library_specific_params:
+            self.title = self.library_specific_params["title"]
         else:
             self.title = self.x
 
         self.chart = figure(
-            title=self.title, tools=" pan, wheel_zoom, reset",
-            active_scroll='wheel_zoom', active_drag='pan'
+            title=self.title,
+            tools=" pan, wheel_zoom, reset",
+            active_scroll="wheel_zoom",
+            active_drag="pan",
         )
         if self.color is None:
             self.sub_chart = self.chart.line(
@@ -299,8 +338,10 @@ class Line(BaseLine):
             )
         else:
             self.sub_chart = self.chart.line(
-                x=self.data_x_axis, y=self.data_y_axis, source=self.source,
-                color=self.color
+                x=self.data_x_axis,
+                y=self.data_y_axis,
+                source=self.source,
+                color=self.color,
             )
 
     def update_dimensions(self, width=None, height=None):
@@ -354,73 +395,97 @@ class Line(BaseLine):
 
         """
         if self.color is None:
-            self.sub_chart.glyph.line_color = (
-                properties_dict['chart_color']['color'])
+            self.sub_chart.glyph.line_color = properties_dict["chart_color"][
+                "color"
+            ]
 
-        self.chart.xgrid.grid_line_color = (
-            properties_dict['agg_charts_grids']['xgrid'])
-        self.chart.ygrid.grid_line_color = (
-            properties_dict['agg_charts_grids']['ygrid'])
+        self.chart.xgrid.grid_line_color = properties_dict["agg_charts_grids"][
+            "xgrid"
+        ]
+        self.chart.ygrid.grid_line_color = properties_dict["agg_charts_grids"][
+            "ygrid"
+        ]
 
         # title
-        self.chart.title.text_color = properties_dict['title']['text_color']
-        self.chart.title.text_font = properties_dict['title']['text_font']
-        self.chart.title.text_font_style = (
-            properties_dict['title']['text_font_style'])
-        self.chart.title.text_font_size = (
-            properties_dict['title']['text_font_size'])
+        self.chart.title.text_color = properties_dict["title"]["text_color"]
+        self.chart.title.text_font = properties_dict["title"]["text_font"]
+        self.chart.title.text_font_style = properties_dict["title"][
+            "text_font_style"
+        ]
+        self.chart.title.text_font_size = properties_dict["title"][
+            "text_font_size"
+        ]
 
         # background, border, padding
-        self.chart.background_fill_color = (
-            properties_dict['background_fill_color'])
-        self.chart.border_fill_color = properties_dict['border_fill_color']
-        self.chart.min_border = properties_dict['min_border']
-        self.chart.outline_line_width = properties_dict['outline_line_width']
-        self.chart.outline_line_alpha = properties_dict['outline_line_alpha']
-        self.chart.outline_line_color = properties_dict['outline_line_color']
+        self.chart.background_fill_color = properties_dict[
+            "background_fill_color"
+        ]
+        self.chart.border_fill_color = properties_dict["border_fill_color"]
+        self.chart.min_border = properties_dict["min_border"]
+        self.chart.outline_line_width = properties_dict["outline_line_width"]
+        self.chart.outline_line_alpha = properties_dict["outline_line_alpha"]
+        self.chart.outline_line_color = properties_dict["outline_line_color"]
 
         # x axis title
-        self.chart.xaxis.axis_label_text_font_style = (
-            properties_dict['xaxis']['axis_label_text_font_style'])
-        self.chart.xaxis.axis_label_text_color = (
-            properties_dict['xaxis']['axis_label_text_color'])
-        self.chart.xaxis.axis_label_standoff = (
-            properties_dict['xaxis']['axis_label_standoff'])
-        self.chart.xaxis.major_label_text_color = (
-            properties_dict['xaxis']['major_label_text_color'])
-        self.chart.xaxis.axis_line_width = (
-            properties_dict['xaxis']['axis_line_width'])
-        self.chart.xaxis.axis_line_color = (
-            properties_dict['xaxis']['axis_line_color'])
+        self.chart.xaxis.axis_label_text_font_style = properties_dict["xaxis"][
+            "axis_label_text_font_style"
+        ]
+        self.chart.xaxis.axis_label_text_color = properties_dict["xaxis"][
+            "axis_label_text_color"
+        ]
+        self.chart.xaxis.axis_label_standoff = properties_dict["xaxis"][
+            "axis_label_standoff"
+        ]
+        self.chart.xaxis.major_label_text_color = properties_dict["xaxis"][
+            "major_label_text_color"
+        ]
+        self.chart.xaxis.axis_line_width = properties_dict["xaxis"][
+            "axis_line_width"
+        ]
+        self.chart.xaxis.axis_line_color = properties_dict["xaxis"][
+            "axis_line_color"
+        ]
         # y axis title
-        self.chart.yaxis.axis_label_text_font_style = (
-            properties_dict['yaxis']['axis_label_text_font_style'])
-        self.chart.yaxis.axis_label_text_color = (
-            properties_dict['yaxis']['axis_label_text_color'])
-        self.chart.yaxis.axis_label_standoff = (
-            properties_dict['yaxis']['axis_label_standoff'])
-        self.chart.yaxis.major_label_text_color = (
-            properties_dict['yaxis']['major_label_text_color'])
-        self.chart.yaxis.axis_line_width = (
-            properties_dict['yaxis']['axis_line_width'])
-        self.chart.yaxis.axis_line_color = (
-            properties_dict['yaxis']['axis_line_color'])
+        self.chart.yaxis.axis_label_text_font_style = properties_dict["yaxis"][
+            "axis_label_text_font_style"
+        ]
+        self.chart.yaxis.axis_label_text_color = properties_dict["yaxis"][
+            "axis_label_text_color"
+        ]
+        self.chart.yaxis.axis_label_standoff = properties_dict["yaxis"][
+            "axis_label_standoff"
+        ]
+        self.chart.yaxis.major_label_text_color = properties_dict["yaxis"][
+            "major_label_text_color"
+        ]
+        self.chart.yaxis.axis_line_width = properties_dict["yaxis"][
+            "axis_line_width"
+        ]
+        self.chart.yaxis.axis_line_color = properties_dict["yaxis"][
+            "axis_line_color"
+        ]
 
         # axis ticks
-        self.chart.axis.major_tick_line_color = (
-            properties_dict['axis']['major_tick_line_color'])
-        self.chart.axis.minor_tick_line_color = (
-            properties_dict['axis']['minor_tick_line_color'])
-        self.chart.axis.minor_tick_out = (
-            properties_dict['axis']['minor_tick_out'])
-        self.chart.axis.major_tick_out = (
-            properties_dict['axis']['major_tick_out'])
-        self.chart.axis.major_tick_in = (
-            properties_dict['axis']['major_tick_in'])
+        self.chart.axis.major_tick_line_color = properties_dict["axis"][
+            "major_tick_line_color"
+        ]
+        self.chart.axis.minor_tick_line_color = properties_dict["axis"][
+            "minor_tick_line_color"
+        ]
+        self.chart.axis.minor_tick_out = properties_dict["axis"][
+            "minor_tick_out"
+        ]
+        self.chart.axis.major_tick_out = properties_dict["axis"][
+            "major_tick_out"
+        ]
+        self.chart.axis.major_tick_in = properties_dict["axis"][
+            "major_tick_in"
+        ]
 
         # interactive slider
-        self.datatile_active_color = (
-            properties_dict['widgets']['datatile_active_color'])
+        self.datatile_active_color = properties_dict["widgets"][
+            "datatile_active_color"
+        ]
 
 
 class Choropleth(BaseChoropleth):
@@ -428,8 +493,8 @@ class Choropleth(BaseChoropleth):
     # reset event handling not required, as the default behavior
     # unselects all selected points, and that is already taken care of
     reset_event = None
-    data_y_axis = 'rates'
-    data_x_axis = 'x'
+    data_y_axis = "rates"
+    data_x_axis = "x"
 
     def format_source_data(self, source_dict, patch_update=False):
         """
@@ -454,8 +519,8 @@ class Choropleth(BaseChoropleth):
                     prop.append(i)
                     lats.append(lat)
                     longs.append(long)
-                    if i in source_dict['X']:
-                        rates.append(res_df.loc[res_df['X'] == i, 'Y'].iloc[0])
+                    if i in source_dict["X"]:
+                        rates.append(res_df.loc[res_df["X"] == i, "Y"].iloc[0])
                     else:
                         rates.append(np.nan)
             rates = np.array(rates)
@@ -463,26 +528,26 @@ class Choropleth(BaseChoropleth):
             self.source = ColumnDataSource(
                 {
                     self.data_x_axis: np.array([]),
-                    'xs': np.array([]),
-                    'ys': np.array([]),
-                    self.data_y_axis: np.array([])
+                    "xs": np.array([]),
+                    "ys": np.array([]),
+                    self.data_y_axis: np.array([]),
                 }
             )
             data = {
                 self.data_x_axis: np.array(prop),
-                'xs': np.array(lats), 'ys': np.array(longs),
-                self.data_y_axis: rates
+                "xs": np.array(lats),
+                "ys": np.array(longs),
+                self.data_y_axis: rates,
             }
             self.source.stream(data)
 
         else:
             rates = []
-            for i in source_dict['X']:
+            for i in source_dict["X"]:
                 if i in self.geo_mapper:
                     temp_list = [
-                        res_df.loc[
-                            res_df['X'] == float(i),
-                            'Y'].iloc[0]] * len(self.geo_mapper[i])
+                        res_df.loc[res_df["X"] == float(i), "Y"].iloc[0]
+                    ] * len(self.geo_mapper[i])
 
                     rates = rates + temp_list
             rates = np.array(rates)
@@ -497,7 +562,8 @@ class Choropleth(BaseChoropleth):
         """
         if self.source is not None:
             unique_x_axis = np.unique(
-                self.source.data[self.data_x_axis]).tolist()
+                self.source.data[self.data_x_axis]
+            ).tolist()
             return_val = np.zeros(self.data_points)
             for index, x in enumerate(unique_x_axis):
                 return_val[int(x)] = self.source.data[self.data_y_axis][int(x)]
@@ -510,54 +576,64 @@ class Choropleth(BaseChoropleth):
         """
         if self.geo_color_palette is None:
             mapper = LinearColorMapper(
-                palette=bokeh.palettes.Purples9, nan_color=self.nan_color,
+                palette=bokeh.palettes.Purples9,
+                nan_color=self.nan_color,
                 low=np.nanmin(self.source.data[self.data_y_axis]),
-                high=np.nanmax(self.source.data[self.data_y_axis])
+                high=np.nanmax(self.source.data[self.data_y_axis]),
             )
         else:
             mapper = LinearColorMapper(
-                palette=self.geo_color_palette, nan_color=self.nan_color,
+                palette=self.geo_color_palette,
+                nan_color=self.nan_color,
                 low=np.nanmin(self.source.data[self.data_y_axis]),
-                high=np.nanmax(self.source.data[self.data_y_axis])
+                high=np.nanmax(self.source.data[self.data_y_axis]),
             )
 
         tooltips_r = [
             (self.x, "@" + self.data_x_axis),
-            (self.data_y_axis, "@" + self.data_y_axis)
+            (self.data_y_axis, "@" + self.data_y_axis),
         ]
 
-        if 'title' in self.library_specific_params:
-            self.title = self.library_specific_params['title']
+        if "title" in self.library_specific_params:
+            self.title = self.library_specific_params["title"]
         else:
             self.title = "Geo Choropleth Map for " + self.y
 
-        self.chart = figure(title=self.title, toolbar_location="right",
-                            tooltips=tooltips_r,
-                            tools="hover, pan, wheel_zoom, tap, reset",
-                            active_scroll='wheel_zoom', active_drag='pan',
-                            **self.library_specific_params
-                            )
+        self.chart = figure(
+            title=self.title,
+            toolbar_location="right",
+            tooltips=tooltips_r,
+            tools="hover, pan, wheel_zoom, tap, reset",
+            active_scroll="wheel_zoom",
+            active_drag="pan",
+            **self.library_specific_params
+        )
 
         if self.tile_provider is not None:
             self.chart.add_tile(self.tile_provider)
 
         self.sub_chart = self.chart.patches(
-            xs='xs', ys='ys', source=self.source, line_width=0.5,
+            xs="xs",
+            ys="ys",
+            source=self.source,
+            line_width=0.5,
             fill_alpha=0.7,
-            fill_color={'field': self.data_y_axis, 'transform': mapper}
+            fill_color={"field": self.data_y_axis, "transform": mapper},
         )
 
         self.color_bar = ColorBar(
-            color_mapper=mapper, major_label_text_font_size="7pt",
+            color_mapper=mapper,
+            major_label_text_font_size="7pt",
             ticker=BasicTicker(desired_num_ticks=4),
             formatter=PrintfTickFormatter(format="%f"),
-            label_standoff=6, location='bottom_right',
-            background_fill_alpha=0.5
+            label_standoff=6,
+            location="bottom_right",
+            background_fill_alpha=0.5,
         )
 
         self.chart.add_layout(self.color_bar)
 
-        self.chart.sizing_mode = 'scale_both'
+        self.chart.sizing_mode = "scale_both"
         self.source = self.sub_chart.data_source
         self.source_backup = self.source.data.copy()
 
@@ -636,12 +712,13 @@ class Choropleth(BaseChoropleth):
         add selection event
         ---
         """
+
         def temp_callback(attr, old, new):
             old = self.map_indices_to_values(old)
             new = self.map_indices_to_values(new)
             callback(old, new)
 
-        self.source.selected.on_change('indices', temp_callback)
+        self.source.selected.on_change("indices", temp_callback)
 
     def apply_theme(self, properties_dict):
         """
@@ -651,66 +728,84 @@ class Choropleth(BaseChoropleth):
         """
         if self.geo_color_palette is None:
             mapper = LinearColorMapper(
-                palette=properties_dict['chart_color']['color_palette'],
+                palette=properties_dict["chart_color"]["color_palette"],
                 nan_color=self.nan_color,
                 low=np.nanmin(self.source.data[self.data_y_axis]),
-                high=np.nanmax(self.source.data[self.data_y_axis])
+                high=np.nanmax(self.source.data[self.data_y_axis]),
             )
-            self.sub_chart.glyph.fill_color['transform'] = mapper
+            self.sub_chart.glyph.fill_color["transform"] = mapper
             self.color_bar.color_mapper = mapper
 
-        self.chart.xgrid.grid_line_color = (
-            properties_dict['geo_charts_grids']['xgrid'])
-        self.chart.ygrid.grid_line_color = (
-            properties_dict['geo_charts_grids']['ygrid'])
+        self.chart.xgrid.grid_line_color = properties_dict["geo_charts_grids"][
+            "xgrid"
+        ]
+        self.chart.ygrid.grid_line_color = properties_dict["geo_charts_grids"][
+            "ygrid"
+        ]
 
         # title
-        self.chart.title.text_color = properties_dict['title']['text_color']
-        self.chart.title.text_font = properties_dict['title']['text_font']
-        self.chart.title.text_font_style = (
-            properties_dict['title']['text_font_style'])
-        self.chart.title.text_font_size = (
-            properties_dict['title']['text_font_size'])
+        self.chart.title.text_color = properties_dict["title"]["text_color"]
+        self.chart.title.text_font = properties_dict["title"]["text_font"]
+        self.chart.title.text_font_style = properties_dict["title"][
+            "text_font_style"
+        ]
+        self.chart.title.text_font_size = properties_dict["title"][
+            "text_font_size"
+        ]
 
         # background, border, padding
-        self.chart.background_fill_color = (
-            properties_dict['background_fill_color'])
-        self.chart.border_fill_color = properties_dict['border_fill_color']
-        self.chart.min_border = properties_dict['min_border']
-        self.chart.outline_line_width = properties_dict['outline_line_width']
-        self.chart.outline_line_alpha = properties_dict['outline_line_alpha']
-        self.chart.outline_line_color = properties_dict['outline_line_color']
+        self.chart.background_fill_color = properties_dict[
+            "background_fill_color"
+        ]
+        self.chart.border_fill_color = properties_dict["border_fill_color"]
+        self.chart.min_border = properties_dict["min_border"]
+        self.chart.outline_line_width = properties_dict["outline_line_width"]
+        self.chart.outline_line_alpha = properties_dict["outline_line_alpha"]
+        self.chart.outline_line_color = properties_dict["outline_line_color"]
 
         # x axis title
-        self.chart.xaxis.major_label_text_color = (
-            properties_dict['xaxis']['major_label_text_color'])
-        self.chart.xaxis.axis_line_width = (
-            properties_dict['xaxis']['axis_line_width'])
-        self.chart.xaxis.axis_line_color = (
-            properties_dict['xaxis']['axis_line_color'])
+        self.chart.xaxis.major_label_text_color = properties_dict["xaxis"][
+            "major_label_text_color"
+        ]
+        self.chart.xaxis.axis_line_width = properties_dict["xaxis"][
+            "axis_line_width"
+        ]
+        self.chart.xaxis.axis_line_color = properties_dict["xaxis"][
+            "axis_line_color"
+        ]
 
         # y axis title
-        self.chart.yaxis.major_label_text_color = (
-            properties_dict['yaxis']['major_label_text_color'])
-        self.chart.yaxis.axis_line_width = (
-            properties_dict['yaxis']['axis_line_width'])
-        self.chart.yaxis.axis_line_color = (
-            properties_dict['yaxis']['axis_line_color'])
+        self.chart.yaxis.major_label_text_color = properties_dict["yaxis"][
+            "major_label_text_color"
+        ]
+        self.chart.yaxis.axis_line_width = properties_dict["yaxis"][
+            "axis_line_width"
+        ]
+        self.chart.yaxis.axis_line_color = properties_dict["yaxis"][
+            "axis_line_color"
+        ]
 
         # axis ticks
-        self.chart.axis.major_tick_line_color = (
-            properties_dict['axis']['major_tick_line_color'])
-        self.chart.axis.minor_tick_line_color = (
-            properties_dict['axis']['minor_tick_line_color'])
-        self.chart.axis.minor_tick_out = (
-            properties_dict['axis']['minor_tick_out'])
-        self.chart.axis.major_tick_out = (
-            properties_dict['axis']['major_tick_out'])
-        self.chart.axis.major_tick_in = (
-            properties_dict['axis']['major_tick_in'])
+        self.chart.axis.major_tick_line_color = properties_dict["axis"][
+            "major_tick_line_color"
+        ]
+        self.chart.axis.minor_tick_line_color = properties_dict["axis"][
+            "minor_tick_line_color"
+        ]
+        self.chart.axis.minor_tick_out = properties_dict["axis"][
+            "minor_tick_out"
+        ]
+        self.chart.axis.major_tick_out = properties_dict["axis"][
+            "major_tick_out"
+        ]
+        self.chart.axis.major_tick_in = properties_dict["axis"][
+            "major_tick_in"
+        ]
 
         # legend
-        self.color_bar.background_fill_color = (
-            properties_dict['legend']['background_color'])
-        self.color_bar.major_label_text_color = (
-            properties_dict['legend']['text_color'])
+        self.color_bar.background_fill_color = properties_dict["legend"][
+            "background_color"
+        ]
+        self.color_bar.major_label_text_color = properties_dict["legend"][
+            "text_color"
+        ]

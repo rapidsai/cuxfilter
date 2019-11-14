@@ -1,11 +1,20 @@
 from .plots import (
-    RangeSlider, IntSlider, FloatSlider,
-    DropDown, MultiSelect, DataSizeIndicator
+    RangeSlider,
+    IntSlider,
+    FloatSlider,
+    DropDown,
+    MultiSelect,
+    DataSizeIndicator,
 )
 
 
 def range_slider(
-    x, width=400, height=20, data_points=100, step_size=1, step_size_type=int,
+    x,
+    width=400,
+    height=20,
+    data_points=100,
+    step_size=1,
+    step_size_type=int,
     **params
 ):
     """
@@ -105,7 +114,12 @@ def float_slider(
 
     """
     return FloatSlider(
-        x, width, height, data_points, step_size, step_size_type=float,
+        x,
+        width,
+        height,
+        data_points,
+        step_size,
+        step_size_type=float,
         **params
     )
 

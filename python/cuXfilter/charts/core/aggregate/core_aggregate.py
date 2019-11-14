@@ -7,7 +7,7 @@ class BaseAggregateChart(BaseChart):
     use_data_tiles = True
 
     def query_chart_by_range(self, active_chart, query_tuple, datatile):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -19,7 +19,7 @@ class BaseAggregateChart(BaseChart):
         -------------------------------------------
 
         Ouput:
-        '''
+        """
         min_val, max_val = query_tuple
         datatile_index_min = int(
             round((min_val - active_chart.min_value) / active_chart.stride)
@@ -30,7 +30,7 @@ class BaseAggregateChart(BaseChart):
 
         if datatile_index_min == 0:
 
-            if self.aggregate_fn == 'mean':
+            if self.aggregate_fn == "mean":
                 datatile_result_sum = np.array(
                     datatile[0].loc[:, datatile_index_max]
                 )
@@ -38,12 +38,12 @@ class BaseAggregateChart(BaseChart):
                     datatile[1].loc[:, datatile_index_max]
                 )
                 datatile_result = datatile_result_sum / datatile_result_count
-            elif self.aggregate_fn == 'count':
+            elif self.aggregate_fn == "count":
                 datatile_result = datatile.loc[:, datatile_index_max]
 
         else:
             datatile_index_min -= 1
-            if self.aggregate_fn == 'mean':
+            if self.aggregate_fn == "mean":
                 datatile_max0 = datatile[0].loc[:, datatile_index_max]
                 datatile_min0 = datatile[0].loc[:, datatile_index_min]
                 datatile_result_sum = np.array(datatile_max0 - datatile_min0)
@@ -53,17 +53,22 @@ class BaseAggregateChart(BaseChart):
                 datatile_result_count = np.array(datatile_max1 - datatile_min1)
 
                 datatile_result = datatile_result_sum / datatile_result_count
-            elif self.aggregate_fn == 'count':
+            elif self.aggregate_fn == "count":
                 datatile_max = datatile.loc[:, datatile_index_max]
                 datatile_min = datatile.loc[:, datatile_index_min]
                 datatile_result = datatile_max - datatile_min
         self.reset_chart(datatile_result)
 
     def query_chart_by_indices_for_mean(
-        self, active_chart, old_indices, new_indices,
-        datatile, calc_new, remove_old
+        self,
+        active_chart,
+        old_indices,
+        new_indices,
+        datatile,
+        calc_new,
+        remove_old,
     ):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -71,35 +76,40 @@ class BaseAggregateChart(BaseChart):
         -------------------------------------------
 
         Ouput:
-        '''
-        if len(new_indices) == 0 or new_indices == ['']:
+        """
+        if len(new_indices) == 0 or new_indices == [""]:
             datatile_sum_0 = np.array(datatile[0].sum(axis=1, skipna=True))
             datatile_sum_1 = np.array(datatile[1].sum(axis=1, skipna=True))
             datatile_result = datatile_sum_0 / datatile_sum_1
             return datatile_result
 
-        len_y_axis = datatile[0][0][:self.data_points].shape[0]
+        len_y_axis = datatile[0][0][: self.data_points].shape[0]
 
         datatile_result = np.zeros(shape=(len_y_axis,), dtype=np.float64)
         value_sum = np.zeros(shape=(len_y_axis,), dtype=np.float64)
         value_count = np.zeros(shape=(len_y_axis,), dtype=np.float64)
 
         for index in new_indices:
-            index = int(round(
-                (index - active_chart.min_value) / active_chart.stride)
+            index = int(
+                round((index - active_chart.min_value) / active_chart.stride)
             )
-            value_sum += datatile[0][int(index)][:self.data_points]
-            value_count += datatile[1][int(index)][:self.data_points]
+            value_sum += datatile[0][int(index)][: self.data_points]
+            value_count += datatile[1][int(index)][: self.data_points]
 
         datatile_result = value_sum / value_count
 
         return datatile_result
 
     def query_chart_by_indices_for_count(
-        self, active_chart, old_indices, new_indices,
-        datatile, calc_new, remove_old
+        self,
+        active_chart,
+        old_indices,
+        new_indices,
+        datatile,
+        calc_new,
+        remove_old,
     ):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -107,25 +117,26 @@ class BaseAggregateChart(BaseChart):
         -------------------------------------------
 
         Ouput:
-        '''
-        if len(new_indices) == 0 or new_indices == ['']:
+        """
+        if len(new_indices) == 0 or new_indices == [""]:
             datatile_result = np.array(datatile.sum(axis=1, skipna=True))
             return datatile_result
 
-        if len(old_indices) == 0 or old_indices == ['']:
-            len_y_axis = datatile[0][:self.data_points].shape[0]
+        if len(old_indices) == 0 or old_indices == [""]:
+            len_y_axis = datatile[0][: self.data_points].shape[0]
             datatile_result = np.zeros(shape=(len_y_axis,), dtype=np.float64)
         else:
-            len_y_axis = datatile[0][:self.data_points].shape[0]
-            datatile_result = np.array(self.get_source_y_axis(),
-                                       dtype=np.float64)[:len_y_axis]
+            len_y_axis = datatile[0][: self.data_points].shape[0]
+            datatile_result = np.array(
+                self.get_source_y_axis(), dtype=np.float64
+            )[:len_y_axis]
 
         for index in calc_new:
             index = int(
                 round((index - active_chart.min_value) / active_chart.stride)
             )
             datatile_result += np.array(
-                datatile[int(index)][:self.data_points]
+                datatile[int(index)][: self.data_points]
             )
 
         for index in remove_old:
@@ -133,7 +144,7 @@ class BaseAggregateChart(BaseChart):
                 round((index - active_chart.min_value) / active_chart.stride)
             )
             datatile_result -= np.array(
-                datatile[int(index)][:self.data_points]
+                datatile[int(index)][: self.data_points]
             )
 
         return datatile_result
@@ -141,7 +152,7 @@ class BaseAggregateChart(BaseChart):
     def query_chart_by_indices(
         self, active_chart, old_indices, new_indices, datatile
     ):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -153,24 +164,32 @@ class BaseAggregateChart(BaseChart):
         -------------------------------------------
 
         Ouput:
-        '''
+        """
         calc_new = list(set(new_indices) - set(old_indices))
         remove_old = list(set(old_indices) - set(new_indices))
 
-        if '' in calc_new:
-            calc_new.remove('')
-        if '' in remove_old:
-            remove_old.remove('')
+        if "" in calc_new:
+            calc_new.remove("")
+        if "" in remove_old:
+            remove_old.remove("")
 
-        if self.aggregate_fn == 'mean':
+        if self.aggregate_fn == "mean":
             datatile_result = self.query_chart_by_indices_for_mean(
-                active_chart, old_indices, new_indices, datatile,
-                calc_new, remove_old
+                active_chart,
+                old_indices,
+                new_indices,
+                datatile,
+                calc_new,
+                remove_old,
             )
         else:
             datatile_result = self.query_chart_by_indices_for_count(
-                active_chart, old_indices, new_indices, datatile,
-                calc_new, remove_old
+                active_chart,
+                old_indices,
+                new_indices,
+                datatile,
+                calc_new,
+                remove_old,
             )
 
         self.reset_chart(datatile_result)

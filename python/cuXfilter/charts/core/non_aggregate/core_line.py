@@ -6,18 +6,27 @@ from ....layouts import chart_view
 
 class BaseLine(BaseNonAggregate):
 
-    chart_type: str = 'line'
+    chart_type: str = "line"
     stride = 0.0
     reset_event = None
     filter_widget = None
     no_color_set = False
 
     def __init__(
-        self, x, y=None, data_points=100, add_interaction=True,
-        pixel_shade_type='linear', color=None, step_size=None,
-        step_size_type=int, width=800, height=400, **library_specific_params
+        self,
+        x,
+        y=None,
+        data_points=100,
+        add_interaction=True,
+        pixel_shade_type="linear",
+        color=None,
+        step_size=None,
+        step_size_type=int,
+        width=800,
+        height=400,
+        **library_specific_params
     ):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -40,13 +49,13 @@ class BaseLine(BaseNonAggregate):
 
         Ouput:
 
-        '''
+        """
         self.x = x
         self.y = y
         self.data_points = data_points
         self.add_interaction = add_interaction
         if color is None:
-            self.color = 'rapidspurple'
+            self.color = "rapidspurple"
             self.no_color_set = True
         else:
             self.color = color
@@ -59,7 +68,7 @@ class BaseLine(BaseNonAggregate):
         self.height = height
 
     def initiate_chart(self, dashboard_cls):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -69,7 +78,7 @@ class BaseLine(BaseNonAggregate):
 
         Ouput:
 
-        '''
+        """
         self.min_value = dashboard_cls._data[self.x].min()
         self.max_value = dashboard_cls._data[self.x].max()
 
@@ -100,7 +109,7 @@ class BaseLine(BaseNonAggregate):
         return chart_view(self.chart, self.filter_widget, width=self.width)
 
     def add_range_slider_filter(self, dashboard_cls):
-        '''
+        """
         Description: add range slider to the bottom of the chart,
                      for the filter function to facilitate interaction
                      behavior, that updates the rest
@@ -111,17 +120,19 @@ class BaseLine(BaseNonAggregate):
         -------------------------------------------
 
         Ouput:
-        '''
+        """
         if self.stride is None:
             self.stride = self.stride_type(
                 (self.max_value - self.min_value) / self.data_points
             )
 
         self.filter_widget = pn.widgets.RangeSlider(
-            start=self.min_value, end=self.max_value,
+            start=self.min_value,
+            end=self.max_value,
             value=(self.min_value, self.max_value),
-            step=self.stride, **{'width': self.width},
-            sizing_mode='scale_width'
+            step=self.stride,
+            **{"width": self.width},
+            sizing_mode="scale_width"
         )
 
         def filter_widget_callback(event):
@@ -133,11 +144,11 @@ class BaseLine(BaseNonAggregate):
 
         # add callback to filter_Widget on value change
         self.filter_widget.param.watch(
-            filter_widget_callback, ['value'], onlychanged=False
+            filter_widget_callback, ["value"], onlychanged=False
         )
 
     def compute_query_dict(self, query_str_dict):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -146,16 +157,18 @@ class BaseLine(BaseNonAggregate):
         -------------------------------------------
 
         Ouput:
-        '''
+        """
         if self.filter_widget.value != (
-            self.filter_widget.start, self.filter_widget.end
+            self.filter_widget.start,
+            self.filter_widget.end,
         ):
             min_temp, max_temp = self.filter_widget.value
-            query_str_dict[self.name] = (str(min_temp) + '<='
-                                         + str(self.x) + "<=" + str(max_temp))
+            query_str_dict[self.name] = (
+                str(min_temp) + "<=" + str(self.x) + "<=" + str(max_temp)
+            )
 
     def add_events(self, dashboard_cls):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -164,12 +177,12 @@ class BaseLine(BaseNonAggregate):
         -------------------------------------------
 
         Ouput:
-        '''
+        """
         if self.reset_event is not None:
             self.add_reset_event(dashboard_cls)
 
     def add_reset_event(self, dashboard_cls):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -178,10 +191,12 @@ class BaseLine(BaseNonAggregate):
         -------------------------------------------
 
         Ouput:
-        '''
+        """
+
         def reset_callback(event):
             self.filter_widget.value = (
-                self.filter_widget.start, self.filter_widget.end
+                self.filter_widget.start,
+                self.filter_widget.end,
             )
 
         # add callback to reset chart button

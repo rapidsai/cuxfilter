@@ -2,7 +2,7 @@ import panel as pn
 
 from .core_chart import BaseChart
 
-css = '''
+css = """
 .dataframe table{
   border: none;
 }
@@ -17,13 +17,13 @@ css = '''
     overflow: auto;
     text-overflow: ellipsis;
 }
-'''
+"""
 
 pn.extension(raw_css=[css])
 
 
 class ViewDataFrame:
-    chart_type: str = 'view_dataframe'
+    chart_type: str = "view_dataframe"
     _height: int = 0
     columns = None
     _width: int = 0
@@ -66,12 +66,17 @@ class ViewDataFrame:
     def generate_chart(self, data):
         if self.columns is None:
             self.columns = list(data.columns)
-        style = {'width': '100%', 'height': '100%', 'overflow-y': 'auto',
-                 'font-size': '0.5vw', 'overflow-x': 'auto'}
+        style = {
+            "width": "100%",
+            "height": "100%",
+            "overflow-y": "auto",
+            "font-size": "0.5vw",
+            "overflow-x": "auto",
+        }
 
         html_pane = pn.pane.HTML(data[self.columns], style=style)
-        self.chart = pn.Column(html_pane, css_classes=['panel-df'])
-        self.chart.sizing_mode = 'scale_both'
+        self.chart = pn.Column(html_pane, css_classes=["panel-df"])
+        self.chart.sizing_mode = "scale_both"
 
     def view(self):
         return self.chart
@@ -93,7 +98,7 @@ class ViewDataFrame:
             self.chart.height = height
 
     def query_chart_by_range(self, active_chart: BaseChart, query_tuple, data):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -104,7 +109,7 @@ class ViewDataFrame:
         -------------------------------------------
 
         Ouput:
-        '''
+        """
         min_val, max_val = query_tuple
         query = str(min_val) + "<=" + active_chart.x + "<=" + str(max_val)
         self.reload_chart(data.query(query), False)
@@ -112,7 +117,7 @@ class ViewDataFrame:
     def query_chart_by_indices(
         self, active_chart: BaseChart, old_indices, new_indices, data
     ):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -123,9 +128,9 @@ class ViewDataFrame:
         -------------------------------------------
 
         Ouput:
-        '''
-        if '' in new_indices:
-            new_indices.remove('')
+        """
+        if "" in new_indices:
+            new_indices.remove("")
         if len(new_indices) == 0:
             # case: all selected indices were reset
             # reset the chart
@@ -135,6 +140,6 @@ class ViewDataFrame:
             query = active_chart.x + "==" + str(float(new_indices[0]))
             self.reload_chart(data.query(query), False)
         else:
-            new_indices_str = ','.join(map(str, new_indices))
+            new_indices_str = ",".join(map(str, new_indices))
             query = active_chart.x + " in (" + new_indices_str + ")"
             self.reload_chart(data.query(query), False)

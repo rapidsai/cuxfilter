@@ -3,12 +3,12 @@ from ....layouts import chart_view
 
 
 class BaseDataSizeIndicator(BaseAggregateChart):
-    chart_type: str = 'datasize_indicator'
-    x: str = ''
+    chart_type: str = "datasize_indicator"
+    x: str = ""
     use_data_tiles = True
 
     def __init__(self, width=400, height=400, **library_specific_params):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -20,13 +20,13 @@ class BaseDataSizeIndicator(BaseAggregateChart):
 
         Ouput:
 
-        '''
+        """
         self.height = height
         self.width = width
         self.library_specific_params = library_specific_params
 
     def initiate_chart(self, dashboard_cls):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -36,7 +36,7 @@ class BaseDataSizeIndicator(BaseAggregateChart):
 
         Ouput:
 
-        '''
+        """
         self.min_value = 0
         self.max_value = dashboard_cls._data.shape[0]
 
@@ -44,10 +44,10 @@ class BaseDataSizeIndicator(BaseAggregateChart):
         self.generate_chart()
 
     def view(self):
-        return chart_view(self.chart, css_classes=['non-handle-temp'])
+        return chart_view(self.chart, css_classes=["non-handle-temp"])
 
     def calculate_source(self, data, patch_update=False):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -56,13 +56,13 @@ class BaseDataSizeIndicator(BaseAggregateChart):
         -------------------------------------------
 
         Ouput:
-        '''
-        dict_temp = {'X': list([1]), 'Y': list([data.shape[0]])}
+        """
+        dict_temp = {"X": list([1]), "Y": list([data.shape[0]])}
 
         self.format_source_data(dict_temp, patch_update)
 
     def query_chart_by_range(self, active_chart, query_tuple, datatile):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -74,14 +74,14 @@ class BaseDataSizeIndicator(BaseAggregateChart):
         -------------------------------------------
 
         Ouput:
-        '''
+        """
         min_val, max_val = query_tuple
 
-        datatile_index_min = int(round(
-            (min_val - active_chart.min_value) / active_chart.stride)
+        datatile_index_min = int(
+            round((min_val - active_chart.min_value) / active_chart.stride)
         )
-        datatile_index_max = int(round(
-            (max_val - active_chart.min_value) / active_chart.stride)
+        datatile_index_max = int(
+            round((max_val - active_chart.min_value) / active_chart.stride)
         )
 
         if datatile_index_min == 0:
@@ -95,10 +95,15 @@ class BaseDataSizeIndicator(BaseAggregateChart):
         self.reset_chart(datatile_result)
 
     def query_chart_by_indices_for_count(
-        self, active_chart, old_indices, new_indices,
-        datatile, calc_new, remove_old
+        self,
+        active_chart,
+        old_indices,
+        new_indices,
+        datatile,
+        calc_new,
+        remove_old,
     ):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -106,25 +111,25 @@ class BaseDataSizeIndicator(BaseAggregateChart):
         -------------------------------------------
 
         Ouput:
-        '''
-        if len(new_indices) == 0 or new_indices == ['']:
+        """
+        if len(new_indices) == 0 or new_indices == [""]:
             datatile_result = datatile.cumsum().values[-1]
             return datatile_result
 
-        if len(old_indices) == 0 or old_indices == ['']:
+        if len(old_indices) == 0 or old_indices == [""]:
             datatile_result = 0
         else:
             datatile_result = self.get_source_y_axis()
 
         for index in calc_new:
-            index = int(round(
-                (index - active_chart.min_value) / active_chart.stride)
+            index = int(
+                round((index - active_chart.min_value) / active_chart.stride)
             )
             datatile_result += datatile.loc[int(index)][0]
 
         for index in remove_old:
-            index = int(round(
-                (index - active_chart.min_value) / active_chart.stride)
+            index = int(
+                round((index - active_chart.min_value) / active_chart.stride)
             )
             datatile_result -= datatile.loc[int(index)][0]
 
@@ -133,7 +138,7 @@ class BaseDataSizeIndicator(BaseAggregateChart):
     def query_chart_by_indices(
         self, active_chart, old_indices, new_indices, datatile
     ):
-        '''
+        """
         Description:
 
         -------------------------------------------
@@ -145,18 +150,22 @@ class BaseDataSizeIndicator(BaseAggregateChart):
         -------------------------------------------
 
         Ouput:
-        '''
+        """
         calc_new = list(set(new_indices) - set(old_indices))
         remove_old = list(set(old_indices) - set(new_indices))
 
-        if '' in calc_new:
-            calc_new.remove('')
-        if '' in remove_old:
-            remove_old.remove('')
+        if "" in calc_new:
+            calc_new.remove("")
+        if "" in remove_old:
+            remove_old.remove("")
 
         datatile_result = self.query_chart_by_indices_for_count(
-            active_chart, old_indices, new_indices, datatile,
-            calc_new, remove_old
+            active_chart,
+            old_indices,
+            new_indices,
+            datatile,
+            calc_new,
+            remove_old,
         )
 
         self.reset_chart(datatile_result)
