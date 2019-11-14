@@ -1,5 +1,3 @@
-import numpy as np
-from typing import Dict
 import panel as pn
 
 from .core_chart import BaseChart
@@ -10,7 +8,7 @@ css = '''
 }
 
 .panel-df table{
-    width: 100%; 
+    width: 100%;
     border-collapse: collapse;
     border: none;
 }
@@ -32,7 +30,6 @@ class ViewDataFrame:
     chart = None
     source = None
     use_data_tiles = False
-
 
     def __init__(self, columns=None, width=400, height=400):
         self.columns = columns
@@ -63,29 +60,29 @@ class ViewDataFrame:
         if self.chart is not None:
             self.update_dimensions(height=value)
 
-
     def initiate_chart(self, dashboard_cls):
         self.generate_chart(dashboard_cls._data)
 
     def generate_chart(self, data):
         if self.columns is None:
             self.columns = list(data.columns)
-        self.chart = pn.Column(pn.pane.HTML(data[self.columns], style={'width':'100%', 'height':'100%', 'overflow-y':'auto', 'font-size':'0.5vw','overflow-x':'auto'}), css_classes=['panel-df'])
+        style = {'width': '100%', 'height': '100%', 'overflow-y': 'auto',
+                 'font-size': '0.5vw', 'overflow-x': 'auto'}
+
+        html_pane = pn.pane.HTML(data[self.columns], style=style)
+        self.chart = pn.Column(html_pane, css_classes=['panel-df'])
         self.chart.sizing_mode = 'scale_both'
 
     def view(self):
         return self.chart
 
-    def reload_chart(self, data, patch_update:bool):
+    def reload_chart(self, data, patch_update: bool):
         self.chart[0].object = data[self.columns]
 
     def update_dimensions(self, width=None, height=None):
         """
-                
         Parameters
         ----------
-
-        
 
         Ouput
         -----
@@ -95,9 +92,9 @@ class ViewDataFrame:
         if height is not None:
             self.chart.height = height
 
-    def query_chart_by_range(self, active_chart:BaseChart, query_tuple, data):
+    def query_chart_by_range(self, active_chart: BaseChart, query_tuple, data):
         '''
-        Description: 
+        Description:
 
         -------------------------------------------
         Input:
@@ -109,11 +106,14 @@ class ViewDataFrame:
         Ouput:
         '''
         min_val, max_val = query_tuple
-        self.reload_chart(data.query(str(min_val)+"<="+active_chart.x+"<="+str(max_val)), False)
+        query = str(min_val) + "<=" + active_chart.x + "<=" + str(max_val)
+        self.reload_chart(data.query(query), False)
 
-    def query_chart_by_indices(self, active_chart:BaseChart, old_indices, new_indices, data):
+    def query_chart_by_indices(
+        self, active_chart: BaseChart, old_indices, new_indices, data
+    ):
         '''
-        Description: 
+        Description:
 
         -------------------------------------------
         Input:
@@ -124,14 +124,17 @@ class ViewDataFrame:
 
         Ouput:
         '''
-        if '' in new_indices: new_indices.remove('') 
+        if '' in new_indices:
+            new_indices.remove('')
         if len(new_indices) == 0:
-            #case: all selected indices were reset
-            #reset the chart
+            # case: all selected indices were reset
+            # reset the chart
             self.reload_chart(data, False)
         elif len(new_indices) == 1:
-            #just a single index
-            self.reload_chart(data.query(active_chart.x+"=="+str(float(new_indices[0]))), False)
+            # just a single index
+            query = active_chart.x + "==" + str(float(new_indices[0]))
+            self.reload_chart(data.query(query), False)
         else:
-            new_indices_str = ','.join(map(str,new_indices))
-            self.reload_chart(data.query(active_chart.x+" in ("+new_indices_str+")"), False)
+            new_indices_str = ','.join(map(str, new_indices))
+            query = active_chart.x + " in (" + new_indices_str + ")"
+            self.reload_chart(data.query(query), False)

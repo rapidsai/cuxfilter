@@ -1,5 +1,6 @@
 from typing import Dict
 
+
 class BaseWidget:
     chart_type: str = None
     x: str = None
@@ -8,7 +9,7 @@ class BaseWidget:
     width: int = None
     chart = None
     data_points: int = 100
-    start: float  = None
+    start: float = None
     end: float = None
     _stride = None
     stride_type = int
@@ -20,8 +21,8 @@ class BaseWidget:
 
     @property
     def name(self):
-        return self.x+"_"+self.chart_type
-    
+        return self.x + "_" + self.chart_type
+
     @property
     def stride(self):
         return self._stride
@@ -31,18 +32,16 @@ class BaseWidget:
         if value is None:
             self._stride = None
         else:
-            # value = round(value, 2)
             if self.stride_type == int:
                 value = self.stride_type(value)
-            
             if self.stride_type(value) == self.stride_type(0):
                 value = self.stride_type(1.0)
-            # elif self.data_points != int((self.max_value - self.min_value)/value):
-            #     self.data_points = int((self.max_value - self.min_value)/value)
-                
             self._stride = value
-        
-    def __init__(self, x, width=400, height=10, data_points=100, step_size=None, step_size_type=int, **params):
+
+    def __init__(
+        self, x, width=400, height=10, data_points=100, step_size=None,
+        step_size_type=int, **params
+    ):
         '''
         Description:
 
@@ -60,7 +59,7 @@ class BaseWidget:
         self.data_points = data_points
         self.stride_type = step_size_type
         self.stride = step_size
-       
+
         if 'value' in params:
             self.value = params['value']
             params.pop('value')
@@ -68,7 +67,7 @@ class BaseWidget:
             self.label_map = params['label_map']
             self.label_map = {v: k for k, v in self.label_map.items()}
             params.pop('label_map')
-    
+
     def view(self):
         return self.chart
 
@@ -77,21 +76,8 @@ class BaseWidget:
 
     def compute_query_dict(self, query_dict):
         print('base calc source function, to over-ridden by delegated classes')
-    
-    def reload_chart(self, *args, **kwargs):
-        #No reload functionality, added function for consistency with other charts
-        return -1
-    
-    # def add_int_slider_filter(self, min_value, max_value, data_points, value=None, **kwargs):
-    #     '''
-    #     add range slider to the bottom of the chart, for the filter function
-    #      to facilitate interaction behavior, that updates the rest of the charts on the page, using datatiles
-    #     '''
-    #     self.filter_widget = int_slider(min_value, max_value, data_points, value=value, **kwargs)
 
-    # def add_float_slider_filter(self, min_value, max_value, data_points, value=None, **kwargs):
-    #     '''
-    #     add range slider to the bottom of the chart, for the filter function
-    #      to facilitate interaction behavior, that updates the rest of the charts on the page, using datatiles
-    #     '''
-    #     self.filter_widget = float_slider(min_value, max_value, data_points, value=value, **kwargs)
+    def reload_chart(self, *args, **kwargs):
+        # No reload functionality, added function for consistency
+        # with other charts
+        return -1

@@ -1,11 +1,10 @@
-from typing import Type, Dict
-import numpy as np
+from typing import Dict
 
 from .core_aggregate import BaseAggregateChart
 from ....assets.numba_kernels import calc_value_counts, calc_groupby
-from ....datatile import DataTile
 from ....layouts import chart_view
 from ....assets import geo_json_mapper
+
 
 class BaseChoropleth(BaseAggregateChart):
 
@@ -15,7 +14,7 @@ class BaseChoropleth(BaseAggregateChart):
     geo_mapper: Dict[str, str] = {}
     nan_color = 'white'
     use_data_tiles = True
-    
+
     @property
     def datatile_loaded_state(self):
         return self._datatile_loaded_state
@@ -29,10 +28,15 @@ class BaseChoropleth(BaseAggregateChart):
         #     else:
         #         self.filter_widget.bar_color = '#d3d9e2'
 
-    def __init__(self, x, y=None, data_points=100, add_interaction=True, aggregate_fn='count', width=800, height=400, step_size=None, step_size_type=int, geoJSONSource=None, geoJSONProperty=None, geo_color_palette=None, tile_provider=None, **library_specific_params):
+    def __init__(
+        self, x, y=None, data_points=100, add_interaction=True,
+        aggregate_fn='count', width=800, height=400, step_size=None,
+        step_size_type=int, geoJSONSource=None, geoJSONProperty=None,
+        geo_color_palette=None, tile_provider=None, **library_specific_params
+    ):
         '''
         Description:
-        
+
         -------------------------------------------
         Input:
             x
@@ -40,7 +44,7 @@ class BaseChoropleth(BaseAggregateChart):
             geoJSONProperty
             y
             data_points
-            add_interaction 
+            add_interaction
             geo_color_palette
             aggregate_fn
             width
@@ -67,10 +71,12 @@ class BaseChoropleth(BaseAggregateChart):
             print("geoJSONSource is required for the choropleth map")
         else:
             self.geoJSONSource = geoJSONSource
-            
+
         self.geo_color_palette = geo_color_palette
         self.geoJSONProperty = geoJSONProperty
-        self.geo_mapper, x_range, y_range = geo_json_mapper(self.geoJSONSource, self.geoJSONProperty)
+        self.geo_mapper, x_range, y_range = geo_json_mapper(
+            self.geoJSONSource, self.geoJSONProperty
+        )
         self.height = height
         self.width = width
 
@@ -79,22 +85,21 @@ class BaseChoropleth(BaseAggregateChart):
         self.tile_provider = tile_provider
 
         self.library_specific_params = library_specific_params
-        
+
         if 'x_range' not in self.library_specific_params:
             self.library_specific_params['x_range'] = x_range
-        
+
         if 'y_range' not in self.library_specific_params:
             self.library_specific_params['y_range'] = y_range
-        
+
         if 'nan_color' in self.library_specific_params:
             self.nan_color = self.library_specific_params['nan_color']
             self.library_specific_params.pop('nan_color')
-        
 
     def initiate_chart(self, dashboard_cls):
         '''
         Description:
-        
+
         -------------------------------------------
         Input:
         data: cudf DataFrame
@@ -108,28 +113,32 @@ class BaseChoropleth(BaseAggregateChart):
 
         if self.data_points > dashboard_cls._data[self.x].shape[0]:
             self.data_points = dashboard_cls._data[self.x].shape[0]
-        
+
         if self.stride is None:
             if self.max_value < 1 and self.stride_type == int:
                 self.stride_type = float
             if self.stride_type == int:
-                self.stride = int( round((self.max_value - self.min_value)/self.data_points))
+                self.stride = int(
+                    round((self.max_value - self.min_value) / self.data_points)
+                )
             else:
-                self.stride = float((self.max_value - self.min_value)/self.data_points)
+                self.stride = float(
+                    (self.max_value - self.min_value) / self.data_points
+                )
 
         self.calculate_source(dashboard_cls._data)
         self.generate_chart()
         self.apply_mappers()
 
         self.add_events(dashboard_cls)
-    
+
     def view(self):
         return chart_view(self.chart, width=self.width)
 
     def calculate_source(self, data, patch_update=False):
         '''
         Description:
-        
+
         -------------------------------------------
         Input:
 
@@ -137,17 +146,21 @@ class BaseChoropleth(BaseAggregateChart):
 
         Ouput:
         '''
-        if self.y == self.x or self.y is None: 
+        if self.y == self.x or self.y is None:
             # it's a histogram
-            df = calc_value_counts(data[self.x].to_gpu_array(), self.data_points)
+            df = calc_value_counts(
+                data[self.x].to_gpu_array(), self.data_points
+            )
         else:
             df = calc_groupby(self, data)
 
-        dict_temp = {'X':list(df[0].astype(df[0].dtype)), 'Y':list(df[1].astype(df[1].dtype))}
-        
+        dict_temp = {
+            'X': list(df[0].astype(df[0].dtype)),
+            'Y': list(df[1].astype(df[1].dtype))
+        }
+
         self.format_source_data(dict_temp, patch_update)
-        
-        
+
     def get_selection_callback(self, dashboard_cls):
         '''
         Description: generate callback for choropleth selection evetn
@@ -168,7 +181,7 @@ class BaseChoropleth(BaseAggregateChart):
 
     def compute_query_dict(self, query_str_dict):
         '''
-        Description: 
+        Description:
 
         -------------------------------------------
         Input:
@@ -181,15 +194,14 @@ class BaseChoropleth(BaseAggregateChart):
         if len(list_of_indices) == 0 or list_of_indices == ['']:
             query_str_dict.pop(self.name, None)
         elif len(list_of_indices) == 1:
-            query_str_dict[self.name] = self.x+"=="+str(list_of_indices[0])
+            query_str_dict[self.name] = self.x + "==" + str(list_of_indices[0])
         else:
             indices_string = ",".join(map(str, list_of_indices))
-            query_str_dict[self.name] = self.x+" in ("+indices_string+")"
+            query_str_dict[self.name] = self.x + " in (" + indices_string + ")"
 
-       
     def add_events(self, dashboard_cls):
         '''
-        Description: 
+        Description:
 
         -------------------------------------------
         Input:
@@ -199,15 +211,15 @@ class BaseChoropleth(BaseAggregateChart):
         Ouput:
         '''
         if self.add_interaction:
-            self.add_selection_event(self.get_selection_callback(dashboard_cls))
+            self.add_selection_event(
+                self.get_selection_callback(dashboard_cls)
+            )
         if self.reset_event is not None:
             self.add_reset_event(dashboard_cls)
 
-
-
     def add_reset_event(self, dashboard_cls):
         '''
-        Description: 
+        Description:
 
         -------------------------------------------
         Input:
@@ -218,17 +230,18 @@ class BaseChoropleth(BaseAggregateChart):
         '''
         def reset_callback(event):
             if dashboard_cls._active_view != self.name:
-                #reset previous active view and set current chart as active view
+                # reset previous active view and set current chart as
+                # active view
                 dashboard_cls._reset_current_view(new_active_view=self)
-            dashboard_cls._reload_charts()        
+            dashboard_cls._reload_charts()
 
-        #add callback to reset chart button
-        self.add_event(self.reset_event,reset_callback)
+        # add callback to reset chart button
+        self.add_event(self.reset_event, reset_callback)
 
     def get_selected_indices(self):
         '''
         Description:
-        
+
         -------------------------------------------
         Input:
 
@@ -242,7 +255,7 @@ class BaseChoropleth(BaseAggregateChart):
     def add_selection_event(self, callback):
         '''
         Description:
-        
+
         -------------------------------------------
         Input:
 
@@ -250,5 +263,4 @@ class BaseChoropleth(BaseAggregateChart):
 
         Ouput:
         '''
-
         print('function to be overridden by library specific extensions')

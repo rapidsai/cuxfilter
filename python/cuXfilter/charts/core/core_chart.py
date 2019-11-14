@@ -1,4 +1,3 @@
-import numpy as np
 from typing import Dict
 
 
@@ -26,7 +25,7 @@ class BaseChart:
 
     @property
     def name(self):
-        return self.x+"_"+self.chart_type
+        return self.x + "_" + self.chart_type
 
     @property
     def stride(self):
@@ -40,17 +39,15 @@ class BaseChart:
             # value = round(value, 2)
             if self.stride_type == int:
                 value = self.stride_type(value)
-            
             if self.stride_type(value) == self.stride_type(0):
                 value = self.stride_type(1.0)
-            
             temp_max_val = self.max_value
             if self.min_value == 0:
-                temp_max_val +=1
-            
-            if self.data_points != int(round((temp_max_val - self.min_value)/value)):
-                self.data_points = int(round((temp_max_val - self.min_value)/value))
-                
+                temp_max_val += 1
+            if self.data_points != int(
+                    round((temp_max_val - self.min_value) / value)):
+                self.data_points = int(
+                    round((temp_max_val - self.min_value) / value))
             self._stride = value
 
     @property
@@ -110,7 +107,7 @@ class BaseChart:
     def calculate_source(self, data):
         print('base calc source function, to over-ridden by delegated classes')
         return -1
-    
+
     def generate_chart(self):
         print('base calc source function, to over-ridden by delegated classes')
         return -1
@@ -123,15 +120,15 @@ class BaseChart:
         print('base calc source function, to over-ridden by delegated classes')
         return -1
 
-    def reset_chart(self, data:list=[]):
+    def reset_chart(self, data: list = []):
         print('base calc source function, to over-ridden by delegated classes')
         return -1
 
-    def reload_chart(self, data, patch_update:bool):
+    def reload_chart(self, data, patch_update: bool):
         print('base calc source function, to over-ridden by delegated classes')
         return -1
 
-    def format_source_data(self, source_dict, patch_update= False):
+    def format_source_data(self, source_dict, patch_update=False):
         '''
         '''
         # print('function to be overridden by library specific extensions')
@@ -146,5 +143,3 @@ class BaseChart:
         '''
         # print('function to be overridden by library specific extensions')
         return -1
-
-    
