@@ -34,7 +34,7 @@ cuXfilter wouldn’t be possible without using these great open source projects:
 
 ### Where is the original cuXfilter and Mortgage Viz Demo?
 
-The original version (0.1) of cuXfilter, most known for the backend powering the Mortgage Viz Demo, has been moved into the `/javascript` folder. As it has a much more complicated backend and javascript API, we’ve decided to focus more on the streamlined notebook focused version in the `/python` folder.
+The original version (0.2) of cuXfilter, most known for the backend powering the Mortgage Viz Demo, has been moved into the [`GTC-2018-mortgage-visualization branch`](https://github.com/rapidsai/cuxfilter/tree/GTC-2018-mortgage-visualization). As it has a much more complicated backend and javascript API, we’ve decided to focus more on the streamlined notebook focused version in the `/python` folder.
 
 ## Get Started
 
