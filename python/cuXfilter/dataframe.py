@@ -74,8 +74,11 @@ class DataFrame:
         >>> import cuXfilter
         >>> import cudf
         >>> cudf_df = cudf.DataFrame(
-            {'key':[0,1,2,3,4], 'val':[float(i+10) for i in range(5)]}
-            )
+        >>>     {
+        >>>         'key': [0, 1, 2, 3, 4],
+        >>>         'val':[float(i + 10) for i in range(5)]
+        >>>     }
+        >>> )
         >>> cux_df = cuXfilter.DataFrame.from_dataframe(cudf_df)
 
         """
@@ -123,12 +126,15 @@ class DataFrame:
         >>> import cuXfilter
         >>> from cuXfilter import charts
         >>> df = cudf.DataFrame(
-            {'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}
-            )
+        >>>     {
+        >>>         'key': [0, 1, 2, 3, 4],
+        >>>         'val':[float(i + 10) for i in range(5)]
+        >>>     }
+        >>> )
         >>> cux_df = cuXfilter.DataFrame.from_dataframe(df)
         >>> line_chart_1 = charts.bokeh.line(
-            'key', 'val', data_points=5, add_interaction=False
-            )
+        >>>     'key', 'val', data_points=5, add_interaction=False
+        >>> )
 
         >>> # create a dashboard object
         >>> d = cux_df.dashboard([line_chart_1])
