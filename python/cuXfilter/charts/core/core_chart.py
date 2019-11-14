@@ -86,7 +86,6 @@ class BaseChart:
         self.set_color()
 
     def set_color(self):
-        self.color = None
         if 'color' in self.library_specific_params:
             self.color = self.library_specific_params['color']
 
