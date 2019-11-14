@@ -4,7 +4,7 @@ from distutils.version import LooseVersion
 
 import bokeh
 import uuid
-
+import time
 
 from bokeh.document import Document
 from bokeh.models import ColumnDataSource
@@ -16,14 +16,13 @@ if bokeh_version > '0.12.9':
 else:
     from bokeh.embed import notebook_div
 
-import time
-
 NOTEBOOK_DIV = """
 {plot_div}
 <script type="text/javascript">
   {plot_script}
 </script>
 """
+
 
 def bokeh_notebook_div(image):
     """"
@@ -96,7 +95,7 @@ class InteractiveImage(object):
             'ymax': self.p.y_range.end,
             'w': self.p.plot_width,
             'h': self.p.plot_height
-            }
+        }
         self.kwargs.update(kwargs)
         self.update_image(dict_temp)
 
@@ -115,7 +114,6 @@ class InteractiveImage(object):
         self.last_run = time.time()
         self.p.x_range.on_change('start', self.callback_py)
         self.p.y_range.on_change('start', self.callback_py)
-
 
     def _init_image(self):
         """
@@ -149,7 +147,7 @@ class InteractiveImage(object):
                               ranges['h'], **self.kwargs)
         new_data = dict(image=[image.data], x=[x_range[0]],
                         y=[y_range[0]], dw=[dw], dh=[dh])
-        
+
         self.ds.data.update(new_data)
 
     def _repr_html_(self):
