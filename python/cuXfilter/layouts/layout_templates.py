@@ -64,7 +64,7 @@ layout_3 = '''
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -115,7 +115,7 @@ layout_5 = '''
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -135,15 +135,13 @@ layout_5 = '''
 {% endblock %}
 '''
 
-
-
 layout_6 = '''
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -173,7 +171,7 @@ layout_7 = '''
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -203,7 +201,7 @@ layout_8 = '''
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -236,7 +234,7 @@ layout_9 = '''
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -274,7 +272,7 @@ layout_10 = '''
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -310,7 +308,7 @@ layout_11 = '''
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -320,7 +318,7 @@ layout_11 = '''
         <div class="pure-u-1 pure-u-md-1-2">
             {{ embed(roots.chart2) }}
         </div>
-        
+
     </div>
     <div class="pure-g">
         <div class="pure-u-1 pure-u-md-1-4">
@@ -347,7 +345,7 @@ layout_12 = '''
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">

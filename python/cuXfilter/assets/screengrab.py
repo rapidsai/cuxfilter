@@ -1,5 +1,5 @@
-import asyncio
 from pyppeteer import launch
+
 
 async def screengrab(url):
     browser = await launch()
@@ -15,7 +15,7 @@ async def screengrab(url):
 
 # async def screengrab(url):
 #     print('screen grab started')
-    
+
 #     print('screen grabbed')
 
 
