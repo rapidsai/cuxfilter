@@ -2,9 +2,11 @@ import panel as pn
 import cudf
 import pyarrow as pa
 from typing import Type
+
 from .dashboard import DashBoard
 from .layouts import single_feature
-from .themes import light, dark
+from .themes import light
+
 
 def read_arrow(source):
     # print('reading arrow file as arrow table from disk')
@@ -12,11 +14,13 @@ def read_arrow(source):
     pa_df = reader.read_all()
     return pa_df
 
+
 # class DataFrame:
 class DataFrame:
     """
     A cuXfilter GPU DataFrame object
     """
+
     data: Type[cudf.DataFrame] = None
 
     @classmethod
@@ -27,7 +31,7 @@ class DataFrame:
         Parameters
         ----------
         dataframe_location: str or arrow in-memory table
-        
+
         Returns
         -------
         cuXfilter.DataFrame object
@@ -38,7 +42,9 @@ class DataFrame:
         Read dataframe as an arrow file from disk
 
         >>> import cuXfilter
-        >>> cux_df = cuXfilter.DataFrame.from_arrow('./location/of/dataframe.arrow')
+        >>> cux_df = cuXfilter.DataFrame.from_arrow(
+            './location/of/dataframe.arrow'
+            )
 
         """
         if type(dataframe_location) == str:
@@ -55,59 +61,81 @@ class DataFrame:
         Parameters
         ----------
         dataframe_location: cudf.DataFrame
-        
+
         Returns
         -------
         cuXfilter.DataFrame object
-        
+
         Examples
         --------
-        
+
         Read dataframe from a cudf.DataFrame
 
         >>> import cuXfilter
         >>> import cudf
-        >>> cudf_df = cudf.DataFrame({'key':[0,1,2,3,4], 'val':[float(i+10) for i in range(5)]})
+        >>> cudf_df = cudf.DataFrame(
+        >>>     {
+        >>>         'key': [0, 1, 2, 3, 4],
+        >>>         'val':[float(i + 10) for i in range(5)]
+        >>>     }
+        >>> )
         >>> cux_df = cuXfilter.DataFrame.from_dataframe(cudf_df)
-            
+
         """
         return DataFrame(dataframe)
-        
+
     def __init__(self, data):
         pn.extension()
         self.backup = data
         self.data = data
 
-    def dashboard(self, charts:list, layout=single_feature, theme = light, title='Dashboard', data_size_widget=True, warnings=False):
+    def dashboard(
+        self,
+        charts: list,
+        layout=single_feature,
+        theme=light,
+        title="Dashboard",
+        data_size_widget=True,
+        warnings=False,
+    ):
         """
         Creates a cuXfilter.DashBoard object
-        
+
         Parameters
         ----------
 
         charts: list
             list of cuXfilter.charts
-        
+
         layout: cuXfilter.layouts
 
         title: str
             title of the dashboard, default "Dashboard"
 
         data_size_widget: boolean
-            flag to determine whether to diplay the current datapoints selected in the dashboard, default True
+            flag to determine whether to diplay the current datapoints
+            selected in the dashboard, default True
 
         warnings: boolean
-            flag to disable or enable runtime warnings related to layouts, default False
+            flag to disable or enable runtime warnings related to layouts,
+            default False
 
         Examples
         --------
         >>> import cudf
         >>> import cuXfilter
         >>> from cuXfilter import charts
-        >>> df = cudf.DataFrame({'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]})
+        >>> df = cudf.DataFrame(
+        >>>     {
+        >>>         'key': [0, 1, 2, 3, 4],
+        >>>         'val':[float(i + 10) for i in range(5)]
+        >>>     }
+        >>> )
         >>> cux_df = cuXfilter.DataFrame.from_dataframe(df)
-        >>> line_chart_1 = charts.bokeh.line('key', 'val', data_points=5, add_interaction=False)
-        
+        >>> line_chart_1 = charts.bokeh.line(
+        >>>     'key', 'val', data_points=5, add_interaction=False
+        >>> )
+
         >>> # create a dashboard object
         >>> d = cux_df.dashboard([line_chart_1])
 
@@ -116,4 +144,6 @@ class DataFrame:
         cuXfilter.DashBoard object
 
         """
-        return DashBoard(charts, self.data, layout, theme, title, data_size_widget, warnings)
+        return DashBoard(
+            charts, self.data, layout, theme, title, data_size_widget, warnings
+        )

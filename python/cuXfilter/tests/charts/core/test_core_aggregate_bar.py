@@ -7,36 +7,37 @@ from cuXfilter.charts.core.aggregate.core_aggregate_bar import BaseBar
 import cuXfilter
 from cuXfilter.layouts import chart_view
 
+
 class TestBaseBar:
 
     df = cudf.DataFrame(
-            {'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}
-            )
+        {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
+    )
     cux_df = cuXfilter.DataFrame.from_dataframe(df)
-    dashboard = cux_df.dashboard(charts=[], title='test_title')
+    dashboard = cux_df.dashboard(charts=[], title="test_title")
 
     def test_variables(self):
-        bb = BaseBar(x='test_x')
+        bb = BaseBar(x="test_x")
 
-        assert bb.chart_type == 'bar'
-        assert bb.reset_event == None
-        assert bb._datatile_loaded_state == False
-        assert bb.filter_widget == None
-        assert bb.use_data_tiles == True
-        assert bb.datatile_active_color == '#8ab4f7'
-        assert bb.x == 'test_x'
-        assert bb.y == None
+        assert bb.chart_type == "bar"
+        assert bb.reset_event is None
+        assert bb._datatile_loaded_state is False
+        assert bb.filter_widget is None
+        assert bb.use_data_tiles is True
+        assert bb.datatile_active_color == "#8ab4f7"
+        assert bb.x == "test_x"
+        assert bb.y is None
         assert bb.data_points == int(100)
-        assert bb.add_interaction == True
-        assert bb.aggregate_fn == 'count'
+        assert bb.add_interaction is True
+        assert bb.aggregate_fn == "count"
         assert bb.width == 400
         assert bb.height == 400
-        assert bb.stride == None
+        assert bb.stride is None
         assert bb.stride_type == int
         assert bb.library_specific_params == {}
 
     def test_initiate_chart(self):
-        bb = BaseBar(x='key')
+        bb = BaseBar(x="key")
         bb.initiate_chart(self.dashboard)
 
         assert bb.min_value == 0.0
@@ -45,30 +46,46 @@ class TestBaseBar:
         assert bb.stride == 1
         assert bb.stride_type == int
 
-
-    @pytest.mark.parametrize('chart, _chart',[(None, None),(1,1)])
+    @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
     def test_view(self, chart, _chart):
-        bnac = BaseBar(x='test_x')
+        bnac = BaseBar(x="test_x")
         bnac.chart = chart
         bnac.width = 400
-        
-        assert str(bnac.view()) == str(chart_view(_chart, width = bnac.width))
 
-    @pytest.mark.parametrize('bb, result',[
-        (BaseBar(x='key', y='val'), {'X': [0.0, 1.0, 2.0, 3.0, 4.0], 'Y': [10.0, 11.0, 12.0, 13.0, 14.0]}),
-        (BaseBar(x='key'), {'X': [0.0, 0.8, 1.6, 2.4000000000000004, 4.0], 'Y': [1, 1, 1, 1, 1]})
-    ])
+        assert str(bnac.view()) == str(chart_view(_chart, width=bnac.width))
+
+    @pytest.mark.parametrize(
+        "bb, result",
+        [
+            (
+                BaseBar(x="key", y="val"),
+                {
+                    "X": [0.0, 1.0, 2.0, 3.0, 4.0],
+                    "Y": [10.0, 11.0, 12.0, 13.0, 14.0],
+                },
+            ),
+            (
+                BaseBar(x="key"),
+                {
+                    "X": [0.0, 0.8, 1.6, 2.4000000000000004, 4.0],
+                    "Y": [1, 1, 1, 1, 1],
+                },
+            ),
+        ],
+    )
     def test_calculate_source(self, bb, result):
         bb.initiate_chart(self.dashboard)
         self.result = None
+
         def func1(dict_temp, patch_update=False):
             self.result = dict_temp
+
         bb.format_source_data = func1
         bb.calculate_source(self.df)
-        assert  self.result == result
-        
+        assert self.result == result
+
     def test_add_range_slider_filter(self):
-        bb = BaseBar(x='key')
+        bb = BaseBar(x="key")
         bb.min_value = self.dashboard._data[bb.x].min()
         bb.max_value = self.dashboard._data[bb.x].max()
         if bb.data_points > self.dashboard._data[bb.x].shape[0]:
@@ -76,15 +93,13 @@ class TestBaseBar:
         bb.add_range_slider_filter(self.dashboard)
 
         assert type(bb.filter_widget) == pn.widgets.RangeSlider
-        assert bb.filter_widget.value == (0,4)
+        assert bb.filter_widget.value == (0, 4)
 
-
-    @pytest.mark.parametrize('range, query',[
-        ((3,4), '3<=key<=4'),
-         ((0,0),'0<=key<=0')
-         ])
+    @pytest.mark.parametrize(
+        "range, query", [((3, 4), "3<=key<=4"), ((0, 0), "0<=key<=0")]
+    )
     def test_compute_query_dict(self, range, query):
-        bb = BaseBar(x='key')
+        bb = BaseBar(x="key")
         bb.min_value = self.dashboard._data[bb.x].min()
         bb.max_value = self.dashboard._data[bb.x].max()
         if bb.data_points > self.dashboard._data[bb.x].shape[0]:
@@ -92,33 +107,36 @@ class TestBaseBar:
         bb.add_range_slider_filter(self.dashboard)
         self.dashboard.add_charts([bb])
         bb.filter_widget.value = range
-        #test the following function behavior
+        # test the following function behavior
         bb.compute_query_dict(self.dashboard._query_str_dict)
 
-        assert self.dashboard._query_str_dict['key_bar'] == query
+        assert self.dashboard._query_str_dict["key_bar"] == query
 
-    @pytest.mark.parametrize('event, result',[
-        (None, None),
-        (ButtonClick,'func_Called')
-         ])
+    @pytest.mark.parametrize(
+        "event, result", [(None, None), (ButtonClick, "func_Called")]
+    )
     def test_add_events(self, event, result):
-        bb = BaseBar(x='key')
+        bb = BaseBar(x="key")
         self.result = None
+
         def test_func(cls):
-            self.result = 'func_Called'
+            self.result = "func_Called"
+
         bb.add_reset_event = test_func
         bb.reset_event = event
-        #test the following function behavior
+        # test the following function behavior
         bb.add_events(self.dashboard)
 
         assert self.result == result
 
     def test_add_reset_event(self):
-        bb = BaseBar(x='key')
+        bb = BaseBar(x="key")
         self.result = None
+
         def test_func(event, callback):
             self.result = callback
+
         bb.add_event = test_func
-        #test the following function behavior
+        # test the following function behavior
         bb.add_reset_event(self.dashboard)
-        assert self.result.__name__ == 'reset_callback'
+        assert self.result.__name__ == "reset_callback"

@@ -1,4 +1,4 @@
-layout_0 = '''
+layout_0 = """
 <!-- goes in body -->
 {% block contents %}
 <nav>
@@ -14,9 +14,9 @@ layout_0 = '''
     </div>
 </div>
 {% endblock %}
-'''
+"""
 
-layout_1 = '''
+layout_1 = """
 <!-- goes in body -->
 {% block contents %}
 <nav>
@@ -36,9 +36,9 @@ layout_1 = '''
     </div>
 </div>
 {% endblock %}
-'''
+"""
 
-layout_2 = '''
+layout_2 = """
 <!-- goes in body -->
 {% block contents %}
 <nav>
@@ -56,15 +56,15 @@ layout_2 = '''
     </div>
 </div>
 {% endblock %}
-'''
+"""
 
-layout_3 = '''
+layout_3 = """
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -83,9 +83,9 @@ layout_3 = '''
 
 </div>
 {% endblock %}
-'''
+"""
 
-layout_4 = '''
+layout_4 = """
 <!-- goes in body -->
 {% block contents %}
 <nav>
@@ -106,16 +106,16 @@ layout_4 = '''
     </div>
 </div>
 {% endblock %}
-'''
+"""
 
 
-layout_5 = '''
+layout_5 = """
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -133,17 +133,15 @@ layout_5 = '''
     </div>
 </div>
 {% endblock %}
-'''
+"""
 
-
-
-layout_6 = '''
+layout_6 = """
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -164,16 +162,16 @@ layout_6 = '''
     </div>
 </div>
 {% endblock %}
-'''
+"""
 
 
-layout_7 = '''
+layout_7 = """
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -194,16 +192,16 @@ layout_7 = '''
     </div>
 </div>
 {% endblock %}
-'''
+"""
 
 
-layout_8 = '''
+layout_8 = """
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -227,16 +225,16 @@ layout_8 = '''
     </div>
 </div>
 {% endblock %}
-'''
+"""
 
 
-layout_9 = '''
+layout_9 = """
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -265,16 +263,16 @@ layout_9 = '''
     </div>
 </div>
 {% endblock %}
-'''
+"""
 
 
-layout_10 = '''
+layout_10 = """
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -301,16 +299,16 @@ layout_10 = '''
     </div>
 </div>
 {% endblock %}
-'''
+"""
 
 
-layout_11 = '''
+layout_11 = """
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -320,7 +318,7 @@ layout_11 = '''
         <div class="pure-u-1 pure-u-md-1-2">
             {{ embed(roots.chart2) }}
         </div>
-        
+
     </div>
     <div class="pure-g">
         <div class="pure-u-1 pure-u-md-1-4">
@@ -338,16 +336,16 @@ layout_11 = '''
     </div>
 </div>
 {% endblock %}
-'''
+"""
 
 
-layout_12 = '''
+layout_12 = """
 <!-- goes in body -->
 {% block contents %}
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-    
+
 </nav>
 <div class="container">
     <div class="pure-g">
@@ -385,4 +383,4 @@ layout_12 = '''
     </div>
 </div>
 {% endblock %}
-'''
+"""

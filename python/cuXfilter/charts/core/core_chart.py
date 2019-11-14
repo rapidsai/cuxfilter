@@ -1,4 +1,3 @@
-import numpy as np
 from typing import Dict
 
 
@@ -6,7 +5,7 @@ class BaseChart:
     chart_type: str = None
     x: str = None
     y: str = None
-    aggregate_fn: str = 'count'
+    aggregate_fn: str = "count"
     color: str = None
     _height: int = 0
     _width: int = 0
@@ -26,7 +25,7 @@ class BaseChart:
 
     @property
     def name(self):
-        return self.x+"_"+self.chart_type
+        return self.x + "_" + self.chart_type
 
     @property
     def stride(self):
@@ -40,17 +39,17 @@ class BaseChart:
             # value = round(value, 2)
             if self.stride_type == int:
                 value = self.stride_type(value)
-            
             if self.stride_type(value) == self.stride_type(0):
                 value = self.stride_type(1.0)
-            
             temp_max_val = self.max_value
             if self.min_value == 0:
-                temp_max_val +=1
-            
-            if self.data_points != int(round((temp_max_val - self.min_value)/value)):
-                self.data_points = int(round((temp_max_val - self.min_value)/value))
-                
+                temp_max_val += 1
+            if self.data_points != int(
+                round((temp_max_val - self.min_value) / value)
+            ):
+                self.data_points = int(
+                    round((temp_max_val - self.min_value) / value)
+                )
             self._stride = value
 
     @property
@@ -86,16 +85,16 @@ class BaseChart:
         self.set_color()
 
     def set_color(self):
-        if 'color' in self.library_specific_params:
-            self.color = self.library_specific_params['color']
+        if "color" in self.library_specific_params:
+            self.color = self.library_specific_params["color"]
 
     def extract_mappers(self):
-        if 'x_label_map' in self.library_specific_params:
-            self.x_label_map = self.library_specific_params['x_label_map']
-            self.library_specific_params.pop('x_label_map')
-        if 'y_label_map' in self.library_specific_params:
-            self.y_label_map = self.library_specific_params['y_label_map']
-            self.library_specific_params.pop('y_label_map')
+        if "x_label_map" in self.library_specific_params:
+            self.x_label_map = self.library_specific_params["x_label_map"]
+            self.library_specific_params.pop("x_label_map")
+        if "y_label_map" in self.library_specific_params:
+            self.y_label_map = self.library_specific_params["y_label_map"]
+            self.library_specific_params.pop("y_label_map")
 
     def view(self):
         return self.chart
@@ -104,36 +103,36 @@ class BaseChart:
         self.chart.on_event(event, callback)
 
     def update_dimensions(self, width=None, height=None):
-        print('base calc source function, to over-ridden by delegated classes')
+        print("base calc source function, to over-ridden by delegated classes")
         return -1
 
     def calculate_source(self, data):
-        print('base calc source function, to over-ridden by delegated classes')
+        print("base calc source function, to over-ridden by delegated classes")
         return -1
-    
+
     def generate_chart(self):
-        print('base calc source function, to over-ridden by delegated classes')
+        print("base calc source function, to over-ridden by delegated classes")
         return -1
 
     def add_reset_event(self, callback=None):
-        print('base calc source function, to over-ridden by delegated classes')
+        print("base calc source function, to over-ridden by delegated classes")
         return -1
 
     def compute_query_dict(self, query_dict):
-        print('base calc source function, to over-ridden by delegated classes')
+        print("base calc source function, to over-ridden by delegated classes")
         return -1
 
-    def reset_chart(self, data:list=[]):
-        print('base calc source function, to over-ridden by delegated classes')
+    def reset_chart(self, data: list = []):
+        print("base calc source function, to over-ridden by delegated classes")
         return -1
 
-    def reload_chart(self, data, patch_update:bool):
-        print('base calc source function, to over-ridden by delegated classes')
+    def reload_chart(self, data, patch_update: bool):
+        print("base calc source function, to over-ridden by delegated classes")
         return -1
 
-    def format_source_data(self, source_dict, patch_update= False):
-        '''
-        '''
+    def format_source_data(self, source_dict, patch_update=False):
+        """
+        """
         # print('function to be overridden by library specific extensions')
         return -1
 
@@ -142,9 +141,7 @@ class BaseChart:
         return []
 
     def apply_mappers(self):
-        '''
-        '''
+        """
+        """
         # print('function to be overridden by library specific extensions')
         return -1
-
-    

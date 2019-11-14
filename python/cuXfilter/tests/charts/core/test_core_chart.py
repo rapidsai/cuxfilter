@@ -1,38 +1,37 @@
-import pytest ; pytest
+import pytest
 
 from cuXfilter.charts.core.core_chart import BaseChart
 
 
-class TestBaseChart():
-    
+class TestBaseChart:
     def test_variables(self):
         bc = BaseChart()
-        assert bc.chart_type == None
-        assert bc.x == None
-        assert bc.y == None
-        assert bc.aggregate_fn == 'count'
-        assert bc.color == None
+        assert bc.chart_type is None
+        assert bc.x is None
+        assert bc.y is None
+        assert bc.aggregate_fn == "count"
+        assert bc.color is None
         assert bc.height == 0
         assert bc.width == 0
-        assert bc.add_interaction == True
-        assert bc.chart == None
-        assert bc.source == None
-        assert bc.source_backup == None
+        assert bc.add_interaction is True
+        assert bc.chart is None
+        assert bc.source is None
+        assert bc.source_backup is None
         assert bc.data_points == 0
         assert bc._library_specific_params == {}
-        assert bc._stride == None
+        assert bc._stride is None
         assert bc.stride_type == int
         assert bc.min_value == 0.0
         assert bc.max_value == 0.0
         assert bc.x_label_map == {}
         assert bc.y_label_map == {}
 
-        bc.x = 'test_x'
-        bc.chart_type = 'test_chart_type'
+        bc.x = "test_x"
+        bc.chart_type = "test_chart_type"
 
-        assert bc.name == 'test_x_test_chart_type'
+        assert bc.name == "test_x_test_chart_type"
 
-    @pytest.mark.parametrize("stride, _stride", [(1,1),(None, None), (0,1)])
+    @pytest.mark.parametrize("stride, _stride", [(1, 1), (None, None), (0, 1)])
     def test_stride(self, stride, _stride):
         bc = BaseChart()
         bc.stride = stride
@@ -41,7 +40,9 @@ class TestBaseChart():
     def test_set_dimensions(self):
         bc = BaseChart()
         bc.chart = 1
-        bc.filter_widget = BaseChart() #setting filter_widget to some chart object
+        bc.filter_widget = (
+            BaseChart()
+        )  # setting filter_widget to some chart object
         bc.width = 400
         bc.height = 400
         assert bc.width == 400
@@ -51,31 +52,28 @@ class TestBaseChart():
     def test_label_mappers(self):
         bc = BaseChart()
         library_specific_params = {
-            'x_label_map': {'a':1, 'b':2},
-            'y_label_map':{'a':1, 'b':2}
+            "x_label_map": {"a": 1, "b": 2},
+            "y_label_map": {"a": 1, "b": 2},
         }
         bc.library_specific_params = library_specific_params
         bc.extract_mappers()
 
-        assert bc.x_label_map == {'a':1, 'b':2}
-        assert bc.y_label_map == {'a':1, 'b':2}
+        assert bc.x_label_map == {"a": 1, "b": 2}
+        assert bc.y_label_map == {"a": 1, "b": 2}
 
-    @pytest.mark.parametrize('chart, _chart',[(None, None),(1,1)])
+    @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
     def test_view(self, chart, _chart):
         bc = BaseChart()
         bc.chart = chart
         assert bc.view() == _chart
 
-
     def test_set_color(self):
         bc = BaseChart()
-        library_specific_params = {
-           'color': 'blue'
-        }
+        library_specific_params = {"color": "blue"}
         bc.library_specific_params = library_specific_params
         bc.set_color()
 
-        assert bc.color == 'blue'
+        assert bc.color == "blue"
 
     def test_umimplemented_fns(self):
         bc = BaseChart()
@@ -99,12 +97,9 @@ class TestBaseChart():
         from bokeh.models import Button
 
         def callback(event):
-            print('Python:Click')
+            print("Python:Click")
 
         bc.chart = Button()
-        bc.add_event(ButtonClick,callback)
+        bc.add_event(ButtonClick, callback)
 
         assert ButtonClick.event_name in bc.chart.subscribed_events
-
-
-
