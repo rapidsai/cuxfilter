@@ -36,12 +36,11 @@ cuXfilter wouldn’t be possible without using these great open source projects:
 
 The original version (0.2) of cuXfilter, most known for the backend powering the Mortgage Viz Demo, has been moved into the [`GTC-2018-mortgage-visualization branch`](https://github.com/rapidsai/cuxfilter/tree/GTC-2018-mortgage-visualization). As it has a much more complicated backend and javascript API, we’ve decided to focus more on the streamlined notebook focused version in the `/python` folder.
 
-## Get Started
+## Usage
 
 ```python
 import cuXfilter
 from cuXfilter import charts
-from cuXfilter.layouts import feature_and_base
 
 #update data_dir if you have downloaded datasets elsewhere
 DATA_DIR = './data'
@@ -52,29 +51,17 @@ cux_df = cuXfilter.DataFrame.from_arrow('./data/auto_accidents.arrow')
 cux_df.data['ST_CASE'] = cux_df.data['ST_CASE'].astype('float64')
 
 label_map = {1: 'Sunday',    2: 'Monday',    3: 'Tuesday',    4: 'Wednesday',   5: 'Thursday',    6: 'Friday',    7: 'Saturday',    9: 'Unknown'}
-
 gtc_demo_red_blue_palette = [ (49,130,189), (107,174,214), (123, 142, 216), (226,103,152), (255,0,104) , (50,50,50) ]
-
-from bokeh.tile_providers import get_provider as gp
-tile_provider = gp('CARTODBPOSITRON')
 
 #declare charts
 chart1 = charts.cudatashader.scatter_geo(x='dropoff_x', y='dropoff_y', aggregate_col='ST_CASE',
-                                        tile_provider=tile_provider,
-                                         color_palette=gtc_demo_red_blue_palette,)
-
+                                         color_palette=gtc_demo_red_blue_palette)
 chart2 = charts.panel_widgets.multi_select('YEAR')
-
 chart3 = charts.bokeh.bar('DAY_WEEK', x_label_map=label_map)
+chart4 = charts.bokeh.bar('MONTH')
 
 #declare dashboard
-d = cux_df.dashboard([chart1, chart3, chart2], layout=cuXfilter.layouts.feature_and_base,theme = cuXfilter.themes.rapids, title='Auto Accident Dataset')
-
-#display the dashboard as a web-app(interactive)
-d.show()
-
-#view the interactive dashboard(without layouts) inside the notebook
-d.app()
+d = cux_df.dashboard([chart1, chart2, chart3, chart4], layout=cuXfilter.layouts.feature_and_double_base,theme = cuXfilter.themes.light, title='Auto Accident Dataset')
 
 #preview the dashboard inside the notebook(non-interactive) with layout
 await d.preview()
