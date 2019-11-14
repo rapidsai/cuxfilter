@@ -11,7 +11,7 @@ class BaseLine(BaseNonAggregate):
     reset_event = None
     filter_widget = None
     no_color_set = False
-    
+
     def __init__(
         self, x, y=None, data_points=100, add_interaction=True,
         pixel_shade_type='linear', color=None, step_size=None,

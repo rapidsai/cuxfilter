@@ -3,8 +3,6 @@ from ..core.aggregate import BaseDataSizeIndicator
 from ...assets.numba_kernels import aggregated_column_unique
 
 import panel as pn
-import datetime as dt
-import numpy as np
 
 
 class RangeSlider(BaseWidget):
@@ -24,17 +22,9 @@ class RangeSlider(BaseWidget):
         else:
             self.chart.bar_color = '#d3d9e2'
 
-    
     def initiate_chart(self, dashboard_cls):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        initiate chart on dashboard creation
         '''
         self.min_value = dashboard_cls._data[self.x].min()
         self.max_value = dashboard_cls._data[self.x].max()
@@ -43,41 +33,33 @@ class RangeSlider(BaseWidget):
 
     def generate_widget(self):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        generate widget range slider
         '''
         if self.stride is None:
-            self.chart = pn.widgets.RangeSlider(name=self.x, start=self.min_value, end=self.max_value, value=(self.min_value, self.max_value), **self.params)
+            self.chart = pn.widgets.RangeSlider(
+                name=self.x, start=self.min_value, end=self.max_value,
+                value=(self.min_value, self.max_value), **self.params
+            )
         else:
-            self.chart = pn.widgets.RangeSlider(name=self.x, start=self.min_value, end=self.max_value, value=(self.min_value, self.max_value), step=self.stride, **self.params)
-
+            self.chart = pn.widgets.RangeSlider(
+                name=self.x, start=self.min_value, end=self.max_value,
+                value=(self.min_value, self.max_value), step=self.stride,
+                **self.params
+            )
 
     def apply_theme(self, properties_dict):
         """
-        apply thematic changes to the chart based on the input properties dictionary
+        apply thematic changes to the chart based on the input
+        properties dictionary.
 
         """
+        # interactive slider
+        self.datatile_active_color = (
+            properties_dict['widgets']['datatile_active_color'])
 
-        #interactive slider
-        self.datatile_active_color = properties_dict['widgets']['datatile_active_color']
-
-    
     def add_events(self, dashboard_cls):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        add events
         '''
         def widget_callback(event):
             if dashboard_cls._active_view != self.name:
@@ -86,25 +68,24 @@ class RangeSlider(BaseWidget):
 
             dashboard_cls._query_datatiles_by_range(event.new)
 
-        #add callback to filter_Widget on value change
+        # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ['value'], onlychanged=False)
         # self.add_reset_event(dashboard_cls)
-    
+
     def compute_query_dict(self, query_str_dict):
         '''
-        Description: 
+        compute query value
 
-        -------------------------------------------
-        Input:
-        query_dict = reference to dashboard.__cls__.query_dict
-        -------------------------------------------
+        Parameters:
+        -----------
 
-        Ouput:
+        query_dict:
+            reference to dashboard.__cls__.query_dict
         '''
-        
-        if self.chart.value != (self.chart.start,self.chart.end):
+        if self.chart.value != (self.chart.start, self.chart.end):
             min_temp, max_temp = self.chart.value
-            query_str_dict[self.name] =  str(min_temp)+'<='+str(self.x)+"<="+str(max_temp)
+            query_str_dict[self.name] = (str(min_temp) + '<=' + str(self.x)
+                                         + "<=" + str(max_temp))
 
 
 class IntSlider(BaseWidget):
@@ -125,17 +106,9 @@ class IntSlider(BaseWidget):
         else:
             self.chart.bar_color = '#d3d9e2'
 
-    
     def initiate_chart(self, dashboard_cls):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        initiate chart on dashboard creation
         '''
         self.min_value = int(dashboard_cls._data[self.x].min())
         self.max_value = int(dashboard_cls._data[self.x].max())
@@ -144,39 +117,29 @@ class IntSlider(BaseWidget):
 
     def generate_widget(self):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        generate widget int slider
         '''
         if self.value is None:
             self.value = self.min_value
-        self.chart = pn.widgets.IntSlider(name=self.x, start=self.min_value, end=self.max_value, value=self.value, step=self.stride, width=self.width, height=self.height, **self.params)
-
+        self.chart = pn.widgets.IntSlider(
+            name=self.x, start=self.min_value, end=self.max_value,
+            value=self.value, step=self.stride, width=self.width,
+            height=self.height, **self.params
+        )
 
     def apply_theme(self, properties_dict):
         """
-        apply thematic changes to the chart based on the input properties dictionary
+        apply thematic changes to the chart based on the input
+        properties dictionary.
 
         """
+        # interactive slider
+        self.datatile_active_color = (
+            properties_dict['widgets']['datatile_active_color'])
 
-        #interactive slider
-        self.datatile_active_color = properties_dict['widgets']['datatile_active_color']
-    
     def add_events(self, dashboard_cls):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        add events
         '''
         def widget_callback(event):
             if dashboard_cls._active_view != self.name:
@@ -185,23 +148,21 @@ class IntSlider(BaseWidget):
 
             dashboard_cls._query_datatiles_by_indices([event.old], [event.new])
 
-        #add callback to filter_Widget on value change
+        # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ['value'], onlychanged=False)
         # self.add_reset_event(dashboard_cls)
-    
+
     def compute_query_dict(self, query_str_dict):
         '''
-        Description: 
+        compute query value
 
-        -------------------------------------------
-        Input:
-        query_dict = reference to dashboard.__cls__.query_dict
-        -------------------------------------------
+        Parameters:
+        -----------
 
-        Ouput:
+        query_dict:
+            reference to dashboard.__cls__.query_dict
         '''
-        
-        query_str_dict[self.name] =  str(self.x)+"=="+str(self.chart.value)
+        query_str_dict[self.name] = str(self.x) + "==" + str(self.chart.value)
 
 
 class FloatSlider(BaseWidget):
@@ -221,17 +182,10 @@ class FloatSlider(BaseWidget):
             self.chart.bar_color = self.datatile_active_color
         else:
             self.chart.bar_color = '#d3d9e2'
-    
+
     def initiate_chart(self, dashboard_cls):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        initiate chart on dashboard creation
         '''
         self.min_value = dashboard_cls._data[self.x].min()
         self.max_value = dashboard_cls._data[self.x].max()
@@ -240,42 +194,36 @@ class FloatSlider(BaseWidget):
 
     def generate_widget(self):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        generate widget float slider
         '''
         if self.value is None:
-            self.value = self.min_value 
+            self.value = self.min_value
         if self.stride is None:
-            self.chart = pn.widgets.FloatSlider(name=self.x, start=self.min_value, end=self.max_value, value=self.value, width=self.width, height=self.height, **self.params)
+            self.chart = pn.widgets.FloatSlider(
+                name=self.x, start=self.min_value, end=self.max_value,
+                value=self.value, width=self.width, height=self.height,
+                **self.params
+            )
         else:
-            self.chart = pn.widgets.FloatSlider(name=self.x, start=self.min_value, end=self.max_value, value=self.value, step=self.stride, width=self.width, height=self.height, **self.params)
+            self.chart = pn.widgets.FloatSlider(
+                name=self.x, start=self.min_value, end=self.max_value,
+                value=self.value, step=self.stride, width=self.width,
+                height=self.height, **self.params
+            )
 
     def apply_theme(self, properties_dict):
         """
-        apply thematic changes to the chart based on the input properties dictionary
+        apply thematic changes to the chart based on the input
+        properties dictionary.
 
         """
+        # interactive slider
+        self.datatile_active_color = (
+            properties_dict['widgets']['datatile_active_color'])
 
-        #interactive slider
-        self.datatile_active_color = properties_dict['widgets']['datatile_active_color']
-
-    
     def add_events(self, dashboard_cls):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        add events
         '''
         def widget_callback(event):
             if dashboard_cls._active_view != self.name:
@@ -284,23 +232,21 @@ class FloatSlider(BaseWidget):
 
             dashboard_cls._query_datatiles_by_indices([event.old], [event.new])
 
-        #add callback to filter_Widget on value change
+        # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ['value'], onlychanged=False)
         # self.add_reset_event(dashboard_cls)
-    
+
     def compute_query_dict(self, query_str_dict):
         '''
-        Description: 
+        compute query value
 
-        -------------------------------------------
-        Input:
-        query_dict = reference to dashboard.__cls__.query_dict
-        -------------------------------------------
+        Parameters:
+        -----------
 
-        Ouput:
+        query_dict:
+            reference to dashboard.__cls__.query_dict
         '''
-        
-        query_str_dict[self.name] =  str(self.x)+"=="+str(self.chart.value)
+        query_str_dict[self.name] = str(self.x) + "==" + str(self.chart.value)
 
 
 class DropDown(BaseWidget):
@@ -309,14 +255,7 @@ class DropDown(BaseWidget):
 
     def initiate_chart(self, dashboard_cls):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        initiate chart on dashboard creation
         '''
         self.min_value = dashboard_cls._data[self.x].min()
         self.max_value = dashboard_cls._data[self.x].max()
@@ -324,34 +263,28 @@ class DropDown(BaseWidget):
         if self.stride is None:
             if self.max_value < 1 and self.stride_type == int:
                 self.stride_type = float
-            self.stride = self.stride_type( (self.max_value - self.min_value)/self.data_points)
+            self.stride = self.stride_type(
+                (self.max_value - self.min_value) / self.data_points
+            )
 
-        
         self.calc_list_of_values(dashboard_cls._data)
-
         self.generate_widget()
-        
         self.add_events(dashboard_cls)
-
 
     def calc_list_of_values(self, data):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        calculate unique list of values to be included in the drop down menu
         '''
         if self.label_map is None:
             self.list_of_values = data[self.x].unique().to_pandas().tolist()
             if len(self.list_of_values) > self.data_points:
                 self.list_of_values = aggregated_column_unique(self, data)
-            
-            if len(self.list_of_values)>500:
-                print('It is not recommended to use a column with so many different values for dropdown menu')
+
+            if len(self.list_of_values) > 500:
+                print(
+                    '''It is not recommended to use a column with
+                    so many different values for dropdown menu'''
+                )
             self.list_of_values.append('')
             self.data_points = len(self.list_of_values) - 1
         else:
@@ -363,20 +296,17 @@ class DropDown(BaseWidget):
 
     def generate_widget(self):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        generate widget dropdown
         '''
-        self.chart = pn.widgets.Select(name=self.x, options=self.list_of_values, value='', width=self.width, height=self.height, **self.params)
+        self.chart = pn.widgets.Select(
+            name=self.x, options=self.list_of_values, value='',
+            width=self.width, height=self.height, **self.params
+        )
 
     def apply_theme(self, properties_dict):
         """
-        apply thematic changes to the chart based on the input properties dictionary
+        apply thematic changes to the chart based on the input
+        properties dictionary.
 
         """
         css = '''
@@ -388,17 +318,10 @@ class DropDown(BaseWidget):
         pn.extension(raw_css=[css])
 
         self.chart.css_classes = ['custom-dropdown']
-    
+
     def add_events(self, dashboard_cls):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        add events
         '''
         def widget_callback(event):
             if dashboard_cls._active_view != self.name:
@@ -406,24 +329,23 @@ class DropDown(BaseWidget):
                 dashboard_cls._calc_data_tiles(cumsum=False)
             dashboard_cls._query_datatiles_by_indices([], [event.new])
 
-        #add callback to filter_Widget on value change
+        # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ['value'], onlychanged=False)
         # self.add_reset_event(dashboard_cls)
-    
+
     def compute_query_dict(self, query_str_dict):
         '''
-        Description: 
+        compute query value
 
-        -------------------------------------------
-        Input:
-        query_dict = reference to dashboard.__cls__.query_dict
-        -------------------------------------------
+        Parameters:
+        -----------
 
-        Ouput:
+        query_dict:
+            reference to dashboard.__cls__.query_dict
         '''
         if len(str(self.chart.value)) > 0:
-            query_str_dict[self.name] =  str(self.x)+"=="+str(self.chart.value)
-
+            query_str_dict[self.name] = (str(self.x) + "=="
+                                         + str(self.chart.value))
 
 
 class MultiSelect(BaseWidget):
@@ -432,14 +354,7 @@ class MultiSelect(BaseWidget):
 
     def initiate_chart(self, dashboard_cls):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        initiate chart on dashboard creation
         '''
         self.min_value = dashboard_cls._data[self.x].min()
         self.max_value = dashboard_cls._data[self.x].max()
@@ -448,32 +363,27 @@ class MultiSelect(BaseWidget):
             if self.max_value < 1 and self.stride_type == int:
                 self.stride_type = float
             self.stride = self.stride_type(1)
-        
+
         self.calc_list_of_values(dashboard_cls._data)
 
         self.generate_widget()
-        
-        self.add_events(dashboard_cls)
 
+        self.add_events(dashboard_cls)
 
     def calc_list_of_values(self, data):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        calculate unique list of values to be included in the multiselect menu
         '''
         if self.label_map is None:
             self.list_of_values = data[self.x].unique().to_pandas().tolist()
             # if len(self.list_of_values) > self.data_points:
             #     self.list_of_values = aggregated_column_unique(self, data)
-            
-            if len(self.list_of_values)>500:
-                print('It is not recommended to use a column with so many different values for dropdown menu')
+
+            if len(self.list_of_values) > 500:
+                print(
+                    '''It is not recommended to use a column with
+                    so many different values for multiselect menu'''
+                )
             self.list_of_values.append('')
             self.data_points = len(self.list_of_values) - 1
         else:
@@ -483,27 +393,23 @@ class MultiSelect(BaseWidget):
 
     def generate_widget(self):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        generate widget multiselect
         '''
-
-        self.chart = pn.widgets.MultiSelect(name=self.x, options=self.list_of_values, value=[''], width=self.width, height=self.height, **self.params)
+        self.chart = pn.widgets.MultiSelect(
+            name=self.x, options=self.list_of_values, value=[''],
+            width=self.width, height=self.height, **self.params
+        )
 
     def apply_theme(self, properties_dict):
         """
-        apply thematic changes to the chart based on the input properties dictionary
+        apply thematic changes to the chart based on the input
+        properties dictionary.
 
-        """ 
+        """
         css = '''
             .custom-dropdown select, .custom-dropdown option {{
                 background-color: {0} !important;
-                
+
             }}
             .custom-dropdown {{
                 font-size: 15px !important;
@@ -517,14 +423,7 @@ class MultiSelect(BaseWidget):
 
     def add_events(self, dashboard_cls):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        add events
         '''
         def widget_callback(event):
             if dashboard_cls._active_view != self.name:
@@ -532,28 +431,29 @@ class MultiSelect(BaseWidget):
                 dashboard_cls._calc_data_tiles(cumsum=False)
             dashboard_cls._query_datatiles_by_indices(event.old, event.new)
 
-        #add callback to filter_Widget on value change
+        # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ['value'], onlychanged=False)
         # self.add_reset_event(dashboard_cls)
-    
+
     def compute_query_dict(self, query_str_dict):
         '''
-        Description: 
+        compute query value
 
-        -------------------------------------------
-        Input:
-        query_dict = reference to dashboard.__cls__.query_dict
-        -------------------------------------------
+        Parameters:
+        -----------
 
-        Ouput:
+        query_dict:
+            reference to dashboard.__cls__.query_dict
         '''
         if len(self.chart.value) == 0 or self.chart.value == ['']:
             query_str_dict.pop(self.name, None)
         elif len(self.chart.value) == 1:
-            query_str_dict[self.name] = self.x+"=="+str(self.chart.value[0])
+            query_str_dict[self.name] = (
+                self.x + "==" + str(self.chart.value[0])
+            )
         else:
             indices_string = ",".join(map(str, self.chart.value))
-            query_str_dict[self.name] = self.x+" in ("+indices_string+")"
+            query_str_dict[self.name] = self.x + " in (" + indices_string + ")"
 
 
 class DataSizeIndicator(BaseDataSizeIndicator):
@@ -568,80 +468,58 @@ class DataSizeIndicator(BaseDataSizeIndicator):
         }
 
         .non-handle-temp [disabled] .bk-noUi-connect {
-            background: purple; 
+            background: purple;
         }
         '''
-    pn.extension(raw_css=[css])    
+    pn.extension(raw_css=[css])
 
     def format_source_data(self, source_dict, patch_update=False):
         '''
-        Description:
-            format source
-        -------------------------------------------
-        Input:
-        source_dict = {
-            'X': [],
-            'Y': []
-        }
-        -------------------------------------------
+        format source
 
-        Ouput:
+        Parameters:
+        -----------
+        source_dict: {'X': [],'Y': []}
+
         '''
         if patch_update:
             self.chart.value = float(source_dict['Y'][0])
-        else:        
+        else:
             self.source = float(source_dict['Y'][0])
             self.source_backup = self.source
 
     def get_source_y_axis(self):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        get y axis column values
         '''
         return self.chart.value
-            
+
     def generate_chart(self):
         '''
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        generate chart float slider
         '''
-        self.chart = pn.widgets.FloatSlider(name='Data Points selected', width=self.width, start=0, end=self.max_value, value=self.max_value)
+        self.chart = pn.widgets.FloatSlider(
+            name='Data Points selected', width=self.width, start=0,
+            end=self.max_value, value=self.max_value
+        )
 
     def apply_theme(self, properties_dict):
         """
-        apply thematic changes to the chart based on the input properties dictionary
+        apply thematic changes to the chart based on the input
+        properties dictionary.
         """
 
         self.chart.bar_color = properties_dict['data_size_indicator_color']
 
     def reload_chart(self, data, patch_update=True):
         '''
-        Description: 
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
+        reload chart
         '''
         self.calculate_source(data, patch_update=patch_update)
 
-    def reset_chart(self, data:float=-1):
+    def reset_chart(self, data: float = -1):
         '''
-        Description: 
+        Description:
             if len(data) is 0, reset the chart using self.source_backup
         -------------------------------------------
         Input:
@@ -651,6 +529,6 @@ class DataSizeIndicator(BaseDataSizeIndicator):
         Ouput:
         '''
         if data == -1:
-            self.chart.value = self.source_backup #float
+            self.chart.value = self.source_backup
         else:
             self.chart.value = float(data)
