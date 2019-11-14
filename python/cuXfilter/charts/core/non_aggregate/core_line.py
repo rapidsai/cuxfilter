@@ -63,10 +63,17 @@ class BaseLine(BaseNonAggregate):
         '''
         self.min_value = dashboard_cls._data[self.x].min()
         self.max_value = dashboard_cls._data[self.x].max()
+
+        if self.data_points > dashboard_cls._data[self.x].shape[0]:
+            self.data_points = dashboard_cls._data[self.x].shape[0]
+        
         if self.stride is None:
             if self.max_value < 1 and self.stride_type == int:
                 self.stride_type = float
-            self.stride = self.stride_type( (self.max_value - self.min_value)/self.data_points)
+            if self.stride_type == int:
+                self.stride = int( round((self.max_value - self.min_value)/self.data_points))
+            else:
+                self.stride = float((self.max_value - self.min_value)/self.data_points)
 
         self.calculate_source(dashboard_cls._data)
         self.generate_chart()
