@@ -47,11 +47,11 @@ class TestBaseLine:
 
     @pytest.mark.parametrize('chart, _chart',[(None, None),(1,1)])
     def test_view(self, chart, _chart):
-        bnac = BaseLine(x='test_x')
-        bnac.chart = chart
-        bnac.width = 400
+        bl = BaseLine(x='test_x')
+        bl.chart = chart
+        bl.width = 400
         
-        assert str(bnac.view()) == str(chart_view(_chart, width = bnac.width))
+        assert str(bl.view()) == str(chart_view(_chart, width = bl.width))
 
     @pytest.mark.parametrize('bl, result',[
         (BaseLine(x='key', y='val'), {'X': [0.0, 1.0, 2.0, 3.0, 4.0], 'Y': [10.0, 11.0, 12.0, 13.0, 14.0]}),
@@ -64,7 +64,7 @@ class TestBaseLine:
             self.result = dict_temp
         bl.format_source_data = func1
         bl.calculate_source(self.df)
-        assert  self.result == result
+        assert self.result == result
         
     def test_add_range_slider_filter(self):
         bl = BaseLine(x='key')
