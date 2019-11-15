@@ -18,7 +18,7 @@ ARGS=$*
 # script, and that this script resides in the repo dir!
 REPODIR=$(cd $(dirname $0); pwd)
 
-VALIDARGS="clean cuxfilter -v -g -n --allgpuarch -h"
+VALIDARGS="clean cuxfilter cudatashader -v -g -n --allgpuarch -h"
 HELP="$0 [clean] [cuxfilter] [cudatashader] [-v] [-g] [-n] [-h]
    clean        - remove all existing build artifacts and configuration (start
                   over)
