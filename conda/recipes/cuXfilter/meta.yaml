@@ -24,7 +24,8 @@ requirements:
     - setuptools
   run:
     - python
-    - rapids=0.10
+    - cudf=0.10
+    - cupy>=6*
     - panel=0.6.*
     - bokeh>=1.2.*
     - pyproj=1.9.6
