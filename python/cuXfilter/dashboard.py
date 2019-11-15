@@ -352,7 +352,7 @@ class DashBoard:
         loop=None,
         show=False,
         start=False,
-        **kwargs
+        **kwargs,
     ):
         return get_server(
             self._dashboard.generate_dashboard(
@@ -363,7 +363,7 @@ class DashBoard:
             loop,
             show,
             start,
-            **kwargs
+            **kwargs,
         )
 
     async def preview(self):

@@ -18,7 +18,7 @@ def scatter_geo(
     width=800,
     height=400,
     tile_provider="CARTODBPOSITRON",
-    **library_specific_params
+    **library_specific_params,
 ):
     """
     Parameters
@@ -102,7 +102,7 @@ def scatter_geo(
         width,
         height,
         tile_provider,
-        **library_specific_params
+        **library_specific_params,
     )
 
 
@@ -122,7 +122,7 @@ def scatter(
     pixel_spread="dynspread",
     width=800,
     height=400,
-    **library_specific_params
+    **library_specific_params,
 ):
     """
     Parameters
@@ -201,7 +201,7 @@ def scatter(
         pixel_spread,
         width,
         height,
-        **library_specific_params
+        **library_specific_params,
     )
 
 
@@ -218,7 +218,7 @@ def heatmap(
     point_shape="rect_vertical",
     width=800,
     height=400,
-    **library_specific_params
+    **library_specific_params,
 ):
     """
     Heatmap using default cudatashader.scatter plot with slight modifications.
@@ -296,7 +296,7 @@ def heatmap(
         "spread",
         width,
         height,
-        **library_specific_params
+        **library_specific_params,
     )
 
 
@@ -311,7 +311,7 @@ def line(
     step_size_type=int,
     width=800,
     height=400,
-    **library_specific_params
+    **library_specific_params,
 ):
     """
 
@@ -370,7 +370,7 @@ def line(
         step_size_type,
         width,
         height,
-        **library_specific_params
+        **library_specific_params,
     )
 
 
@@ -384,7 +384,7 @@ def stacked_lines(
     step_size_type=int,
     width=800,
     height=400,
-    **library_specific_params
+    **library_specific_params,
 ):
     """
     stacked lines chart
@@ -436,5 +436,5 @@ def stacked_lines(
         step_size_type,
         width,
         height,
-        **library_specific_params
+        **library_specific_params,
     )

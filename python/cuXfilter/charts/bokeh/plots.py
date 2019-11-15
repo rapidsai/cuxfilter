@@ -606,7 +606,7 @@ class Choropleth(BaseChoropleth):
             tools="hover, pan, wheel_zoom, tap, reset",
             active_scroll="wheel_zoom",
             active_drag="pan",
-            **self.library_specific_params
+            **self.library_specific_params,
         )
 
         if self.tile_provider is not None:

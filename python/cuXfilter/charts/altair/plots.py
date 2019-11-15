@@ -50,7 +50,7 @@ class Bar(BaseBar):
             .properties(
                 width=self.width,
                 height=self.height,
-                **self.library_specific_params
+                **self.library_specific_params,
             )
         )
 

@@ -24,7 +24,7 @@ class BaseLine(BaseNonAggregate):
         step_size_type=int,
         width=800,
         height=400,
-        **library_specific_params
+        **library_specific_params,
     ):
         """
         Description:
@@ -132,7 +132,7 @@ class BaseLine(BaseNonAggregate):
             value=(self.min_value, self.max_value),
             step=self.stride,
             **{"width": self.width},
-            sizing_mode="scale_width"
+            sizing_mode="scale_width",
         )
 
         def filter_widget_callback(event):

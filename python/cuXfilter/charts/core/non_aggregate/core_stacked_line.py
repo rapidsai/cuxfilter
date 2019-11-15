@@ -33,7 +33,7 @@ class BaseStackedLine(BaseChart):
         step_size_type=int,
         width=800,
         height=400,
-        **library_specific_params
+        **library_specific_params,
     ):
         """
         Description:

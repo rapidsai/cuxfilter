@@ -37,7 +37,7 @@ class BaseScatterGeo(BaseNonAggregate):
         width=800,
         height=400,
         tile_provider="CARTODBPOSITRON",
-        **library_specific_params
+        **library_specific_params,
     ):
         """
         Description:

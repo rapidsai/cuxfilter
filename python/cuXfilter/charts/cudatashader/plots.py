@@ -855,7 +855,7 @@ class StackedLines(BaseStackedLine):
             y_range=self.y_range,
             width=self.width,
             height=self.height,
-            **self.library_specific_params
+            **self.library_specific_params,
         )
 
         self.chart.add_tools(BoxSelectTool(dimensions="width"))

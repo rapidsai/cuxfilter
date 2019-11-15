@@ -46,7 +46,7 @@ class BaseWidget:
         data_points=100,
         step_size=None,
         step_size_type=int,
-        **params
+        **params,
     ):
         """
         Description:

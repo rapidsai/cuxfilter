@@ -15,7 +15,7 @@ def range_slider(
     data_points=100,
     step_size=1,
     step_size_type=int,
-    **params
+    **params,
 ):
     """
 
@@ -120,7 +120,7 @@ def float_slider(
         data_points,
         step_size,
         step_size_type=float,
-        **params
+        **params,
     )
 
 

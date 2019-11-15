@@ -37,7 +37,7 @@ class BaseScatter(BaseNonAggregate):
         pixel_spread="dynspread",
         width=800,
         height=400,
-        **library_specific_params
+        **library_specific_params,
     ):
         """
         Description:

@@ -11,7 +11,7 @@ def bar(
     height=400,
     step_size=None,
     step_size_type=int,
-    **library_specific_params
+    **library_specific_params,
 ):
     """
     Parameters
@@ -64,7 +64,7 @@ def bar(
         height,
         step_size,
         step_size_type,
-        **library_specific_params
+        **library_specific_params,
     )
 
 
@@ -78,7 +78,7 @@ def line(
     height=400,
     step_size=None,
     step_size_type=int,
-    **library_specific_params
+    **library_specific_params,
 ):
     """
 
@@ -131,7 +131,7 @@ def line(
         height,
         step_size,
         step_size_type,
-        **library_specific_params
+        **library_specific_params,
     )
 
 
@@ -149,7 +149,7 @@ def choropleth(
     geoJSONProperty=None,
     geo_color_palette=None,
     tile_provider=None,
-    **library_specific_params
+    **library_specific_params,
 ):
     """
 
@@ -220,5 +220,5 @@ def choropleth(
         geoJSONProperty,
         geo_color_palette,
         tile_provider,
-        **library_specific_params
+        **library_specific_params,
     )

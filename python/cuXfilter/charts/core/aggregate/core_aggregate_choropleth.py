@@ -43,7 +43,7 @@ class BaseChoropleth(BaseAggregateChart):
         geoJSONProperty=None,
         geo_color_palette=None,
         tile_provider=None,
-        **library_specific_params
+        **library_specific_params,
     ):
         """
         Description:

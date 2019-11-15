@@ -41,7 +41,7 @@ class RangeSlider(BaseWidget):
                 start=self.min_value,
                 end=self.max_value,
                 value=(self.min_value, self.max_value),
-                **self.params
+                **self.params,
             )
         else:
             self.chart = pn.widgets.RangeSlider(
@@ -50,7 +50,7 @@ class RangeSlider(BaseWidget):
                 end=self.max_value,
                 value=(self.min_value, self.max_value),
                 step=self.stride,
-                **self.params
+                **self.params,
             )
 
     def apply_theme(self, properties_dict):
@@ -138,7 +138,7 @@ class IntSlider(BaseWidget):
             step=self.stride,
             width=self.width,
             height=self.height,
-            **self.params
+            **self.params,
         )
 
     def apply_theme(self, properties_dict):
@@ -222,7 +222,7 @@ class FloatSlider(BaseWidget):
                 value=self.value,
                 width=self.width,
                 height=self.height,
-                **self.params
+                **self.params,
             )
         else:
             self.chart = pn.widgets.FloatSlider(
@@ -233,7 +233,7 @@ class FloatSlider(BaseWidget):
                 step=self.stride,
                 width=self.width,
                 height=self.height,
-                **self.params
+                **self.params,
             )
 
     def apply_theme(self, properties_dict):
@@ -331,7 +331,7 @@ class DropDown(BaseWidget):
             value="",
             width=self.width,
             height=self.height,
-            **self.params
+            **self.params,
         )
 
     def apply_theme(self, properties_dict):
@@ -434,7 +434,7 @@ class MultiSelect(BaseWidget):
             value=[""],
             width=self.width,
             height=self.height,
-            **self.params
+            **self.params,
         )
 
     def apply_theme(self, properties_dict):

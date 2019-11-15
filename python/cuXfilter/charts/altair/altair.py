@@ -11,7 +11,7 @@ def bar(
     height=400,
     step_size=None,
     step_size_type=int,
-    **library_specific_params
+    **library_specific_params,
 ):
     return plots.Bar(
         x,
@@ -23,5 +23,5 @@ def bar(
         height,
         step_size,
         step_size_type,
-        **library_specific_params
+        **library_specific_params,
     )

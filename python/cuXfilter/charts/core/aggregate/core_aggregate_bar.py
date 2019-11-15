@@ -38,7 +38,7 @@ class BaseBar(BaseAggregateChart):
         height=400,
         step_size=None,
         step_size_type=int,
-        **library_specific_params
+        **library_specific_params,
     ):
         """
         Description:
@@ -164,7 +164,7 @@ class BaseBar(BaseAggregateChart):
             value=(self.min_value, self.max_value),
             step=self.stride,
             **{"width": self.width},
-            sizing_mode="scale_width"
+            sizing_mode="scale_width",
         )
 
         def filter_widget_callback(event):
