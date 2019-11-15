@@ -24,7 +24,7 @@ requirements:
     - setuptools
   run:
     - python
-    - cudf=0.10
+    - cudf={{ minor_version }}
     - cupy>=6*
     - panel=0.6.*
     - bokeh>=1.2.*

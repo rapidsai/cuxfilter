@@ -18,19 +18,19 @@ ARGS=$*
 # script, and that this script resides in the repo dir!
 REPODIR=$(cd $(dirname $0); pwd)
 
-VALIDARGS="clean cuXfilter -v -g -n --allgpuarch -h"
-HELP="$0 [clean] [cuXfilter] [cuDatashader] [-v] [-g] [-n] [-h]
+VALIDARGS="clean cuxfilter -v -g -n --allgpuarch -h"
+HELP="$0 [clean] [cuxfilter] [cudatashader] [-v] [-g] [-n] [-h]
    clean        - remove all existing build artifacts and configuration (start
                   over)
-   cuXfilter    - build the cuXfilter library only
-   cuDatashader - build the cuDatashader library only
+   cuxfilter    - build the cuxfilter library only
+   cudatashader - build the cudatashader library only
    -v           - verbose build mode
    -g           - build for debug
    -n           - no install step
    --allgpuarch - build for all supported GPU architectures
    -h           - print this text
 "
-CUXFILTER_BUILD_DIR=${REPODIR}/python/cuXfilter/build
+CUXFILTER_BUILD_DIR=${REPODIR}/python/cuxfilter/build
 CUDATASHADER_BUILD_DIR=${REPODIR}/../cuDatashader/build
 BUILD_DIRS="${CUXFILTER_BUILD_DIR} #{CUDATASHADER_BUILD_DIR}"
 
@@ -107,8 +107,8 @@ fi
 
 ################################################################################
 
-# Build and install the cuXfilter Python package
-if (( ${NUMARGS} == 0 )) || hasArg cuXfilter; then
+# Build and install the cuxfilter Python package
+if (( ${NUMARGS} == 0 )) || hasArg cuxfilter; then
 
     cd ${REPODIR}/python
     if [[ ${INSTALL_TARGET} != "" ]]; then
@@ -119,11 +119,12 @@ if (( ${NUMARGS} == 0 )) || hasArg cuXfilter; then
     fi
 fi
 
-# Build and install the cuDatashader Python package
-if (( ${NUMARGS} == 0 )) || hasArg cuDatashader; then
+# Build and install the cudatashader Python package
+if (( ${NUMARGS} == 0 )) || hasArg cudatashader; then
 
     cd ${REPODIR}/../
     git clone https://github.com/rapidsai/cuDataShader.git
     cd ${REPODIR}/../cuDataShader
     python setup.py install --single-version-externally-managed --record=record.txt
+    cd ${REPODIR}
 fi

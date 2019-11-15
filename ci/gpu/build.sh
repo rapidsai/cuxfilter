@@ -75,6 +75,6 @@ else
 
     cd $WORKSPACE/python/cuxfilter/tests
     logger "Python py.test for cuxfilter..."
-    py.test --cache-clear --junitxml=${WORKSPACE}/junit-cuxfilter.xml -v --cov-config=.coveragerc --cov=cuxfilter --cov-report=xml:${WORKSPACE}/python/cuxfilter/cuxfilter-coverage.xml --cov-report term
+    py.test --cache-clear --junitxml=${WORKSPACE}/junit-cuxfilter.xml -v
 
 fi
