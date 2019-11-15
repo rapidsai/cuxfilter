@@ -57,11 +57,11 @@ $CXX --version
 conda list
 
 ################################################################################
-# BUILD - Build cuXfilter from source
+# BUILD - Build cuxfilter from source
 ################################################################################
 
 logger "Build libcudf..."
-$WORKSPACE/build.sh clean cuXfilter
+$WORKSPACE/build.sh clean cuxfilter
 
 ################################################################################
 # TEST - Run pytest 
@@ -73,8 +73,8 @@ else
     logger "Check GPU usage..."
     nvidia-smi
 
-    cd $WORKSPACE/python/cuXfilter/tests
-    logger "Python py.test for cuXfilter..."
-    py.test --cache-clear --junitxml=${WORKSPACE}/junit-cuXfilter.xml -v --cov-config=.coveragerc --cov=cuXfilter --cov-report=xml:${WORKSPACE}/python/cuXfilter/cuXfilter-coverage.xml --cov-report term
+    cd $WORKSPACE/python/cuxfilter/tests
+    logger "Python py.test for cuxfilter..."
+    py.test --cache-clear --junitxml=${WORKSPACE}/junit-cuxfilter.xml -v --cov-config=.coveragerc --cov=cuxfilter --cov-report=xml:${WORKSPACE}/python/cuxfilter/cuxfilter-coverage.xml --cov-report term
 
 fi

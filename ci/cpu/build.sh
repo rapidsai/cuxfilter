@@ -53,7 +53,7 @@ conda config --set ssl_verify False
 ################################################################################
 
 logger "Build conda pkg for cuxfilter..."
-source ci/cpu/cuxfilter/build_cuXfilter.sh
+source ci/cpu/cuxfilter/build_cuxfilter.sh
 
 ################################################################################
 # UPLOAD - Conda packages

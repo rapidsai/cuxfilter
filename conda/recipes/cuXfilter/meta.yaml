@@ -6,7 +6,7 @@
 {% set py_version=environ.get('CONDA_PY', 36) %}
 
 package:
-  name: cuXfilter
+  name: cuxfilter
   version: {{ version }}
 
 source:
@@ -35,7 +35,7 @@ requirements:
 
 test:
   commands:
-    - python -c "import cuXfilter"
+    - python -c "import cuxfilter"
 
 about:
   home: http://rapids.ai/

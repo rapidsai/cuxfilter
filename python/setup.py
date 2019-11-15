@@ -8,7 +8,7 @@ with open("README.md") as f:
 #     license = f.read()
 
 setup(
-    name="cuXfilter",
+    name="cuxfilter",
     version=versioneer.get_version(),
     description="GPU accelerated cross filtering with cuDF",
     url="https://github.com/rapidsai/cuxfilter",
@@ -24,7 +24,7 @@ setup(
         "Programming Language :: Python :: 3.7",
     ],
     packages=find_packages(
-        include=["cuXfilter", "cuXfilter.*"],
+        include=["cuxfilter", "cuxfilter.*"],
         exclude=("tests", "docs", "notebooks"),
     ),
     cmdclass=versioneer.get_cmdclass(),

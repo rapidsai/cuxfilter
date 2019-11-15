@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copyright (c) 2018, NVIDIA CORPORATION.
 #########################
-# cuXfilter CHANGELOG Tester #
+# cuxfilter CHANGELOG Tester #
 #########################
 
 # Checkout master for comparison

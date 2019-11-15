@@ -55,7 +55,7 @@ Portions adopted from https://github.com/pytorch/pytorch/blob/master/CONTRIBUTIN
 
 ### Adding support for new viz libraries
 
-cuXfilter.py acts like a connector library and it is easy to add support for new libraries. The cuxfilter/charts/core directory has all the core chart classes which can be inherited and used to implement a few (viz related) functions and support dashboarding in cuXfilter directly.
+cuxfilter.py acts like a connector library and it is easy to add support for new libraries. The cuxfilter/charts/core directory has all the core chart classes which can be inherited and used to implement a few (viz related) functions and support dashboarding in cuxfilter directly.
 
 You can see the examples to implement viz libraries in the bokeh and cudatashader directories. 
 

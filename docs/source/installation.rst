@@ -1,7 +1,7 @@
 Installation
 ============
 
-Note: You need to have RAPIDS (cudf) installed for cuXfilter to work
+Note: You need to have RAPIDS (cudf) installed for cuxfilter to work
 
 
 1. Installing in a rapids docker container
@@ -101,11 +101,11 @@ While in the directory you want the datasets to be saved, execute the following
 
 .. code-block:: bash
 
-    #go the the environment where cuXfilter is installed. Skip if in a docker container
+    #go the the environment where cuxfilter is installed. Skip if in a docker container
     source activate test_env
 
     #download and extract the datasets
-    python -c "from cuXfilter.sampledata import datasets_check; datasets_check(base_dir='./')"
+    python -c "from cuxfilter.sampledata import datasets_check; datasets_check(base_dir='./')"
 
 
 Individual links:

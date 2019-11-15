@@ -2,7 +2,7 @@ CuDataShader Charts
 ===================
 
 
-.. currentmodule:: cuXfilter.charts
+.. currentmodule:: cuxfilter.charts
 
 
 line chart
@@ -14,7 +14,7 @@ Example
 ~~~~~~~
 .. jupyter-execute::
 
-    from cuXfilter import charts, DataFrame
+    from cuxfilter import charts, DataFrame
     import numpy as np
     import cudf
     import random
@@ -38,7 +38,7 @@ Example
 ~~~~~~~
 .. jupyter-execute::
 
-    from cuXfilter import charts, DataFrame
+    from cuxfilter import charts, DataFrame
     import cudf
     import random
 
@@ -60,7 +60,7 @@ Example
 ~~~~~~~
 .. jupyter-execute::
 
-    from cuXfilter import charts, DataFrame
+    from cuxfilter import charts, DataFrame
     import cudf
     import random
 
@@ -83,12 +83,12 @@ Example
 ~~~~~~~
 .. jupyter-execute::
 
-    from cuXfilter.sampledata import signals_data
-    import cuXfilter
+    from cuxfilter.sampledata import signals_data
+    import cuxfilter
 
-    cux_df = cuXfilter.DataFrame.from_dataframe(signals_data)
+    cux_df = cuxfilter.DataFrame.from_dataframe(signals_data)
 
-    stacked_lines_chart = cuXfilter.charts.cudatashader.stacked_lines(x='Time', y=['a', 'b', 'c', 'd', 'e', 'f', 'g', 'x', 'y', 'z'],
+    stacked_lines_chart = cuxfilter.charts.cudatashader.stacked_lines(x='Time', y=['a', 'b', 'c', 'd', 'e', 'f', 'g', 'x', 'y', 'z'],
                                                         colors = ["red", "grey", "black", "purple", "pink",
                                                                 "yellow", "brown", "green", "orange", "blue"]
                                                         )
@@ -108,8 +108,8 @@ Example
 ~~~~~~~
 .. jupyter-execute::
 
-    from cuXfilter import charts, layouts, themes, DataFrame
-    from cuXfilter.sampledata import unemployment_data
+    from cuxfilter import charts, layouts, themes, DataFrame
+    from cuxfilter.sampledata import unemployment_data
 
     cux_df = DataFrame.from_dataframe(unemployment_data)
 

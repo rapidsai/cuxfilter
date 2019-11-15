@@ -14,10 +14,10 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "from cuXfilter import charts\n",
-    "import cuXfilter\n",
+    "from cuxfilter import charts\n",
+    "import cuxfilter\n",
     "from bokeh import palettes\n",
-    "from cuXfilter.layouts import layout_1\n",
+    "from cuxfilter.layouts import layout_1\n",
     "import warnings\n",
     "warnings.filterwarnings('ignore')"
    ]
@@ -26,7 +26,7 @@
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "## Load cuXfilter dataframe"
+    "## Load cuxfilter dataframe"
    ]
   },
   {
@@ -35,7 +35,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "cux_df = cuXfilter.DataFrame.from_arrow('/home/ajay/data/146M_predictions_v2.arrow')"
+    "cux_df = cuxfilter.DataFrame.from_arrow('/home/ajay/data/146M_predictions_v2.arrow')"
    ]
   },
   {

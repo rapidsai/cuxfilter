@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath('...'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'cuXfilter'
+project = 'cuxfilter'
 copyright = '2019, ajay thorve'
 author = 'ajay thorve'
 

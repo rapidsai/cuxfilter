@@ -1,7 +1,7 @@
 API Reference
 =============
 
-.. currentmodule:: cuXfilter.dataframe
+.. currentmodule:: cuxfilter.dataframe
 
 DataFrame
 ---------
@@ -9,7 +9,7 @@ DataFrame
     :members:
 
 
-.. currentmodule:: cuXfilter.dashboard
+.. currentmodule:: cuxfilter.dashboard
 
 DashBoard
 ---------

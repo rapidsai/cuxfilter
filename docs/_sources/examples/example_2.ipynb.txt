@@ -14,17 +14,17 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "from cuXfilter import charts\n",
-    "import cuXfilter\n",
+    "from cuxfilter import charts\n",
+    "import cuxfilter\n",
     "from bokeh import palettes\n",
-    "from cuXfilter.layouts import layout_2"
+    "from cuxfilter.layouts import layout_2"
    ]
   },
   {
    "cell_type": "markdown",
    "metadata": {},
    "source": [
-    "## Load cuXfilter dataframe"
+    "## Load cuxfilter dataframe"
    ]
   },
   {
@@ -33,7 +33,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "cux_df1 = cuXfilter.DataFrame.from_arrow('/home/ajay/data/nyc_taxi_1.arrow')"
+    "cux_df1 = cuxfilter.DataFrame.from_arrow('/home/ajay/data/nyc_taxi_1.arrow')"
    ]
   },
   {

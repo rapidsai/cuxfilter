@@ -1,2 +1,2 @@
 include versioneer.py
-include cuXfilter/_version.py
+include cuxfilter/_version.py
