@@ -1,10 +1,6 @@
 # cuxfilter 0.2.0 (19 Sep 2019)
 
-## New Features
+## Final release
 
-- Initial release of cuxfilter python package
-
-## Improvements
-
-- Massive refactor and architecture change compared to the js (client-server) architecture
+- final version of the gtc demo 2018 powered by the cuXfilter.js(client-server architecture)
 
