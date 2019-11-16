@@ -66,7 +66,7 @@ d = cux_df.dashboard([chart1, chart2, chart3, chart4], layout=cuXfilter.layouts.
 #preview the dashboard inside the notebook(non-interactive) with layout
 await d.preview()
 ```
-![output dashboard](./docs/_images/readme_sample.png)
+![output dashboard](./docs/_images/demo.gif)
 
 ## Documentation
 
