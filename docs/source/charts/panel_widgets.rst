@@ -1,7 +1,7 @@
 Panel Widgets
 =============
 
-.. currentmodule:: cuXfilter.charts
+.. currentmodule:: cuxfilter.charts
 
 Range slider
 ------------
@@ -13,7 +13,7 @@ Example
 .. jupyter-execute::
 
     import cudf
-    from cuXfilter import charts, DataFrame
+    from cuxfilter import charts, DataFrame
 
     cux_df = DataFrame.from_dataframe(cudf.DataFrame({'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}))
     range_slider = charts.panel_widgets.range_slider('key')
@@ -32,7 +32,7 @@ Example
 .. jupyter-execute::
 
     import cudf
-    from cuXfilter import charts, DataFrame
+    from cuxfilter import charts, DataFrame
 
     cux_df = DataFrame.from_dataframe(cudf.DataFrame({'key': [0, 0.5, 1, 1.5, 2], 'val':[float(i + 10) for i in range(5)]}))
     float_slider = charts.panel_widgets.float_slider('key', step_size=0.5)
@@ -52,7 +52,7 @@ Example
 .. jupyter-execute::
 
     import cudf
-    from cuXfilter import charts, DataFrame
+    from cuxfilter import charts, DataFrame
 
     cux_df = DataFrame.from_dataframe(cudf.DataFrame({'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}))
     int_slider = charts.panel_widgets.int_slider('val')
@@ -71,7 +71,7 @@ Example
 .. jupyter-execute::
 
     import cudf
-    from cuXfilter import charts, DataFrame
+    from cuxfilter import charts, DataFrame
 
     cux_df = DataFrame.from_dataframe(cudf.DataFrame({'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}))
     drop_down = charts.panel_widgets.drop_down('val')
@@ -91,7 +91,7 @@ Example
 .. jupyter-execute::
 
     import cudf
-    from cuXfilter import charts, DataFrame
+    from cuxfilter import charts, DataFrame
 
     cux_df = DataFrame.from_dataframe(cudf.DataFrame({'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}))
     multi_select = charts.panel_widgets.multi_select('val')

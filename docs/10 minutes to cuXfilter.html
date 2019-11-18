@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>10 minutes to cuXfilter &mdash; cuXfilter 0.2 documentation</title>
+  <title>10 minutes to cuxfilter &mdash; cuxfilter 0.2 documentation</title>
   
 
   
@@ -54,7 +54,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> cuXfilter
+            <a href="index.html" class="icon icon-home"> cuxfilter
           
 
           
@@ -88,8 +88,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataframe.html">API Reference</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">10 minutes to cuXfilter</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#What-is-cuXfilter.py?">What is cuXfilter.py?</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">10 minutes to cuxfilter</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#What-is-cuxfilter.py?">What is cuxfilter.py?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#The-modules">The modules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#Usage">Usage</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#1.-Import-the-required-modules">1. Import the required modules</a></li>
@@ -120,7 +120,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">cuXfilter</a>
+          <a href="index.html">cuxfilter</a>
         
       </nav>
 
@@ -151,13 +151,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>10 minutes to cuXfilter</li>
+      <li>10 minutes to cuxfilter</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/10 minutes to cuXfilter.ipynb.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/10 minutes to cuxfilter.ipynb.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -392,26 +392,26 @@ div.rendered_html tbody tr:hover {
     text-align: unset;
 }
 </style>
-<div class="section" id="10-minutes-to-cuXfilter">
-<h1>10 minutes to cuXfilter<a class="headerlink" href="#10-minutes-to-cuXfilter" title="Permalink to this headline">¶</a></h1>
-<p>This is a short introduction to the cuXfilter.py library, mostly going over the basic usage and features provided as a quick summary.</p>
-<div class="section" id="What-is-cuXfilter.py?">
-<h2>What is cuXfilter.py?<a class="headerlink" href="#What-is-cuXfilter.py?" title="Permalink to this headline">¶</a></h2>
-<p>cuXfilter is inspired from the Crossfilter library, which is a fast, browser-based filtering mechanism across multiple dimensions and offers features do groupby operations on top of the dimensions. One of the major limitations of using Crossfilter is that it keeps data in-memory on a client-side browser, making it inefficient for processing large datasets.</p>
-<p>cuXfilter solves the issues by leveraging the power of the rapids.ai stack, mainly cudf. The data is maintained in a gpu as a GPU DataFrame and operations like groupby aggregations, sorting and querying are done on the gpu itself, only returning the result as the output to the charts.</p>
-<p>cuXfilter acts as a <code class="docutils literal notranslate"><span class="pre">connector</span></code> library, which provides the connections between different visualization libraries and a GPU dataframe without much hassle. This also allows the user to use charts from different libraries in a single dashboard, while also providing the interaction.</p>
-<p>cuXfilter uses data-tiles on the front-end, which are precomputed aggregations, for all possible interactions for a single chart, for updating all remaining charts in a dashboard. data-tiles are just smartly computed groupbys, and generally take around 250ms per chart for a 100M row dataset(do the rest of the math!!!!, ps: its fast!). Once it’s downloaded, interactions are seamless, and well, realtime.</p>
+<div class="section" id="10-minutes-to-cuxfilter">
+<h1>10 minutes to cuxfilter<a class="headerlink" href="#10-minutes-to-cuxfilter" title="Permalink to this headline">¶</a></h1>
+<p>This is a short introduction to the cuxfilter.py library, mostly going over the basic usage and features provided as a quick summary.</p>
+<div class="section" id="What-is-cuxfilter.py?">
+<h2>What is cuxfilter.py?<a class="headerlink" href="#What-is-cuxfilter.py?" title="Permalink to this headline">¶</a></h2>
+<p>cuxfilter is inspired from the Crossfilter library, which is a fast, browser-based filtering mechanism across multiple dimensions and offers features do groupby operations on top of the dimensions. One of the major limitations of using Crossfilter is that it keeps data in-memory on a client-side browser, making it inefficient for processing large datasets.</p>
+<p>cuxfilter solves the issues by leveraging the power of the rapids.ai stack, mainly cudf. The data is maintained in a gpu as a GPU DataFrame and operations like groupby aggregations, sorting and querying are done on the gpu itself, only returning the result as the output to the charts.</p>
+<p>cuxfilter acts as a <code class="docutils literal notranslate"><span class="pre">connector</span></code> library, which provides the connections between different visualization libraries and a GPU dataframe without much hassle. This also allows the user to use charts from different libraries in a single dashboard, while also providing the interaction.</p>
+<p>cuxfilter uses data-tiles on the front-end, which are precomputed aggregations, for all possible interactions for a single chart, for updating all remaining charts in a dashboard. data-tiles are just smartly computed groupbys, and generally take around 250ms per chart for a 100M row dataset(do the rest of the math!!!!, ps: its fast!). Once it’s downloaded, interactions are seamless, and well, realtime.</p>
 </div>
 <div class="section" id="The-modules">
 <h2>The modules<a class="headerlink" href="#The-modules" title="Permalink to this headline">¶</a></h2>
 <blockquote>
-<div><p>cuXfilter has following usable modules</p>
+<div><p>cuxfilter has following usable modules</p>
 </div></blockquote>
 <ol class="arabic simple">
-<li><p>cuXfilter.DataFrame</p></li>
-<li><p>cuXfilter.DashBoard</p></li>
-<li><p>cuXfilter.charts</p></li>
-<li><p>cuXfilter.layouts</p></li>
+<li><p>cuxfilter.DataFrame</p></li>
+<li><p>cuxfilter.DashBoard</p></li>
+<li><p>cuxfilter.charts</p></li>
+<li><p>cuxfilter.layouts</p></li>
 </ol>
 </div>
 <div class="section" id="Usage">
@@ -423,7 +423,7 @@ div.rendered_html tbody tr:hover {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">cuXfilter</span> <span class="kn">import</span> <span class="n">charts</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">themes</span><span class="p">,</span> <span class="n">layouts</span>
+<span></span><span class="kn">from</span> <span class="nn">cuxfilter</span> <span class="kn">import</span> <span class="n">charts</span><span class="p">,</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">themes</span><span class="p">,</span> <span class="n">layouts</span>
 </pre></div>
 </div>
 </div>
@@ -431,14 +431,14 @@ div.rendered_html tbody tr:hover {
 <div class="section" id="2.-Read-some-data">
 <h3>2. Read some data<a class="headerlink" href="#2.-Read-some-data" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<div><p>cuXfilter can read arrow files off disk, or an inmemory cudf dataframe</p>
+<div><p>cuxfilter can read arrow files off disk, or an inmemory cudf dataframe</p>
 </div></blockquote>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="c1">#create cuXfilter DataFrame</span>
+<span></span><span class="c1">#create cuxfilter DataFrame</span>
 <span class="n">cux_df</span> <span class="o">=</span> <span class="n">DataFrame</span><span class="o">.</span><span class="n">from_arrow</span><span class="p">(</span><span class="s1">&#39;../../data/auto_accident_loc_data.arrow&#39;</span><span class="p">)</span>
 <span class="n">cux_df</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;ST_CASE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;ST_CASE&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
 <span class="n">cux_df</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
@@ -2159,7 +2159,7 @@ if (window.Jupyter !== undefined) {
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">cuXfilter.assets.custom_tiles</span> <span class="kn">import</span> <span class="n">get_provider</span><span class="p">,</span> <span class="n">Vendors</span>
+<span></span><span class="kn">from</span> <span class="nn">cuxfilter.assets.custom_tiles</span> <span class="kn">import</span> <span class="n">get_provider</span><span class="p">,</span> <span class="n">Vendors</span>
 </pre></div>
 </div>
 </div>
@@ -3768,7 +3768,7 @@ if (window.Jupyter !== undefined) {
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="_images/10_minutes_to_cuXfilter_18_2.png" src="_images/10_minutes_to_cuXfilter_18_2.png" />
+<img alt="_images/10_minutes_to_cuxfilter_18_2.png" src="_images/10_minutes_to_cuxfilter_18_2.png" />
 </div>
 </div>
 </div>

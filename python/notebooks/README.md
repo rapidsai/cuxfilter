@@ -1,6 +1,6 @@
 # Example notebooks
 
-These are example notebooks to showcase cuXfilter. Related Datasets can be download using the link below:
+These are example notebooks to showcase cuxfilter. Related Datasets can be download using the link below:
 
 - Download the mortgage dataset from [here](https://docs.rapids.ai/datasets/mortgage-viz-data)
 

@@ -1,15 +1,15 @@
 Layouts
 =======
 
-Load cuXfilter and data
+Load cuxfilter and data
 -----------------------
 
 .. code-block:: python
 
-    from cuXfilter import charts
-    import cuXfilter
+    from cuxfilter import charts
+    import cuxfilter
     from bokeh import palettes
-    cux_df = cuXfilter.DataFrame.from_arrow('/data/146M_predictions_v2.arrow')
+    cux_df = cuxfilter.DataFrame.from_arrow('/data/146M_predictions_v2.arrow')
     cux_df.data['loan_id'] = cux_df.data['loan_id'].astype('float64')
     cux_df.data['current_actual_upb'] = cux_df.data['current_actual_upb'].astype('float64')
     cux_df.data = cux_df.data.sort_values(by='loan_id')
@@ -47,7 +47,7 @@ layout_0
 
 .. code-block:: python
 
-    from cuXfilter import layouts
+    from cuxfilter import layouts
     d = cux_df.dashboard([chart0], layout=layouts.layout_0, title="Dashboard")
     d.show()
 
@@ -62,7 +62,7 @@ layout_1
     
 .. code-block:: python
 
-    from cuXfilter import layouts
+    from cuxfilter import layouts
     d = cux_df.dashboard([chart0, chart1], layout=layouts.layout_1, title="Dashboard")
     d.show()
 
@@ -77,7 +77,7 @@ layout_2
 
 .. code-block:: python
 
-    from cuXfilter import layouts
+    from cuxfilter import layouts
     d = cux_df.dashboard([chart0, chart1], layout=layouts.layout_2, title="Dashboard")
     d.show()
 
@@ -92,7 +92,7 @@ layout_3
 
 .. code-block:: python
 
-    from cuXfilter import layouts
+    from cuxfilter import layouts
     d = cux_df.dashboard([chart0, chart1, chart2], layout=layouts.layout_3, title="Dashboard")
     d.show()
 
@@ -108,7 +108,7 @@ layout_4
     
 .. code-block:: python
 
-    from cuXfilter import layouts
+    from cuxfilter import layouts
     d = cux_df.dashboard([chart0, chart1, chart2], layout=layouts.layout_4, title="Dashboard")
     d.show()
 
@@ -124,7 +124,7 @@ layout_5
     
 .. code-block:: python
 
-    from cuXfilter import layouts
+    from cuxfilter import layouts
     d = cux_df.dashboard([chart0, chart1, chart2], layout=layouts.layout_5, title="Dashboard")
     d.show()
 
@@ -139,7 +139,7 @@ layout_6
     
 .. code-block:: python
 
-    from cuXfilter import layouts
+    from cuxfilter import layouts
     d = cux_df.dashboard([chart0, chart1, chart2, chart3], layout=layouts.layout_6, title="Dashboard")
     d.show()
 
@@ -155,7 +155,7 @@ layout_7
     
 .. code-block:: python
 
-    from cuXfilter import layouts
+    from cuxfilter import layouts
     d = cux_df.dashboard([chart0, chart1, chart2, chart3], layout=layouts.layout_7, title="Dashboard")
     d.show()
 
@@ -170,7 +170,7 @@ layout_8
     
 .. code-block:: python
 
-    from cuXfilter import layouts
+    from cuxfilter import layouts
     d = cux_df.dashboard([chart0, chart1, chart2, chart3, chart4], layout=layouts.layout_8, title="Dashboard")
     d.show()
 
@@ -185,7 +185,7 @@ layout_9
     
 .. code-block:: python
 
-    from cuXfilter import layouts
+    from cuxfilter import layouts
     d = cux_df.dashboard([chart0, chart1, chart2, chart3, chart4, chart5], layout=layouts.layout_9, title="Dashboard")
     d.show()
 
@@ -200,7 +200,7 @@ layout_10
     
 .. code-block:: python
 
-    from cuXfilter import layouts
+    from cuxfilter import layouts
     d = cux_df.dashboard([chart0, chart1, chart2, chart3, chart4, chart5], layout=layouts.layout_10, title="Dashboard")
     d.show()
 
@@ -215,7 +215,7 @@ layout_11
     
 .. code-block:: python
 
-    from cuXfilter import layouts
+    from cuxfilter import layouts
     d = cux_df.dashboard([chart0, chart1, chart2, chart3, chart4, chart5], layout=layouts.layout_11, title="Dashboard")
     d.show()
 
@@ -230,7 +230,7 @@ layout_12
     
 .. code-block:: python
 
-    from cuXfilter import layouts
+    from cuxfilter import layouts
     d = cux_df.dashboard([chart0, chart1, chart2, chart3, chart4, chart5, chart6, chart7, chart8], layout=layouts.layout_12, title="Dashboard")
     d.show()
 
