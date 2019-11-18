@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; cuXfilter 0.2 documentation</title>
+  <title>Installation &mdash; cuxfilter 0.2 documentation</title>
   
 
   
@@ -25,6 +25,7 @@
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
         <script type="text/javascript" src="_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
         <script type="text/javascript" src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
     
@@ -39,7 +40,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="API Reference" href="dataframe.html" />
-    <link rel="prev" title="Welcome to cuXfilter’s documentation!" href="index.html" /> 
+    <link rel="prev" title="Welcome to cuxfilter’s documentation!" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -53,7 +54,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> cuXfilter
+            <a href="index.html" class="icon icon-home"> cuxfilter
           
 
           
@@ -95,7 +96,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="dataframe.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="10 minutes to cuXfilter.html">10 minutes to cuXfilter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10 minutes to cuxfilter.html">10 minutes to cuxfilter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="charts/charts.html">Charts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="layouts/Layouts.html">Layouts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="themes/Themes.html">Themes</a></li>
@@ -114,7 +115,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">cuXfilter</a>
+          <a href="index.html">cuxfilter</a>
         
       </nav>
 
@@ -190,7 +191,7 @@
 </style>
 <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>Note: You need to have RAPIDS (cudf) installed for cuXfilter to work</p>
+<p>Note: You need to have RAPIDS (cudf) installed for cuxfilter to work</p>
 <div class="section" id="installing-in-a-rapids-docker-container">
 <h2>1. Installing in a rapids docker container<a class="headerlink" href="#installing-in-a-rapids-docker-container" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Before you start juypter lab, you need to install cuxfilter and cudatashader.  In terminal, when you start docker, please run the following commands:
@@ -278,11 +279,11 @@ pip install -e .
 <li><p>Download manually</p></li>
 </ol>
 <p>While in the directory you want the datasets to be saved, execute the following</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1">#go the the environment where cuXfilter is installed. Skip if in a docker container</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1">#go the the environment where cuxfilter is installed. Skip if in a docker container</span>
 <span class="nb">source</span> activate test_env
 
 <span class="c1">#download and extract the datasets</span>
-python -c <span class="s2">&quot;from cuXfilter.sampledata import datasets_check; datasets_check(base_dir=&#39;./&#39;)&quot;</span>
+python -c <span class="s2">&quot;from cuxfilter.sampledata import datasets_check; datasets_check(base_dir=&#39;./&#39;)&quot;</span>
 </pre></div>
 </div>
 <p>Individual links:</p>
@@ -305,7 +306,7 @@ python -c <span class="s2">&quot;from cuXfilter.sampledata import datasets_check
         <a href="dataframe.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to cuXfilter’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to cuxfilter’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -1,19 +1,32 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
+import versioneer
 
-
-with open('README.md') as f:
+with open("README.md") as f:
     readme = f.read()
 
 # with open('LICENSE') as f:
 #     license = f.read()
 
 setup(
-    name='cuXfilter',
-    version='0.2.0',
-    description='Python library to do server-side cross-filtering viz dashboards using cudf, panel & bokeh',
-    long_description=readme,
-    author='Ajay Thorve',
-    author_email='athorve@nvidia.com',
-    url='https://gitlab-master.nvidia.com/athorve/cuxfilter',
-    packages=find_packages(exclude=('tests', 'docs', 'notebooks'))        # license=license,
+    name="cuxfilter",
+    version=versioneer.get_version(),
+    description="GPU accelerated cross filtering with cuDF",
+    url="https://github.com/rapidsai/cuxfilter",
+    author="NVIDIA Corporation",
+    license="Apache 2.0",
+    classifiers=[
+        "Intended Audience :: Developers",
+        "Topic :: Database",
+        "Topic :: Scientific/Engineering",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+    ],
+    packages=find_packages(
+        include=["cuxfilter", "cuxfilter.*"],
+        exclude=("tests", "docs", "notebooks"),
+    ),
+    cmdclass=versioneer.get_cmdclass(),
+    zip_safe=False,
 )

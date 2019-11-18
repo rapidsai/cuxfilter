@@ -1,7 +1,7 @@
-Welcome to cuXfilter's documentation!
+Welcome to cuxfilter's documentation!
 =====================================
 
-cuXfilter acts as a connector library, which provides the connections between different visualization libraries and a GPU dataframe without much hassle. This also allows the user to use charts from different libraries in a single dashboard, while also providing the interaction.
+cuxfilter acts as a connector library, which provides the connections between different visualization libraries and a GPU dataframe without much hassle. This also allows the user to use charts from different libraries in a single dashboard, while also providing the interaction.
 
 .. toctree::
    :maxdepth: 2
@@ -10,7 +10,7 @@ cuXfilter acts as a connector library, which provides the connections between di
     
    ./installation.rst
    ./dataframe.rst
-   ./10 minutes to cuXfilter.ipynb
+   ./10 minutes to cuxfilter.ipynb
    ./charts/charts.rst
    ./layouts/Layouts.ipynb
    ./themes/Themes.ipynb
