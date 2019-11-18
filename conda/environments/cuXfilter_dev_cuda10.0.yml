@@ -23,7 +23,6 @@ dependencies:
 - nbsphinx
 - numpydoc
 - ipython
-- altair
 - pyppeteer
 - jupyterlab
 - black
