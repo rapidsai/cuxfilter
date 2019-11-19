@@ -9,11 +9,11 @@ dependencies:
 - python>=3.6,<3.8
 - rapids=0.10
 - geopandas>=0.6.*
-- pyproj=1.9.6
+- pyproj>=2.4.*
 - pandoc=<2.0.0
 - panel=0.6.*
 - bokeh>=1.2.*
-- cudatoolkit=9.2
+- cudatoolkit=10.1
 - recommonmark
 - pytest
 - sphinx
