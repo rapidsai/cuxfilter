@@ -1,6 +1,5 @@
 #!/bin/bash
 # Copyright (c) 2018, NVIDIA CORPORATION.
-#test
 ######################################
 # cuDF CPU conda build script for CI #
 ######################################
@@ -62,3 +61,4 @@ source ci/cpu/cuxfilter/build_cuxfilter.sh
 
 logger "Upload conda pkgs..."
 source ci/cpu/upload_anaconda.sh
+
