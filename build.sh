@@ -31,8 +31,8 @@ HELP="$0 [clean] [cuxfilter] [cudatashader] [-v] [-g] [-n] [-h]
    -h           - print this text
 "
 CUXFILTER_BUILD_DIR=${REPODIR}/python/cuxfilter/build
-CUDATASHADER_BUILD_DIR=${REPODIR}/cuDatashader/build
-BUILD_DIRS="${CUXFILTER_BUILD_DIR} #{CUDATASHADER_BUILD_DIR}"
+#CUDATASHADER_BUILD_DIR=${REPODIR}/cuDatashader/build
+BUILD_DIRS="${CUXFILTER_BUILD_DIR}" #{CUDATASHADER_BUILD_DIR}
 
 # Set defaults for vars modified by flags to this script
 VERBOSE=""
