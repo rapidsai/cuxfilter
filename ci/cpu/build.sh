@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copyright (c) 2018, NVIDIA CORPORATION.
 ######################################
-# cuDF CPU conda build script for CI #
+# cuXfilter CPU conda build script for CI #
 ######################################
 set -e
 
@@ -49,7 +49,7 @@ conda list
 conda config --set ssl_verify False
 
 ################################################################################
-# BUILD - Conda package builds (conda deps: libcudf <- libcudf_cffi <- cudf)
+# BUILD - Conda package build
 ################################################################################
 
 #logger "Cloning cuDataShader..."

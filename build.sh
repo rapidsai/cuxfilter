@@ -112,19 +112,19 @@ if (( ${NUMARGS} == 0 )) || hasArg cuxfilter; then
 
     cd ${REPODIR}/python
     if [[ ${INSTALL_TARGET} != "" ]]; then
-    python setup.py build_ext --inplace
-    python setup.py install --single-version-externally-managed --record=record.txt
+        python setup.py build_ext --inplace
+        python setup.py install --single-version-externally-managed --record=record.txt
     else
-    python setup.py build_ext --inplace --library-dir=${LIBCUDF_BUILD_DIR}
+        python setup.py build_ext --inplace --library-dir=${LIBCUXFILTER_BUILD_DIR}
     fi
 fi
 
 # Build and install the cudatashader Python package
-if (( ${NUMARGS} == 0 )) || hasArg cudatashader; then
-
-    cd ${REPODIR}/../
-    git clone https://github.com/rapidsai/cuDataShader.git
-    cd ${REPODIR}/../cuDataShader
-    python setup.py install --single-version-externally-managed --record=record.txt
-    cd ${REPODIR}
-fi
+#if (( ${NUMARGS} == 0 )) || hasArg cudatashader; then
+#
+#    cd ${REPODIR}/../
+#    git clone https://github.com/rapidsai/cuDataShader.git
+#    cd ${REPODIR}/../cuDataShader
+#    python setup.py install --single-version-externally-managed --record=record.txt
+#    cd ${REPODIR}
+#fi
