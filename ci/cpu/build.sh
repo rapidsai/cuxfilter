@@ -53,7 +53,7 @@ conda config --set ssl_verify False
 ################################################################################
 
 logger "Cloning cuDataShader..."
-git@github.com:rapidsai/cuDataShader.git
+git clone git@github.com:rapidsai/cuDataShader.git
 
 logger "Build conda pkg for cuxfilter..."
 source ci/cpu/cuxfilter/build_cuxfilter.sh
