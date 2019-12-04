@@ -52,8 +52,8 @@ conda config --set ssl_verify False
 # BUILD - Conda package builds (conda deps: libcudf <- libcudf_cffi <- cudf)
 ################################################################################
 
-logger "Cloning cuDataShader..."
-git clone git@github.com:rapidsai/cuDataShader.git
+#logger "Cloning cuDataShader..."
+#git clone git@github.com:rapidsai/cuDataShader.git
 
 logger "Build conda pkg for cuxfilter..."
 source ci/cpu/cuxfilter/build_cuxfilter.sh
