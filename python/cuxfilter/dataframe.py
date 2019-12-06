@@ -124,7 +124,7 @@ class DataFrame:
         --------
         >>> import cudf
         >>> import cuxfilter
-        >>> from cuxfilter import charts
+        >>> from cuxfilter.charts import bokeh
         >>> df = cudf.DataFrame(
         >>>     {
         >>>         'key': [0, 1, 2, 3, 4],
@@ -132,7 +132,7 @@ class DataFrame:
         >>>     }
         >>> )
         >>> cux_df = cuxfilter.DataFrame.from_dataframe(df)
-        >>> line_chart_1 = charts.bokeh.line(
+        >>> line_chart_1 = bokeh.line(
         >>>     'key', 'val', data_points=5, add_interaction=False
         >>> )
 

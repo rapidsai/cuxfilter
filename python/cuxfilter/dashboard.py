@@ -41,15 +41,15 @@ class DashBoard:
 
     >>> import cudf
     >>> import cuxfilter
-    >>> from cuxfilter import charts
+    >>> from cuxfilter.charts import bokehfrom cuxfilter.charts import bokeh
     >>> df = cudf.DataFrame(
     >>>     {'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}
     >>> )
     >>> cux_df = cuxfilter.DataFrame.from_dataframe(df)
-    >>> line_chart_1 = charts.bokeh.line(
+    >>> line_chart_1 = bokeh.line(
     >>>     'key', 'val', data_points=5, add_interaction=False
     >>> )
-    >>> line_chart_2 = charts.bokeh.bar(
+    >>> line_chart_2 = bokeh.bar(
     >>>     'val', 'key', data_points=5, add_interaction=False
     >>> )
     >>> d = cux_df.dashboard([line_chart_1, line_chart_2])
@@ -169,7 +169,7 @@ class DashBoard:
 
         >>> import cudf
         >>> import cuxfilter
-        >>> from cuxfilter import charts
+        >>> from cuxfilter.charts import bokeh
         >>> df = cudf.DataFrame(
         >>>     {
         >>>         'key': [0, 1, 2, 3, 4],
@@ -177,11 +177,11 @@ class DashBoard:
         >>>     }
         >>> )
         >>> cux_df = cuxfilter.DataFrame.from_dataframe(df)
-        >>> line_chart_1 = charts.bokeh.line(
+        >>> line_chart_1 = bokeh.line(
         >>>     'key', 'val', data_points=5, add_interaction=False
         >>> )
         >>> d = cux_df.dashboard([line_chart_1])
-        >>> line_chart_2 = charts.bokeh.bar(
+        >>> line_chart_2 = bokeh.bar(
         >>>     'val', 'key', data_points=5, add_interaction=False
         >>> )
         >>> d.add_charts([line_chart_2])
@@ -249,7 +249,7 @@ class DashBoard:
         --------
         >>> import cudf
         >>> import cuxfilter
-        >>> from cuxfilter import charts
+        >>> from cuxfilter.charts import bokeh
         >>> df = cudf.DataFrame(
         >>>     {
         >>>         'key': [0, 1, 2, 3, 4],
@@ -257,10 +257,10 @@ class DashBoard:
         >>>     }
         >>> )
         >>> cux_df = cuxfilter.DataFrame.from_dataframe(df)
-        >>> line_chart_1 = charts.bokeh.line(
+        >>> line_chart_1 = bokeh.line(
         >>>     'key', 'val', data_points=5, add_interaction=False
         >>> )
-        >>> line_chart_2 = charts.bokeh.bar(
+        >>> line_chart_2 = bokeh.bar(
         >>>     'val', 'key', data_points=5, add_interaction=False
         >>> )
         >>> d = cux_df.dashboard([line_chart_1, line_chart_2])
@@ -381,7 +381,7 @@ class DashBoard:
 
         >>> import cudf
         >>> import cuxfilter
-        >>> from cuxfilter import charts
+        >>> from cuxfilter.charts import bokeh
         >>> df = cudf.DataFrame(
         >>>     {
         >>>         'key': [0, 1, 2, 3, 4],
@@ -389,10 +389,10 @@ class DashBoard:
         >>>     }
         >>> )
         >>> cux_df = cuxfilter.DataFrame.from_dataframe(df)
-        >>> line_chart_1 = charts.bokeh.line(
+        >>> line_chart_1 = bokeh.line(
         >>>     'key', 'val', data_points=5, add_interaction=False
         >>> )
-        >>> line_chart_2 = charts.bokeh.bar(
+        >>> line_chart_2 = bokeh.bar(
         >>>     'val', 'key', data_points=5, add_interaction=False
         >>> )
         >>> d = cux_df.dashboard([line_chart_1, line_chart_2])
@@ -429,7 +429,7 @@ class DashBoard:
 
         >>> import cudf
         >>> import cuxfilter
-        >>> from cuxfilter import charts
+        >>> from cuxfilter.charts import bokeh
         >>> df = cudf.DataFrame(
         >>>     {
         >>>         'key': [0, 1, 2, 3, 4],
@@ -437,7 +437,7 @@ class DashBoard:
         >>>     }
         >>> )
         >>> cux_df = cuxfilter.DataFrame.from_dataframe(df)
-        >>> line_chart_1 = charts.bokeh.line(
+        >>> line_chart_1 = bokeh.line(
         >>>     'key', 'val', data_points=5, add_interaction=False
         >>> )
         >>> d = cux_df.dashboard([line_chart_1])
@@ -475,7 +475,7 @@ class DashBoard:
 
         >>> import cudf
         >>> import cuxfilter
-        >>> from cuxfilter import charts
+        >>> from cuxfilter.charts import bokeh
         >>> df = cudf.DataFrame(
         >>>     {
         >>>         'key': [0, 1, 2, 3, 4],
@@ -483,7 +483,7 @@ class DashBoard:
         >>>     }
         >>> )
         >>> cux_df = cuxfilter.DataFrame.from_dataframe(df)
-        >>> line_chart_1 = charts.bokeh.line(
+        >>> line_chart_1 = bokeh.line(
         >>>     'key', 'val', data_points=5, add_interaction=False
         >>> )
         >>> d = cux_df.dashboard([line_chart_1])
