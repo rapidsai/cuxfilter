@@ -1,6 +1,7 @@
 import json
 from urllib.request import urlopen
 import geopandas as gpd
+import pyproj
 
 
 def geo_json_mapper(url, prop=None):
@@ -13,7 +14,7 @@ def geo_json_mapper(url, prop=None):
             raise ValueError("url invalid" + e)
 
     temp_gpd_df = gpd.read_file(data)
-    if temp_gpd_df.crs["init"] != "epsg:3857":
+    if pyproj.CRS(temp_gpd_df.crs) != "epsg:3857":
         temp_gpd_df = temp_gpd_df.to_crs(epsg=3857)
 
     data_json = json.loads(temp_gpd_df.to_json())
