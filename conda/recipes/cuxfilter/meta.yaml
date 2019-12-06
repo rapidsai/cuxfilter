@@ -31,7 +31,6 @@ requirements:
     - pyproj  >=2.4.*
     - geopandas >=0.6.*
     - pyppeteer
-    - altair 
 
 test:
   commands:
