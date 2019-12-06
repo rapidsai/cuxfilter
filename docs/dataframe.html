@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="10 minutes to cuxfilter" href="10 minutes to cuxfilter.html" />
+    <link rel="next" title="Charts" href="charts/charts.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
 </head>
 
@@ -92,7 +92,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#dashboard">DashBoard</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="10 minutes to cuxfilter.html">10 minutes to cuxfilter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="charts/charts.html">Charts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="layouts/Layouts.html">Layouts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="themes/Themes.html">Themes</a></li>
@@ -247,7 +246,7 @@ default False</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cudf</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter</span> <span class="k">import</span> <span class="n">charts</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter.charts</span> <span class="k">import</span> <span class="n">bokeh</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
@@ -255,7 +254,7 @@ default False</p>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 </pre></div>
@@ -337,15 +336,15 @@ Examples
 <p>Create a dashboard</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cudf</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter</span> <span class="k">import</span> <span class="n">charts</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter.charts</span> <span class="k">import</span> <span class="n">bokehfrom</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">charts</span> <span class="kn">import</span> <span class="nn">bokeh</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span><span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="s1">&#39;val&#39;</span><span class="p">:[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_2</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_2</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">line_chart_1</span><span class="p">,</span> <span class="n">line_chart_2</span><span class="p">])</span>
@@ -412,7 +411,7 @@ or dashboard.show() cell to see the updated charts.</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cudf</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter</span> <span class="k">import</span> <span class="n">charts</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter.charts</span> <span class="k">import</span> <span class="n">bokeh</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
@@ -420,11 +419,11 @@ or dashboard.show() cell to see the updated charts.</p>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">line_chart_1</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_2</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_2</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">add_charts</span><span class="p">([</span><span class="n">line_chart_2</span><span class="p">])</span>
@@ -452,7 +451,7 @@ running jupyter remotely and only few ports are exposed.</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cudf</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter</span> <span class="k">import</span> <span class="n">charts</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter.charts</span> <span class="k">import</span> <span class="n">bokeh</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
@@ -460,7 +459,7 @@ running jupyter remotely and only few ports are exposed.</p>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">line_chart_1</span><span class="p">])</span>
@@ -493,7 +492,7 @@ cudf.DataFrame</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cudf</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter</span> <span class="k">import</span> <span class="n">charts</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter.charts</span> <span class="k">import</span> <span class="n">bokeh</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
@@ -501,10 +500,10 @@ cudf.DataFrame</p>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_2</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_2</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">line_chart_1</span><span class="p">,</span> <span class="n">line_chart_2</span><span class="p">])</span>
@@ -530,7 +529,7 @@ documentation while still rendering the dashboard.</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cudf</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter</span> <span class="k">import</span> <span class="n">charts</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter.charts</span> <span class="k">import</span> <span class="n">bokeh</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
@@ -538,10 +537,10 @@ documentation while still rendering the dashboard.</p>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_2</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_2</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">line_chart_1</span><span class="p">,</span> <span class="n">line_chart_2</span><span class="p">])</span>
@@ -569,7 +568,7 @@ url: str, optional</p>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cudf</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter</span> <span class="k">import</span> <span class="n">charts</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter.charts</span> <span class="k">import</span> <span class="n">bokeh</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
 <span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
@@ -577,7 +576,7 @@ url: str, optional</p>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">charts</span><span class="o">.</span><span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">line_chart_1</span><span class="p">])</span>
@@ -611,7 +610,7 @@ url: str, optional</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="10 minutes to cuxfilter.html" class="btn btn-neutral float-right" title="10 minutes to cuxfilter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="charts/charts.html" class="btn btn-neutral float-right" title="Charts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
