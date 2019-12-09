@@ -74,7 +74,7 @@ class TestCoreNonAggregateChart:
     def test_get_selection_geometry_callback(self):
         bnac = BaseNonAggregate()
 
-        df = cudf.DataFrame([("a", [1, 2, 2]), ("b", [3, 4, 5])])
+        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(data=df)
 
         assert (
@@ -94,7 +94,7 @@ class TestCoreNonAggregateChart:
             self.result = data
 
         bnac.reload_chart = t_function
-        df = cudf.DataFrame([("a", [1, 2, 2]), ("b", [3, 4, 5])])
+        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(data=df)
 
         dashboard._active_view = bnac.name
@@ -108,8 +108,8 @@ class TestCoreNonAggregateChart:
         [
             (cudf.DataFrame(), cudf.DataFrame()),
             (
-                cudf.DataFrame([("a", [1, 2, 2]), ("b", [3, 4, 5])]),
-                cudf.DataFrame([("a", [1, 2, 2]), ("b", [3, 4, 5])]),
+                cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]}),
+                cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]}),
             ),
         ],
     )
@@ -144,7 +144,7 @@ class TestCoreNonAggregateChart:
         bnac.x_range = x_range
         bnac.y_range = y_range
 
-        df = cudf.DataFrame([("a", [1, 2, 2]), ("b", [3, 4, 5])])
+        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(data=df)
 
         bnac.compute_query_dict(dashboard._query_str_dict)
@@ -164,7 +164,7 @@ class TestCoreNonAggregateChart:
         bnac.add_interaction = add_interaction
         bnac.reset_event = reset_event
 
-        df = cudf.DataFrame([("a", [1, 2, 2]), ("b", [3, 4, 5])])
+        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(data=df)
 
         self.event_1 = None
@@ -191,7 +191,7 @@ class TestCoreNonAggregateChart:
         bnac.x_range = (0, 2)
         bnac.y_range = (3, 5)
 
-        df = cudf.DataFrame([("a", [1, 2, 2]), ("b", [3, 4, 5])])
+        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(data=df)
         dashboard._active_view = "a_test"
 
@@ -217,7 +217,7 @@ class TestCoreNonAggregateChart:
 
         query_tuple = (4, 5)
 
-        df = cudf.DataFrame([("a", [1, 2, 3, 4]), ("b", [3, 4, 5, 6])])
+        df = cudf.DataFrame({"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
         bnac.source = df
 
         self.result = None
@@ -257,7 +257,7 @@ class TestCoreNonAggregateChart:
 
         new_indices = new_indices
 
-        df = cudf.DataFrame([("a", [1, 2, 3, 4]), ("b", [3, 4, 5, 6])])
+        df = cudf.DataFrame({"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
         bnac.source = df
 
         self.result = None
