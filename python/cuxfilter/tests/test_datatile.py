@@ -1,7 +1,6 @@
 import pytest
 
 from cuxfilter.datatile import DataTile
-from cuxfilter.charts import bokeh
 import cuxfilter
 import cudf
 import pandas as pd

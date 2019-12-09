@@ -1,7 +1,6 @@
 import pytest
 
 import cuxfilter
-from cuxfilter.charts import bokeh
 import cudf
 import pandas as pd
 import numpy as np
