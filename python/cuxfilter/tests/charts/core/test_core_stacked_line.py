@@ -107,7 +107,7 @@ class TestBaseStackedLine:
         bsl = BaseStackedLine("a", ["b"])
         bsl.x_range = x_range
         bsl.y_range = y_range
-        df = cudf.DataFrame([("a", [1, 2, 2]), ("b", [3, 4, 5])])
+        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = cuxfilter.dashboard.DashBoard(data=df)
         bsl.compute_query_dict(dashboard._query_str_dict)
 
@@ -125,7 +125,7 @@ class TestBaseStackedLine:
         bsl = BaseStackedLine("a", ["b"])
         bsl.add_interaction = add_interaction
         bsl.reset_event = reset_event
-        df = cudf.DataFrame([("a", [1, 2, 2]), ("b", [3, 4, 5])])
+        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = cuxfilter.dashboard.DashBoard(data=df)
         self.event_1 = None
         self.event_2 = None
@@ -148,7 +148,7 @@ class TestBaseStackedLine:
         bsl.x_range = (0, 2)
         bsl.y_range = (3, 5)
 
-        df = cudf.DataFrame([("a", [1, 2, 2]), ("b", [3, 4, 5])])
+        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = cuxfilter.dashboard.DashBoard(data=df)
         dashboard._active_view = "a_stacked_lines"
 
@@ -167,7 +167,7 @@ class TestBaseStackedLine:
         bsl = BaseStackedLine("a", ["b"])
         bsl_1 = BaseStackedLine("b", ["a"])
         query_tuple = (4, 5)
-        df = cudf.DataFrame([("a", [1, 2, 3, 4]), ("b", [3, 4, 5, 6])])
+        df = cudf.DataFrame({"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
         bsl.source = df
         self.result = None
         self.patch_update = None
@@ -198,7 +198,7 @@ class TestBaseStackedLine:
         bsl = BaseStackedLine("a", ["b"])
         bsl_1 = BaseStackedLine("b", ["a"])
         new_indices = new_indices
-        df = cudf.DataFrame([("a", [1, 2, 3, 4]), ("b", [3, 4, 5, 6])])
+        df = cudf.DataFrame({"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
         bsl.source = df
         self.result = None
         self.patch_update = None
