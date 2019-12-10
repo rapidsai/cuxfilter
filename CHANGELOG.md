@@ -8,3 +8,6 @@
 
 - Massive refactor and architecture change compared to the js (client-server) architecture
 
+## Bug Fixes
+
+- PR #78 Fix gpuCI GPU build script

@@ -81,7 +81,7 @@ class TestViewDataFrame:
         bsl = ViewDataFrame()
         bsl_1 = BaseStackedLine("b", ["a"])
         query_tuple = (4, 5)
-        df = cudf.DataFrame([("a", [1, 2, 3, 4]), ("b", [3, 4, 5, 6])])
+        df = cudf.DataFrame({"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
         bsl.source = df
         self.result = None
         self.patch_update = None
@@ -112,7 +112,7 @@ class TestViewDataFrame:
         bsl = ViewDataFrame()
         bsl_1 = BaseStackedLine("b", ["a"])
         new_indices = new_indices
-        df = cudf.DataFrame([("a", [1, 2, 3, 4]), ("b", [3, 4, 5, 6])])
+        df = cudf.DataFrame({"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
         bsl.source = df
         self.result = None
         self.patch_update = None
