@@ -10,14 +10,13 @@
 
 # Abort script on first error
 set -e
-echo "1"
+
 NUMARGS=$#
 ARGS=$*
 
 # NOTE: ensure all dir changes are relative to the location of this
 # script, and that this script resides in the repo dir!
 REPODIR=$(cd $(dirname $0); pwd)
-echo "2"
 VALIDARGS="clean cuxfilter cudatashader -v -g -n --allgpuarch -h"
 HELP="$0 [clean] [cuxfilter] [cudatashader] [-v] [-g] [-n] [-h]
    clean        - remove all existing build artifacts and configuration (start
@@ -33,7 +32,7 @@ HELP="$0 [clean] [cuxfilter] [cudatashader] [-v] [-g] [-n] [-h]
 CUXFILTER_BUILD_DIR=${REPODIR}/python/cuxfilter/build
 #CUDATASHADER_BUILD_DIR=${REPODIR}/cuDatashader/build
 BUILD_DIRS="${CUXFILTER_BUILD_DIR}" #{CUDATASHADER_BUILD_DIR}
-echo "3"
+
 # Set defaults for vars modified by flags to this script
 VERBOSE=""
 BUILD_TYPE=Release
@@ -51,7 +50,6 @@ function hasArg {
     (( ${NUMARGS} != 0 )) && (echo " ${ARGS} " | grep -q " $1 ")
 }
 
-echo "4"
 if hasArg -h; then
     echo "${HELP}"
     exit 0
@@ -66,7 +64,7 @@ if (( ${NUMARGS} != 0 )); then
     fi
     done
 fi
-echo "5"
+
 # Process flags
 if hasArg -v; then
     VERBOSE=1
@@ -83,7 +81,7 @@ fi
 if hasArg benchmarks; then
     BENCHMARKS="ON"
 fi
-echo "6"
+
 # If clean given, run it prior to any other steps
 if hasArg clean; then
     # If the dirs to clean are mounted dirs in a container, the
@@ -105,7 +103,7 @@ else
     GPU_ARCH="-DGPU_ARCHS=ALL"
     echo "Building for *ALL* supported GPU architectures..."
 fi
-echo "7"
+
 ################################################################################
 
 # Build and install the cuxfilter Python package
@@ -121,12 +119,3 @@ if (( ${NUMARGS} == 0 )) || hasArg cuxfilter; then
     fi
 fi
 
-# Build and install the cudatashader Python package
-#if (( ${NUMARGS} == 0 )) || hasArg cudatashader; then
-#
-#    cd ${REPODIR}/../
-#    git clone https://github.com/rapidsai/cuDataShader.git
-#    cd ${REPODIR}/../cuDataShader
-#    python setup.py install --single-version-externally-managed --record=record.txt
-#    cd ${REPODIR}
-#fi
