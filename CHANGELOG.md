@@ -12,4 +12,5 @@
 
 - PR #78 Fix gpuCI GPU build script
 - PR #80 Fix conda upload
+- PR #81 Fix upload variable
 
