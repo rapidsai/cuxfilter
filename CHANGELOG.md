@@ -11,5 +11,5 @@
 ## Bug Fixes
 
 - PR #78 Fix gpuCI GPU build script
-- PR #82 Fix conda upload
+- PR #83 Fix conda upload
 
