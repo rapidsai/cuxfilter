@@ -24,12 +24,12 @@ requirements:
     - setuptools
   run:
     - python
-    - cudf={{ minor_version }}
-    - cupy>=6*
-    - panel=0.6.*
-    - bokeh>=1.2.*
-    - pyproj>=2.4.*
-    - geopandas>=0.6.*
+    - cudf {{ minor_version }}
+    - cupy  >=6*
+    - panel 0.6.*
+    - bokeh >=1.2.*
+    - pyproj  >=2.4.*
+    - geopandas >=0.6.*
     - pyppeteer
 
 test:

@@ -4,7 +4,7 @@
 
 set -e
 
-export  CUXFILTER_FILE=`conda build conda/recipes/cuXfilter --output`
+export  CUXFILTER_FILE=`conda build conda/recipes/cuxfilter --output`
 
 SOURCE_BRANCH=master
 CUDA_REL=${CUDA_VERSION%.*}

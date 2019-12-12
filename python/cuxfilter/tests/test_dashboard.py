@@ -30,10 +30,10 @@ class TestDashBoard:
         assert self.dashboard._active_view == ""
 
     def test_add_charts(self):
-        bac = cuxfilter.charts.bokeh.bar("key")
+        bac = bokeh.bar("key")
         bac.chart_type = "chart_1"
         for _ in range(3):
-            bac = cuxfilter.charts.bokeh.bar("key")
+            bac = bokeh.bar("key")
             bac.chart_type = "chart_" + str(_ + 1)
             self.dashboard.add_charts([bac])
 
@@ -107,7 +107,7 @@ class TestDashBoard:
         ],
     )
     def test_export(self, active_view, result):
-        bac = cuxfilter.charts.bokeh.bar("key")
+        bac = bokeh.bar("key")
         bac.chart_type = "chart_1"
         self.dashboard.add_charts([bac])
         self.dashboard._query_str_dict = {"key_chart_1": "0<=key<=3"}
@@ -143,9 +143,9 @@ class TestDashBoard:
             {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
         )
         cux_df = cuxfilter.DataFrame.from_dataframe(df)
-        bac = cuxfilter.charts.bokeh.line("key", "val")
+        bac = bokeh.line("key", "val")
         bac.use_data_tiles = False
-        bac1 = cuxfilter.charts.bokeh.bar("val")
+        bac1 = bokeh.bar("val")
         dashboard = cux_df.dashboard(
             charts=[bac, bac1],
             title="test_title",
@@ -178,8 +178,8 @@ class TestDashBoard:
             {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
         )
         cux_df = cuxfilter.DataFrame.from_dataframe(df)
-        bac = cuxfilter.charts.bokeh.line("key", "val")
-        bac1 = cuxfilter.charts.bokeh.bar("val")
+        bac = bokeh.line("key", "val")
+        bac1 = bokeh.bar("val")
         dashboard = cux_df.dashboard(
             charts=[bac, bac1],
             title="test_title",
@@ -207,8 +207,8 @@ class TestDashBoard:
             {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
         )
         cux_df = cuxfilter.DataFrame.from_dataframe(df)
-        bac = cuxfilter.charts.bokeh.line("key", "val")
-        bac1 = cuxfilter.charts.bokeh.bar("val")
+        bac = bokeh.line("key", "val")
+        bac1 = bokeh.bar("val")
         dashboard = cux_df.dashboard(
             charts=[bac, bac1],
             title="test_title",
@@ -229,8 +229,8 @@ class TestDashBoard:
             {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
         )
         cux_df = cuxfilter.DataFrame.from_dataframe(df)
-        bac = cuxfilter.charts.bokeh.line("key", "val")
-        bac1 = cuxfilter.charts.bokeh.bar("val")
+        bac = bokeh.line("key", "val")
+        bac1 = bokeh.bar("val")
         dashboard = cux_df.dashboard(
             charts=[bac, bac1],
             title="test_title",

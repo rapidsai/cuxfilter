@@ -17,7 +17,6 @@ ARGS=$*
 # NOTE: ensure all dir changes are relative to the location of this
 # script, and that this script resides in the repo dir!
 REPODIR=$(cd $(dirname $0); pwd)
-
 VALIDARGS="clean cuxfilter cudatashader -v -g -n --allgpuarch -h"
 HELP="$0 [clean] [cuxfilter] [cudatashader] [-v] [-g] [-n] [-h]
    clean        - remove all existing build artifacts and configuration (start
@@ -31,8 +30,8 @@ HELP="$0 [clean] [cuxfilter] [cudatashader] [-v] [-g] [-n] [-h]
    -h           - print this text
 "
 CUXFILTER_BUILD_DIR=${REPODIR}/python/cuxfilter/build
-CUDATASHADER_BUILD_DIR=${REPODIR}/../cuDatashader/build
-BUILD_DIRS="${CUXFILTER_BUILD_DIR} #{CUDATASHADER_BUILD_DIR}"
+#CUDATASHADER_BUILD_DIR=${REPODIR}/cuDatashader/build
+BUILD_DIRS="${CUXFILTER_BUILD_DIR}" #{CUDATASHADER_BUILD_DIR}
 
 # Set defaults for vars modified by flags to this script
 VERBOSE=""
@@ -111,20 +110,12 @@ fi
 if (( ${NUMARGS} == 0 )) || hasArg cuxfilter; then
 
     cd ${REPODIR}/python
+    echo "8"
     if [[ ${INSTALL_TARGET} != "" ]]; then
-    python setup.py build_ext --inplace
-    python setup.py install --single-version-externally-managed --record=record.txt
+        python setup.py build_ext --inplace
+        python setup.py install --single-version-externally-managed --record=record.txt
     else
-    python setup.py build_ext --inplace --library-dir=${LIBCUDF_BUILD_DIR}
+        python setup.py build_ext --inplace --library-dir=${LIBCUXFILTER_BUILD_DIR}
     fi
 fi
 
-# Build and install the cudatashader Python package
-if (( ${NUMARGS} == 0 )) || hasArg cudatashader; then
-
-    cd ${REPODIR}/../
-    git clone https://github.com/rapidsai/cuDataShader.git
-    cd ${REPODIR}/../cuDataShader
-    python setup.py install --single-version-externally-managed --record=record.txt
-    cd ${REPODIR}
-fi

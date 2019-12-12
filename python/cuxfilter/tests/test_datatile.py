@@ -9,8 +9,8 @@ import pandas as pd
 
 class TestDataTile:
 
-    bac = cuxfilter.charts.bokeh.line("key", "val")
-    bac1 = cuxfilter.charts.bokeh.bar("val")
+    bac = bokeh.line("key", "val")
+    bac1 = bokeh.bar("val")
     df = cudf.DataFrame(
         {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
     )
@@ -42,7 +42,7 @@ class TestDataTile:
         def f2(data):
             return "2-d function"
 
-        bac1 = cuxfilter.charts.bokeh.bar("val")
+        bac1 = bokeh.bar("val")
         bac1.chart_type = chart_type
         data_tile = DataTile(active_chart=self.bac, passive_chart=bac1)
         data_tile._calc_data_tile_for_size = f1
