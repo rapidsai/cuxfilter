@@ -15,7 +15,7 @@ For more detailed requirements, see below.
 
 The python version of cuxfilter leverage jupyter notebook and bokeh server to greatly reduce backend complexity. Currently we are focusing development efforts on the python version instead of the older javascript version.
 
-<img src="https://github.com/rapidsai/cuxfilter/blob/master/docs/_images/RAPIDS%20Viz%20EcoSystem%20v2.png" />
+![layout architecture](./docs/_images/RAPIDS%20Viz%20EcoSystem%20v2.png)
 
 ### What is cuDataTiles?
 
@@ -83,38 +83,16 @@ Troubleshooting help can be found [here](https://rapidsai.github.io/cuxfilter/in
 
 ## Installation
 
-> You need to have RAPIDS (cudf) installed for cuxfilter to work
-
-
-### 1. If installing within the rapidai DOCKER container, follow the following instructions
+Install cuxfilter Nightly(0.12)
 
 ```bash
+# for CUDA 9.2
+conda install -c rapidsai-nightly \
+    cuxfilter=0.12 cudatoolkit=9.2
 
-Before you start juypter lab, you need to install cuxfilter and cudatashader.  In terminal, when you start docker, please run the following commands:
-
-#Get to the /rapidsai folder, up one level, where the libraries live.  List files to verify (you'll see cuspatal, cuml, cdf, etc)
-cd /rapids
-
-#Clone cuxfilter here
-git clone https://github.com/rapidsai/cuxfilter
-
-#Drop into cuxfilter's python library folder, make, and install
-cd cuxfilter/python
-/opt/conda/envs/rapids/bin/python -m pip install -U -r requirements.txt
-/opt/conda/envs/rapids/bin/python -m pip install -e .
-
-#Get back to /rapidsai folder
-cd /rapids
-
-#clone cudatashader
-git clone https://github.com/rapidsai/cudatashader
-
-#Drop into cudatashader folder and install
-cd cudatashader
-/opt/conda/envs/rapids/bin/python -m pip install -e .
-
-# start a jupyter lab environment
-# visit localhost:8888/
+# or, for CUDA 10.0
+conda install -c rapidsai-nightly \
+    cuxfilter=0.12 cudatoolkit=10.0
 ```
 
 To run the bokeh server in a jupyter lab
@@ -135,39 +113,6 @@ jupyter labextension install jupyterlab_bokeh
 d.app(url='ip.addr:current_port', port=bokeh_port)
 # OR for a separate web app
 d.show('ip.addr:bokeh_port')
-
-```
-
-
-
-### 2. If installing in a conda environment
-
-
-```bash
-
-#Clone cuxfilter here
-git clone https://github.com/rapidsai/cuxfilter
-
-#create a conda environment
-conda create -n test_env
-source activate test_env
-
-
-#Drop into cuxfilter's python library folder, make, and install
-cd cuxfilter/python
-make
-pip install -e .
-
-#Get back to /rapidsai folder
-cd ..
-cd ..
-
-#clone cudatashader
-git clone https://github.com/rapidsai/cudatashader
-
-Drop into cudatashader folder and install
-cd cudatashader
-pip install -e .
 
 ```
 
