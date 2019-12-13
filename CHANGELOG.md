@@ -12,4 +12,4 @@
 
 - PR #78 Fix gpuCI GPU build script
 - PR #83 Fix conda upload
-- PR #84 Updaed Docs and Readme with conda nightly install instructions for cuxfilter version 0.12
+- PR #84 Updated Docs and Readme with conda nightly install instructions for cuxfilter version 0.12
