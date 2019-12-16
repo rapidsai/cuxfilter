@@ -87,15 +87,15 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#installing-in-a-rapids-docker-container">1. Installing in a rapids docker container</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#to-run-the-bokeh-server-in-a-jupyter-lab">To run the bokeh server in a jupyter lab</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-cuxfilter-nightly-0-12">Install cuxfilter Nightly(0.12)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#to-run-the-bokeh-server-in-a-jupyter-lab">To run the bokeh server in a jupyter lab</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#download-datasets">Download datasets</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#if-installing-in-a-conda-environment">2. If installing in a conda environment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#download-datasets">Download datasets</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="dataframe.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10 minutes to cuxfilter.html">10 minutes to cuxfilter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="charts/charts.html">Charts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="layouts/Layouts.html">Layouts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="themes/Themes.html">Themes</a></li>
@@ -190,38 +190,19 @@
 </style>
 <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>Note: You need to have RAPIDS (cudf) installed for cuxfilter to work</p>
-<div class="section" id="installing-in-a-rapids-docker-container">
-<h2>1. Installing in a rapids docker container<a class="headerlink" href="#installing-in-a-rapids-docker-container" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Before you start juypter lab, you need to install cuxfilter and cudatashader.  In terminal, when you start docker, please run the following commands:
+<p>NOTE: cuxfilter is in ongoing development and the installation instructions will be updated in the near future.</p>
+<div class="section" id="install-cuxfilter-nightly-0-12">
+<h2>Install cuxfilter Nightly(0.12)<a class="headerlink" href="#install-cuxfilter-nightly-0-12" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># for CUDA 9.2</span>
+conda install -c rapidsai-nightly <span class="nv">cuxfilter</span><span class="o">=</span><span class="m">0</span>.12 <span class="nv">cudatoolkit</span><span class="o">=</span><span class="m">9</span>.2
 
-<span class="c1">#Get to the /rapidsai folder, up one level, where the libraries live.  List files to verify (you&#39;ll see cuspatal, cuml, cdf, etc)</span>
-<span class="nb">cd</span> /rapids
-
-<span class="c1">#Clone cuxfilter here</span>
-git clone https://github.com/rapidsai/cuxfilter
-
-<span class="c1">#Drop into cuxfilter&#39;s python library folder, make, and install</span>
-<span class="nb">cd</span> cuxfilter/python
-make
-pip install -e .
-
-<span class="c1">#Get back to /rapidsai folder</span>
-<span class="nb">cd</span> /rapids
-
-<span class="c1">#clone cudatashader</span>
-git clone https://github.com/rapidsai/cudatashader
-
-Drop into cudatashader folder and install
-<span class="nb">cd</span> cudatashader
-pip install -e .
-
-<span class="c1"># start a jupyter lab environment</span>
-jupyter lab
+<span class="c1"># or, for CUDA 10.0</span>
+conda install -c rapidsai-nightly <span class="nv">cuxfilter</span><span class="o">=</span><span class="m">0</span>.12 <span class="nv">cudatoolkit</span><span class="o">=</span><span class="m">10</span>.0
 </pre></div>
 </div>
+</div>
 <div class="section" id="to-run-the-bokeh-server-in-a-jupyter-lab">
-<h3>To run the bokeh server in a jupyter lab<a class="headerlink" href="#to-run-the-bokeh-server-in-a-jupyter-lab" title="Permalink to this headline">¶</a></h3>
+<h2>To run the bokeh server in a jupyter lab<a class="headerlink" href="#to-run-the-bokeh-server-in-a-jupyter-lab" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic simple">
 <li><p>expose an additional port for server, lets call it bokeh_port.</p></li>
 <li><p>Install jupyterlab dependencies</p></li>
@@ -239,37 +220,8 @@ d.app<span class="o">(</span><span class="nv">url</span><span class="o">=</span>
 d.show<span class="o">(</span><span class="s1">&#39;ip.addr:bokeh_port&#39;</span><span class="o">)</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="if-installing-in-a-conda-environment">
-<h2>2. If installing in a conda environment<a class="headerlink" href="#if-installing-in-a-conda-environment" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1">#Clone cuxfilter here</span>
-git clone https://github.com/rapidsai/cuxfilter
-
-<span class="c1">#create a conda environment</span>
-conda create -n test_env
-<span class="nb">source</span> activate test_env
-
-<span class="c1">#Drop into cuxfilter&#39;s python library folder, make, and install</span>
-<span class="nb">cd</span> cuxfilter/python
-make
-pip install -e .
-
-<span class="c1">#Get back to /rapidsai folder</span>
-<span class="nb">cd</span> ..
-<span class="nb">cd</span> ..
-
-<span class="c1">#clone cudatashader</span>
-git clone https://github.com/rapidsai/cudatashader
-
-Drop into cudatashader folder and install
-<span class="nb">cd</span> cudatashader
-pip install -e .
-</pre></div>
-</div>
-</div>
 <div class="section" id="download-datasets">
-<h2>Download datasets<a class="headerlink" href="#download-datasets" title="Permalink to this headline">¶</a></h2>
+<h3>Download datasets<a class="headerlink" href="#download-datasets" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Auto download datasets</p></li>
 </ol>
@@ -291,6 +243,7 @@ python -c <span class="s2">&quot;from cuxfilter.sampledata import datasets_check
 <li><p>Nyc taxi dataset - <a class="reference external" href="https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2015-01.csv">https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2015-01.csv</a></p></li>
 <li><p>Auto dataset - <a class="reference external" href="https://s3.us-east-2.amazonaws.com/rapidsai-data/viz-data/auto_accidents.arrow.gz">https://s3.us-east-2.amazonaws.com/rapidsai-data/viz-data/auto_accidents.arrow.gz</a></p></li>
 </ul>
+</div>
 </div>
 </div>
 

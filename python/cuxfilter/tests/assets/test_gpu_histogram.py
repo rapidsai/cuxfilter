@@ -358,7 +358,7 @@ def test_aggregated_column_unique():
                     ]
                     * 50
                 )
-            ),
+            )
         }
     )
     bc = BaseChart()
