@@ -83,6 +83,9 @@ Troubleshooting help can be found [here](https://rapidsai.github.io/cuxfilter/in
 
 ## Installation
 
+> NOTE: cuxfilter is in ongoing development and the installation instructions will be updated in the near future.
+
+
 Install cuxfilter Nightly(0.12)
 
 ```bash
@@ -155,10 +158,6 @@ Currently supported layout templates and example code can be found [here](https:
 | panel_widgets  | range_slider, float_slider, int_slider, drop_down, multi_select  |
 | custom    | view_dataframe |
 
-Our plan is to **add support in the future** for the following libraries:
-1. plotly
-2. altair
-3. pydeck
 
 ## Contributing Developers Guide
 
