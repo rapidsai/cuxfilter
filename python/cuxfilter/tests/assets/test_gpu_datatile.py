@@ -25,7 +25,7 @@ def test_calc_cumsum_data_tile():
     )
     groupby_as_ndarray = cuda.to_device(
         df.groupby(
-            by=["key", "val_mod"], method="hash", sort=False, as_index=False
+            by=["key", "val_mod"], method="hash", sort=True, as_index=False
         )
         .agg({"val": "count"})
         .to_pandas()
@@ -38,11 +38,11 @@ def test_calc_cumsum_data_tile():
         groupby_as_ndarray.copy_to_host(),
         np.array(
             [
-                [2.0, 4.0, 5.0],
-                [1.0, 6.0, 5.0],
-                [0.0, 8.0, 5.0],
-                [3.0, 2.0, 5.0],
-                [4.0, 0.0, 5.0],
+                [0., 8., 5.],
+                [1., 6., 5.],
+                [2., 4., 5.],
+                [3., 2., 5.],
+                [4., 0., 5.]
             ]
         ),
     )
