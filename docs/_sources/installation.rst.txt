@@ -1,6 +1,9 @@
 Installation
 ============
 
+NOTE: cuxfilter is in ongoing development and the installation instructions will be updated in the near future.
+
+
 Install cuxfilter Nightly(0.12)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: bash
