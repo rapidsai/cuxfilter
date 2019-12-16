@@ -1,39 +1,18 @@
 Installation
 ============
 
-Note: You need to have RAPIDS (cudf) installed for cuxfilter to work
+NOTE: cuxfilter is in ongoing development and the installation instructions will be updated in the near future.
 
 
-1. Installing in a rapids docker container
-------------------------------------------
-
+Install cuxfilter Nightly(0.12)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: bash
 
-    Before you start juypter lab, you need to install cuxfilter and cudatashader.  In terminal, when you start docker, please run the following commands:
+    # for CUDA 9.2
+    conda install -c rapidsai-nightly cuxfilter=0.12 cudatoolkit=9.2
 
-    #Get to the /rapidsai folder, up one level, where the libraries live.  List files to verify (you'll see cuspatal, cuml, cdf, etc)
-    cd /rapids
-
-    #Clone cuxfilter here
-    git clone https://github.com/rapidsai/cuxfilter
-
-    #Drop into cuxfilter's python library folder, make, and install
-    cd cuxfilter/python
-    make
-    pip install -e .
-
-    #Get back to /rapidsai folder
-    cd /rapids
-
-    #clone cudatashader
-    git clone https://github.com/rapidsai/cudatashader
-
-    Drop into cudatashader folder and install
-    cd cudatashader
-    pip install -e .
-
-    # start a jupyter lab environment
-    jupyter lab
+    # or, for CUDA 10.0
+    conda install -c rapidsai-nightly cuxfilter=0.12 cudatoolkit=10.0
 
 To run the bokeh server in a jupyter lab
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -55,38 +34,6 @@ To run the bokeh server in a jupyter lab
     d.app(url='ip.addr:current_port', port=bokeh_port)
     # OR for a separate web app
     d.show('ip.addr:bokeh_port')
-
-
-
-2. If installing in a conda environment
----------------------------------------
-
-.. code-block:: bash
-
-    #Clone cuxfilter here
-    git clone https://github.com/rapidsai/cuxfilter
-
-    #create a conda environment
-    conda create -n test_env
-    source activate test_env
-
-
-    #Drop into cuxfilter's python library folder, make, and install
-    cd cuxfilter/python
-    make
-    pip install -e .
-
-    #Get back to /rapidsai folder
-    cd ..
-    cd ..
-
-    #clone cudatashader
-    git clone https://github.com/rapidsai/cudatashader
-
-    Drop into cudatashader folder and install
-    cd cudatashader
-    pip install -e .
-
 
 Download datasets
 -----------------
