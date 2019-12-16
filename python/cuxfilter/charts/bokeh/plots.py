@@ -150,9 +150,7 @@ class Bar(BaseBar):
         x_axis_len = self.source.data[self.data_x_axis].size
         data = data[:x_axis_len]
 
-        patch_dict = {
-            self.data_y_axis: [(slice(data.size), data)],
-        }
+        patch_dict = {self.data_y_axis: [(slice(data.size), data)]}
         self.source.patch(patch_dict)
 
     def apply_theme(self, properties_dict):
@@ -383,9 +381,7 @@ class Line(BaseLine):
         x_axis_len = self.source.data[self.data_x_axis].size
         data = data[:x_axis_len]
 
-        patch_dict = {
-            self.data_y_axis: [(slice(data.size), data)],
-        }
+        patch_dict = {self.data_y_axis: [(slice(data.size), data)]}
         self.source.patch(patch_dict)
 
     def apply_theme(self, properties_dict):
@@ -551,9 +547,7 @@ class Choropleth(BaseChoropleth):
 
                     rates = rates + temp_list
             rates = np.array(rates)
-            patch_dict = {
-                self.data_y_axis: [(slice(len(rates)), rates)],
-            }
+            patch_dict = {self.data_y_axis: [(slice(len(rates)), rates)]}
             self.source.patch(patch_dict)
 
     def get_source_y_axis(self):
@@ -684,9 +678,7 @@ class Choropleth(BaseChoropleth):
                 temp_list = [data[i]] * len(self.geo_mapper[i])
                 rates = rates + temp_list
         rates = np.array(rates)
-        patch_dict = {
-            self.data_y_axis: [(slice(len(rates)), rates)],
-        }
+        patch_dict = {self.data_y_axis: [(slice(len(rates)), rates)]}
 
         self.source.patch(patch_dict)
 
