@@ -1,1 +1,1 @@
-from .cudatashader import scatter_geo, scatter, line, heatmap, stacked_lines
+from .datashader import scatter_geo, scatter, line, heatmap, stacked_lines

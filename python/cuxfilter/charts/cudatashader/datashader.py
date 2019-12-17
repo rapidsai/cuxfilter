@@ -51,7 +51,7 @@ def scatter_geo(
         Available options: circle, square, rect_vertical, rect_horizontal.
 
     pixel_shade_type: str, default 'eq_hist'
-        The "how" parameter in cudatashader.transfer_functions.shade()
+        The "how" parameter in datashader.transfer_functions.shade()
         function.
         Available options: eq_hist, linear, log, cbrt
 
@@ -83,7 +83,7 @@ def scatter_geo(
     Returns
     -------
     A cudashader geo-scatter plot.
-    Type cuxfilter.charts.cudatashader.custom_extensions.InteractiveImage
+    Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
     return plots.ScatterGeo(
         x,
@@ -155,7 +155,7 @@ def scatter(
         Available options: circle, square, rect_vertical, rect_horizontal.
 
     pixel_shade_type: str, default 'eq_hist'
-        The "how" parameter in cudatashader.transfer_functions.shade()
+        The "how" parameter in datashader.transfer_functions.shade()
         function.
         Available options: eq_hist, linear, log, cbrt
 
@@ -183,7 +183,7 @@ def scatter(
     Returns
     -------
     A cudashader scatter plot.
-    Type cuxfilter.charts.cudatashader.custom_extensions.InteractiveImage
+    Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
     return plots.Scatter(
         x,
@@ -221,7 +221,7 @@ def heatmap(
     **library_specific_params,
 ):
     """
-    Heatmap using default cudatashader.scatter plot with slight modifications.
+    Heatmap using default datashader.scatter plot with slight modifications.
     Added for better defaults. In theory, scatter directly can be used
     to generate the same.
 
@@ -278,7 +278,7 @@ def heatmap(
     Returns
     -------
     A cudashader heatmap (scatter object).
-    Type cuxfilter.charts.cudatashader.custom_extensions.InteractiveImage
+    Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
     return plots.Scatter(
         x,
@@ -330,7 +330,7 @@ def line(
     add_interaction: {True, False},  default True
 
     pixel_shade_type: str, default 'linear'
-        The "how" parameter in cudatashader.transfer_functions.shade()
+        The "how" parameter in datashader.transfer_functions.shade()
         function.
         Available options: eq_hist, linear, log, cbrt
 
@@ -357,7 +357,7 @@ def line(
     Returns
     -------
     A cudashader scatter plot.
-    Type cuxfilter.charts.cudatashader.custom_extensions.InteractiveImage
+    Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
     return plots.Line(
         x,
@@ -422,7 +422,7 @@ def stacked_lines(
     Returns
     -------
     A cudashader stacked_lines plot.
-    Type cuxfilter.charts.cudatashader.custom_extensions.InteractiveImage
+    Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
     if type(y) is not list or len(y) == 0:
         raise ValueError("y must be a list of atleast one column name")

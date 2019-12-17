@@ -6,9 +6,9 @@ from ..core.non_aggregate import (
 )
 from .custom_extensions import InteractiveImage
 
-import cudatashader as cds
-from cudatashader import transfer_functions as tf
-from cudatashader.colors import Hot
+import datashader as cds
+from datashader import transfer_functions as tf
+from datashader.colors import Hot
 from bokeh import events
 from bokeh.plotting import figure
 from bokeh.models import BoxSelectTool
