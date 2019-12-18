@@ -25,6 +25,7 @@ requirements:
   run:
     - python
     - cudf {{ minor_version }}
+    - datashader >=0.9.*
     - cupy  >=6*
     - panel 0.6.*
     - bokeh >=1.2.*
