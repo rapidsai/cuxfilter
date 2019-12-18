@@ -1,0 +1,655 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>API Reference &mdash; cuxfilter 0.12.0a+22.g9790239.dirty documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script type="text/javascript" src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="10 minutes to cuxfilter" href="10 minutes to cuxfilter.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cuxfilter
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#dataframe">DataFrame</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dashboard">DashBoard</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="10 minutes to cuxfilter.html">10 minutes to cuxfilter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="charts/charts.html">Charts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layouts/Layouts.html">Layouts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="themes/Themes.html">Themes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cuxfilter</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>API Reference</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/dataframe.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="dataframe">
+<h2>DataFrame<a class="headerlink" href="#dataframe" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cuxfilter.dataframe.DataFrame">
+<em class="property">class </em><code class="sig-prename descclassname">cuxfilter.dataframe.</code><code class="sig-name descname">DataFrame</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="headerlink" href="#cuxfilter.dataframe.DataFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>A cuxfilter GPU DataFrame object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cuxfilter.dataframe.DataFrame.dashboard" title="cuxfilter.dataframe.DataFrame.dashboard"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dashboard</span></code></a>(self, charts[, layout, theme, …])</p></td>
+<td><p>Creates a cuxfilter.DashBoard object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cuxfilter.dataframe.DataFrame.from_arrow" title="cuxfilter.dataframe.DataFrame.from_arrow"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_arrow</span></code></a>(dataframe_location)</p></td>
+<td><p>read an arrow file from disk as cuxfilter.DataFrame</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cuxfilter.dataframe.DataFrame.from_dataframe" title="cuxfilter.dataframe.DataFrame.from_dataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_dataframe</span></code></a>(dataframe)</p></td>
+<td><p>create a cuxfilter.DataFrame from cudf.DataFrame (zero-copy reference)</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cuxfilter.dataframe.DataFrame.dashboard">
+<code class="sig-name descname">dashboard</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">charts:list</em>, <em class="sig-param">layout=&lt;class 'cuxfilter.layouts.layouts.Layout0'&gt;</em>, <em class="sig-param">theme=&lt;class 'cuxfilter.themes.light.Theme'&gt;</em>, <em class="sig-param">title='Dashboard'</em>, <em class="sig-param">data_size_widget=True</em>, <em class="sig-param">warnings=False</em><span class="sig-paren">)</span><a class="headerlink" href="#cuxfilter.dataframe.DataFrame.dashboard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a cuxfilter.DashBoard object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>charts: list</strong></dt><dd><p>list of cuxfilter.charts</p>
+</dd>
+<dt><strong>layout: cuxfilter.layouts</strong></dt><dd></dd>
+<dt><strong>title: str</strong></dt><dd><p>title of the dashboard, default “Dashboard”</p>
+</dd>
+<dt><strong>data_size_widget: boolean</strong></dt><dd><p>flag to determine whether to diplay the current datapoints
+selected in the dashboard, default True</p>
+</dd>
+<dt><strong>warnings: boolean</strong></dt><dd><p>flag to disable or enable runtime warnings related to layouts,
+default False</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>cuxfilter.DashBoard object</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cudf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter.charts</span> <span class="k">import</span> <span class="n">bokeh</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;val&#39;</span><span class="p">:[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># create a dashboard object</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">line_chart_1</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cuxfilter.dataframe.DataFrame.from_arrow">
+<em class="property">classmethod </em><code class="sig-name descname">from_arrow</code><span class="sig-paren">(</span><em class="sig-param">dataframe_location</em><span class="sig-paren">)</span><a class="headerlink" href="#cuxfilter.dataframe.DataFrame.from_arrow" title="Permalink to this definition">¶</a></dt>
+<dd><p>read an arrow file from disk as cuxfilter.DataFrame</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dataframe_location: str or arrow in-memory table</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>cuxfilter.DataFrame object</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Read dataframe as an arrow file from disk</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_arrow</span><span class="p">(</span>
+<span class="go">    &#39;./location/of/dataframe.arrow&#39;</span>
+<span class="go">    )</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cuxfilter.dataframe.DataFrame.from_dataframe">
+<em class="property">classmethod </em><code class="sig-name descname">from_dataframe</code><span class="sig-paren">(</span><em class="sig-param">dataframe</em><span class="sig-paren">)</span><a class="headerlink" href="#cuxfilter.dataframe.DataFrame.from_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a cuxfilter.DataFrame from cudf.DataFrame (zero-copy reference)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dataframe_location: cudf.DataFrame</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><dl class="simple">
+<dt>cuxfilter.DataFrame object</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Read dataframe from a cudf.DataFrame</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cudf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cudf_df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;val&#39;</span><span class="p">:[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">cudf_df</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="dashboard">
+<h2>DashBoard<a class="headerlink" href="#dashboard" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cuxfilter.dashboard.DashBoard">
+<em class="property">class </em><code class="sig-prename descclassname">cuxfilter.dashboard.</code><code class="sig-name descname">DashBoard</code><span class="sig-paren">(</span><em class="sig-param">charts=[]</em>, <em class="sig-param">data=None</em>, <em class="sig-param">layout=&lt;class 'cuxfilter.layouts.layouts.Layout0'&gt;</em>, <em class="sig-param">theme=&lt;class 'cuxfilter.themes.light.Theme'&gt;</em>, <em class="sig-param">title='Dashboard'</em>, <em class="sig-param">data_size_widget=True</em>, <em class="sig-param">warnings=False</em><span class="sig-paren">)</span><a class="headerlink" href="#cuxfilter.dashboard.DashBoard" title="Permalink to this definition">¶</a></dt>
+<dd><p>A cuxfilter GPU DashBoard object.
+Examples
+——–</p>
+<p>Create a dashboard</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cudf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter.charts</span> <span class="k">import</span> <span class="n">bokehfrom</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">charts</span> <span class="kn">import</span> <span class="nn">bokeh</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span><span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="s1">&#39;val&#39;</span><span class="p">:[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_2</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">line_chart_1</span><span class="p">,</span> <span class="n">line_chart_2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span>
+<span class="go">`cuxfilter DashBoard</span>
+<span class="go">[title] Markdown(str)</span>
+<span class="go">[chart1] Column(sizing_mode=&#39;scale_both&#39;, width=1600)</span>
+<span class="go">    [0] Bokeh(Figure)</span>
+<span class="go">[chart2] Column(sizing_mode=&#39;scale_both&#39;, width=1600)</span>
+<span class="go">    [0] Bokeh(Figure)`</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes</dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#cuxfilter.dashboard.DashBoard.charts" title="cuxfilter.dashboard.DashBoard.charts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">charts</span></code></a></dt><dd><p>Charts in the dashboard as a dictionary.</p>
+</dd>
+<dt><a class="reference internal" href="#cuxfilter.dashboard.DashBoard.data_size_widget" title="cuxfilter.dashboard.DashBoard.data_size_widget"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data_size_widget</span></code></a></dt><dd><p>Data_size_widget flag.</p>
+</dd>
+<dt><a class="reference internal" href="#cuxfilter.dashboard.DashBoard.title" title="cuxfilter.dashboard.DashBoard.title"><code class="xref py py-obj docutils literal notranslate"><span class="pre">title</span></code></a></dt><dd><p>Title of the dashboard.</p>
+</dd>
+<dt><a class="reference internal" href="#cuxfilter.dashboard.DashBoard.warnings" title="cuxfilter.dashboard.DashBoard.warnings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">warnings</span></code></a></dt><dd><p>Layout warnings flag.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cuxfilter.dashboard.DashBoard.add_charts" title="cuxfilter.dashboard.DashBoard.add_charts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_charts</span></code></a>(self[, charts])</p></td>
+<td><p>Adding more charts to the dashboard, after it has been initialized.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cuxfilter.dashboard.DashBoard.app" title="cuxfilter.dashboard.DashBoard.app"><code class="xref py py-obj docutils literal notranslate"><span class="pre">app</span></code></a>(self[, url])</p></td>
+<td><p>Run the dashboard with a bokeh backend server within the notebook.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cuxfilter.dashboard.DashBoard.export" title="cuxfilter.dashboard.DashBoard.export"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export</span></code></a>(self)</p></td>
+<td><p>Export the cudf.DataFrame based on the current filtered state of the dashboard.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#cuxfilter.dashboard.DashBoard.preview" title="cuxfilter.dashboard.DashBoard.preview"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preview</span></code></a>(self)</p></td>
+<td><p>Preview(Async) all the charts in a jupyter cell, non interactive(no backend server).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#cuxfilter.dashboard.DashBoard.show" title="cuxfilter.dashboard.DashBoard.show"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show</span></code></a>(self[, url, threaded])</p></td>
+<td><p>Run the dashboard with a bokeh backend server within the notebook.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cuxfilter.dashboard.DashBoard.add_charts">
+<code class="sig-name descname">add_charts</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">charts=[]</em><span class="sig-paren">)</span><a class="headerlink" href="#cuxfilter.dashboard.DashBoard.add_charts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adding more charts to the dashboard, after it has been initialized.
+Parameters
+———-
+charts: list</p>
+<blockquote>
+<div><p>list of cuxfilter.charts objects</p>
+</div></blockquote>
+<p class="rubric">Notes</p>
+<p>After adding the charts, re-run the dashboard.app()
+or dashboard.show() cell to see the updated charts.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cudf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter.charts</span> <span class="k">import</span> <span class="n">bokeh</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;val&#39;</span><span class="p">:[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">line_chart_1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_2</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">add_charts</span><span class="p">([</span><span class="n">line_chart_2</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cuxfilter.dashboard.DashBoard.app">
+<code class="sig-name descname">app</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">url=''</em>, <em class="sig-param">port:int=0</em><span class="sig-paren">)</span><a class="headerlink" href="#cuxfilter.dashboard.DashBoard.app" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the dashboard with a bokeh backend server within the notebook.
+Parameters
+———-
+url: str, optional</p>
+<blockquote>
+<div><p>url of the notebook(including the port).
+Can use localhost instead of ip if running locally</p>
+</div></blockquote>
+<dl class="simple">
+<dt>port: int, optional</dt><dd><p>Port number bokeh uses for it’s two communication protocol.
+Default is random open port. Recommended to set this value if
+running jupyter remotely and only few ports are exposed.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cudf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter.charts</span> <span class="k">import</span> <span class="n">bokeh</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;val&#39;</span><span class="p">:[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">line_chart_1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">app</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;localhost:8888&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cuxfilter.dashboard.DashBoard.charts">
+<em class="property">property </em><code class="sig-name descname">charts</code><a class="headerlink" href="#cuxfilter.dashboard.DashBoard.charts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Charts in the dashboard as a dictionary.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cuxfilter.dashboard.DashBoard.data_size_widget">
+<em class="property">property </em><code class="sig-name descname">data_size_widget</code><a class="headerlink" href="#cuxfilter.dashboard.DashBoard.data_size_widget" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data_size_widget flag.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cuxfilter.dashboard.DashBoard.export">
+<code class="sig-name descname">export</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#cuxfilter.dashboard.DashBoard.export" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export the cudf.DataFrame based on the current filtered state of
+the dashboard.</p>
+<p>Also prints the query string of the current state of the dashboard.
+Returns
+——-
+cudf.DataFrame</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cudf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter.charts</span> <span class="k">import</span> <span class="n">bokeh</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;val&#39;</span><span class="p">:[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_2</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">line_chart_1</span><span class="p">,</span> <span class="n">line_chart_2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">app</span><span class="p">()</span> <span class="c1">#or d.show()</span>
+<span class="go">displays dashboard</span>
+<span class="go">do some visual querying/ crossfiltering</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">queried_df</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">export</span><span class="p">()</span>
+<span class="go">final query 2&lt;=key&lt;=4</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cuxfilter.dashboard.DashBoard.preview">
+<em class="property">async </em><code class="sig-name descname">preview</code><span class="sig-paren">(</span><em class="sig-param">self</em><span class="sig-paren">)</span><a class="headerlink" href="#cuxfilter.dashboard.DashBoard.preview" title="Permalink to this definition">¶</a></dt>
+<dd><p>Preview(Async) all the charts in a jupyter cell, non interactive(no
+backend server). Mostly intended to save notebook state for blogs,
+documentation while still rendering the dashboard.</p>
+<p class="rubric">Notes</p>
+<p>Png format</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cudf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter.charts</span> <span class="k">import</span> <span class="n">bokeh</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;val&#39;</span><span class="p">:[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_2</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">line_chart_1</span><span class="p">,</span> <span class="n">line_chart_2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">await</span> <span class="n">d</span><span class="o">.</span><span class="n">preview</span><span class="p">()</span>
+<span class="go">displays charts in the dashboard</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cuxfilter.dashboard.DashBoard.show">
+<code class="sig-name descname">show</code><span class="sig-paren">(</span><em class="sig-param">self</em>, <em class="sig-param">url=''</em>, <em class="sig-param">threaded=False</em><span class="sig-paren">)</span><a class="headerlink" href="#cuxfilter.dashboard.DashBoard.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the dashboard with a bokeh backend server within the notebook.
+Parameters
+———-
+url: str, optional</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>URL where you want to run the dashboard as a web-app,</p></li>
+</ul>
+<p>including the port number.
+- Can use localhost instead of ip if running locally.
+- Has to be an open port.</p>
+</div></blockquote>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cudf</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">cuxfilter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">cuxfilter.charts</span> <span class="k">import</span> <span class="n">bokeh</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">df</span> <span class="o">=</span> <span class="n">cudf</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;key&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s1">&#39;val&#39;</span><span class="p">:[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cux_df</span> <span class="o">=</span> <span class="n">cuxfilter</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">line_chart_1</span> <span class="o">=</span> <span class="n">bokeh</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s1">&#39;key&#39;</span><span class="p">,</span> <span class="s1">&#39;val&#39;</span><span class="p">,</span> <span class="n">data_points</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">add_interaction</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">cux_df</span><span class="o">.</span><span class="n">dashboard</span><span class="p">([</span><span class="n">line_chart_1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s1">&#39;localhost:8889&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cuxfilter.dashboard.DashBoard.title">
+<em class="property">property </em><code class="sig-name descname">title</code><a class="headerlink" href="#cuxfilter.dashboard.DashBoard.title" title="Permalink to this definition">¶</a></dt>
+<dd><p>Title of the dashboard.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cuxfilter.dashboard.DashBoard.warnings">
+<em class="property">property </em><code class="sig-name descname">warnings</code><a class="headerlink" href="#cuxfilter.dashboard.DashBoard.warnings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Layout warnings flag.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="10 minutes to cuxfilter.html" class="btn btn-neutral float-right" title="10 minutes to cuxfilter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, NVIDIA
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
