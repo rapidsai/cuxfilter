@@ -334,7 +334,7 @@ def line(
         function.
         Available options: eq_hist, linear, log, cbrt
 
-    color: str,  default rapidspurple
+    color: str,  default #8735fb
 
     step_size: int, default None
         for the range_slider below the chart
@@ -399,7 +399,7 @@ def stacked_lines(
 
     add_interaction: {True, False},  default True
 
-    colors: list, default [rapidspurple, rapidspurple, ....]
+    colors: list, default [#8735fb, #8735fb, ....]
 
     step_size: int, default None
         for the range_slider below the chart

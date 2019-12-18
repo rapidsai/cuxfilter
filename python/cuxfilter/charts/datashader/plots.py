@@ -6,14 +6,34 @@ from ..core.non_aggregate import (
 )
 from .custom_extensions import InteractiveImage
 
+import datashader
 import datashader as cds
 from datashader import transfer_functions as tf
 from datashader.colors import Hot
+import numpy as np
 from bokeh import events
 from bokeh.plotting import figure
 from bokeh.models import BoxSelectTool
 from bokeh.tile_providers import get_provider
 
+def _rect_vertical_mask(px):
+    """Produce a vertical rectangle mask with truth values in ``(2 * px + 1) * ((2 * px + 1)/2)``"""
+    px = int(px)
+    w = 2 * px + 1
+    zero_bool = np.zeros((w,px), dtype='bool')
+    x_bool = np.ones((w, w - px), dtype='bool')
+    return np.concatenate((x_bool,zero_bool), axis=1)
+
+def _rect_horizontal_mask(px):
+    """Produce a horizontal rectangle mask with truth values in ``((2 * px + 1)/2) * (2 * px + 1)``"""
+    px = int(px)
+    w = 2 * px + 1
+    zero_bool = np.zeros((px,w), dtype='bool') 
+    x_bool = np.ones((w - px, w), dtype='bool')
+    return np.concatenate((x_bool,zero_bool), axis=0)
+
+datashader.transfer_functions._mask_lookup['rect_vertical'] = _rect_vertical_mask
+datashader.transfer_functions._mask_lookup['rect_horizontal'] = _rect_horizontal_mask
 
 class ScatterGeo(BaseScatterGeo):
     """
@@ -582,7 +602,7 @@ class Line(BaseLine):
         Ouput:
         """
         if self.color is None:
-            self.color = "rapidspurple"
+            self.color = "#8735fb"
 
         if "title" in self.library_specific_params:
             self.title = self.library_specific_params["title"]
@@ -838,7 +858,7 @@ class StackedLines(BaseStackedLine):
 
         if self.colors == []:
             self.no_colors_set = True
-            self.colors = ["rapidspurple"] * len(self.y)
+            self.colors = ["#8735fb"] * len(self.y)
 
         if "title" in self.library_specific_params:
             self.title = self.library_specific_params["title"]
