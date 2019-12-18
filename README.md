@@ -40,7 +40,6 @@ The original version (0.2) of cuxfilter, most known for the backend powering the
 
 ```python
 import cuxfilter
-from cuxfilter.charts import cudatashader, bokeh
 
 #update data_dir if you have downloaded datasets elsewhere
 DATA_DIR = './data'
@@ -54,11 +53,11 @@ label_map = {1: 'Sunday',    2: 'Monday',    3: 'Tuesday',    4: 'Wednesday',   
 gtc_demo_red_blue_palette = [ (49,130,189), (107,174,214), (123, 142, 216), (226,103,152), (255,0,104) , (50,50,50) ]
 
 #declare charts
-chart1 = cudatashader.scatter_geo(x='dropoff_x', y='dropoff_y', aggregate_col='ST_CASE',
+chart1 = cuxfilter.charts.datashader.scatter_geo(x='dropoff_x', y='dropoff_y', aggregate_col='ST_CASE',
                                          color_palette=gtc_demo_red_blue_palette)
 chart2 = cuxfilter.charts.panel_widgets.multi_select('YEAR')
-chart3 = bokeh.bar('DAY_WEEK', x_label_map=label_map)
-chart4 = bokeh.bar('MONTH')
+chart3 = cuxfilter.charts.bokeh.bar('DAY_WEEK', x_label_map=label_map)
+chart4 = cuxfilter.charts.bokeh.bar('MONTH')
 
 #declare dashboard
 d = cux_df.dashboard([chart1, chart2, chart3, chart4], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Auto Accident Dataset')
