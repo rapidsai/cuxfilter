@@ -493,9 +493,24 @@ class DashBoard:
 
         if len(url) > 0:
             port = url.split(":")[-1]
-            return self._dashboard.generate_dashboard(
-                self._title, self._charts, self._theme
-            ).show(port=int(port), websocket_origin=url, threaded=threaded)
+            try:
+                self.temp_server = self._get_server(
+                    port=int(port),
+                    websocket_origin=url,
+                    show=False,
+                    start=True,
+                    threaded=threaded,
+                )
+            except OSError:
+                self.temp_server.stop()
+                self.temp_server = self._get_server(
+                    port=int(port),
+                    websocket_origin=url,
+                    show=False,
+                    start=True,
+                    threaded=threaded,
+                )
+            return self.temp_server
         else:
             return self._dashboard.generate_dashboard(
                 self._title, self._charts, self._theme

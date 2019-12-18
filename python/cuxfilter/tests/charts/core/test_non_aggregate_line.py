@@ -18,7 +18,7 @@ class TestNonAggregateBaseLine:
     dashboard = cux_df.dashboard(charts=[], title="test_title")
 
     def test_variables(self):
-        bl = BaseLine(x="test_x", y="test_y", color="rapidspurple")
+        bl = BaseLine(x="test_x", y="test_y", color="#8735fb")
         print(bl.color)
         assert bl.chart_type == "line"
         assert bl.x == "test_x"
@@ -29,7 +29,7 @@ class TestNonAggregateBaseLine:
         assert bl.width == 800
         assert bl.height == 400
         assert bl.pixel_shade_type == "linear"
-        assert bl.color == "rapidspurple"
+        assert bl.color == "#8735fb"
         assert bl.library_specific_params == {}
         assert bl.data_points == 100
         assert bl.add_interaction is True

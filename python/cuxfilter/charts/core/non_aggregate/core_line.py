@@ -55,7 +55,7 @@ class BaseLine(BaseNonAggregate):
         self.data_points = data_points
         self.add_interaction = add_interaction
         if color is None:
-            self.color = "rapidspurple"
+            self.color = "#8735fb"
             self.no_color_set = True
         else:
             self.color = color
