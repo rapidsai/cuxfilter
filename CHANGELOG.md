@@ -13,3 +13,4 @@
 - PR #78 Fix gpuCI GPU build script
 - PR #83 Fix conda upload
 - PR #84 Updated Docs and Readme with conda nightly install instructions for cuxfilter version 0.12
+- PR #86 Implemented #79 - cudatashader replaced by datashader(>=0.9) with cudf & dask_cudf support
