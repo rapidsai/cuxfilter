@@ -2,7 +2,7 @@ from pyppeteer import launch
 
 
 async def screengrab(url):
-    browser = await launch({'slowMo': 5})
+    browser = await launch({"slowMo": 5})
     page = await browser.newPage()
     await page.setViewport(
         {"width": 1920, "height": 1080, "deviceScaleFactor": 1}
