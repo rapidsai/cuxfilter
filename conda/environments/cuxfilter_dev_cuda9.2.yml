@@ -31,3 +31,4 @@ dependencies:
 - pip
 - pip:
   - sphinx-markdown-tables
+  - jupyter-server-proxy

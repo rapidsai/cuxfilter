@@ -46,7 +46,7 @@ conda install "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
               "numpy>=1.16" "cupy>=6.0.0" "datashader>=0.9.*" "pandas>=0.24.2,<0.25" "panel=0.6.*" \
               "bokeh>=1.2.*" "geopandas>=0.6.*" "pytest" "pyppeteer" \
               "pyproj>=2.4.*"
-
+pip install jupyter-server-proxy
 # Install the master version of cudatashader
 # logger "pip install git+https://github.com/rapidsai/cuDataShader.git --upgrade --no-deps"
 # pip install git+https://github.com/rapidsai/cuDataShader.git --upgrade --no-deps
