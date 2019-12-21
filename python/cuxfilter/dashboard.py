@@ -464,7 +464,7 @@ class DashBoard:
 
         """
         if len(notebook_url) > 0:
-            app(
+            self.server = app(
                 self._dashboard.generate_dashboard(
                     self._title, self._charts, self._theme
                 ),
@@ -472,7 +472,7 @@ class DashBoard:
                 port=port,
             )
         else:
-            app(
+            self.server = app(
                 self._dashboard.generate_dashboard(
                     self._title, self._charts, self._theme
                 )
@@ -522,7 +522,7 @@ class DashBoard:
             print("Dashboard running at " + dashboard_url)
 
             try:
-                self.temp_server = self._get_server(
+                self.server = self._get_server(
                     port=port,
                     websocket_origin=notebook_url,
                     show=False,
@@ -531,8 +531,8 @@ class DashBoard:
                     **kwargs,
                 )
             except OSError:
-                self.temp_server.stop()
-                self.temp_server = self._get_server(
+                self.server.stop()
+                self.server = self._get_server(
                     port=port,
                     websocket_origin=notebook_url,
                     show=False,
@@ -540,11 +540,18 @@ class DashBoard:
                     threaded=threaded,
                     **kwargs,
                 )
-            return self.temp_server
         else:
-            return self._dashboard.generate_dashboard(
+            self.server = self._dashboard.generate_dashboard(
                 self._title, self._charts, self._theme
             ).show(threaded=threaded)
+
+    def stop(self):
+        """
+        stop the bokeh server
+        """
+        if self.server._stopped is False:
+            self.server.stop()
+            self.server._tornado.stop()
 
     def _reload_charts(self, data=None, include_cols=[], ignore_cols=[]):
         """
