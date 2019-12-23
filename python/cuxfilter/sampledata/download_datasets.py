@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import requests
-import sys
 import gzip
 import tarfile
 import shutil
@@ -43,8 +41,13 @@ def decompress_extract_data(file_path):
 def download_dataset(downloaded_filename, filename, url):
     print("Dataset - " + filename)
     if not os.path.isfile(downloaded_filename):
-        bash_cmd = '! wget' + ' -O ' + downloaded_filename + ' ' + url
-        print("Dataset not found. Run the following for downloading the dataset: " + bash_cmd)
+        bash_cmd = "! wget" + " -O " + downloaded_filename + " " + url
+        print(
+            """
+            Dataset not found. Run the following for downloading the dataset:
+            """
+            + bash_cmd
+        )
     else:
         print("\ndataset already downloaded")
         if not os.path.isfile(filename):
