@@ -14,4 +14,4 @@ DataFrame
 DashBoard
 ---------
 .. autoclass:: DashBoard
-    :members: 
+    :members:
