@@ -322,7 +322,7 @@ class DashBoard:
         cls = "#### cuxfilter " + type(self).__name__
         spacer = "\n    "
         objs = [
-            "[%s] %s" % (name, obj.__repr__(1))
+            "[%s] %s" % (name, obj.__repr__())
             for name, obj in template_obj._render_items.items()
         ]
         template = "{cls}{spacer}{spacer}{objs}"
@@ -333,33 +333,6 @@ class DashBoard:
     def _repr_mimebundle_(self, include=None, exclude=None):
         str_repr = self.__repr__()
         server_info = pn.pane.HTML("")
-        # button = pn.widgets.Button(name="Launch server")
-        # button_in_notebook = pn.widgets.Button(name="Launch in notebook")
-
-        # def launch(event):
-        #     if template_obj._server:
-        #         button.name = "Launch server"
-        #         server_info.object = ""
-        #         template_obj._server.stop()
-        #         template_obj._server = None
-        #     else:
-        #         button.name = "Stop server"
-        #         template_obj._server = template_obj._get_server(
-        #             start=True, show=True
-        #         )
-        #         server_info.object = _server_info.format(
-        #             port=template_obj._server.port
-        #         )
-
-        # def launch_in_notebook(event):
-        #     server_info.object = (
-        #         "<b> In a new cell, execute "
-        #         "`dashboard.app(notebook_url, temp_server_port) </b>"
-        #     )
-
-        # button.param.watch(launch, "clicks")
-        # button_in_notebook.param.watch(launch_in_notebook, "clicks")
-
         return pn.Column(str_repr, server_info, width=800)._repr_mimebundle_(
             include, exclude
         )
