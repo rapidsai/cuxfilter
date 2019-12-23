@@ -1,8 +1,9 @@
 from typing import Dict, Type
 import bokeh.embed.util as u
-from panel.io.notebook import show_server
 import panel as pn
-from panel.io.server import get_server
+import uuid
+from panel.io.server import _origin_url, get_server
+from bokeh.embed import server_document
 
 from .charts.core.core_chart import BaseChart
 from .datatile import DataTile
@@ -16,6 +17,8 @@ _server_info = (
     '<a target="_blank" href="https://localhost:{port}">'
     "https://localhost:{port}</a>"
 )
+EXEC_MIME = "application/vnd.holoviews_exec.v0+json"
+HTML_MIME = "text/html"
 
 
 def app(panel_obj, notebook_url="localhost:8888", port=0):
@@ -28,7 +31,26 @@ def app(panel_obj, notebook_url="localhost:8888", port=0):
     port: int (optional, default=0)
         Allows specifying a specific port
     """
-    return show_server(panel_obj, notebook_url, port)
+    from IPython.display import publish_display_data
+
+    if callable(notebook_url):
+        origin = notebook_url(None)
+    else:
+        origin = _origin_url(notebook_url)
+    server_id = uuid.uuid4().hex
+    server = get_server(
+        panel_obj, port, origin, start=True, show=False, server_id=server_id
+    )
+
+    url = "http://%s%s%d%s" % (notebook_url, "/proxy/", server.port, "/")
+
+    script = server_document(url, resources=None)
+
+    publish_display_data(
+        {HTML_MIME: script, EXEC_MIME: ""},
+        metadata={EXEC_MIME: {"server_id": server_id}},
+    )
+    return server
 
 
 class DashBoard:
@@ -300,7 +322,7 @@ class DashBoard:
         cls = "#### cuxfilter " + type(self).__name__
         spacer = "\n    "
         objs = [
-            "[%s] %s" % (name, obj.__repr__(1))
+            "[%s] %s" % (name, obj.__repr__())
             for name, obj in template_obj._render_items.items()
         ]
         template = "{cls}{spacer}{spacer}{objs}"
@@ -309,41 +331,11 @@ class DashBoard:
         )
 
     def _repr_mimebundle_(self, include=None, exclude=None):
-        template_obj = self._dashboard.generate_dashboard(
-            self._title, self._charts, self._theme
-        )
         str_repr = self.__repr__()
         server_info = pn.pane.HTML("")
-        button = pn.widgets.Button(name="Launch server")
-        button_in_notebook = pn.widgets.Button(name="Launch in notebook")
-
-        def launch(event):
-            if template_obj._server:
-                button.name = "Launch server"
-                server_info.object = ""
-                template_obj._server.stop()
-                template_obj._server = None
-            else:
-                button.name = "Stop server"
-                template_obj._server = template_obj._get_server(
-                    start=True, show=True
-                )
-                server_info.object = _server_info.format(
-                    port=template_obj._server.port
-                )
-
-        def launch_in_notebook(event):
-            server_info.object = (
-                "<b> In a new cell, execute "
-                "`dashboard.app(notebook_url, temp_server_port) </b>"
-            )
-
-        button.param.watch(launch, "clicks")
-        button_in_notebook.param.watch(launch_in_notebook, "clicks")
-
-        return pn.Column(
-            str_repr, server_info, button, button_in_notebook, width=800
-        )._repr_mimebundle_(include, exclude)
+        return pn.Column(str_repr, server_info, width=800)._repr_mimebundle_(
+            include, exclude
+        )
 
     def _get_server(
         self,
@@ -410,7 +402,7 @@ class DashBoard:
 
         display(Image("temp.png"))
 
-    def app(self, url="", port: int = 0):
+    def app(self, notebook_url="", port: int = 0):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
@@ -441,25 +433,25 @@ class DashBoard:
         >>>     'key', 'val', data_points=5, add_interaction=False
         >>> )
         >>> d = cux_df.dashboard([line_chart_1])
-        >>> d.app(url='localhost:8888')
+        >>> d.app(notebook_url='localhost:8888')
 
         """
-        if len(url) > 0:
-            app(
+        if len(notebook_url) > 0:
+            self.server = app(
                 self._dashboard.generate_dashboard(
                     self._title, self._charts, self._theme
                 ),
-                notebook_url=url,
+                notebook_url=notebook_url,
                 port=port,
             )
         else:
-            app(
+            self.server = app(
                 self._dashboard.generate_dashboard(
                     self._title, self._charts, self._theme
                 )
             )
 
-    def show(self, url="", threaded=False):
+    def show(self, notebook_url="", port=0, threaded=False, **kwargs):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
@@ -490,31 +482,49 @@ class DashBoard:
         >>> d.show(url='localhost:8889')
 
         """
+        if len(notebook_url) > 0:
+            if port == 0:
+                port = get_open_port()
 
-        if len(url) > 0:
-            port = url.split(":")[-1]
+            dashboard_url = "http://%s%s%d%s" % (
+                notebook_url,
+                "/proxy/",
+                port,
+                "/",
+            )
+            print("Dashboard running at " + dashboard_url)
+
             try:
-                self.temp_server = self._get_server(
-                    port=int(port),
-                    websocket_origin=url,
+                self.server = self._get_server(
+                    port=port,
+                    websocket_origin=notebook_url,
                     show=False,
                     start=True,
                     threaded=threaded,
+                    **kwargs,
                 )
             except OSError:
-                self.temp_server.stop()
-                self.temp_server = self._get_server(
-                    port=int(port),
-                    websocket_origin=url,
+                self.server.stop()
+                self.server = self._get_server(
+                    port=port,
+                    websocket_origin=notebook_url,
                     show=False,
                     start=True,
                     threaded=threaded,
+                    **kwargs,
                 )
-            return self.temp_server
         else:
-            return self._dashboard.generate_dashboard(
+            self.server = self._dashboard.generate_dashboard(
                 self._title, self._charts, self._theme
             ).show(threaded=threaded)
+
+    def stop(self):
+        """
+        stop the bokeh server
+        """
+        if self.server._stopped is False:
+            self.server.stop()
+            self.server._tornado.stop()
 
     def _reload_charts(self, data=None, include_cols=[], ignore_cols=[]):
         """

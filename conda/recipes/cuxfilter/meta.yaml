@@ -32,6 +32,7 @@ requirements:
     - pyproj  >=2.4.*
     - geopandas >=0.6.*
     - pyppeteer
+    - jupyter-server-proxy
 
 test:
   commands:
