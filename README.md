@@ -64,6 +64,9 @@ d = cux_df.dashboard([chart1, chart2, chart3, chart4], layout=cuxfilter.layouts.
 
 #preview the dashboard inside the notebook(non-interactive) with layout
 await d.preview()
+
+#run the dashboard as a webapp:
+d.show('jupyter-notebook/lab-url')
 ```
 ![output dashboard](./docs/_images/demo.gif)
 
@@ -97,25 +100,23 @@ conda install -c rapidsai-nightly \
     cuxfilter=0.12 cudatoolkit=10.0
 ```
 
-To run the bokeh server in a jupyter lab
 
-1. expose an additional port for server, lets call it bokeh_port.
-2. Install jupyterlab dependencies
+## Troubleshooting
+
+1. If the `await d.preview()` throws a libxcomposite.so.1 not found error, execute the following commands:
+
+```bash
+apt-get update
+apt-get install libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxrandr2 libxtst6 libcups2 libxss1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libatk1.0-0 libgtk-3-0 libgdk-pixbuf2.0-0
+```
+
+
+2. To run the bokeh server in a jupyter lab, install jupyterlab dependencies
 
 ```bash
 conda install -c conda-forge jupyterlab
 jupyter labextension install @pyviz/jupyterlab_pyviz
 jupyter labextension install jupyterlab_bokeh
-```
-
-3.running the server
-```bash
-#enter ip address without http://
-#current port is the port at which jupyterlab is running
-d.app(url='ip.addr:current_port', port=bokeh_port)
-# OR for a separate web app
-d.show('ip.addr:bokeh_port')
-
 ```
 
 ## Download Datasets
@@ -133,17 +134,12 @@ While in the directory you want the datasets to be saved, execute the following
 source activate test_env
 
 #download and extract the datasets
+curl https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2015-01.csv --create-dirs -o ./nyc_taxi.csv
+curl https://s3.us-east-2.amazonaws.com/rapidsai-data/viz-data/146M_predictions_v2.arrow.gz --create-dirs -o ./146M_predictions_v2.arrow.gz
+curl https://s3.us-east-2.amazonaws.com/rapidsai-data/viz-data/auto_accidents.arrow.gz --create-dirs -o ./auto_accidents.arrow.gz
+
 python -c "from cuxfilter.sampledata import datasets_check; datasets_check(base_dir='./')"
 ```
-
-Individual links:
-
-- Download the mortgage dataset from [here](https://docs.rapids.ai/datasets/mortgage-viz-data)
-
-- Nyc taxi dataset from [here](https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2015-01.csv)
-
-- Auto dataset from [here](https://s3.us-east-2.amazonaws.com/rapidsai-data/viz-data/auto_accidents.arrow.gz)
-
 
 ## Guides and Layout Templates
 
