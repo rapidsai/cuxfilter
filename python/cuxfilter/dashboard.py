@@ -438,7 +438,7 @@ class DashBoard:
 
         """
         url = re.compile(r"https?://(www\.)?")
-        notebook_url = url.sub('', notebook_url).strip().strip('/')
+        notebook_url = url.sub("", notebook_url).strip().strip("/")
         if len(notebook_url) > 0:
             self.server = app(
                 self._dashboard.generate_dashboard(
@@ -486,7 +486,7 @@ class DashBoard:
 
         """
         url = re.compile(r"https?://(www\.)?")
-        notebook_url = url.sub('', notebook_url).strip().strip('/')
+        notebook_url = url.sub("", notebook_url).strip().strip("/")
         if len(notebook_url) > 0:
             if port == 0:
                 port = get_open_port()
