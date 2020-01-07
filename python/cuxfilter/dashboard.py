@@ -4,6 +4,7 @@ import panel as pn
 import uuid
 from panel.io.server import _origin_url, get_server
 from bokeh.embed import server_document
+import re
 
 from .charts.core.core_chart import BaseChart
 from .datatile import DataTile
@@ -436,6 +437,8 @@ class DashBoard:
         >>> d.app(notebook_url='localhost:8888')
 
         """
+        url = re.compile(r"https?://(www\.)?")
+        notebook_url = url.sub('', notebook_url).strip().strip('/')
         if len(notebook_url) > 0:
             self.server = app(
                 self._dashboard.generate_dashboard(
@@ -482,6 +485,8 @@ class DashBoard:
         >>> d.show(url='localhost:8889')
 
         """
+        url = re.compile(r"https?://(www\.)?")
+        notebook_url = url.sub('', notebook_url).strip().strip('/')
         if len(notebook_url) > 0:
             if port == 0:
                 port = get_open_port()
