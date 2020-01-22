@@ -188,7 +188,7 @@ def calc_value_counts(a_gpu, bins):
     return bin_edges.copy_to_host(), histogram_out.copy_to_host()
 
 
-def calc_groupby(chart: Type[BaseChart], data):
+def calc_groupby(chart: Type[BaseChart], data, agg= None):
     """
     description:
         main function to calculate histograms
@@ -212,11 +212,18 @@ def calc_groupby(chart: Type[BaseChart], data):
     )
     temp_df.add_column(chart.y, data[chart.y].copy().to_gpu_array())
 
-    groupby_res = (
-        temp_df.groupby(by=[chart.x], as_index=False)
-        .agg({chart.y: chart.aggregate_fn})
-        .to_pandas()
-    )
+    if agg is None:
+        groupby_res = (
+            temp_df.groupby(by=[chart.x], as_index=False)
+            .agg({chart.y: chart.aggregate_fn})
+            .to_pandas()
+        )
+    else:
+        groupby_res = (
+            temp_df.groupby(by=[chart.x], as_index=False)
+            .agg(agg)
+            .to_pandas()
+        )
 
     del temp_df
     gc.collect()
