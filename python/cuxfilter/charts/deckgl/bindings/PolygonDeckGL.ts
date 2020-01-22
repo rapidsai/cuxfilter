@@ -2,6 +2,11 @@ import {PolygonDeckGLView} from "./PolygonDeckGLView"
 import {ColumnDataSource} from "models/sources/column_data_source"
 import {LayoutDOM} from "models/layouts/layout_dom"
 import * as p from "core/properties"
+import {LinearColorMapper} from "models/mappers/linear_color_mapper"
+import {ColorMapper} from "models/mappers/color_mapper"
+
+
+const Greys9 = () => ["#000000", "#252525", "#525252", "#737373", "#969696", "#bdbdbd", "#d9d9d9", "#f0f0f0", "#ffffff"]
 
 // We must also create a corresponding JavaScript BokehJS model subclass to
 // correspond to the python Bokeh model subclass. In this case, since we want
@@ -12,6 +17,7 @@ export namespace PolygonDeckGL {
         layer_spec: p.Property<object>
         deck_spec: p.Property<object>
         data_source: p.Property<ColumnDataSource>
+        color_mapper: p.Property<ColorMapper>
       }
   export type Attrs = p.AttrsOf<Props>
  
@@ -45,7 +51,8 @@ export class PolygonDeckGL extends LayoutDOM {
     this.define<PolygonDeckGL.Props>({
       layer_spec:   [ p.Any ],
       deck_spec: [ p.Any ],
-      data_source: [ p.Instance ]
+      data_source: [ p.Instance ],
+      color_mapper: [ p.Instance,  () => new LinearColorMapper({palette: Greys9()}) ],
     })
   }
 }

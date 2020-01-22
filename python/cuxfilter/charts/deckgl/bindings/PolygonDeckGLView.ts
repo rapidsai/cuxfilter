@@ -2,7 +2,8 @@ import {LayoutDOM, LayoutDOMView} from "models/layouts/layout_dom"
 import {div} from "core/dom"
 import {PolygonDeckGL} from "./PolygonDeckGL"
 import {ContentBox} from "core/layout"
-
+// import {LinearColorMapper} from "models/mappers/linear_color_mapper"
+ 
 declare namespace deck {
   class Layer {
     constructor(OPTIONS: object)
@@ -38,43 +39,31 @@ export class PolygonDeckGLView extends LayoutDOMView {
     // Set a listener so that when the Bokeh data source has a change
     // event, we can process the new data
     this.connect(this.model.data_source.streaming, () => {
-       console.log('updated data....')
-       this._update_deck()
+        this._update_deck()
     })
     this.connect(this.model.data_source.change, () => {
-      console.log('updated data....')
       this._update_deck()
     })
 
-   this.connect(this.model.data_source.patching, () => {
-    console.log('updated data....')
+    this.connect(this.model.data_source.patching, () => {
     this._update_deck()
     })
 
     this.connect(this.model.data_source.selected.change, () => {
-      console.log('updated data....')
       this._update_deck()
-   })
-   this.connect(this.model.data_source._select, () => {
-    console.log('updated data....')
-    this._update_deck()
- })
+    })
+    this.connect(this.model.data_source._select, () => {
+      this._update_deck()
+    })
     this.connect(this.model.data_source.inspect, () => {
-      console.log('updated data....')
       this._update_deck()
     })
   }
 
   initialize(): void {
     super.initialize()
-    // this.el.style.margin = '0';
-    // this.el.style.overflow = 'hidden';
-    // this.el.style.width = this.model.properties.width.spec.value+'px'
-    // this.el.style.height= this.model.properties.height.spec.value+'px'
-    this.el.style.margin = '0'
-    this.el.style.padding = '0'
-    this.el.style.overflow = 'hidden'
-    
+    this.el.style.width = `${this.model.properties.width.spec.value}px`
+    this.el.style.height =`${this.model.properties.height.spec.value}px`
 
 
     const url = "https://unpkg.com/deck.gl@latest/dist.min.js"
@@ -106,8 +95,8 @@ export class PolygonDeckGLView extends LayoutDOMView {
  private _init(): void {
         this._container = div({
           style: {
-            width: this.model.properties.width.spec.value+"px",
-            height: this.model.properties.height.spec.value+"px",
+            width: '100%',
+            height: '100%',
           },
           id: 'deck-gl',
           class: 'bk-clearfix'
@@ -164,7 +153,14 @@ export class PolygonDeckGLView extends LayoutDOMView {
   get_data(): Array<any> {
     let data: Array<any>
     const source: any = this.model.data_source.data
-    data = parseData(source)
+
+    console.log(this.model.color_mapper)
+    // let col_name: string = this.model.layer_spec['getFillColor'].replace("@@=", '')
+    
+    // console.log(this.model.color_mapper.rgba_mapper.v_compute(source['prediction']))
+    // source['color'] = this.model.color_mapper.rgba_mapper.v_compute(source['prediction'])
+    data = parseData(source, this.model.color_mapper)
+    // console.log(this.model.color_mapper.v_compute(data[['layer_spec']['getFillColor'].replace("@@==", '')]))
     console.log(data)
     return data
   }
@@ -185,11 +181,17 @@ export class PolygonDeckGLView extends LayoutDOMView {
   }
 }
 
-function parseData(obj: any): Array<any> {
+function parseData(obj: any, cm: any): Array<any> {
   let b: Array<any> = []
   for (let key in obj) {
       let value = obj[key];
       for (let i in value) {
+        if( key == cm.name){
+          console.log(value[i])
+          console.log(cm.rgba_mapper.v_compute([value[i]]))
+          let buf8_0: string = cm.rgba_mapper.v_compute([value[i]])
+          b[parseInt(i)]['color'] = [buf8_0[0], buf8_0[1], buf8_0[2], buf8_0[3]]
+        }
           if (b.length <= +i) {
               b.push({[key]: value[i]})
           } else {
