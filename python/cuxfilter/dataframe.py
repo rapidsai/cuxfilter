@@ -1,4 +1,3 @@
-import panel as pn
 import cudf
 import pyarrow as pa
 from typing import Type

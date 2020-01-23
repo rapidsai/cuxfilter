@@ -1,7 +1,6 @@
 import json
 from urllib.request import urlopen
 import geopandas as gpd
-import pyproj
 
 
 def geo_json_mapper(url, prop=None, projection=3857):

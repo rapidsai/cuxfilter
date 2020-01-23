@@ -7,6 +7,7 @@ from typing import Type
 from bokeh.models import ColumnDataSource, LinearColorMapper
 import bokeh
 
+
 class Choropleth3d(Base3dChoropleth):
 
     # reset event handling not required, as the default behavior
@@ -16,35 +17,35 @@ class Choropleth3d(Base3dChoropleth):
     source: Type[ColumnDataSource]
 
     layer_spec = {
-        'opacity': 1,
-        'getLineWidth': 10,
-        'getPolygon': '@@=coordinates',
-        'getElevation': '',
-        'getFillColor': '@@=color',
-        'stroked': True,
-        'filled': True,
-        'extruded': True,
-        'lineWidthScale': 10,
-        'lineWidthMinPixels': 1,
-        'highlightColor': [200, 200, 200, 200],
-        'visible': True,
-        'pickable': True,
-        'getLineColor': [0, 188, 212],
-        'autoHighlight': True,
-        'elevationScale': 0.8,
-        'pickMultipleObjects': True
+        "opacity": 1,
+        "getLineWidth": 10,
+        "getPolygon": "@@=coordinates",
+        "getElevation": "",
+        "getFillColor": "@@=color",
+        "stroked": True,
+        "filled": True,
+        "extruded": True,
+        "lineWidthScale": 10,
+        "lineWidthMinPixels": 1,
+        "highlightColor": [200, 200, 200, 200],
+        "visible": True,
+        "pickable": True,
+        "getLineColor": [0, 188, 212],
+        "autoHighlight": True,
+        "elevationScale": 0.8,
+        "pickMultipleObjects": True,
     }
 
     deck_spec = {
-        'mapboxApiAccessToken': '',
-        'mapStyle': '',
-        'initialViewState' : {
-            'latitude': 38.212288,
-            'longitude': -107.101581,
-            'zoom': 3,
-            'max_zoom': 16,
-        } ,
-        'controller': True
+        "mapboxApiAccessToken": "",
+        "mapStyle": "",
+        "initialViewState": {
+            "latitude": 38.212288,
+            "longitude": -107.101581,
+            "zoom": 3,
+            "max_zoom": 16,
+        },
+        "controller": True,
     }
 
     def format_source_data(self, source_dict, patch_update=False):
@@ -63,11 +64,9 @@ class Choropleth3d(Base3dChoropleth):
         res_df = pd.DataFrame(source_dict)
 
         if patch_update is False:
-            result_df = res_df.merge(
-                self.geo_mapper, on=self.x, how='left'
-            )
-            result_df['index'] = result_df.index
-            result_df = result_df.dropna(subset=['coordinates'])
+            result_df = res_df.merge(self.geo_mapper, on=self.x, how="left")
+            result_df["index"] = result_df.index
+            result_df = result_df.dropna(subset=["coordinates"])
 
             self.retained_indices = result_df.index.tolist()
             self.source_backup = result_df
@@ -85,12 +84,10 @@ class Choropleth3d(Base3dChoropleth):
                 self.source.stream(result_dict)
 
         else:
-            result_df = res_df.merge(
-                self.geo_mapper, on=self.x, how='left'
-            )
-            result_df['index'] = result_df.index
+            result_df = res_df.merge(self.geo_mapper, on=self.x, how="left")
+            result_df["index"] = result_df.index
 
-            result_df = result_df.dropna(subset=['coordinates'])
+            result_df = result_df.dropna(subset=["coordinates"])
 
             self.retained_indices = result_df.index.tolist()
 
@@ -118,7 +115,7 @@ class Choropleth3d(Base3dChoropleth):
                 nan_color=self.nan_color,
                 low=np.nanmin(self.source.data[self.color_column]),
                 high=np.nanmax(self.source.data[self.color_column]),
-                name=self.color_column
+                name=self.color_column,
             )
         else:
             mapper = LinearColorMapper(
@@ -126,26 +123,31 @@ class Choropleth3d(Base3dChoropleth):
                 nan_color=self.nan_color,
                 low=np.nanmin(self.source.data[self.color_column]),
                 high=np.nanmax(self.source.data[self.color_column]),
-                name=self.color_column
+                name=self.color_column,
             )
 
-        self.layer_spec['getElevation'] = "@@={}*{}".format(
+        self.layer_spec["getElevation"] = "@@={}*{}".format(
             self.elevation_column, self.elevation_factor
         )
 
-        self.deck_spec['initialViewState']['latitude'] = self.get_mean(
+        self.deck_spec["initialViewState"]["latitude"] = self.get_mean(
             self.library_specific_params["y_range"]
         )
-        self.deck_spec['initialViewState']['longitude'] = self.get_mean(
+        self.deck_spec["initialViewState"]["longitude"] = self.get_mean(
             self.library_specific_params["x_range"]
         )
-        self.deck_spec['mapboxApiAccessToken'] = self.mapbox_api_key
-        self.deck_spec['mapStyle'] = 'mapbox://styles/mapbox/{}-v9'.format(self.map_style)
+        self.deck_spec["mapboxApiAccessToken"] = self.mapbox_api_key
+        self.deck_spec["mapStyle"] = "mapbox://styles/mapbox/{}-v9".format(
+            self.map_style
+        )
         self.chart = PolygonDeckGL(
-            layer_spec=self.layer_spec, deck_spec=self.deck_spec,
-            color_mapper=mapper, data_source=self.source,
-            width=self.width, height=self.height,
-            tooltip=self.library_specific_params['tooltip']
+            layer_spec=self.layer_spec,
+            deck_spec=self.deck_spec,
+            color_mapper=mapper,
+            data_source=self.source,
+            width=self.width,
+            height=self.height,
+            tooltip=self.library_specific_params["tooltip"],
         )
 
     def update_dimensions(self, width=None, height=None):
@@ -184,18 +186,14 @@ class Choropleth3d(Base3dChoropleth):
             update self.data_y_axis in self.source
         """
         if column is None:
-            self.source.patch(self.source_backup.to_dict(orient='list'))
+            self.source.patch(self.source_backup.to_dict(orient="list"))
         else:
             # verifying length is same as x axis
             data = np.take(data, self.retained_indices)
             x_axis_len = self.source.data[self.x].size
             data = data[:x_axis_len]
 
-            patch_dict = {
-                column: [
-                    (slice(data.size), data)
-                ]
-            }
+            patch_dict = {column: [(slice(data.size), data)]}
             self.source.patch(patch_dict)
 
     def map_indices_to_values(self, indices: list):
@@ -240,6 +238,6 @@ class Choropleth3d(Base3dChoropleth):
                 nan_color=self.nan_color,
                 low=np.nanmin(self.source.data[self.color_column]),
                 high=np.nanmax(self.source.data[self.color_column]),
-                name=self.color_column
+                name=self.color_column,
             )
             self.chart.color_mapper = mapper

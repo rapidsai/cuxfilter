@@ -73,7 +73,9 @@ class DataTile:
         ret_datatile = {}
         print(self.cumsum)
         self.passive_chart.y = self.passive_chart.color_column
-        ret_datatile[self.passive_chart.color_column] = gpu_datatile.calc_data_tile(
+        ret_datatile[
+            self.passive_chart.color_column
+        ] = gpu_datatile.calc_data_tile(
             data,
             self.active_chart,
             self.passive_chart,
@@ -82,7 +84,9 @@ class DataTile:
             return_format=self.dtype,
         )
         self.passive_chart.y = self.passive_chart.elevation_column
-        ret_datatile[self.passive_chart.elevation_column] = gpu_datatile.calc_data_tile(
+        ret_datatile[
+            self.passive_chart.elevation_column
+        ] = gpu_datatile.calc_data_tile(
             data,
             self.active_chart,
             self.passive_chart,

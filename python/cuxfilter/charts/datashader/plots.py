@@ -40,12 +40,8 @@ def _rect_horizontal_mask(px):
     return np.concatenate((x_bool, zero_bool), axis=0)
 
 
-cds.transfer_functions._mask_lookup[
-    "rect_vertical"
-] = _rect_vertical_mask
-cds.transfer_functions._mask_lookup[
-    "rect_horizontal"
-] = _rect_horizontal_mask
+cds.transfer_functions._mask_lookup["rect_vertical"] = _rect_vertical_mask
+cds.transfer_functions._mask_lookup["rect_horizontal"] = _rect_horizontal_mask
 
 
 class ScatterGeo(BaseScatterGeo):

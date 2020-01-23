@@ -19,8 +19,8 @@ def choropleth3d(
     geoJSONSource=None,
     geoJSONProperty=None,
     geo_color_palette=None,
-    mapbox_api_key=os.getenv('MAPBOX_API_KEY'),
-    map_style='dark',
+    mapbox_api_key=os.getenv("MAPBOX_API_KEY"),
+    map_style="dark",
     **library_specific_params,
 ):
     """
@@ -53,8 +53,8 @@ def choropleth3d(
         while performing groupby aggregation by `column x`
 
     elevation_factor: float, default 1
-        factor to be multiplied to each value of elevation column before scaling
-        the elevation
+        factor to be multiplied to each value of elevation column before
+        scaling the elevation
 
     data_points: int,  default 100
 
@@ -93,7 +93,7 @@ def choropleth3d(
     map_style: {'dark', 'light'}, default 'dark'
         map background type
     tooltip: {True, False},  default True
-    
+
     title: str,
 
         chart title

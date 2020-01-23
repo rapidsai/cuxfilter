@@ -221,15 +221,10 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
         )
     else:
         for key in list(agg.keys()):
-            temp_df.add_column(
-                key,
-                data[key].copy().to_gpu_array()
-            )
+            temp_df.add_column(key, data[key].copy().to_gpu_array())
 
         groupby_res = (
-            temp_df.groupby(by=[chart.x], as_index=False)
-            .agg(agg)
-            .to_pandas()
+            temp_df.groupby(by=[chart.x], as_index=False).agg(agg).to_pandas()
         )
 
     del temp_df

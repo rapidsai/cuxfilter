@@ -49,8 +49,8 @@ class Base3dChoropleth(BaseChart):
         geoJSONSource=None,
         geoJSONProperty=None,
         geo_color_palette=None,
-        mapbox_api_key=os.getenv('MAPBOX_API_KEY'),
-        map_style='dark',
+        mapbox_api_key=os.getenv("MAPBOX_API_KEY"),
+        map_style="dark",
         **library_specific_params,
     ):
         """
@@ -93,7 +93,7 @@ class Base3dChoropleth(BaseChart):
 
         self.aggregate_dict = {
             self.color_column: self.color_aggregate_fn,
-            self.elevation_column: self.elevation_aggregate_fn
+            self.elevation_column: self.elevation_aggregate_fn,
         }
         self.data_points = data_points
         self.add_interaction = add_interaction
@@ -147,10 +147,12 @@ class Base3dChoropleth(BaseChart):
                 self.geoJSONSource, self.geoJSONProperty, projection=4326
             )
 
-        self.geo_mapper = pd.DataFrame({
-            self.x: np.array(list(self.geo_mapper.keys())),
-            'coordinates': np.array(list(self.geo_mapper.values()))
-        })
+        self.geo_mapper = pd.DataFrame(
+            {
+                self.x: np.array(list(self.geo_mapper.keys())),
+                "coordinates": np.array(list(self.geo_mapper.values())),
+            }
+        )
 
         if self.data_points > dashboard_cls._data[self.x].shape[0]:
             self.data_points = dashboard_cls._data[self.x].shape[0]
@@ -187,9 +189,7 @@ class Base3dChoropleth(BaseChart):
 
         Ouput:
         """
-        df = calc_groupby(
-            self, data, agg=self.aggregate_dict
-        )
+        df = calc_groupby(self, data, agg=self.aggregate_dict)
 
         dict_temp = {
             self.x: list(df[0].astype(df[0].dtype)),
@@ -343,10 +343,10 @@ class Base3dChoropleth(BaseChart):
                     datatile_result_count = np.array(
                         datatile[1].loc[:, datatile_index_max]
                     )
-                    datatile_result = datatile_result_sum / datatile_result_count
-                elif temp_agg_function in [
-                    "count", "sum", "min", "max"
-                ]:
+                    datatile_result = (
+                        datatile_result_sum / datatile_result_count
+                    )
+                elif temp_agg_function in ["count", "sum", "min", "max"]:
                     datatile_result = datatile.loc[:, datatile_index_max]
 
             else:
@@ -354,16 +354,20 @@ class Base3dChoropleth(BaseChart):
                 if temp_agg_function == "mean":
                     datatile_max0 = datatile[0].loc[:, datatile_index_max]
                     datatile_min0 = datatile[0].loc[:, datatile_index_min]
-                    datatile_result_sum = np.array(datatile_max0 - datatile_min0)
+                    datatile_result_sum = np.array(
+                        datatile_max0 - datatile_min0
+                    )
 
                     datatile_max1 = datatile[1].loc[:, datatile_index_max]
                     datatile_min1 = datatile[1].loc[:, datatile_index_min]
-                    datatile_result_count = np.array(datatile_max1 - datatile_min1)
+                    datatile_result_count = np.array(
+                        datatile_max1 - datatile_min1
+                    )
 
-                    datatile_result = datatile_result_sum / datatile_result_count
-                elif temp_agg_function in [
-                    "count", "sum", "min", "max"
-                ]:
+                    datatile_result = (
+                        datatile_result_sum / datatile_result_count
+                    )
+                elif temp_agg_function in ["count", "sum", "min", "max"]:
                     datatile_max = datatile.loc[:, datatile_index_max]
                     datatile_min = datatile.loc[:, datatile_index_min]
                     datatile_result = np.array(datatile_max - datatile_min)
@@ -409,7 +413,9 @@ class Base3dChoropleth(BaseChart):
                 round((index - active_chart.min_value) / active_chart.stride)
             )
             value_sum += np.array(datatile[0][int(index)][: self.data_points])
-            value_count += np.array(datatile[1][int(index)][: self.data_points])
+            value_count += np.array(
+                datatile[1][int(index)][: self.data_points]
+            )
 
         datatile_result = value_sum / value_count
 
