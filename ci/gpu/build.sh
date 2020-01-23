@@ -43,13 +43,9 @@ nvidia-smi
 logger "Activate conda env..."
 source activate gdf
 conda install "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
-              "numpy>=1.16" "cupy>=6.0.0" "datashader>=0.9.*" "pandas>=0.24.2,<0.25" "panel=0.6.*" \
-              "bokeh>=1.2.*" "geopandas>=0.6.*" "pytest" "pyppeteer" \
+              "numpy>=1.16" "cupy>=6.0.0" "datashader>=0.10.*" "pandas>=0.24.2,<0.25" "panel=0.6.*" \
+              "bokeh>=1.2.*" "geopandas>=0.6.*" "pytest" "pyppeteer" "jupyter-server-proxy"\
               "pyproj>=2.4.*"
-pip install jupyter-server-proxy
-# Install the master version of cudatashader
-# logger "pip install git+https://github.com/rapidsai/cuDataShader.git --upgrade --no-deps"
-# pip install git+https://github.com/rapidsai/cuDataShader.git --upgrade --no-deps
 
 logger "Check versions..."
 python --version
