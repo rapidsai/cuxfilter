@@ -33,6 +33,8 @@ export class PolygonDeckGLView extends LayoutDOMView {
   private _deckgl: deck.DeckGL
   private _jsonConverter: deck.JSONConverter
   private _container: HTMLElement
+  private _loaded: boolean = false
+  private _current_selection: Set<number>
 
   connect_signals(): void {
     super.connect_signals()
@@ -62,44 +64,17 @@ export class PolygonDeckGLView extends LayoutDOMView {
 
   initialize(): void {
     super.initialize()
-    this.el.style.width = `${this.model.properties.width.spec.value}px`
-    this.el.style.height =`${this.model.properties.height.spec.value}px`
-
-
-    const url = "https://unpkg.com/deck.gl@latest/dist.min.js"
-    const script = document.createElement("script")
-    script.onload = () => this._load_script2()
-    script.async = false
-    script.src = url
-    document.head.appendChild(script)    
+    this._init()
   }
 
-  private _load_script2(): void {
-    const url = "https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.0/mapbox-gl.js"
-    const script = document.createElement("script")
-    script.onload = () => this._load_script3()
-    script.async = false
-    script.src = url
-    document.head.appendChild(script)
-  }
-
-  private _load_script3(): void {
-    const url = "https://unpkg.com/@deck.gl/json@latest/dist.min.js"
-    const script = document.createElement("script")
-    script.onload = () => this._init()
-    script.async = false
-    script.src = url
-    document.head.appendChild(script)
-  }
-  
  private _init(): void {
+        this._current_selection = new Set()
         this._container = div({
           style: {
-            width: '100%',
-            height: '100%',
+            width:  '100%',//`${this.model.properties.width.spec.value}px`,
+            height: '100%'//`${this.model.properties.height.spec.value}px`,
           },
           id: 'deck-gl',
-          class: 'bk-clearfix'
         })
         // document.body.appendChild(this._container)
         this.el.appendChild(this._container)
@@ -110,6 +85,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
         })
 
         this._create_deck()
+
  }
 
  private _create_deck(): void {
@@ -126,12 +102,18 @@ export class PolygonDeckGLView extends LayoutDOMView {
           ...this.model.deck_spec,
           container: this._container,
           layers: [this._layer]
-      })      
+      })
+
+      this._loaded = true
+
+      //console.log("create_deck", this._deckgl)
  }
 
  private _update_deck(): void {
-
-      console.log('update deck called')
+      if (this._loaded == false){
+          this._init()
+      }
+      //console.log('update deck called')
 
       let options: any = {
           data: this.get_data(),
@@ -143,6 +125,8 @@ export class PolygonDeckGLView extends LayoutDOMView {
       this._deckgl.setProps({
           layers: [this._layer]
       })
+
+      //console.log("update_deck", this._deckgl)
  }
 
   render(): void {
@@ -153,15 +137,8 @@ export class PolygonDeckGLView extends LayoutDOMView {
   get_data(): Array<any> {
     let data: Array<any>
     const source: any = this.model.data_source.data
-
-    console.log(this.model.color_mapper)
-    // let col_name: string = this.model.layer_spec['getFillColor'].replace("@@=", '')
-    
-    // console.log(this.model.color_mapper.rgba_mapper.v_compute(source['prediction']))
-    // source['color'] = this.model.color_mapper.rgba_mapper.v_compute(source['prediction'])
-    data = parseData(source, this.model.color_mapper)
-    // console.log(this.model.color_mapper.v_compute(data[['layer_spec']['getFillColor'].replace("@@==", '')]))
-    console.log(data)
+    console.log(this._current_selection)
+    data = parseData(source, this.model.color_mapper, this._current_selection)
     return data
   }
 
@@ -176,27 +153,42 @@ export class PolygonDeckGLView extends LayoutDOMView {
   }
     
   private _onclickHandler(obj: any): void {
-      console.log(obj)
-      this.model.data_source.selected.multiline_indices = obj.object
+      if(!this._current_selection.has(obj.index)){
+        this._current_selection.add(obj.index)
+      }else{
+        this._current_selection.delete(obj.index)
+      }
+      this.model.data_source.selected.indices = Array.from(this._current_selection.values());
   }
 }
 
-function parseData(obj: any, cm: any): Array<any> {
+function parseData(obj: any, cm: any, _current_selection: Set<number>): Array<any> {
+ 
   let b: Array<any> = []
   for (let key in obj) {
       let value = obj[key];
       for (let i in value) {
-        if( key == cm.name){
-          console.log(value[i])
-          console.log(cm.rgba_mapper.v_compute([value[i]]))
+        if( key == cm.name && _current_selection.size == 0){
+          
           let buf8_0: string = cm.rgba_mapper.v_compute([value[i]])
           b[parseInt(i)]['color'] = [buf8_0[0], buf8_0[1], buf8_0[2], buf8_0[3]]
+
+        }else if( key == cm.name && _current_selection.has(+i)){
+          
+          let buf8_0: string = cm.rgba_mapper.v_compute([value[i]])
+          b[parseInt(i)]['color'] = [buf8_0[0], buf8_0[1], buf8_0[2], buf8_0[3]]
+
+        }else if( key == cm.name && !_current_selection.has(+i)){
+          
+          b[parseInt(i)]['color'] = [211, 211, 211, 50]
+
         }
-          if (b.length <= +i) {
-              b.push({[key]: value[i]})
-          } else {
-              b[parseInt(i)][key] = value[i]
-          }
+
+        if (b.length <= +i) {
+            b.push({[key]: value[i]})
+        } else {
+            b[parseInt(i)][key] = value[i]
+        }
       }
  }
  return b

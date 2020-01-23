@@ -3,13 +3,13 @@ import os
 import pandas as pd
 import numpy as np
 
-from .core_aggregate import BaseAggregateChart
-from ....assets.numba_kernels import calc_value_counts, calc_groupby
+from ..core_chart import BaseChart
+from ....assets.numba_kernels import calc_groupby
 from ....layouts import chart_view
 from ....assets import geo_json_mapper
 
 
-class Base3dChoropleth(BaseAggregateChart):
+class Base3dChoropleth(BaseChart):
 
     chart_type: str = "3d_choropleth"
     reset_event = None
@@ -50,6 +50,7 @@ class Base3dChoropleth(BaseAggregateChart):
         geoJSONProperty=None,
         geo_color_palette=None,
         mapbox_api_key=os.getenv('MAPBOX_API_KEY'),
+        map_style='dark',
         **library_specific_params,
     ):
         """
@@ -74,9 +75,8 @@ class Base3dChoropleth(BaseAggregateChart):
             step_size
             step_size_type
             nan_color
-            x_label_map
-            y_label_map
             mapbox_api_key
+            map_style
             **library_specific_params
         -------------------------------------------
 
@@ -106,7 +106,7 @@ class Base3dChoropleth(BaseAggregateChart):
         self.geo_color_palette = geo_color_palette
         self.geoJSONProperty = geoJSONProperty
         self.geo_mapper, x_range, y_range = geo_json_mapper(
-            self.geoJSONSource, self.geoJSONProperty
+            self.geoJSONSource, self.geoJSONProperty, projection=4326
         )
         self.height = height
         self.width = width
@@ -114,7 +114,7 @@ class Base3dChoropleth(BaseAggregateChart):
         self.stride = step_size
         self.stride_type = step_size_type
         self.mapbox_api_key = mapbox_api_key
-
+        self.map_style = map_style
         self.library_specific_params = library_specific_params
 
         if "x_range" not in self.library_specific_params:
@@ -141,10 +141,17 @@ class Base3dChoropleth(BaseAggregateChart):
         """
         self.min_value = dashboard_cls._data[self.x].min()
         self.max_value = dashboard_cls._data[self.x].max()
+
+        if isinstance(self.geo_mapper, pd.DataFrame):
+            self.geo_mapper, x_range, y_range = geo_json_mapper(
+                self.geoJSONSource, self.geoJSONProperty, projection=4326
+            )
+
         self.geo_mapper = pd.DataFrame({
             self.x: np.array(list(self.geo_mapper.keys())),
-            'coordinates': np.array(list(self.geo_mapper[0].values()))
+            'coordinates': np.array(list(self.geo_mapper.values()))
         })
+
         if self.data_points > dashboard_cls._data[self.x].shape[0]:
             self.data_points = dashboard_cls._data[self.x].shape[0]
 
@@ -180,13 +187,9 @@ class Base3dChoropleth(BaseAggregateChart):
 
         Ouput:
         """
-        if self.y == self.x or self.y is None:
-            # it's a histogram
-            df = calc_value_counts(
-                data[self.x].to_gpu_array(), self.data_points
-            )
-        else:
-            df = calc_groupby(self, data, agg=self.aggregate_dict)
+        df = calc_groupby(
+            self, data, agg=self.aggregate_dict
+        )
 
         dict_temp = {
             self.x: list(df[0].astype(df[0].dtype)),
