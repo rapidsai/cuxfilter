@@ -13,6 +13,7 @@ class Choropleth3d(Base3dChoropleth):
     # unselects all selected points, and that is already taken care of
     reset_event = None
     coordinates = "coordinates"
+    source: Type[ColumnDataSource]
 
     layer_spec = {
         'opacity': 1,
@@ -53,17 +54,30 @@ class Choropleth3d(Base3dChoropleth):
         Parameters:
         -----------
         source_dict: {'X': [], 'Y': []}
-        """
-        self.source: Type[ColumnDataSource]
 
+        ColumnDataSource: {
+            'X': np.array(list),
+            'Y': np.array(list)
+        }
+        """
         res_df = pd.DataFrame(source_dict)
 
         if patch_update is False:
-            result_dict = res_df.merge(
+            result_df = res_df.merge(
                 self.geo_mapper, on=self.x, how='left'
-            ).dropna(subset=['coordinates']).to_dict(
-                orient='list'
             )
+            result_df['index'] = result_df.index
+            result_df = result_df.dropna(subset=['coordinates'])
+
+            self.retained_indices = result_df.index.tolist()
+            self.source_backup = result_df
+
+            result_np = result_df.values
+            # print(result_np.shape, result_df.shape)
+            result_dict = {}
+
+            for i in range(result_np.shape[1]):
+                result_dict[result_df.columns[i]] = result_np[:, i]
 
             if self.source is None:
                 self.source = ColumnDataSource(result_dict)
@@ -71,12 +85,25 @@ class Choropleth3d(Base3dChoropleth):
                 self.source.stream(result_dict)
 
         else:
-            patch_dict = res_df.merge(
+            result_df = res_df.merge(
                 self.geo_mapper, on=self.x, how='left'
-            ).to_dict(
-                orient='list'
             )
-            self.source.patch(patch_dict)
+            result_df['index'] = result_df.index
+
+            result_df = result_df.dropna(subset=['coordinates'])
+
+            self.retained_indices = result_df.index.tolist()
+
+            result_np = result_df.values
+
+            result_dict = {}
+
+            for i in range(result_np.shape[1]):
+                result_dict[result_df.columns[i]] = [
+                    (slice(result_np[:, i].size), result_np[:, i])
+                ]
+
+            self.source.patch(result_dict)
 
     def get_mean(self, x):
         return (x[0] + x[1]) / 2
@@ -117,7 +144,8 @@ class Choropleth3d(Base3dChoropleth):
         self.chart = PolygonDeckGL(
             layer_spec=self.layer_spec, deck_spec=self.deck_spec,
             color_mapper=mapper, data_source=self.source,
-            width=self.width, height=self.height
+            width=self.width, height=self.height,
+            tooltip=self.library_specific_params['tooltip']
         )
 
     def update_dimensions(self, width=None, height=None):
@@ -146,31 +174,29 @@ class Choropleth3d(Base3dChoropleth):
         """
         self.calculate_source(data, patch_update=patch_update)
 
-    def reset_chart(self, data: np.array = np.array([])):
-        """if len(data) is 0, reset the chart using self.source_backup
+    def reset_chart(self, data: np.array = np.array([]), column=None):
+        """
+        if len(data) is 0, reset the chart using self.source_backup
 
         Parameters:
         -----------
         data:  list()
             update self.data_y_axis in self.source
         """
-        print('called reset charts', data)
-        # if data.size == 0:
-        #     data = self.source_backup[self.data_y_axis].tolist()
+        if column is None:
+            self.source.patch(self.source_backup.to_dict(orient='list'))
+        else:
+            # verifying length is same as x axis
+            data = np.take(data, self.retained_indices)
+            x_axis_len = self.source.data[self.x].size
+            data = data[:x_axis_len]
 
-        # # verifying length is same as x axis
-        # x_axis_len = self.source.data[self.data_x_axis].size
-        # data = data[:x_axis_len]
-
-        # rates = []
-        # for i in range(data.size):
-        #     if i in self.geo_mapper:
-        #         temp_list = [data[i]] * len(self.geo_mapper[i])
-        #         rates = rates + temp_list
-        # rates = np.array(rates)
-        # patch_dict = {self.data_y_axis: [(slice(len(rates)), rates)]}
-
-        # self.source.patch(patch_dict)
+            patch_dict = {
+                column: [
+                    (slice(data.size), data)
+                ]
+            }
+            self.source.patch(patch_dict)
 
     def map_indices_to_values(self, indices: list):
         """
