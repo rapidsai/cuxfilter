@@ -21,6 +21,7 @@ def choropleth3d(
     geo_color_palette=None,
     mapbox_api_key=os.getenv("MAPBOX_API_KEY"),
     map_style="dark",
+    tooltip=True,
     **library_specific_params,
 ):
     """
@@ -125,5 +126,6 @@ def choropleth3d(
         geo_color_palette,
         mapbox_api_key,
         map_style,
+        tooltip,
         **library_specific_params,
     )
