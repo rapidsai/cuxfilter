@@ -85,7 +85,7 @@ class DataFrame:
         return DataFrame(dataframe)
 
     def __init__(self, data):
-        pn.extension()
+        # pn.extension()
         self.backup = data
         self.data = data
 
