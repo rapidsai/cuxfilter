@@ -1,5 +1,5 @@
 from bokeh.models import ColumnDataSource, LayoutDOM, LinearColorMapper
-from bokeh.core.properties import Instance, Dict, String, Any
+from bokeh.core.properties import Instance, Dict, String, Any, Bool
 
 
 class PolygonDeckGL(LayoutDOM):
@@ -14,3 +14,4 @@ class PolygonDeckGL(LayoutDOM):
     deck_spec = Dict(String, Any)
     data_source = Instance(ColumnDataSource)
     color_mapper = Instance(LinearColorMapper)
+    tooltip = Bool

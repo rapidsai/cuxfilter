@@ -92,7 +92,8 @@ def choropleth3d(
 
     map_style: {'dark', 'light'}, default 'dark'
         map background type
-
+    tooltip: {True, False},  default True
+    
     title: str,
 
         chart title
