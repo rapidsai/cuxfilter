@@ -4,7 +4,7 @@ import geopandas as gpd
 import pyproj
 
 
-def geo_json_mapper(url, prop=None):
+def geo_json_mapper(url, prop=None, projection=3857):
     if "http" in url:
         data = urlopen(url).read().decode()
     else:
@@ -13,9 +13,7 @@ def geo_json_mapper(url, prop=None):
         except Exception as e:
             raise ValueError("url invalid" + e)
 
-    temp_gpd_df = gpd.read_file(data)
-    if pyproj.CRS(temp_gpd_df.crs) != "epsg:3857":
-        temp_gpd_df = temp_gpd_df.to_crs(epsg=3857)
+    temp_gpd_df = gpd.read_file(data).to_crs(epsg=projection)
 
     data_json = json.loads(temp_gpd_df.to_json())
     x_range = (
@@ -38,9 +36,9 @@ def geo_json_mapper(url, prop=None):
         # else str
         if temp_index.replace(".", "", 1).isdigit():
             temp_index = float(temp_index)
-        if i["geometry"]["type"] == "Polygon":
-            geo_mapper[temp_index] = [i["geometry"]["coordinates"]]
-        else:
-            geo_mapper[temp_index] = i["geometry"]["coordinates"]
+        # if i["geometry"]["type"] == "Polygon":
+        #     geo_mapper[temp_index] = [i["geometry"]["coordinates"]]
+        # else:
+        geo_mapper[temp_index] = i["geometry"]["coordinates"]
 
     return geo_mapper, x_range, y_range
