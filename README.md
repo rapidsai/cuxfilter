@@ -129,8 +129,27 @@ conda install -c rapidsai-nightly \
 # or, for CUDA 10.0
 conda install -c rapidsai-nightly \
     cuxfilter=0.12 cudatoolkit=10.0
+
+# or, for CUDA 10.1
+conda install -c rapidsai-nightly \
+    cuxfilter=0.12 cudatoolkit=10.1
 ```
 
+## Install in the rapids nightly container
+
+```bash
+docker pull rapidsai/rapidsai-nightly:cuda10.1-runtime-ubuntu16.04-py3.7
+
+docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 rapidsai/rapidsai-nightly:cuda10.1-runtime-ubuntu16.04-py3.7
+
+#install cuXfilter
+conda install -c rapidsai-nightly cuxfilter=0.12 cudatoolkit=10.1
+
+#get rid of the libxcomposite.so.1 error
+apt-get update
+apt-get install libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxrandr2 libxtst6 libcups2 libxss1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libatk1.0-0 libgtk-3-0 libgdk-pixbuf2.0-0
+
+```
 
 ## Troubleshooting
 
