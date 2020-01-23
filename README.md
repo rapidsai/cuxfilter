@@ -38,6 +38,8 @@ The original version (0.2) of cuxfilter, most known for the backend powering the
 
 ## Usage
 
+### Example 1
+
 ```python
 import cuxfilter
 
@@ -62,13 +64,42 @@ chart4 = cuxfilter.charts.bokeh.bar('MONTH')
 #declare dashboard
 d = cux_df.dashboard([chart1, chart2, chart3, chart4], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Auto Accident Dataset')
 
-#preview the dashboard inside the notebook(non-interactive) with layout
-await d.preview()
-
 #run the dashboard as a webapp:
 d.show('jupyter-notebook/lab-url')
 ```
 ![output dashboard](./docs/_images/demo.gif)
+
+### Example 2
+
+
+```python
+import cuxfilter
+
+#update data_dir if you have downloaded datasets elsewhere
+DATA_DIR = './data'
+from cuxfilter.sampledata import datasets_check
+datasets_check('mortgage', base_dir=DATA_DIR)
+
+cux_df = cuxfilter.DataFrame.from_arrow(DATA_DIR + '/146M_predictions_v2.arrow')
+
+MAPBOX_API_KEY= "<mapbox-api-key>"
+geoJSONSource='https://raw.githubusercontent.com/rapidsai/cuxfilter/GTC-2018-mortgage-visualization/javascript/demos/GTC%20demo/src/data/zip3-ms-rhs-lessprops.json'
+
+chart0 = cuxfilter.charts.deckgl.choropleth3d( x='zip', color_column='delinquency_12_prediction', color_aggregate_fn='mean',
+            elevation_column='current_actual_upb', elevation_factor=0.00001, elevation_aggregate_fn='sum', 
+            geoJSONSource=geoJSONSource, mapbox_api_key=MAPBOX_API_KEY, data_points=1000
+)
+chart2 = cuxfilter.charts.bokeh.bar('delinquency_12_prediction',data_points=50)
+chart3 = cuxfilter.charts.panel_widgets.range_slider('borrower_credit_score',data_points=50)
+chart1 = cuxfilter.charts.panel_widgets.drop_down('dti')
+
+#declare dashboard
+d = cux_df.dashboard([chart0, chart2, chart3, chart4], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Mortgage Dashboard')
+
+#run the dashboard as a webapp:
+d.show('jupyter-notebook/lab-url')
+```
+![output dashboard](./docs/_images/demo2.gif)
 
 ## Documentation
 
