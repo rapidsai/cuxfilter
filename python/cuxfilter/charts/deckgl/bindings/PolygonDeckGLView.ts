@@ -33,6 +33,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
   private _deckgl: deck.DeckGL
   private _jsonConverter: deck.JSONConverter
   private _container: HTMLElement
+  private _tooltip: HTMLElement
   private _loaded: boolean = false
   private _current_selection: Set<number>
 
@@ -71,11 +72,26 @@ export class PolygonDeckGLView extends LayoutDOMView {
         this._current_selection = new Set()
         this._container = div({
           style: {
-            width:  '100%',//`${this.model.properties.width.spec.value}px`,
-            height: '100%'//`${this.model.properties.height.spec.value}px`,
+            width:  '100%',
+            height: '100%'
           },
           id: 'deck-gl',
         })
+        if(this.model.tooltip){
+          this._tooltip = div({
+            style: {
+              position: 'absolute',
+              'z-index': 1,
+              'point-events': 'none',
+              'background-color': 'black',
+              'color': 'white',
+              'padding': '10px'
+            },
+            id: 'tooltip',
+          })
+          document.body.appendChild(this._tooltip)
+        }
+        
         // document.body.appendChild(this._container)
         this.el.appendChild(this._container)
 
@@ -93,7 +109,11 @@ export class PolygonDeckGLView extends LayoutDOMView {
       let options: any = {
           data: this.get_data(),
           ...this._jsonConverter.convert(this.model.layer_spec),
-          onClick: (obj: object) => this._onclickHandler(obj)
+          onClick: (obj: object) => this._onclickHandler(obj),
+      }
+
+      if(this.model.tooltip){
+        options['onHover'] = (info: any) => this._setTooltip(info)
       }
 
       this._layer = new deck.PolygonLayer(options)
@@ -118,7 +138,11 @@ export class PolygonDeckGLView extends LayoutDOMView {
       let options: any = {
           data: this.get_data(),
           ...this._jsonConverter.convert(this.model.layer_spec),
-          onClick: (obj: object) => this._onclickHandler(obj)
+          onClick: (obj: object) => this._onclickHandler(obj),
+      }
+      
+      if(this.model.tooltip){
+        options['onHover'] = (info: any) => this._setTooltip(info)
       }
       this._layer = new deck.PolygonLayer(options)
 
@@ -159,6 +183,23 @@ export class PolygonDeckGLView extends LayoutDOMView {
         this._current_selection.delete(obj.index)
       }
       this.model.data_source.selected.indices = Array.from(this._current_selection.values());
+  }
+
+  private _setTooltip(info: any): void {
+    if (info.object) {
+      let content = ''
+      for(let key in info.object){     
+        if(key !== 'coordinates' && key !== 'color'){
+          content += `<b>${key}</b>: ${info.object[key]} <br/>`
+        }
+      }
+      this._tooltip.innerHTML = content
+      this._tooltip.style.display = 'block'
+      this._tooltip.style.left = info.x + 'px'
+      this._tooltip.style.top = info.y + 'px'
+    } else {
+      this._tooltip.style.display = 'none'
+    }
   }
 }
 

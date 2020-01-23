@@ -18,6 +18,7 @@ export namespace PolygonDeckGL {
         deck_spec: p.Property<object>
         data_source: p.Property<ColumnDataSource>
         color_mapper: p.Property<ColorMapper>
+        tooltip: p.Property<boolean>
       }
   export type Attrs = p.AttrsOf<Props>
  
@@ -53,6 +54,7 @@ export class PolygonDeckGL extends LayoutDOM {
       deck_spec: [ p.Any ],
       data_source: [ p.Instance ],
       color_mapper: [ p.Instance,  () => new LinearColorMapper({palette: Greys9()}) ],
+      tooltip: [p.Boolean]
     })
   }
 }
