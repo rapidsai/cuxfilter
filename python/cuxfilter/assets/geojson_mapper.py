@@ -15,7 +15,7 @@ def geo_json_mapper(url, prop=None, projection=3857):
     temp_gpd_df = gpd.read_file(data).to_crs(epsg=projection)
 
     if prop == "" or prop is None:
-        if temp_gpd_df.columns[0] != 'geometry':
+        if temp_gpd_df.columns[0] != "geometry":
             prop = temp_gpd_df.columns[0]
         else:
             prop = temp_gpd_df.columns[1]
