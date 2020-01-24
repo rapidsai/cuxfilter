@@ -119,20 +119,20 @@ Troubleshooting help can be found [here](https://rapidsai.github.io/cuxfilter/in
 > NOTE: cuxfilter is in ongoing development and the installation instructions will be updated in the near future.
 
 
-Install cuxfilter Nightly(0.12)
+Install cuxfilter Nightly(0.13)
 
 ```bash
 # for CUDA 9.2
 conda install -c rapidsai-nightly \
-    cuxfilter=0.12 cudatoolkit=9.2
+    cuxfilter cudatoolkit=9.2
 
 # or, for CUDA 10.0
 conda install -c rapidsai-nightly \
-    cuxfilter=0.12 cudatoolkit=10.0
+    cuxfilter cudatoolkit=10.0
 
 # or, for CUDA 10.1
 conda install -c rapidsai-nightly \
-    cuxfilter=0.12 cudatoolkit=10.1
+    cuxfilter cudatoolkit=10.1
 ```
 
 ## Install in the rapids nightly container
