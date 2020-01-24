@@ -62,7 +62,6 @@ class Choropleth3d(Base3dChoropleth):
         }
         """
         res_df = pd.DataFrame(source_dict)
-
         if patch_update is False:
             result_df = res_df.merge(self.geo_mapper, on=self.x, how="left")
             result_df["index"] = result_df.index
@@ -147,7 +146,7 @@ class Choropleth3d(Base3dChoropleth):
             data_source=self.source,
             width=self.width,
             height=self.height,
-            tooltip=self.library_specific_params["tooltip"],
+            tooltip=self.tooltip,
         )
 
     def update_dimensions(self, width=None, height=None):

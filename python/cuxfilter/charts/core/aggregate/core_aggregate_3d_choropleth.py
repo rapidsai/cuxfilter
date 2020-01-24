@@ -51,6 +51,7 @@ class Base3dChoropleth(BaseChart):
         geo_color_palette=None,
         mapbox_api_key=os.getenv("MAPBOX_API_KEY"),
         map_style="dark",
+        tooltip=True,
         **library_specific_params,
     ):
         """
@@ -116,7 +117,7 @@ class Base3dChoropleth(BaseChart):
         self.mapbox_api_key = mapbox_api_key
         self.map_style = map_style
         self.library_specific_params = library_specific_params
-
+        self.tooltip = tooltip
         if "x_range" not in self.library_specific_params:
             self.library_specific_params["x_range"] = x_range
 

@@ -9,7 +9,7 @@ pn.extension(
         "deck/json": "https://unpkg.com/@deck.gl/json@latest/dist.min.js",
     },
     css_files=[
-        "https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css"
+        "https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.0/mapbox-gl.css"
     ],
 )
 
