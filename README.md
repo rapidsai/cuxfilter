@@ -202,6 +202,7 @@ Currently supported layout templates and example code can be found [here](https:
 | cudatashader  | scatter, scatter_geo, line, stacked_lines, heatmap |
 | panel_widgets  | range_slider, float_slider, int_slider, drop_down, multi_select  |
 | custom    | view_dataframe |
+| deckgl    | choropleth3d   |
 
 
 ## Contributing Developers Guide
