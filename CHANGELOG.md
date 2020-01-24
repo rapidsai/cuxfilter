@@ -18,3 +18,4 @@
 - PR #89 Fixed headless chrome sandbox for dashboard preview feature issue mentioned in #88
 - PR #90 Implemented deck-gl_bokeh plugin and integrated with cuxfilter with layout and theme options
   and added full support for deck.gl/polygon layer
+- PR #93 Added typescript bindings in conda build package and added tests
