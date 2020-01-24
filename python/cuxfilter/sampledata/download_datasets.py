@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import requests
-import sys
 import gzip
 import tarfile
 import shutil
@@ -43,32 +41,19 @@ def decompress_extract_data(file_path):
 def download_dataset(downloaded_filename, filename, url):
     print("Dataset - " + filename)
     if not os.path.isfile(downloaded_filename):
-        with open(downloaded_filename, "wb") as f:
-            print("Downloading %s" % filename)
-            response = requests.get(url, stream=True)
-            total_length = response.headers.get("content-length")
-            # no content length header
-            if total_length is None:
-                f.write(response.content)
-            else:
-                dl = 0
-                total_length = int(total_length)
-                for data in response.iter_content(chunk_size=4096):
-                    dl += len(data)
-                    f.write(data)
-                    done = int(50 * dl / total_length)
-                    sys.stdout.write(
-                        "\r[%s%s]" % ("=" * done, " " * (50 - done))
-                    )
-                    sys.stdout.flush()
-
-        print("dataset downloaded")
+        bash_cmd = "! wget" + " -O " + downloaded_filename + " " + url
+        print(
+            """
+            Dataset not found. Run the following for downloading the dataset:
+            """
+            + bash_cmd
+        )
     else:
         print("\ndataset already downloaded")
-    if not os.path.isfile(filename):
-        if filename != downloaded_filename:
-            print("Extracting ....")
-            decompress_extract_data(downloaded_filename)
+        if not os.path.isfile(filename):
+            if filename != downloaded_filename:
+                print("Extracting ....")
+                decompress_extract_data(downloaded_filename)
 
 
 def datasets_check(*args, base_dir="./"):

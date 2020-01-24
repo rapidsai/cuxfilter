@@ -25,12 +25,14 @@ requirements:
   run:
     - python
     - cudf {{ minor_version }}
+    - datashader >=0.9.*
     - cupy  >=6*
     - panel 0.6.*
     - bokeh >=1.2.*
     - pyproj  >=2.4.*
     - geopandas >=0.6.*
     - pyppeteer
+    - jupyter-server-proxy
 
 test:
   commands:

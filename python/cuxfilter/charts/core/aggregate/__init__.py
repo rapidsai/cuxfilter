@@ -1,4 +1,5 @@
 from .core_aggregate_bar import BaseBar
 from .core_aggregate_choropleth import BaseChoropleth
+from .core_aggregate_3d_choropleth import Base3dChoropleth
 from .core_aggregate_line import BaseLine
 from .core_datasize_indicator import BaseDataSizeIndicator

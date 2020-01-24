@@ -38,9 +38,10 @@ The original version (0.2) of cuxfilter, most known for the backend powering the
 
 ## Usage
 
+### Example 1
+
 ```python
 import cuxfilter
-from cuxfilter.charts import cudatashader, bokeh
 
 #update data_dir if you have downloaded datasets elsewhere
 DATA_DIR = './data'
@@ -54,19 +55,51 @@ label_map = {1: 'Sunday',    2: 'Monday',    3: 'Tuesday',    4: 'Wednesday',   
 gtc_demo_red_blue_palette = [ (49,130,189), (107,174,214), (123, 142, 216), (226,103,152), (255,0,104) , (50,50,50) ]
 
 #declare charts
-chart1 = cudatashader.scatter_geo(x='dropoff_x', y='dropoff_y', aggregate_col='ST_CASE',
+chart1 = cuxfilter.charts.datashader.scatter_geo(x='dropoff_x', y='dropoff_y', aggregate_col='ST_CASE',
                                          color_palette=gtc_demo_red_blue_palette)
 chart2 = cuxfilter.charts.panel_widgets.multi_select('YEAR')
-chart3 = bokeh.bar('DAY_WEEK', x_label_map=label_map)
-chart4 = bokeh.bar('MONTH')
+chart3 = cuxfilter.charts.bokeh.bar('DAY_WEEK', x_label_map=label_map)
+chart4 = cuxfilter.charts.bokeh.bar('MONTH')
 
 #declare dashboard
 d = cux_df.dashboard([chart1, chart2, chart3, chart4], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Auto Accident Dataset')
 
-#preview the dashboard inside the notebook(non-interactive) with layout
-await d.preview()
+#run the dashboard as a webapp:
+d.show('jupyter-notebook/lab-url')
 ```
 ![output dashboard](./docs/_images/demo.gif)
+
+### Example 2
+
+
+```python
+import cuxfilter
+
+#update data_dir if you have downloaded datasets elsewhere
+DATA_DIR = './data'
+from cuxfilter.sampledata import datasets_check
+datasets_check('mortgage', base_dir=DATA_DIR)
+
+cux_df = cuxfilter.DataFrame.from_arrow(DATA_DIR + '/146M_predictions_v2.arrow')
+
+MAPBOX_API_KEY= "<mapbox-api-key>"
+geoJSONSource='https://raw.githubusercontent.com/rapidsai/cuxfilter/GTC-2018-mortgage-visualization/javascript/demos/GTC%20demo/src/data/zip3-ms-rhs-lessprops.json'
+
+chart0 = cuxfilter.charts.deckgl.choropleth3d( x='zip', color_column='delinquency_12_prediction', color_aggregate_fn='mean',
+            elevation_column='current_actual_upb', elevation_factor=0.00001, elevation_aggregate_fn='sum', 
+            geoJSONSource=geoJSONSource, mapbox_api_key=MAPBOX_API_KEY, data_points=1000
+)
+chart2 = cuxfilter.charts.bokeh.bar('delinquency_12_prediction',data_points=50)
+chart3 = cuxfilter.charts.panel_widgets.range_slider('borrower_credit_score',data_points=50)
+chart1 = cuxfilter.charts.panel_widgets.drop_down('dti')
+
+#declare dashboard
+d = cux_df.dashboard([chart0, chart2, chart3, chart4], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Mortgage Dashboard')
+
+#run the dashboard as a webapp:
+d.show('jupyter-notebook/lab-url')
+```
+![output dashboard](./docs/_images/demo2.gif)
 
 ## Documentation
 
@@ -96,27 +129,44 @@ conda install -c rapidsai-nightly \
 # or, for CUDA 10.0
 conda install -c rapidsai-nightly \
     cuxfilter=0.12 cudatoolkit=10.0
+
+# or, for CUDA 10.1
+conda install -c rapidsai-nightly \
+    cuxfilter=0.12 cudatoolkit=10.1
 ```
 
-To run the bokeh server in a jupyter lab
+## Install in the rapids nightly container
 
-1. expose an additional port for server, lets call it bokeh_port.
-2. Install jupyterlab dependencies
+```bash
+docker pull rapidsai/rapidsai-nightly:cuda10.1-runtime-ubuntu16.04-py3.7
+
+docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 rapidsai/rapidsai-nightly:cuda10.1-runtime-ubuntu16.04-py3.7
+
+#install cuXfilter
+conda install -c rapidsai-nightly cuxfilter=0.12 cudatoolkit=10.1
+
+#get rid of the libxcomposite.so.1 error
+apt-get update
+apt-get install libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxrandr2 libxtst6 libcups2 libxss1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libatk1.0-0 libgtk-3-0 libgdk-pixbuf2.0-0
+
+```
+
+## Troubleshooting
+
+1. If the `await d.preview()` throws a libxcomposite.so.1 not found error, execute the following commands:
+
+```bash
+apt-get update
+apt-get install libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxrandr2 libxtst6 libcups2 libxss1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libatk1.0-0 libgtk-3-0 libgdk-pixbuf2.0-0
+```
+
+
+2. To run the bokeh server in a jupyter lab, install jupyterlab dependencies
 
 ```bash
 conda install -c conda-forge jupyterlab
 jupyter labextension install @pyviz/jupyterlab_pyviz
 jupyter labextension install jupyterlab_bokeh
-```
-
-3.running the server
-```bash
-#enter ip address without http://
-#current port is the port at which jupyterlab is running
-d.app(url='ip.addr:current_port', port=bokeh_port)
-# OR for a separate web app
-d.show('ip.addr:bokeh_port')
-
 ```
 
 ## Download Datasets
@@ -134,17 +184,12 @@ While in the directory you want the datasets to be saved, execute the following
 source activate test_env
 
 #download and extract the datasets
+curl https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2015-01.csv --create-dirs -o ./nyc_taxi.csv
+curl https://s3.us-east-2.amazonaws.com/rapidsai-data/viz-data/146M_predictions_v2.arrow.gz --create-dirs -o ./146M_predictions_v2.arrow.gz
+curl https://s3.us-east-2.amazonaws.com/rapidsai-data/viz-data/auto_accidents.arrow.gz --create-dirs -o ./auto_accidents.arrow.gz
+
 python -c "from cuxfilter.sampledata import datasets_check; datasets_check(base_dir='./')"
 ```
-
-Individual links:
-
-- Download the mortgage dataset from [here](https://docs.rapids.ai/datasets/mortgage-viz-data)
-
-- Nyc taxi dataset from [here](https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2015-01.csv)
-
-- Auto dataset from [here](https://s3.us-east-2.amazonaws.com/rapidsai-data/viz-data/auto_accidents.arrow.gz)
-
 
 ## Guides and Layout Templates
 

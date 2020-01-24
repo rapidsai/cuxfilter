@@ -9,7 +9,7 @@ class BaseScatter(BaseNonAggregate):
 
         If dataset size is greater than a few thousand points,
         scatter geos can crash the browser tabs, and is only recommended
-        with cudatashader plugin, in which case an image is
+        with datashader plugin, in which case an image is
         rendered instead of points on canvas
     """
 

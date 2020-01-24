@@ -188,7 +188,7 @@ def calc_value_counts(a_gpu, bins):
     return bin_edges.copy_to_host(), histogram_out.copy_to_host()
 
 
-def calc_groupby(chart: Type[BaseChart], data):
+def calc_groupby(chart: Type[BaseChart], data, agg=None):
     """
     description:
         main function to calculate histograms
@@ -203,24 +203,28 @@ def calc_groupby(chart: Type[BaseChart], data):
         np.asarray([chart.min_value, chart.max_value], dtype=np.float32)
     )
 
-    temp_df = cudf.DataFrame()
-    temp_df.add_column(
-        chart.x,
-        get_binwise_reduced_column(
-            data[chart.x].copy().to_gpu_array(), chart.stride, a_x_range
-        ),
-    )
-    temp_df.add_column(chart.y, data[chart.y].copy().to_gpu_array())
+    if agg is None:
+        temp_df = cudf.DataFrame()
 
-    groupby_res = (
-        temp_df.groupby(by=[chart.x], as_index=False)
-        .agg({chart.y: chart.aggregate_fn})
-        .to_pandas()
-    )
+        temp_df.add_column(
+            chart.x,
+            get_binwise_reduced_column(
+                data[chart.x].copy().to_gpu_array(), chart.stride, a_x_range
+            ),
+        )
+        temp_df.add_column(chart.y, data[chart.y].copy().to_gpu_array())
 
-    del temp_df
-    gc.collect()
-
+        groupby_res = (
+            temp_df.groupby(by=[chart.x], as_index=False)
+            .agg({chart.y: chart.aggregate_fn})
+            .to_pandas()
+        )
+        del temp_df
+        gc.collect()
+    else:
+        groupby_res = (
+            data.groupby(by=[chart.x], as_index=False).agg(agg).to_pandas()
+        )
     return groupby_res.to_numpy().transpose()
 
 

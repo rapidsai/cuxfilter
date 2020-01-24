@@ -12,17 +12,19 @@
 #
 import os
 import sys
+import cuxfilter
 sys.path.insert(0, os.path.abspath('...'))
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'cuxfilter'
-copyright = '2019, ajay thorve'
-author = 'ajay thorve'
+copyright = '2019, NVIDIA'
+author = 'NVIDIA'
 
 # The full version, including alpha/beta/rc tags
-release = '0.2'
+release = '0.12'
+release = cuxfilter.__version__
 
 nbsphinx_allow_errors = True
 # -- General configuration ---------------------------------------------------

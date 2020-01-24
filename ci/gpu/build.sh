@@ -29,6 +29,21 @@ export HOME=$WORKSPACE
 cd $WORKSPACE
 export GIT_DESCRIBE_TAG=`git describe --tags`
 export MINOR_VERSION=`echo $GIT_DESCRIBE_TAG | grep -o -E '([0-9]+\.[0-9]+)'`
+# Set `LIBCUDF_KERNEL_CACHE_PATH` environment variable to $HOME/.jitify-cache because
+# it's local to the container's virtual file system, and not shared with other CI jobs
+# like `/tmp` is.
+export LIBCUDF_KERNEL_CACHE_PATH="$HOME/.jitify-cache"
+
+function remove_libcudf_kernel_cache_dir {
+    EXITCODE=$?
+    logger "removing kernel cache dir: $LIBCUDF_KERNEL_CACHE_PATH"
+    rm -rf "$LIBCUDF_KERNEL_CACHE_PATH" || logger "could not rm -rf $LIBCUDF_KERNEL_CACHE_PATH"
+    exit $EXITCODE
+}
+
+trap remove_libcudf_kernel_cache_dir EXIT
+
+mkdir -p "$LIBCUDF_KERNEL_CACHE_PATH" || logger "could not mkdir -p $LIBCUDF_KERNEL_CACHE_PATH"
 
 ################################################################################
 # SETUP - Check environment
@@ -43,13 +58,9 @@ nvidia-smi
 logger "Activate conda env..."
 source activate gdf
 conda install "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
-              "numpy>=1.16" "cupy>=6.0.0" "pandas>=0.24.2,<0.25" "panel=0.6.*" \
-              "bokeh>=1.2.*" "geopandas>=0.6.*" "pytest" "pyppeteer" \
+              "numpy>=1.16" "cupy>=6.0.0" "datashader>=0.10.*" "pandas>=0.24.2,<0.25" "panel=0.6.*" \
+              "bokeh>=1.2.*" "geopandas>=0.6.*" "pytest" "pyppeteer" "jupyter-server-proxy"\
               "pyproj>=2.4.*"
-
-# Install the master version of cudatashader
-logger "pip install git+https://github.com/rapidsai/cuDataShader.git --upgrade --no-deps"
-pip install git+https://github.com/rapidsai/cuDataShader.git --upgrade --no-deps
 
 logger "Check versions..."
 python --version
@@ -61,7 +72,7 @@ conda list
 # BUILD - Build cuxfilter from source
 ################################################################################
 
-logger "Build libcudf..."
+logger "Build cuxfilter..."
 $WORKSPACE/build.sh clean cuxfilter
 
 ################################################################################

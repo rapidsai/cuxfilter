@@ -6,5 +6,5 @@ Charts
    :caption: Contents:
 
    bokeh_charts.rst
-   cudatashader_charts.rst
+   datashader_charts.rst
    panel_widgets.rst
