@@ -6,7 +6,6 @@ from ..core.non_aggregate import (
 )
 from .custom_extensions import InteractiveImage
 
-import datashader
 import datashader as cds
 from datashader import transfer_functions as tf
 from datashader.colors import Hot
@@ -41,12 +40,8 @@ def _rect_horizontal_mask(px):
     return np.concatenate((x_bool, zero_bool), axis=0)
 
 
-datashader.transfer_functions._mask_lookup[
-    "rect_vertical"
-] = _rect_vertical_mask
-datashader.transfer_functions._mask_lookup[
-    "rect_horizontal"
-] = _rect_horizontal_mask
+cds.transfer_functions._mask_lookup["rect_vertical"] = _rect_vertical_mask
+cds.transfer_functions._mask_lookup["rect_horizontal"] = _rect_horizontal_mask
 
 
 class ScatterGeo(BaseScatterGeo):
