@@ -93,7 +93,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
           })
           document.body.appendChild(this._tooltip)
         }
-        
+
         // document.body.appendChild(this._container)
         this.el.appendChild(this._container)
 
@@ -107,7 +107,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
  }
 
  private _create_deck(): void {
-           
+
       let options: any = {
           data: this.get_data(),
           ...this._jsonConverter.convert(this.model.layer_spec),
@@ -142,7 +142,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
           ...this._jsonConverter.convert(this.model.layer_spec),
           onClick: (obj: object) => this._onclickHandler(obj),
       }
-      
+
       if(this.model.tooltip){
         options['onHover'] = (info: any) => this._setTooltip(info)
       }
@@ -157,7 +157,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
 
   render(): void {
       super.render()
-      this._update_deck()   
+      this._update_deck()
   }
 
   get_data(): Array<any> {
@@ -184,13 +184,15 @@ export class PolygonDeckGLView extends LayoutDOMView {
       }else{
         this._current_selection.delete(obj.index)
       }
-      this.model.data_source.selected.indices = Array.from(this._current_selection.values());
+      this.model.data_source.selected.indices = Array.from(
+          this._current_selection.values()
+      );
   }
 
   private _setTooltip(info: any): void {
     if (info.object) {
       let content = ''
-      for(let key in info.object){     
+      for(let key in info.object){
         if(key !== 'coordinates' && key !== 'color'){
           content += `<b>${key}</b>: ${info.object[key]} <br/>`
         }
@@ -205,24 +207,30 @@ export class PolygonDeckGLView extends LayoutDOMView {
   }
 }
 
-function parseData(obj: any, cm: any, _current_selection: Set<number>): Array<any> {
- 
+function parseData(
+    obj: any, cm: any, _current_selection: Set<number>
+): Array<any> {
+
   let b: Array<any> = []
   for (let key in obj) {
       let value = obj[key];
       for (let i in value) {
         if( key == cm.name && _current_selection.size == 0){
-          
+
           let buf8_0: string = cm.rgba_mapper.v_compute([value[i]])
-          b[parseInt(i)]['color'] = [buf8_0[0], buf8_0[1], buf8_0[2], buf8_0[3]]
+          b[parseInt(i)]['color'] = [
+              buf8_0[0], buf8_0[1], buf8_0[2], buf8_0[3]
+          ]
 
         }else if( key == cm.name && _current_selection.has(+i)){
-          
+
           let buf8_0: string = cm.rgba_mapper.v_compute([value[i]])
-          b[parseInt(i)]['color'] = [buf8_0[0], buf8_0[1], buf8_0[2], buf8_0[3]]
+          b[parseInt(i)]['color'] = [
+              buf8_0[0], buf8_0[1], buf8_0[2], buf8_0[3]
+          ]
 
         }else if( key == cm.name && !_current_selection.has(+i)){
-          
+
           b[parseInt(i)]['color'] = [211, 211, 211, 50]
 
         }
@@ -240,7 +248,10 @@ function parseData(obj: any, cm: any, _current_selection: Set<number>): Array<an
 
 
 
-const Greys9 = () => ["#000000", "#252525", "#525252", "#737373", "#969696", "#bdbdbd", "#d9d9d9", "#f0f0f0", "#ffffff"]
+const Greys9 = () => [
+    "#000000", "#252525", "#525252", "#737373", "#969696",
+    "#bdbdbd", "#d9d9d9", "#f0f0f0", "#ffffff"
+]
 
 // We must also create a corresponding JavaScript BokehJS model subclass to
 // correspond to the python Bokeh model subclass. In this case, since we want
@@ -255,7 +266,7 @@ export namespace PolygonDeckGL {
         tooltip: p.Property<boolean>
       }
   export type Attrs = p.AttrsOf<Props>
- 
+
 }
 
 export interface PolygonDeckGL extends PolygonDeckGL.Attrs {}
@@ -281,13 +292,16 @@ export class PolygonDeckGL extends LayoutDOM {
     // The @define block adds corresponding "properties" to the JS model. These
     // should basically line up 1-1 with the Python model class. Most property
     // types have counterparts, e.g. ``bokeh.core.properties.String`` will be
-    // ``p.String`` in the JS implementatin. Where the JS type system is not yet
-    // as rich, you can use ``p.Any`` as a "wildcard" property type.
+    // ``p.String`` in the JS implementatin. Where the JS type system is not
+    // yet as rich, you can use ``p.Any`` as a "wildcard" property type.
+
     this.define<PolygonDeckGL.Props>({
       layer_spec:   [ p.Any ],
       deck_spec: [ p.Any ],
       data_source: [ p.Instance ],
-      color_mapper: [ p.Instance,  () => new LinearColorMapper({palette: Greys9()}) ],
+      color_mapper: [ p.Instance,  () => new LinearColorMapper(
+          {palette: Greys9()}
+      ) ],
       tooltip: [p.Boolean]
     })
   }
