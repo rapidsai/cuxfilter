@@ -1,4 +1,3 @@
-import panel as pn
 import cudf
 import pyarrow as pa
 from typing import Type
@@ -85,7 +84,7 @@ class DataFrame:
         return DataFrame(dataframe)
 
     def __init__(self, data):
-        pn.extension()
+        # pn.extension()
         self.backup = data
         self.data = data
 

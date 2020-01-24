@@ -56,7 +56,7 @@ class BaseAggregateChart(BaseChart):
             elif self.aggregate_fn == "count":
                 datatile_max = datatile.loc[:, datatile_index_max]
                 datatile_min = datatile.loc[:, datatile_index_min]
-                datatile_result = datatile_max - datatile_min
+                datatile_result = np.array(datatile_max - datatile_min)
         self.reset_chart(datatile_result)
 
     def query_chart_by_indices_for_mean(
