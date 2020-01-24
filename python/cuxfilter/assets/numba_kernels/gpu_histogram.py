@@ -203,15 +203,15 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
         np.asarray([chart.min_value, chart.max_value], dtype=np.float32)
     )
 
-    temp_df = cudf.DataFrame()
-    temp_df.add_column(
-        chart.x,
-        get_binwise_reduced_column(
-            data[chart.x].copy().to_gpu_array(), chart.stride, a_x_range
-        ),
-    )
-
     if agg is None:
+        temp_df = cudf.DataFrame()
+
+        temp_df.add_column(
+            chart.x,
+            get_binwise_reduced_column(
+                data[chart.x].copy().to_gpu_array(), chart.stride, a_x_range
+            ),
+        )
         temp_df.add_column(chart.y, data[chart.y].copy().to_gpu_array())
 
         groupby_res = (
@@ -219,17 +219,12 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
             .agg({chart.y: chart.aggregate_fn})
             .to_pandas()
         )
+        del temp_df
+        gc.collect()
     else:
-        for key in list(agg.keys()):
-            temp_df.add_column(key, data[key].copy().to_gpu_array())
-
         groupby_res = (
-            temp_df.groupby(by=[chart.x], as_index=False).agg(agg).to_pandas()
+            data.groupby(by=[chart.x], as_index=False).agg(agg).to_pandas()
         )
-
-    del temp_df
-    gc.collect()
-
     return groupby_res.to_numpy().transpose()
 
 
