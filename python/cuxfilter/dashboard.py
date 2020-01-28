@@ -117,6 +117,7 @@ class DashBoard:
             for chart in charts:
                 self._charts[chart.name] = chart
                 chart.initiate_chart(self)
+                chart._initialized = True
 
         self._title = title
         self._dashboard = layout()
@@ -220,6 +221,7 @@ class DashBoard:
                 if chart not in self._charts:
                     self._charts[chart.name] = chart
                     chart.initiate_chart(self)
+                    chart._initialized = True
 
     def _query(self, query_str, inplace=False):
         """
