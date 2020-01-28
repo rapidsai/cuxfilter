@@ -1,6 +1,9 @@
 import panel as pn
+import logging
+from panel.config import panel_extension
 
 from .core_chart import BaseChart
+from ...layouts import chart_view
 
 css = """
 .dataframe table{
@@ -19,7 +22,7 @@ css = """
 }
 """
 
-pn.extension(raw_css=[css])
+pn.config.raw_css += [css]
 
 
 class ViewDataFrame:
@@ -30,6 +33,7 @@ class ViewDataFrame:
     chart = None
     source = None
     use_data_tiles = False
+    _initialized = False
 
     def __init__(self, columns=None, width=400, height=400):
         self.columns = columns
@@ -78,8 +82,30 @@ class ViewDataFrame:
         self.chart = pn.Column(html_pane, css_classes=["panel-df"])
         self.chart.sizing_mode = "scale_both"
 
+    def _repr_mimebundle_(self, include=None, exclude=None):
+        view = self.view()
+        if self._initialized and panel_extension._loaded:
+            return view._repr_mimebundle_(include, exclude)
+
+        if self._initialized is False:
+            logging.warning(
+                "dashboard has not been initialized."
+                "Please run cuxfilter.dashboard.Dashboard([...charts])"
+                " to view this object in notebook"
+            )
+
+        if panel_extension._loaded is False:
+            logging.warning(
+                "notebooks assets not loaded."
+                "Please run cuxfilter.load_notebooks_assets()"
+                " to view this object in notebook"
+            )
+            if isinstance(view, pn.Column):
+                return view.pprint()
+        return None
+
     def view(self):
-        return self.chart
+        return chart_view(self.chart, width=self.width)
 
     def reload_chart(self, data, patch_update: bool):
         self.chart[0].object = data[self.columns]

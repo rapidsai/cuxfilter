@@ -1,4 +1,7 @@
 from typing import Dict
+import logging
+from panel.config import panel_extension
+import panel as pn
 
 
 class BaseChart:
@@ -22,6 +25,7 @@ class BaseChart:
     max_value: float = 0.0
     x_label_map = {}
     y_label_map = {}
+    _initialized = False
 
     @property
     def name(self):
@@ -95,6 +99,28 @@ class BaseChart:
         if "y_label_map" in self.library_specific_params:
             self.y_label_map = self.library_specific_params["y_label_map"]
             self.library_specific_params.pop("y_label_map")
+
+    def _repr_mimebundle_(self, include=None, exclude=None):
+        view = self.view()
+        if self._initialized and panel_extension._loaded:
+            return view._repr_mimebundle_(include, exclude)
+
+        if self._initialized is False:
+            logging.warning(
+                "dashboard has not been initialized."
+                "Please run cuxfilter.dashboard.Dashboard([...charts])"
+                " to view this object in notebook"
+            )
+
+        if panel_extension._loaded is False:
+            logging.warning(
+                "notebooks assets not loaded."
+                "Please run cuxfilter.load_notebooks_assets()"
+                " to view this object in notebook"
+            )
+            if isinstance(view, pn.Column):
+                return view.pprint()
+        return None
 
     def view(self):
         return self.chart

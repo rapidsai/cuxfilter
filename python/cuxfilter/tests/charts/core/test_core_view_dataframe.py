@@ -8,6 +8,7 @@ from cuxfilter.charts.core.non_aggregate.core_stacked_line import (
     BaseStackedLine,
 )
 import cuxfilter
+from cuxfilter.layouts import chart_view
 
 
 class TestViewDataFrame:
@@ -55,7 +56,7 @@ class TestViewDataFrame:
         vd = ViewDataFrame()
         vd.chart = chart
 
-        assert vd.view() == _chart
+        assert str(vd.view()) == str(chart_view(_chart, width=vd.width))
 
     def test_reload_chart(self):
         vd = ViewDataFrame()

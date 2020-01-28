@@ -19,3 +19,4 @@
 - PR #90 Implemented deck-gl_bokeh plugin and integrated with cuxfilter with layout and theme options
   and added full support for deck.gl/polygon layer
 - PR #93 Added typescript bindings in conda build package and added tests
+- PR #95 Faster import time, segregated in-notebook asset loading to save import costs, updated tests
