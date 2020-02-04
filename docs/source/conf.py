@@ -23,7 +23,7 @@ copyright = '2019, NVIDIA'
 author = 'NVIDIA'
 
 # The full version, including alpha/beta/rc tags
-release = '0.12'
+release = '0.12.0'
 
 nbsphinx_allow_errors = True
 # -- General configuration ---------------------------------------------------

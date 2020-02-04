@@ -7,7 +7,7 @@ channels:
 dependencies:
 - cupy>=6*
 - python>=3.6,<3.8
-- cudf>=0.11
+- cudf>=0.12
 - datashader>=0.10.*
 - geopandas>=0.6.*
 - pyproj>=2.4.*
