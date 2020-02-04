@@ -3,7 +3,7 @@
 ######################################
 # cuXfilter CPU conda build script for CI #
 ######################################
-set -ex
+set -e
 
 # Logger function for build status output
 function logger() {
