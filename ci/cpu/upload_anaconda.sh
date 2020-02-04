@@ -4,7 +4,7 @@
 
 set -e
 
-export  CUXFILTER_FILE=`conda build conda/recipes/cuxfilter --output`
+export CUXFILTER_FILE=`conda build conda/recipes/cuxfilter --python=$PYTHON --output`
 
 SOURCE_BRANCH=master
 CUDA_REL=${CUDA_VERSION%.*}
@@ -28,5 +28,4 @@ if [ "$UPLOAD_CUXFILTER" == "1" ]; then
   echo "Upload cuXfilter"
   echo ${CUXFILTER_FILE}
   anaconda -t ${MY_UPLOAD_KEY} upload -u ${CONDA_USERNAME:-rapidsai} ${LABEL_OPTION} --force ${CUXFILTER_FILE}
-
 fi
