@@ -332,6 +332,30 @@ def test_calc_groupby(aggregate_fn, result):
     assert np.array_equal(gpu_histogram.calc_groupby(bc, df), result)
 
 
+@pytest.mark.parametrize(
+    "x, y, aggregate_fn, result",
+    [
+        ("key", "val", "mean", np.array([[0.0, 1.0], [np.NaN, 3.0]])),
+        ("val", "key", "mean", np.array([[0.0], [2.0]])),
+    ],
+)
+def test_calc_groupby_for_nulls(x, y, aggregate_fn, result):
+    df = cudf.DataFrame({"key": [1, 2], "val": [np.NaN, 3]})
+    print(df, x, y)
+    bc = BaseChart()
+    bc.x = x
+    bc.y = y
+    bc.stride = 1.0
+    bc.min_value = df[x].min()
+    bc.max_value = df[x].max()
+    bc.aggregate_fn = aggregate_fn
+    print(gpu_histogram.calc_groupby(bc, df))
+    print(result)
+    assert np.allclose(
+        gpu_histogram.calc_groupby(bc, df), result, equal_nan=True
+    )
+
+
 def test_aggregated_column_unique():
     df = cudf.DataFrame(
         {
