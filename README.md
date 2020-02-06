@@ -116,10 +116,29 @@ Troubleshooting help can be found [here](https://rapidsai.github.io/cuxfilter/in
 
 ## Installation
 
-> NOTE: cuxfilter is in ongoing development and the installation instructions will be updated in the near future.
+### Conda
+
+For all versions use Rapids Release Selector - https://rapids.ai/start.html
 
 
-Install cuxfilter Nightly(0.13)
+cuxfilter can be installed with conda ([miniconda](https://conda.io/miniconda.html), or the full [Anaconda distribution](https://www.anaconda.com/download)) from the `rapidsai` channel:
+
+For the stable version ![cuxfilter stable version](https://anaconda.org/rapidsai/cuxfilter/badges/version.svg) ![last updated](https://anaconda.org/rapidsai/cuxfilter/badges/latest_release_relative_date.svg) :
+```bash
+# for CUDA 9.2
+conda install -c rapidsai -c nvidia -c conda-forge \
+    -c defaults cuxfilter=0.12 python=3.6 cudatoolkit=9.2
+
+# or, for CUDA 10.0
+conda install -c rapidsai -c nvidia -c conda-forge \
+    -c defaults cuxfilter=0.12 python=3.6 cudatoolkit=10.0
+
+# or, for CUDA 10.1
+conda install -c rapidsai -c nvidia -c conda-forge \
+    -c defaults cuxfilter=0.12 python=3.6 cudatoolkit=10.1
+```
+
+For the nightly version of cuxfilter  ![cuxfilter nightly version](https://anaconda.org/rapidsai-nightly/cuxfilter/badges/version.svg) ![last updated](https://anaconda.org/rapidsai-nightly/cuxfilter/badges/latest_release_relative_date.svg)
 
 ```bash
 # for CUDA 9.2
@@ -135,20 +154,20 @@ conda install -c rapidsai-nightly \
     cuxfilter cudatoolkit=10.1
 ```
 
-## Install in the rapids nightly container
+## Build/Install from Source
+See build [instructions](CONTRIBUTING.md#setting-up-your-build-environment).
+
+
+## Docker container
+
+For all versions use Rapids Release Selector - https://rapids.ai/start.html
 
 ```bash
-docker pull rapidsai/rapidsai-nightly:cuda10.1-runtime-ubuntu16.04-py3.7
+docker pull rapidsai/rapidsai:cuda10.0-runtime-ubuntu16.04
+docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 \
+    rapidsai/rapidsai:cuda10.0-runtime-ubuntu16.04
 
-docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 rapidsai/rapidsai-nightly:cuda10.1-runtime-ubuntu16.04-py3.7
-
-#install cuXfilter
-conda install -c rapidsai-nightly cuxfilter=0.12 cudatoolkit=10.1
-
-#get rid of the libxcomposite.so.1 error
-apt-get update
-apt-get install libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxrandr2 libxtst6 libcups2 libxss1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libatk1.0-0 libgtk-3-0 libgdk-pixbuf2.0-0
-
+# visit http://localhost:8888
 ```
 
 ## Troubleshooting
