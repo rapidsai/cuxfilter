@@ -11,15 +11,15 @@ By the way, cuxfilter is best used to interact with large (1 million+) tabular d
 
 For more detailed requirements, see below.
 
-## cuxfilter.py Architecture
+## cuxfilter Architecture
 
-The python version of cuxfilter leverage jupyter notebook and bokeh server to greatly reduce backend complexity. Currently we are focusing development efforts on the python version instead of the older javascript version.
+The current version of cuxfilter leverages jupyter notebook and bokeh server to reduce architecture and installation complexity.
 
 ![layout architecture](./docs/_images/RAPIDS%20Viz%20EcoSystem%20v2.png)
 
 ### What is cuDataTiles?
 
-cuxfilter.py implements cuDataTiles, a GPU accelerated version of data tiles based on the work of [Falcon](https://github.com/uwdata/falcon). When starting to interact with specific charts in a cuxfilter dashboard, values for the other charts are precomputed to allow for fast slider scrubbing without having to recalculate values. 
+cuxfilter implements cuDataTiles, a GPU accelerated version of data tiles based on the work of [Falcon](https://github.com/uwdata/falcon). When starting to interact with specific charts in a cuxfilter dashboard, values for the other charts are precomputed to allow for fast slider scrubbing without having to recalculate values. 
 
 ### Open Source Projects
 
@@ -34,7 +34,7 @@ cuxfilter wouldn’t be possible without using these great open source projects:
 
 ### Where is the original cuxfilter and Mortgage Viz Demo?
 
-The original version (0.2) of cuxfilter, most known for the backend powering the Mortgage Viz Demo, has been moved into the [`GTC-2018-mortgage-visualization branch`](https://github.com/rapidsai/cuxfilter/tree/GTC-2018-mortgage-visualization). As it has a much more complicated backend and javascript API, we’ve decided to focus more on the streamlined notebook focused version in the `/python` folder.
+The original version (0.2) of cuxfilter, most known for the backend powering the Mortgage Viz Demo, has been moved into the [`GTC-2018-mortgage-visualization branch`](https://github.com/rapidsai/cuxfilter/tree/GTC-2018-mortgage-visualization). As it has a much more complicated backend and javascript API, we’ve decided to focus more on the streamlined notebook focused version here.
 
 ## Usage
 
@@ -118,49 +118,21 @@ Troubleshooting help can be found [here](https://rapidsai.github.io/cuxfilter/in
 
 ### Conda
 
-For all versions use Rapids Release Selector - https://rapids.ai/start.html
+For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the [Get Started Page](https://rapids.ai/start.html#rapids-release-selector)
 
+*cuxfilter conda example installation*
 
-cuxfilter can be installed with conda ([miniconda](https://conda.io/miniconda.html), or the full [Anaconda distribution](https://www.anaconda.com/download)) from the `rapidsai` channel:
-
-For the stable version ![cuxfilter stable version](https://anaconda.org/rapidsai/cuxfilter/badges/version.svg) ![last updated](https://anaconda.org/rapidsai/cuxfilter/badges/latest_release_relative_date.svg) :
 ```bash
-# for CUDA 9.2
-conda install -c rapidsai -c nvidia -c conda-forge \
-    -c defaults cuxfilter=0.12 python=3.6 cudatoolkit=9.2
-
 # or, for CUDA 10.0
 conda install -c rapidsai -c nvidia -c conda-forge \
     -c defaults cuxfilter=0.12 python=3.6 cudatoolkit=10.0
-
-# or, for CUDA 10.1
-conda install -c rapidsai -c nvidia -c conda-forge \
-    -c defaults cuxfilter=0.12 python=3.6 cudatoolkit=10.1
 ```
-
-For the nightly version of cuxfilter  ![cuxfilter nightly version](https://anaconda.org/rapidsai-nightly/cuxfilter/badges/version.svg) ![last updated](https://anaconda.org/rapidsai-nightly/cuxfilter/badges/latest_release_relative_date.svg)
-
-```bash
-# for CUDA 9.2
-conda install -c rapidsai-nightly \
-    cuxfilter cudatoolkit=9.2
-
-# or, for CUDA 10.0
-conda install -c rapidsai-nightly \
-    cuxfilter cudatoolkit=10.0
-
-# or, for CUDA 10.1
-conda install -c rapidsai-nightly \
-    cuxfilter cudatoolkit=10.1
-```
-
-## Build/Install from Source
-See build [instructions](CONTRIBUTING.md#setting-up-your-build-environment).
-
 
 ## Docker container
 
-For all versions use Rapids Release Selector - https://rapids.ai/start.html
+For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the [Get Started Page](https://rapids.ai/start.html#rapids-release-selector)
+
+*cuxfilter docker example installation*
 
 ```bash
 docker pull rapidsai/rapidsai:cuda10.0-runtime-ubuntu16.04
@@ -169,6 +141,12 @@ docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 \
 
 # visit http://localhost:8888
 ```
+
+
+## Build/Install from Source
+See build [instructions](CONTRIBUTING.md#setting-up-your-build-environment).
+
+
 
 ## Troubleshooting
 
@@ -226,7 +204,7 @@ Currently supported layout templates and example code can be found [here](https:
 
 ## Contributing Developers Guide
 
-cuxfilter.py acts like a connector library and it is easy to add support for new libraries. The `python/cuxfilter/charts/core` directory has all the core chart classes which can be inherited and used to implement a few (viz related) functions and support dashboarding in cuxfilter directly.
+cuxfilter acts like a connector library and it is easy to add support for new libraries. The `python/cuxfilter/charts/core` directory has all the core chart classes which can be inherited and used to implement a few (viz related) functions and support dashboarding in cuxfilter directly.
 
 You can see the examples to implement viz libraries in the bokeh and cudatashader directories. Let us know if you would like to add a chart by opening a feature request issue or submitting a PR.
 
