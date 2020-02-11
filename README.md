@@ -2,6 +2,7 @@
 
 cuxfilter ( ku-cross-filter ) is a [RAPIDS](https://github.com/rapidsai) framework to connect web visualizations to GPU accelerated crossfiltering. Inspired by the javascript version of the [original]( https://github.com/crossfilter/crossfilter), it enables interactive and super fast multi-dimensional filtering of 100 million+ row tabular datasets via [cuDF](https://github.com/rapidsai/cudf). 
 
+
 ## RAPIDS Viz
 cuxfilter is one of the core projects of the “RAPIDS viz” team. Taking the axiom that “a slider is worth a thousand queries” from @lmeyerov to heart, we want to enable fast exploratory data analytics through an easier-to-use pythonic notebook interface. 
 
@@ -15,7 +16,7 @@ For more detailed requirements, see below.
 
 The current version of cuxfilter leverages jupyter notebook and bokeh server to reduce architecture and installation complexity.
 
-![layout architecture](./docs/_images/RAPIDS%20Viz%20EcoSystem%20v2.png)
+![layout architecture](./docs/_images/RAPIDS_cuxfilter.png)
 
 ### What is cuDataTiles?
 
@@ -34,7 +35,8 @@ cuxfilter wouldn’t be possible without using these great open source projects:
 
 ### Where is the original cuxfilter and Mortgage Viz Demo?
 
-The original version (0.2) of cuxfilter, most known for the backend powering the Mortgage Viz Demo, has been moved into the [`GTC-2018-mortgage-visualization branch`](https://github.com/rapidsai/cuxfilter/tree/GTC-2018-mortgage-visualization). As it has a much more complicated backend and javascript API, we’ve decided to focus more on the streamlined notebook focused version here.
+The original version (0.2) of cuxfilter, most known for the backend powering the Mortgage Viz Demo, has been moved into the [`GTC-2018-mortgage-visualization branch`](https://github.com/rapidsai/cuxfilter/tree/GTC-2018-mortgage-visualization) branch. As it has a much more complicated backend and javascript API, we’ve decided to focus more on the streamlined notebook focused version here.
+
 
 ## Usage
 
@@ -101,70 +103,82 @@ d.show('jupyter-notebook/lab-url')
 ```
 ![output dashboard](./docs/_images/demo2.gif)
 
+
 ## Documentation
 
-Full documentation can be found [here](https://rapidsai.github.io/cuxfilter/index.html).
+Full documentation can be found [on our docs page](https://rapidsai.github.io/cuxfilter/index.html).
 
-Troubleshooting help can be found [here](https://rapidsai.github.io/cuxfilter/installation.html#troubleshooting).
+Troubleshooting help can be found [troubleshooting page](https://rapidsai.github.io/cuxfilter/installation.html#troubleshooting).
 
-## Dependecies
 
-- [cudf](https://github.com/rapidsai/cudf)
-- [panel](https://github.com/pyviz/panel)
-- [bokeh](https://github.com/bokeh/bokeh)
-- [cuDatashader](https://github.com/rapidsai/cudatashader)
+## General Dependencies
+
+- python
+- cudf
+- datashader
+- cupy
+- panel
+- bokeh
+- pyproj
+- geopandas
+- pyppeteer
+- jupyter-server-proxy
+
 
 ## Installation
 
 ### Conda
 
-For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the [Get Started Page](https://rapids.ai/start.html#rapids-release-selector)
+For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the RAPIDS [Get Started Page](https://rapids.ai/start.html#rapids-release-selector).
 
-*cuxfilter conda example installation*
+*cuxfilter conda example installation:*
 
 ```bash
-# or, for CUDA 10.0
+# ex. for CUDA 10.0
 conda install -c rapidsai -c nvidia -c conda-forge \
     -c defaults cuxfilter=0.12 python=3.6 cudatoolkit=10.0
 ```
 
-## Docker container
+### Docker container
 
-For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the [Get Started Page](https://rapids.ai/start.html#rapids-release-selector)
+For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the RAPIDS [Get Started Page](https://rapids.ai/start.html#rapids-release-selector).
 
-*cuxfilter docker example installation*
+*cuxfilter docker example installation:*
 
 ```bash
+# ex. for CUDA 10.0
 docker pull rapidsai/rapidsai:cuda10.0-runtime-ubuntu16.04
 docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 \
     rapidsai/rapidsai:cuda10.0-runtime-ubuntu16.04
 
-# visit http://localhost:8888
+# open http://localhost:8888
 ```
 
 
-## Build/Install from Source
-See build [instructions](CONTRIBUTING.md#setting-up-your-build-environment).
+### Build/Install from Source
+See [build instructions](CONTRIBUTING.md#setting-up-your-build-environment).
 
 
 
 ## Troubleshooting
 
-1. If the `await d.preview()` throws a libxcomposite.so.1 not found error, execute the following commands:
+**libxcomposite.so.1 not found error**
+If the `await d.preview()` throws a libxcomposite.so.1 not found error, execute the following commands:
 
 ```bash
 apt-get update
 apt-get install libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxrandr2 libxtst6 libcups2 libxss1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libatk1.0-0 libgtk-3-0 libgdk-pixbuf2.0-0
 ```
 
-
-2. To run the bokeh server in a jupyter lab, install jupyterlab dependencies
+**bokeh server in jupyter lab**
+To run the bokeh server in a jupyter lab, install jupyterlab dependencies
 
 ```bash
 conda install -c conda-forge jupyterlab
 jupyter labextension install @pyviz/jupyterlab_pyviz
 jupyter labextension install jupyterlab_bokeh
 ```
+
 
 ## Download Datasets
 
@@ -190,7 +204,7 @@ python -c "from cuxfilter.sampledata import datasets_check; datasets_check(base_
 
 ## Guides and Layout Templates
 
-Currently supported layout templates and example code can be found [here](https://rapidsai.github.io/cuxfilter/layouts/Layouts.html)
+Currently supported layout templates and example code can be found on the [layouts page](https://rapidsai.github.io/cuxfilter/layouts/Layouts.html).
 
 ### Currently Supported Charts
 | Library  | Chart type |
