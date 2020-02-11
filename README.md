@@ -108,7 +108,7 @@ d.show('jupyter-notebook/lab-url')
 
 Full documentation can be found [on our docs page](https://rapidsai.github.io/cuxfilter/index.html).
 
-Troubleshooting help can be found [troubleshooting page](https://rapidsai.github.io/cuxfilter/installation.html#troubleshooting).
+Troubleshooting help can be found [on our troubleshooting page](https://rapidsai.github.io/cuxfilter/installation.html#troubleshooting).
 
 
 ## General Dependencies
@@ -163,6 +163,7 @@ See [build instructions](CONTRIBUTING.md#setting-up-your-build-environment).
 ## Troubleshooting
 
 **libxcomposite.so.1 not found error**
+
 If the `await d.preview()` throws a libxcomposite.so.1 not found error, execute the following commands:
 
 ```bash
@@ -171,6 +172,7 @@ apt-get install libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxran
 ```
 
 **bokeh server in jupyter lab**
+
 To run the bokeh server in a jupyter lab, install jupyterlab dependencies
 
 ```bash
