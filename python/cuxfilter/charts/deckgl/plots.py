@@ -140,6 +140,7 @@ class Choropleth3d(Base3dChoropleth):
             self.map_style
         )
         self.chart = PolygonDeckGL(
+            x=self.x,
             layer_spec=self.layer_spec,
             deck_spec=self.deck_spec,
             color_mapper=mapper,

@@ -71,7 +71,6 @@ class DataTile:
         calc multiple data tiles for color and elevation agg for 3d choropleth
         """
         ret_datatile = {}
-        print(self.cumsum)
         self.passive_chart.y = self.passive_chart.color_column
         ret_datatile[
             self.passive_chart.color_column
