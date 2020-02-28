@@ -14,6 +14,7 @@ const Greys9 = () => ["#000000", "#252525", "#525252", "#737373", "#969696", "#b
 // we subclass from ``LayoutDOM``
 export namespace PolygonDeckGL {
     export type Props = LayoutDOM.Props & {
+        x: p.Property<string>
         layer_spec: p.Property<object>
         deck_spec: p.Property<object>
         data_source: p.Property<ColumnDataSource>
@@ -50,6 +51,7 @@ export class PolygonDeckGL extends LayoutDOM {
     // ``p.String`` in the JS implementatin. Where the JS type system is not yet
     // as rich, you can use ``p.Any`` as a "wildcard" property type.
     this.define<PolygonDeckGL.Props>({
+      x: [p.String],
       layer_spec:   [ p.Any ],
       deck_spec: [ p.Any ],
       data_source: [ p.Instance ],

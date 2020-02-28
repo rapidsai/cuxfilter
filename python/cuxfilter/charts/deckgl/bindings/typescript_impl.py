@@ -163,8 +163,11 @@ export class PolygonDeckGLView extends LayoutDOMView {
   get_data(): Array<any> {
     let data: Array<any>
     const source: any = this.model.data_source.data
+    const x: string = this.model.x
     console.log(this._current_selection)
-    data = parseData(source, this.model.color_mapper, this._current_selection)
+    data = parseData(
+      x, source, this.model.color_mapper, this._current_selection
+    )
     return data
   }
 
@@ -208,10 +211,22 @@ export class PolygonDeckGLView extends LayoutDOMView {
 }
 
 function parseData(
-    obj: any, cm: any, _current_selection: Set<number>
+    x: string, obj: any, cm: any, _current_selection: Set<number>
 ): Array<any> {
 
+  // create a object with x_col values as keys, to later add color properties
+  let value_x_column: any =  obj[x]
   let b: Array<any> = []
+
+  for (let value_x in value_x_column) {
+
+    if (b.length <= +value_x) {
+        b.push({[x]: value_x_column[value_x]})
+    } else {
+        b[parseInt(value_x)][x] = value_x_column[value_x]
+    }
+  }
+
   for (let key in obj) {
       let value = obj[key];
       for (let i in value) {
@@ -234,15 +249,17 @@ function parseData(
           b[parseInt(i)]['color'] = [211, 211, 211, 50]
 
         }
-
-        if (b.length <= +i) {
-            b.push({[key]: value[i]})
-        } else {
-            b[parseInt(i)][key] = value[i]
+        if (key !== x) {
+          if (b.length <= +i) {
+              b.push({[key]: value[i]})
+          } else {
+              b[parseInt(i)][key] = value[i]
+          }
         }
       }
  }
- return b
+
+  return b
 
 }
 
@@ -259,6 +276,7 @@ const Greys9 = () => [
 // we subclass from ``LayoutDOM``
 export namespace PolygonDeckGL {
     export type Props = LayoutDOM.Props & {
+        x: p.Property<string>
         layer_spec: p.Property<object>
         deck_spec: p.Property<object>
         data_source: p.Property<ColumnDataSource>
@@ -296,6 +314,7 @@ export class PolygonDeckGL extends LayoutDOM {
     // yet as rich, you can use ``p.Any`` as a "wildcard" property type.
 
     this.define<PolygonDeckGL.Props>({
+      x: [p.String],
       layer_spec:   [ p.Any ],
       deck_spec: [ p.Any ],
       data_source: [ p.Instance ],

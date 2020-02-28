@@ -228,7 +228,6 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
         groupby_res = (
             data.groupby(by=[chart.x], as_index=False).agg(agg).to_pandas()
         )
-        print(data.groupby(by=[chart.x], as_index=False).agg(agg).to_pandas())
     return groupby_res.to_numpy().transpose()
 
 

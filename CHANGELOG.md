@@ -21,3 +21,4 @@
 - PR #93 Added typescript bindings in conda build package and added tests
 - PR #95 Faster import time, segregated in-notebook asset loading to save import costs, updated tests
 - PR #100 Bug Fixes - Added NaN value handling for custom bin computations in numba kernels
+- PR #104 Bug Fixes - fixed naming issue for geo column for choropleth3d charts, which did not allow all-small-caps names
