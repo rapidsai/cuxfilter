@@ -1,6 +1,7 @@
-# name: cudf_dev10.0
+name: cuxfilter_dev
 channels:
 - rapidsai
+- rapidsai-nightly
 - nvidia
 - conda-forge
 - anaconda
