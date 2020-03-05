@@ -1,3 +1,14 @@
+# cuXfilter 0.13.0 (TBD)
+
+## New Features
+
+- PR #111 Add notebooks testing to CI
+
+## Improvements
+
+## Bug Fixes
+
+
 # cuxfilter 0.2.0 (19 Sep 2019)
 
 ## New Features
