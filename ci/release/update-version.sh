@@ -52,5 +52,5 @@ sed_runner 's/release = .*/release = '"'${NEXT_FULL_TAG}'"'/g' docs/source/conf.
 
 # bump rmm
 for FILE in conda/environments/*.yml; do
-  sed_runner "s/cudf>=.*/cudf>=${NEXT_SHORT_TAG}/g" ${FILE};
+  sed_runner "s/cudf=.*/cudf=${NEXT_SHORT_TAG}/g" ${FILE};
 done

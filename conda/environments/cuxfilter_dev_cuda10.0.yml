@@ -1,13 +1,14 @@
 # name: cudf_dev10.0
 channels:
 - rapidsai
+- rapidsai-nightly
 - nvidia
 - conda-forge
 - anaconda
 dependencies:
 - cupy>=6*
 - python>=3.6,<3.8
-- cudf>=0.13
+- cudf=0.13
 - datashader>=0.10.*
 - geopandas>=0.6.*
 - pyproj>=2.4.*
