@@ -14,7 +14,7 @@ dependencies:
 - pyproj>=2.4.*
 - pandoc=<2.0.0
 - panel=0.6.*
-- bokeh>=1.2.*
+- bokeh=1.*
 - cudatoolkit=9.2
 - recommonmark
 - pytest
