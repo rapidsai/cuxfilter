@@ -1,4 +1,4 @@
-datashader Charts
+Datashader Charts
 ===================
 
 
@@ -19,6 +19,7 @@ Example
     import numpy as np
     import cudf
     import random
+    import cuxfilter
 
     n = 100000                           # Number of points
     start = 1456297053                   # Start time
@@ -52,7 +53,6 @@ Example
     d = cux_df.dashboard([scatter_geo_chart])
     scatter_geo_chart.view()
 
-
 Scatter chart
 -------------
 .. automethod:: datashader.scatter
@@ -74,7 +74,6 @@ Example
 
     d = cux_df.dashboard([scatter_chart])
     scatter_chart.view()
-
 
 Stacked_Lines chart
 -------------------
@@ -101,7 +100,6 @@ Example
 
     stacked_lines_chart.view()
 
-
 Heat Map chart
 --------------
 
@@ -126,5 +124,4 @@ Example
 
 
     d = cux_df.dashboard([chart1], layout=layouts.single_feature, theme=themes.dark)
-
     chart1.view()

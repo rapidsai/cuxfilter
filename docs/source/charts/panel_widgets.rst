@@ -14,12 +14,15 @@ Example
 
     import cudf
     from cuxfilter import charts, DataFrame
+    import cuxfilter
 
     cux_df = DataFrame.from_dataframe(cudf.DataFrame({'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}))
     range_slider = charts.panel_widgets.range_slider('key')
+    #bar_chart_1 = cuxfilter.charts.bokeh.bar('key', 'val', data_points=5, add_interaction=False)
 
     d = cux_df.dashboard([range_slider])
     #view the individual range_slider chart part of the dashboard d
+    #await d.preview()
     range_slider.view()
 
 
@@ -39,6 +42,7 @@ Example
 
     d = cux_df.dashboard([float_slider])
     #view the individual float_slider chart part of the dashboard d
+    #await d.preview()
     float_slider.view()
 
 
@@ -81,7 +85,6 @@ Example
     drop_down.view()
 
 
-
 Multiselect
 -----------
 .. automethod:: panel_widgets.multi_select
@@ -99,4 +102,3 @@ Example
     d = cux_df.dashboard([multi_select])
     #view the individual multi_select chart part of the dashboard d
     multi_select.view()
-
