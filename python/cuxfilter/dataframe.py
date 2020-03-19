@@ -5,6 +5,7 @@ from typing import Type
 from .dashboard import DashBoard
 from .layouts import single_feature
 from .themes import light
+from .assets import notebook_assets
 
 
 def read_arrow(source):
@@ -143,6 +144,9 @@ class DataFrame:
         cuxfilter.DashBoard object
 
         """
+        if notebook_assets.pn.config.js_files == {}:
+            notebook_assets.load_notebook_assets()
+
         return DashBoard(
             charts, self.data, layout, theme, title, data_size_widget, warnings
         )
