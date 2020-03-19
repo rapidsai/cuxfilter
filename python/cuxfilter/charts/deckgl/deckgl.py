@@ -69,13 +69,6 @@ def choropleth3d(
 
     step_size_type: {int, float},  default int
 
-    # x_label_map: dict,  default None
-    #     label maps for x axis
-    #     {value: mapped_str}
-    # y_label_map: dict,  default None
-    #     label maps for y axis
-    #     {value: mapped_str}
-
     geoJSONSource: str
         url to the geoJSON file
 
