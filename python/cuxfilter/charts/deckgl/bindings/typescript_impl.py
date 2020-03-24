@@ -111,6 +111,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
       let options: any = {
           data: this.get_data(),
           ...this._jsonConverter.convert(this.model.layer_spec),
+          getFillColor: (obj: object) => this._getFillColor(obj),
           onClick: (obj: object) => this._onclickHandler(obj),
       }
 
@@ -128,7 +129,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
 
       this._loaded = true
 
-      //console.log("create_deck", this._deckgl)
+      # console.log("create_deck", this._deckgl)
  }
 
  private _update_deck(): void {
@@ -140,6 +141,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
       let options: any = {
           data: this.get_data(),
           ...this._jsonConverter.convert(this.model.layer_spec),
+          getFillColor: (obj: object) => this._getFillColor(obj),
           onClick: (obj: object) => this._onclickHandler(obj),
       }
 
@@ -164,7 +166,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
     let data: Array<any>
     const source: any = this.model.data_source.data
     const x: string = this.model.x
-    console.log(this._current_selection)
+    # console.log(this._current_selection)
     data = parseData(
       x, source, this.model.color_mapper, this._current_selection
     )
@@ -192,12 +194,15 @@ export class PolygonDeckGLView extends LayoutDOMView {
       );
   }
 
+  private _getFillColor(obj: any): void {
+    return obj.__color__
+  }
+
   private _setTooltip(info: any): void {
-    console.log(info)
     if (info.object) {
       let content = ''
       for(let key in info.object){
-        if(key !== 'coordinates' && key !== 'color'){
+        if(key !== 'coordinates' && key !== '__color__'){
           let val = Math.round(info.object[key]*1000000)/1000000
           content += `<b>${key}</b>: ${val} <br/>`
         }
@@ -221,7 +226,6 @@ function parseData(
   let b: Array<any> = []
 
   for (let value_x in value_x_column) {
-
     if (b.length <= +value_x) {
         b.push({[x]: value_x_column[value_x]})
     } else {
@@ -235,20 +239,20 @@ function parseData(
         if( key == cm.name && _current_selection.size == 0){
 
           let buf8_0: string = cm.rgba_mapper.v_compute([value[i]])
-          b[parseInt(i)]['color'] = [
+          b[parseInt(i)]['__color__'] = [
               buf8_0[0], buf8_0[1], buf8_0[2], buf8_0[3]
           ]
 
         }else if( key == cm.name && _current_selection.has(+i)){
 
           let buf8_0: string = cm.rgba_mapper.v_compute([value[i]])
-          b[parseInt(i)]['color'] = [
+          b[parseInt(i)]['__color__'] = [
               buf8_0[0], buf8_0[1], buf8_0[2], buf8_0[3]
           ]
 
         }else if( key == cm.name && !_current_selection.has(+i)){
 
-          b[parseInt(i)]['color'] = [211, 211, 211, 50]
+          b[parseInt(i)]['__color__'] = [211, 211, 211, 50]
 
         }
         if (key !== x) {
