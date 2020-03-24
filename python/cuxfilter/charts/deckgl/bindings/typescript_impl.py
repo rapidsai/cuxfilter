@@ -91,7 +91,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
             },
             id: 'tooltip',
           })
-          document.body.appendChild(this._tooltip)
+          this._container.appendChild(this._tooltip)
         }
 
         // document.body.appendChild(this._container)
@@ -193,17 +193,19 @@ export class PolygonDeckGLView extends LayoutDOMView {
   }
 
   private _setTooltip(info: any): void {
+    console.log(info)
     if (info.object) {
       let content = ''
       for(let key in info.object){
         if(key !== 'coordinates' && key !== 'color'){
-          content += `<b>${key}</b>: ${info.object[key]} <br/>`
+          let val = Math.round(info.object[key]*1000000)/1000000
+          content += `<b>${key}</b>: ${val} <br/>`
         }
       }
       this._tooltip.innerHTML = content
       this._tooltip.style.display = 'block'
-      this._tooltip.style.left = info.x + 'px'
-      this._tooltip.style.top = info.y + 'px'
+      this._tooltip.style.left = (info.x+12) + 'px'
+      this._tooltip.style.top = (info.y+12) + 'px'
     } else {
       this._tooltip.style.display = 'none'
     }
