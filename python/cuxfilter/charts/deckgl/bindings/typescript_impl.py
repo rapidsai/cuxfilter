@@ -103,7 +103,8 @@ export class PolygonDeckGLView extends LayoutDOMView {
               'point-events': 'none',
               'backgroundColor': 'black',
               'color': 'white',
-              'padding': '10px'
+              'padding': '10px',
+              'display': 'none',
             },
             id: 'tooltip',
           })
