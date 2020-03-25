@@ -1,18 +1,9 @@
-from ..core.aggregate import BaseBar, BaseChoropleth, BaseLine
+from ..core.aggregate import BaseBar, BaseLine
 
-import pandas as pd
 import numpy as np
-from typing import Type
 from bokeh import events
 from bokeh.plotting import figure
-import bokeh
-from bokeh.models import (
-    ColumnDataSource,
-    LinearColorMapper,
-    ColorBar,
-    BasicTicker,
-    PrintfTickFormatter,
-)
+from bokeh.models import ColumnDataSource
 
 
 class Bar(BaseBar):

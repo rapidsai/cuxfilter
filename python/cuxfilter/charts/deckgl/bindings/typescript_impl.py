@@ -63,7 +63,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
     })
     this.connect(this.model.data_source.inspect, () => {
       this._update_deck()
-    }) 
+    })
   }
 
   initialize(): void {
@@ -88,7 +88,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
             'backgroundColor': '#787878',
             'color': 'white',
             'padding': '10px',
-            'opacity': 0.8, 
+            'opacity': 0.8,
             'bottom': 0,
             'right': 0,
           },
@@ -111,7 +111,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
           this._container.appendChild(this._tooltip)
         }
 
-        
+
 
         // document.body.appendChild(this._container)
         this.el.appendChild(this._container)
@@ -119,7 +119,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
         console.log(this.model.color_mapper)
         let colors = this.model.color_mapper.palette;
         let layers = this.model.color_mapper.palette;
-        
+
         for (let i = 0; i < layers.length; i++) {
           let layer = layers[i].toString();
           let color = colors[i];
@@ -135,7 +135,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
             },
             class: 'legend-key',
           });
-          
+
           let value = document.createElement('span');
           value.innerHTML = layer;
           item.appendChild(key);
@@ -159,7 +159,9 @@ export class PolygonDeckGLView extends LayoutDOMView {
       let options: any = {
           data: this.get_data(),
           ...this._jsonConverter.convert(this.model.layer_spec),
-          onClick: (obj: object, srcEvent:object) => this._onclickHandler(obj, srcEvent),
+          onClick: (
+            obj: object, srcEvent:object
+          ) => this._onclickHandler(obj, srcEvent),
       }
 
       if(this.model.tooltip){
@@ -188,7 +190,9 @@ export class PolygonDeckGLView extends LayoutDOMView {
       let options: any = {
           data: this.get_data(),
           ...this._jsonConverter.convert(this.model.layer_spec),
-          onClick: (obj: object, srcEvent:object) => this._onclickHandler(obj, srcEvent),
+          onClick: (
+            obj: object, srcEvent:object
+          ) => this._onclickHandler(obj, srcEvent),
       }
 
       if(this.model.tooltip){
@@ -245,7 +249,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
           this._current_selection.add(obj.index)
         }
       }
-      
+
       this.model.data_source.selected.indices = Array.from(
           this._current_selection.values()
       );

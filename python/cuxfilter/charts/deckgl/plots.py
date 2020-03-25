@@ -3,7 +3,6 @@ from .bindings import PolygonDeckGL
 
 import pandas as pd
 import numpy as np
-import panel as pn
 from typing import Type
 from bokeh.models import ColumnDataSource, LinearColorMapper
 import bokeh
