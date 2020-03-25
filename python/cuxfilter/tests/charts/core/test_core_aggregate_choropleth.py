@@ -20,11 +20,21 @@ class TestBaseCholorpleth:
 
     def test_variables(self):
         bc = BaseChoropleth(
-            x="key", geoJSONSource=self.geoJSONSource, nan_color="white"
+            x="key",
+            geoJSONSource=self.geoJSONSource,
+            color_column="val",
+            nan_color="white",
+            elevation_column="val",
         )
-        result = geo_json_mapper(self.geoJSONSource, None)
+        result = geo_json_mapper(self.geoJSONSource, None, projection=4326)
 
         assert bc.chart_type == "choropleth"
+        assert bc.color_column == "val"
+        assert bc.elevation_column == "val"
+        assert bc.color_aggregate_fn == "count"
+        assert bc.elevation_aggregate_fn == "sum"
+        assert bc.color_factor == 1
+        assert bc.elevation_factor == 1
         assert bc.reset_event is None
         assert bc._datatile_loaded_state is False
         assert bc.geo_mapper == result[0]
@@ -33,7 +43,6 @@ class TestBaseCholorpleth:
         assert bc.y is None
         assert bc.data_points == int(100)
         assert bc.add_interaction is True
-        assert bc.aggregate_fn == "count"
         assert bc.width == 800
         assert bc.height == 400
         assert bc.stride is None
@@ -41,7 +50,6 @@ class TestBaseCholorpleth:
         assert bc.geoJSONSource == self.geoJSONSource
         assert bc.geoJSONProperty is None
         assert bc.geo_color_palette is None
-        assert bc.tile_provider is None
         assert bc.library_specific_params["x_range"] == result[1]
         assert bc.library_specific_params["y_range"] == result[2]
         assert "nan_color" not in bc.library_specific_params
@@ -49,7 +57,10 @@ class TestBaseCholorpleth:
 
     def test_initiate_chart(self):
         bc = BaseChoropleth(
-            x="key", geoJSONSource=self.geoJSONSource, nan_color="white"
+            x="key",
+            geoJSONSource=self.geoJSONSource,
+            nan_color="white",
+            color_column="val",
         )
         dashboard = self.cux_df.dashboard(charts=[bc], title="test_title")
 
@@ -64,54 +75,15 @@ class TestBaseCholorpleth:
     @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
     def test_view(self, chart, _chart):
         bc = BaseChoropleth(
-            x="key", geoJSONSource=self.geoJSONSource, nan_color="white"
+            x="key",
+            geoJSONSource=self.geoJSONSource,
+            nan_color="white",
+            color_column="val",
         )
         bc.chart = chart
         bc.width = 400
 
         assert str(bc.view()) == str(chart_view(_chart, width=bc.width))
-
-    @pytest.mark.parametrize(
-        "bc, aggregate_fn, result",
-        [
-            (
-                BaseChoropleth(
-                    x="key",
-                    y="val",
-                    geoJSONSource="./test.geojson",
-                    nan_color="white",
-                ),
-                "mean",
-                {
-                    "X": [0.0, 1.0, 2.0, 3.0, 4.0],
-                    "Y": [10.0, 11.0, 12.0, 13.0, 14.0],
-                },
-            ),
-            (
-                BaseChoropleth(
-                    x="key", geoJSONSource="./test.geojson", nan_color="white"
-                ),
-                "count",
-                {
-                    "X": [0.0, 0.8, 1.6, 2.4000000000000004, 4.0],
-                    "Y": [1, 1, 1, 1, 1],
-                },
-            ),
-        ],
-    )
-    def test_calculate_source(self, bc, aggregate_fn, result):
-        self.result = None
-        dashboard = self.cux_df.dashboard(charts=[bc], title="test_title")
-        bc.initiate_chart(dashboard)
-
-        def func1(dict_temp, patch_update=False):
-            self.result = dict_temp
-
-        bc.aggregate_fn = aggregate_fn
-        bc.format_source_data = func1
-        bc.calculate_source(self.df)
-
-        assert self.result == result
 
     @pytest.mark.parametrize(
         "old, new", [([1], [1, 2]), ([], [1]), ([1], [2])]
@@ -122,6 +94,7 @@ class TestBaseCholorpleth:
             y="val",
             geoJSONSource=self.geoJSONSource,
             nan_color="white",
+            color_column="val",
         )
         dashboard = self.cux_df.dashboard(charts=[bc], title="test_title")
         self.result = None
@@ -142,6 +115,7 @@ class TestBaseCholorpleth:
             y="val",
             geoJSONSource=self.geoJSONSource,
             nan_color="white",
+            color_column="val",
         )
         dashboard = self.cux_df.dashboard(charts=[bc], title="test_title")
         bc.min_value = dashboard._data[bc.x].min()
@@ -172,6 +146,7 @@ class TestBaseCholorpleth:
             y="val",
             geoJSONSource=self.geoJSONSource,
             nan_color="white",
+            color_column="val",
         )
         dashboard = self.cux_df.dashboard(charts=[bc], title="test_title")
         bc.add_interaction = add_interaction
@@ -199,6 +174,7 @@ class TestBaseCholorpleth:
             y="val",
             geoJSONSource=self.geoJSONSource,
             nan_color="white",
+            color_column="val",
         )
         dashboard = self.cux_df.dashboard(charts=[bc], title="test_title")
         self.result = None
@@ -217,5 +193,6 @@ class TestBaseCholorpleth:
             y="val",
             geoJSONSource=self.geoJSONSource,
             nan_color="white",
+            color_column="val",
         )
         assert bc.get_selected_indices() == []

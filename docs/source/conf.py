@@ -88,3 +88,7 @@ htmlhelp_basename = "cuxfilterdoc"
 
 def setup(app):
     app.add_css_file('custom.css')
+    app.add_css_file('https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.0/mapbox-gl.css')
+    app.add_js_file('https://unpkg.com/deck.gl@latest/dist.min.js')
+    app.add_js_file('https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.0/mapbox-gl.js')
+    app.add_js_file('https://unpkg.com/@deck.gl/json@8.1.0/dist.min.js')
