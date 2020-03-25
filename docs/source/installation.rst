@@ -1,22 +1,44 @@
 Installation
 ============
 
-NOTE: cuxfilter is in ongoing development and the installation instructions will be updated in the near future.
+Conda
+-----
+For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the RAPIDS `Get Started Page <https://rapids.ai/start.html#rapids-release-selector>`_.
 
+cuxfilter conda example installation:
 
-Install cuxfilter Nightly(0.12)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: bash
 
-    # for CUDA 9.2
-    conda install -c rapidsai-nightly cuxfilter=0.12 cudatoolkit=9.2
+    conda install -c rapidsai -c nvidia -c conda-forge \
+        -c defaults cuxfilter=0.12 python=3.6 cudatoolkit=10.0
 
-    # or, for CUDA 10.0
-    conda install -c rapidsai-nightly cuxfilter=0.12 cudatoolkit=10.0
+Docker container
+----------------
+For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the RAPIDS `Get Started Page <https://rapids.ai/start.html#rapids-release-selector>`_.
 
-To run the bokeh server in a jupyter lab
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cuxfilter docker example installation:
+
+.. code-block:: bash
+
+    # ex. for CUDA 10.0
+    docker pull rapidsai/rapidsai:cuda10.0-runtime-ubuntu16.04
+    docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 \
+        rapidsai/rapidsai:cuda10.0-runtime-ubuntu16.04
+
+    # open http://localhost:8888
+
+Build/Install from Source
+-------------------------
+
+See `build instructions <https://github.com/rapidsai/cuxfilter/blob/branch-0.13/CONTRIBUTING.md#setting-up-your-build-environment>`_.
+
+
+
+Troubleshooting
+---------------
+
 1. Install jupyterlab dependencies
+**********************************
 
 .. code-block:: bash
 
@@ -25,6 +47,7 @@ To run the bokeh server in a jupyter lab
     jupyter labextension install jupyterlab_bokeh
 
 2.running the server
+********************
 
 .. code-block:: bash
 
@@ -34,10 +57,10 @@ To run the bokeh server in a jupyter lab
     # OR for a separate web app
     d.show(notebook_url='ip.addr:current_port')
 
-Troubleshooting
-~~~~~~~~~~~~~~~
+3. libxcomposite.so.1 not found error
+*************************************
 
-1. If the await d.preview() throws a libxcomposite.so.1 not found error, execute the following commands:
+If using **await d.preview()** throws a **libxcomposite.so.1 not found error**, execute the following commands:
 
 .. code-block:: bash
 
@@ -48,10 +71,12 @@ Download datasets
 -----------------
 
 1. Auto download datasets
+*************************
 
 The notebooks inside `python/notebooks` already have a check function which verifies whether the example dataset is downloaded, and downloads it if it's not.
 
 2. Download manually
+********************
 
 While in the directory you want the datasets to be saved, execute the following
 

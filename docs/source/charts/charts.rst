@@ -7,4 +7,6 @@ Charts
 
    bokeh_charts.rst
    datashader_charts.rst
+   deckgl_charts.rst
    panel_widgets.rst
+   custom_charts.rst

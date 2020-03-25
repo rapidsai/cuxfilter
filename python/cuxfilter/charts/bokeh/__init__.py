@@ -1,1 +1,1 @@
-from .bokeh import bar, choropleth, line
+from .bokeh import bar, line

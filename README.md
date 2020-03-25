@@ -59,11 +59,11 @@ label_map = {1: 'Sunday',    2: 'Monday',    3: 'Tuesday',    4: 'Wednesday',   
 gtc_demo_red_blue_palette = [ (49,130,189), (107,174,214), (123, 142, 216), (226,103,152), (255,0,104) , (50,50,50) ]
 
 #declare charts
-chart1 = cuxfilter.charts.datashader.scatter_geo(x='dropoff_x', y='dropoff_y', aggregate_col='ST_CASE',
+chart1 = cuxfilter.charts.scatter_geo(x='dropoff_x', y='dropoff_y', aggregate_col='ST_CASE',
                                          color_palette=gtc_demo_red_blue_palette)
-chart2 = cuxfilter.charts.panel_widgets.multi_select('YEAR')
-chart3 = cuxfilter.charts.bokeh.bar('DAY_WEEK', x_label_map=label_map)
-chart4 = cuxfilter.charts.bokeh.bar('MONTH')
+chart2 = cuxfilter.charts.multi_select('YEAR')
+chart3 = cuxfilter.charts.bar('DAY_WEEK', x_label_map=label_map)
+chart4 = cuxfilter.charts.bar('MONTH')
 
 #declare dashboard
 d = cux_df.dashboard([chart1, chart2, chart3, chart4], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Auto Accident Dataset')
@@ -89,16 +89,16 @@ cux_df = cuxfilter.DataFrame.from_arrow(DATA_DIR + '/146M_predictions_v2.arrow')
 MAPBOX_API_KEY= "<mapbox-api-key>"
 geoJSONSource='https://raw.githubusercontent.com/rapidsai/cuxfilter/GTC-2018-mortgage-visualization/javascript/demos/GTC%20demo/src/data/zip3-ms-rhs-lessprops.json'
 
-chart0 = cuxfilter.charts.deckgl.choropleth3d( x='zip', color_column='delinquency_12_prediction', color_aggregate_fn='mean',
+chart0 = cuxfilter.charts.choropleth( x='zip', color_column='delinquency_12_prediction', color_aggregate_fn='mean',
             elevation_column='current_actual_upb', elevation_factor=0.00001, elevation_aggregate_fn='sum', 
             geoJSONSource=geoJSONSource, mapbox_api_key=MAPBOX_API_KEY, data_points=1000
 )
-chart2 = cuxfilter.charts.bokeh.bar('delinquency_12_prediction',data_points=50)
-chart3 = cuxfilter.charts.panel_widgets.range_slider('borrower_credit_score',data_points=50)
-chart1 = cuxfilter.charts.panel_widgets.drop_down('dti')
+chart2 = cuxfilter.charts.bar('delinquency_12_prediction',data_points=50)
+chart3 = cuxfilter.charts.range_slider('borrower_credit_score',data_points=50)
+chart1 = cuxfilter.charts.drop_down('dti')
 
 #declare dashboard
-d = cux_df.dashboard([chart0, chart2, chart3, chart4], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Mortgage Dashboard')
+d = cux_df.dashboard([chart0, chart2, chart3, chart1], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Mortgage Dashboard')
 
 #run the dashboard as a webapp:
 d.show('jupyter-notebook/lab-url')
@@ -213,11 +213,11 @@ Currently supported layout templates and example code can be found on the [layou
 ### Currently Supported Charts
 | Library  | Chart type |
 | ------------- | ------------- |
-| bokeh  | bar, line, choropleth  |
+| bokeh  | bar, line  |
 | cudatashader  | scatter, scatter_geo, line, stacked_lines, heatmap |
 | panel_widgets  | range_slider, float_slider, int_slider, drop_down, multi_select  |
 | custom    | view_dataframe |
-| deckgl    | choropleth3d   |
+| deckgl    | choropleth   |
 
 
 ## Contributing Developers Guide
