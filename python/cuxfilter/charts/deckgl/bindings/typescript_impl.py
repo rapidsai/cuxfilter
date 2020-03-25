@@ -36,6 +36,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
   private _jsonConverter: deck.JSONConverter
   private _container: HTMLElement
   private _tooltip: HTMLElement
+  //private _legend: HTMLElement
   private _loaded: boolean = false
   private _current_selection: Set<number>
 
@@ -62,7 +63,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
     })
     this.connect(this.model.data_source.inspect, () => {
       this._update_deck()
-    })
+    }) 
   }
 
   initialize(): void {
@@ -79,13 +80,28 @@ export class PolygonDeckGLView extends LayoutDOMView {
           },
           id: 'deck-gl',
         })
+     /*   this._legend = div({
+          style: {
+            position: 'absolute',
+            'z-index': 1,
+            'point-events': 'none',
+            'backgroundColor': '#787878',
+            'color': 'white',
+            'padding': '10px',
+            'opacity': 0.8, 
+            'bottom': 0,
+            'right': 0,
+          },
+          id: 'legend_deck',
+        })
+        */
         if(this.model.tooltip){
           this._tooltip = div({
             style: {
-              position: 'absolute',
+              'position': 'absolute',
               'z-index': 1,
               'point-events': 'none',
-              'background-color': 'black',
+              'backgroundColor': 'black',
               'color': 'white',
               'padding': '10px'
             },
@@ -94,8 +110,40 @@ export class PolygonDeckGLView extends LayoutDOMView {
           this._container.appendChild(this._tooltip)
         }
 
+        
+
         // document.body.appendChild(this._container)
         this.el.appendChild(this._container)
+/*
+        console.log(this.model.color_mapper)
+        let colors = this.model.color_mapper.palette;
+        let layers = this.model.color_mapper.palette;
+        
+        for (let i = 0; i < layers.length; i++) {
+          let layer = layers[i].toString();
+          let color = colors[i];
+          let item = document.createElement('div');
+          let key = span({
+            style: {
+              'display': 'inline-block',
+              'border-radius': '20%',
+              'width': '10px',
+              'height': '10px',
+              'margin-right': '5px',
+              'background-color': color
+            },
+            class: 'legend-key',
+          });
+          
+          let value = document.createElement('span');
+          value.innerHTML = layer;
+          item.appendChild(key);
+          item.appendChild(value);
+          this._legend.appendChild(item);
+        }
+
+        this._container.appendChild(this._legend)
+*/
 
         const {JSONConverter} = deck;
         this._jsonConverter = new JSONConverter({
@@ -107,12 +155,10 @@ export class PolygonDeckGLView extends LayoutDOMView {
  }
 
  private _create_deck(): void {
-
       let options: any = {
           data: this.get_data(),
           ...this._jsonConverter.convert(this.model.layer_spec),
-          getFillColor: (obj: object) => this._getFillColor(obj),
-          onClick: (obj: object) => this._onclickHandler(obj),
+          onClick: (obj: object, srcEvent:object) => this._onclickHandler(obj, srcEvent),
       }
 
       if(this.model.tooltip){
@@ -129,7 +175,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
 
       this._loaded = true
 
-      # console.log("create_deck", this._deckgl)
+      // console.log("create_deck", this._deckgl)
  }
 
  private _update_deck(): void {
@@ -141,8 +187,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
       let options: any = {
           data: this.get_data(),
           ...this._jsonConverter.convert(this.model.layer_spec),
-          getFillColor: (obj: object) => this._getFillColor(obj),
-          onClick: (obj: object) => this._onclickHandler(obj),
+          onClick: (obj: object, srcEvent:object) => this._onclickHandler(obj, srcEvent),
       }
 
       if(this.model.tooltip){
@@ -166,7 +211,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
     let data: Array<any>
     const source: any = this.model.data_source.data
     const x: string = this.model.x
-    # console.log(this._current_selection)
+    //console.log(this._current_selection)
     data = parseData(
       x, source, this.model.color_mapper, this._current_selection
     )
@@ -183,19 +228,26 @@ export class PolygonDeckGLView extends LayoutDOMView {
 
   }
 
-  private _onclickHandler(obj: any): void {
-      if(!this._current_selection.has(obj.index)){
-        this._current_selection.add(obj.index)
+  private _onclickHandler(obj: any, srcEvent:any): void {
+      if(srcEvent.srcEvent.shiftKey){
+        if(!this._current_selection.has(obj.index)){
+          this._current_selection.add(obj.index)
+        }else{
+          this._current_selection.delete(obj.index)
+        }
       }else{
-        this._current_selection.delete(obj.index)
+        if(this._current_selection.has(obj.index)){
+          this._current_selection.clear()
+        }
+        else{
+          this._current_selection.clear()
+          this._current_selection.add(obj.index)
+        }
       }
+      
       this.model.data_source.selected.indices = Array.from(
           this._current_selection.values()
       );
-  }
-
-  private _getFillColor(obj: any): void {
-    return obj.__color__
   }
 
   private _setTooltip(info: any): void {
