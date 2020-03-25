@@ -11,7 +11,7 @@ from ....assets import geo_json_mapper
 
 class BaseChoropleth(BaseChart):
 
-    chart_type: str = "3d_choropleth"
+    chart_type: str = "choropleth"
     reset_event = None
     _datatile_loaded_state: bool = False
     geo_mapper: Dict[str, str] = {}
@@ -151,11 +151,10 @@ class BaseChoropleth(BaseChart):
             self.geo_mapper, x_range, y_range = geo_json_mapper(
                 self.geoJSONSource, self.geoJSONProperty, projection=4326
             )
-
         self.geo_mapper = pd.DataFrame(
             {
                 self.x: np.array(list(self.geo_mapper.keys())),
-                "coordinates": np.array(list(self.geo_mapper.values())),
+                "coordinates": np.array(self.geo_mapper.values()),
             }
         )
 
