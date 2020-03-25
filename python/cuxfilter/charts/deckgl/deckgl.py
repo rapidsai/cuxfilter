@@ -1,11 +1,11 @@
-from . import plots
 import os
+from . import plots
 
 
-def choropleth3d(
+def choropleth(
     x,
     color_column,
-    elevation_column,
+    elevation_column=None,
     color_aggregate_fn="count",
     color_factor=1,
     elevation_aggregate_fn="sum",
@@ -35,7 +35,7 @@ def choropleth3d(
         column name from the gpu dataframe on which color palettes
         are based on
 
-    elevation_column: str
+    elevation_column: str  | Optional
         column name from the gpu dataframe on which elevation scale
         is based on
 
@@ -100,7 +100,7 @@ def choropleth3d(
     -------
     A bokeh chart object of type 3dchoropleth
     """
-    return plots.Choropleth3d(
+    return plots.Choropleth(
         x,
         color_column,
         elevation_column,
