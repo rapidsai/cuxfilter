@@ -8,6 +8,7 @@ from typing import Type
 from bokeh.models import ColumnDataSource, LinearColorMapper
 import bokeh
 
+
 class Choropleth(BaseChoropleth):
 
     # reset event handling not required, as the default behavior
@@ -124,9 +125,11 @@ class Choropleth(BaseChoropleth):
                 high=np.nanmax(self.source.data[self.color_column]),
                 name=self.color_column,
             )
-        if 'opacity' in self.library_specific_params:
-            self.layer_spec["opacity"] = self.library_specific_params['opacity']
-        
+        if "opacity" in self.library_specific_params:
+            self.layer_spec["opacity"] = self.library_specific_params[
+                "opacity"
+            ]
+
         if self.elevation_column is not None:
             self.layer_spec["getElevation"] = "@@={}*{}".format(
                 self.elevation_column, self.elevation_factor
@@ -142,7 +145,7 @@ class Choropleth(BaseChoropleth):
         self.deck_spec["mapStyle"] = "mapbox://styles/mapbox/{}-v9".format(
             self.map_style
         )
-        
+
         self.chart = PolygonDeckGL(
             x=self.x,
             layer_spec=self.layer_spec,
