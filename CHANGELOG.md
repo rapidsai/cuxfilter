@@ -43,3 +43,4 @@
 - PR #104 Bug Fixes - fixed naming issue for geo column for choropleth3d charts, which did not allow all-small-caps names
 - PR #112 - updated bokeh dependecy to be 1.* instead of >1
 - PR #114 Major refactor - added choropleth(2d and 3d) deckgl chart, updated chart import to skip library names. Major bug fixes
+- PR #122 Critical bug fix - resolves rendering issue related to deckgl charts
