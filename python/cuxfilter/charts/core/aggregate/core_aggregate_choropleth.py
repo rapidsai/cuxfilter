@@ -154,7 +154,7 @@ class BaseChoropleth(BaseChart):
         self.geo_mapper = pd.DataFrame(
             {
                 self.x: np.array(list(self.geo_mapper.keys())),
-                "coordinates": np.array(self.geo_mapper.values()),
+                "coordinates": np.array(list(self.geo_mapper.values())),
             }
         )
 
