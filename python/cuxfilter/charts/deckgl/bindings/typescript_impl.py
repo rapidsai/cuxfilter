@@ -36,6 +36,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
   private _jsonConverter: deck.JSONConverter
   private _container: HTMLElement
   private _tooltip: HTMLElement
+  //private _legend: HTMLElement
   private _loaded: boolean = false
   private _current_selection: Set<number>
 
@@ -79,23 +80,71 @@ export class PolygonDeckGLView extends LayoutDOMView {
           },
           id: 'deck-gl',
         })
+     /*   this._legend = div({
+          style: {
+            position: 'absolute',
+            'z-index': 1,
+            'point-events': 'none',
+            'backgroundColor': '#787878',
+            'color': 'white',
+            'padding': '10px',
+            'opacity': 0.8,
+            'bottom': 0,
+            'right': 0,
+          },
+          id: 'legend_deck',
+        })
+        */
         if(this.model.tooltip){
           this._tooltip = div({
             style: {
-              position: 'absolute',
+              'position': 'absolute',
               'z-index': 1,
               'point-events': 'none',
-              'background-color': 'black',
+              'backgroundColor': 'black',
               'color': 'white',
-              'padding': '10px'
+              'padding': '10px',
+              'display': 'none',
             },
             id: 'tooltip',
           })
-          document.body.appendChild(this._tooltip)
+          this._container.appendChild(this._tooltip)
         }
+
+
 
         // document.body.appendChild(this._container)
         this.el.appendChild(this._container)
+/*
+        console.log(this.model.color_mapper)
+        let colors = this.model.color_mapper.palette;
+        let layers = this.model.color_mapper.palette;
+
+        for (let i = 0; i < layers.length; i++) {
+          let layer = layers[i].toString();
+          let color = colors[i];
+          let item = document.createElement('div');
+          let key = span({
+            style: {
+              'display': 'inline-block',
+              'border-radius': '20%',
+              'width': '10px',
+              'height': '10px',
+              'margin-right': '5px',
+              'background-color': color
+            },
+            class: 'legend-key',
+          });
+
+          let value = document.createElement('span');
+          value.innerHTML = layer;
+          item.appendChild(key);
+          item.appendChild(value);
+          this._legend.appendChild(item);
+        }
+
+        this._container.appendChild(this._legend)
+*/
 
         const {JSONConverter} = deck;
         this._jsonConverter = new JSONConverter({
@@ -107,11 +156,12 @@ export class PolygonDeckGLView extends LayoutDOMView {
  }
 
  private _create_deck(): void {
-
       let options: any = {
           data: this.get_data(),
           ...this._jsonConverter.convert(this.model.layer_spec),
-          onClick: (obj: object) => this._onclickHandler(obj),
+          onClick: (
+            obj: object, srcEvent:object
+          ) => this._onclickHandler(obj, srcEvent),
       }
 
       if(this.model.tooltip){
@@ -128,7 +178,7 @@ export class PolygonDeckGLView extends LayoutDOMView {
 
       this._loaded = true
 
-      //console.log("create_deck", this._deckgl)
+      // console.log("create_deck", this._deckgl)
  }
 
  private _update_deck(): void {
@@ -140,7 +190,9 @@ export class PolygonDeckGLView extends LayoutDOMView {
       let options: any = {
           data: this.get_data(),
           ...this._jsonConverter.convert(this.model.layer_spec),
-          onClick: (obj: object) => this._onclickHandler(obj),
+          onClick: (
+            obj: object, srcEvent:object
+          ) => this._onclickHandler(obj, srcEvent),
       }
 
       if(this.model.tooltip){
@@ -163,8 +215,11 @@ export class PolygonDeckGLView extends LayoutDOMView {
   get_data(): Array<any> {
     let data: Array<any>
     const source: any = this.model.data_source.data
-    console.log(this._current_selection)
-    data = parseData(source, this.model.color_mapper, this._current_selection)
+    const x: string = this.model.x
+    //console.log(this._current_selection)
+    data = parseData(
+      x, source, this.model.color_mapper, this._current_selection
+    )
     return data
   }
 
@@ -178,12 +233,23 @@ export class PolygonDeckGLView extends LayoutDOMView {
 
   }
 
-  private _onclickHandler(obj: any): void {
-      if(!this._current_selection.has(obj.index)){
-        this._current_selection.add(obj.index)
+  private _onclickHandler(obj: any, srcEvent:any): void {
+      if(srcEvent.srcEvent.shiftKey){
+        if(!this._current_selection.has(obj.index)){
+          this._current_selection.add(obj.index)
+        }else{
+          this._current_selection.delete(obj.index)
+        }
       }else{
-        this._current_selection.delete(obj.index)
+        if(this._current_selection.has(obj.index)){
+          this._current_selection.clear()
+        }
+        else{
+          this._current_selection.clear()
+          this._current_selection.add(obj.index)
+        }
       }
+
       this.model.data_source.selected.indices = Array.from(
           this._current_selection.values()
       );
@@ -193,14 +259,15 @@ export class PolygonDeckGLView extends LayoutDOMView {
     if (info.object) {
       let content = ''
       for(let key in info.object){
-        if(key !== 'coordinates' && key !== 'color'){
-          content += `<b>${key}</b>: ${info.object[key]} <br/>`
+        if(key !== 'coordinates' && key !== '__color__'){
+          let val = Math.round(info.object[key]*1000000)/1000000
+          content += `<b>${key}</b>: ${val} <br/>`
         }
       }
       this._tooltip.innerHTML = content
       this._tooltip.style.display = 'block'
-      this._tooltip.style.left = info.x + 'px'
-      this._tooltip.style.top = info.y + 'px'
+      this._tooltip.style.left = (info.x+12) + 'px'
+      this._tooltip.style.top = (info.y+12) + 'px'
     } else {
       this._tooltip.style.display = 'none'
     }
@@ -208,41 +275,54 @@ export class PolygonDeckGLView extends LayoutDOMView {
 }
 
 function parseData(
-    obj: any, cm: any, _current_selection: Set<number>
+    x: string, obj: any, cm: any, _current_selection: Set<number>
 ): Array<any> {
 
+  // create a object with x_col values as keys, to later add color properties
+  let value_x_column: any =  obj[x]
   let b: Array<any> = []
+
+  for (let value_x in value_x_column) {
+    if (b.length <= +value_x) {
+        b.push({[x]: value_x_column[value_x]})
+    } else {
+        b[parseInt(value_x)][x] = value_x_column[value_x]
+    }
+  }
+
   for (let key in obj) {
       let value = obj[key];
       for (let i in value) {
         if( key == cm.name && _current_selection.size == 0){
 
           let buf8_0: string = cm.rgba_mapper.v_compute([value[i]])
-          b[parseInt(i)]['color'] = [
+          b[parseInt(i)]['__color__'] = [
               buf8_0[0], buf8_0[1], buf8_0[2], buf8_0[3]
           ]
 
         }else if( key == cm.name && _current_selection.has(+i)){
 
           let buf8_0: string = cm.rgba_mapper.v_compute([value[i]])
-          b[parseInt(i)]['color'] = [
+          b[parseInt(i)]['__color__'] = [
               buf8_0[0], buf8_0[1], buf8_0[2], buf8_0[3]
           ]
 
         }else if( key == cm.name && !_current_selection.has(+i)){
 
-          b[parseInt(i)]['color'] = [211, 211, 211, 50]
+          b[parseInt(i)]['__color__'] = [211, 211, 211, 50]
 
         }
-
-        if (b.length <= +i) {
-            b.push({[key]: value[i]})
-        } else {
-            b[parseInt(i)][key] = value[i]
+        if (key !== x) {
+          if (b.length <= +i) {
+              b.push({[key]: value[i]})
+          } else {
+              b[parseInt(i)][key] = value[i]
+          }
         }
       }
  }
- return b
+
+  return b
 
 }
 
@@ -259,6 +339,7 @@ const Greys9 = () => [
 // we subclass from ``LayoutDOM``
 export namespace PolygonDeckGL {
     export type Props = LayoutDOM.Props & {
+        x: p.Property<string>
         layer_spec: p.Property<object>
         deck_spec: p.Property<object>
         data_source: p.Property<ColumnDataSource>
@@ -296,6 +377,7 @@ export class PolygonDeckGL extends LayoutDOM {
     // yet as rich, you can use ``p.Any`` as a "wildcard" property type.
 
     this.define<PolygonDeckGL.Props>({
+      x: [p.String],
       layer_spec:   [ p.Any ],
       deck_spec: [ p.Any ],
       data_source: [ p.Instance ],

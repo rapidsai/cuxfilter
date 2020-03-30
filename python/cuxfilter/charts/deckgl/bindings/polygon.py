@@ -12,6 +12,7 @@ class PolygonDeckGL(LayoutDOM):
     # that implements the JavaScript side of the custom extension model.
     __implementation__ = TypeScript(TS_CODE)
 
+    x = String
     layer_spec = Dict(String, Any)
     deck_spec = Dict(String, Any)
     data_source = Instance(ColumnDataSource)

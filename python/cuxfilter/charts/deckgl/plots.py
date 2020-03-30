@@ -1,4 +1,4 @@
-from ..core.aggregate import Base3dChoropleth
+from ..core.aggregate import BaseChoropleth
 from .bindings import PolygonDeckGL
 
 import pandas as pd
@@ -8,7 +8,7 @@ from bokeh.models import ColumnDataSource, LinearColorMapper
 import bokeh
 
 
-class Choropleth3d(Base3dChoropleth):
+class Choropleth(BaseChoropleth):
 
     # reset event handling not required, as the default behavior
     # unselects all selected points, and that is already taken care of
@@ -21,7 +21,7 @@ class Choropleth3d(Base3dChoropleth):
         "getLineWidth": 10,
         "getPolygon": "@@=coordinates",
         "getElevation": "",
-        "getFillColor": "@@=color",
+        "getFillColor": "@@=__color__",
         "stroked": True,
         "filled": True,
         "extruded": True,
@@ -124,10 +124,15 @@ class Choropleth3d(Base3dChoropleth):
                 high=np.nanmax(self.source.data[self.color_column]),
                 name=self.color_column,
             )
+        if "opacity" in self.library_specific_params:
+            self.layer_spec["opacity"] = self.library_specific_params[
+                "opacity"
+            ]
 
-        self.layer_spec["getElevation"] = "@@={}*{}".format(
-            self.elevation_column, self.elevation_factor
-        )
+        if self.elevation_column is not None:
+            self.layer_spec["getElevation"] = "@@={}*{}".format(
+                self.elevation_column, self.elevation_factor
+            )
 
         self.deck_spec["initialViewState"]["latitude"] = self.get_mean(
             self.library_specific_params["y_range"]
@@ -139,7 +144,9 @@ class Choropleth3d(Base3dChoropleth):
         self.deck_spec["mapStyle"] = "mapbox://styles/mapbox/{}-v9".format(
             self.map_style
         )
+
         self.chart = PolygonDeckGL(
+            x=self.x,
             layer_spec=self.layer_spec,
             deck_spec=self.deck_spec,
             color_mapper=mapper,

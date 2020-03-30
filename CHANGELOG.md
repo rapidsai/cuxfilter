@@ -1,3 +1,14 @@
+# cuXfilter 0.13.0 (31 Mar 2020)
+
+## New Features
+
+- PR #111 Add notebooks testing to CI
+
+## Improvements
+
+## Bug Fixes
+
+
 # cuxfilter 0.2.0 (19 Sep 2019)
 
 ## New Features
@@ -19,3 +30,9 @@
 - PR #90 Implemented deck-gl_bokeh plugin and integrated with cuxfilter with layout and theme options
   and added full support for deck.gl/polygon layer
 - PR #93 Added typescript bindings in conda build package and added tests
+- PR #95 Faster import time, segregated in-notebook asset loading to save import costs, updated tests
+- PR #100 Bug Fixes - Added NaN value handling for custom bin computations in numba kernels
+- PR #104 Bug Fixes - fixed naming issue for geo column for choropleth3d charts, which did not allow all-small-caps names
+- PR #112 - updated bokeh dependecy to be 1.* instead of >1
+- PR #114 Major refactor - added choropleth(2d and 3d) deckgl chart, updated chart import to skip library names. Major bug fixes
+- PR #122 Critical bug fix - resolves rendering issue related to deckgl charts

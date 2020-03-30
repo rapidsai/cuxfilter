@@ -346,7 +346,7 @@ class DropDown(BaseWidget):
             }}
             """
         css = css.format(properties_dict["widgets"]["background_color"])
-        pn.extension(raw_css=[css])
+        pn.config.raw_css = pn.config.raw_css + [css]
 
         self.chart.css_classes = ["custom-dropdown"]
 
@@ -454,7 +454,7 @@ class MultiSelect(BaseWidget):
             }}
             """
         css = css.format(properties_dict["widgets"]["background_color"])
-        pn.extension(raw_css=[css])
+        pn.config.raw_css = pn.config.raw_css + [css]
 
         self.chart.css_classes = ["custom-dropdown"]
 
@@ -509,7 +509,7 @@ class DataSizeIndicator(BaseDataSizeIndicator):
             background: purple;
         }
         """
-    pn.extension(raw_css=[css])
+    pn.config.raw_css = pn.config.raw_css + [css]
 
     def format_source_data(self, source_dict, patch_update=False):
         """

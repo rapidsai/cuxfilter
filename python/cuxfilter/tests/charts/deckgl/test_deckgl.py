@@ -26,7 +26,7 @@ class TestDeckGL:
             )
         )
 
-        choropleth3d_chart = charts.deckgl.choropleth3d(
+        choropleth3d_chart = charts.choropleth(
             x="states",
             color_column="val",
             elevation_column="val_t",
@@ -44,7 +44,7 @@ class TestDeckGL:
 
         cux_df.dashboard([choropleth3d_chart])
 
-        assert isinstance(choropleth3d_chart, charts.deckgl.plots.Choropleth3d)
+        assert isinstance(choropleth3d_chart, charts.deckgl.plots.Choropleth)
 
         assert choropleth3d_chart.deck_spec == {
             "mapboxApiAccessToken": None,
@@ -63,7 +63,7 @@ class TestDeckGL:
             "getLineWidth": 10,
             "getPolygon": "@@=coordinates",
             "getElevation": "@@=val_t*100000",
-            "getFillColor": "@@=color",
+            "getFillColor": "@@=__color__",
             "stroked": True,
             "filled": True,
             "extruded": True,

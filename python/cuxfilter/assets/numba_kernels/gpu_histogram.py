@@ -205,15 +205,18 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
 
     if agg is None:
         temp_df = cudf.DataFrame()
-
+        temp_df.index = data.dropna(subset=[chart.x]).index
         temp_df.add_column(
             chart.x,
             get_binwise_reduced_column(
-                data[chart.x].copy().to_gpu_array(), chart.stride, a_x_range
+                data.dropna(subset=[chart.x])[chart.x].copy().to_gpu_array(),
+                chart.stride,
+                a_x_range,
             ),
         )
-        temp_df.add_column(chart.y, data[chart.y].copy().to_gpu_array())
-
+        temp_df.add_column(
+            chart.y, data.dropna(subset=[chart.x])[chart.y].copy()
+        )
         groupby_res = (
             temp_df.groupby(by=[chart.x], as_index=False)
             .agg({chart.y: chart.aggregate_fn})

@@ -22,8 +22,14 @@ project = 'cuxfilter'
 copyright = '2019, NVIDIA'
 author = 'NVIDIA'
 
+# The version info for the project you're documenting, acts as replacement for
+# |version| and |release|, also used in various other places throughout the
+# built documents.
+#
+# The short X.Y version.
+version = '0.13'
 # The full version, including alpha/beta/rc tags
-release = '0.12.1'
+release = '0.13.0'
 
 nbsphinx_allow_errors = True
 # -- General configuration ---------------------------------------------------
@@ -82,3 +88,7 @@ htmlhelp_basename = "cuxfilterdoc"
 
 def setup(app):
     app.add_css_file('custom.css')
+    app.add_css_file('https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.0/mapbox-gl.css')
+    app.add_js_file('https://unpkg.com/deck.gl@latest/dist.min.js')
+    app.add_js_file('https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.0/mapbox-gl.js')
+    app.add_js_file('https://unpkg.com/@deck.gl/json@8.1.0/dist.min.js')
