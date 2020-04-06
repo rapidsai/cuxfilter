@@ -108,9 +108,9 @@ d.show('jupyter-notebook/lab-url')
 
 ## Documentation
 
-Full documentation can be found [on our docs page](https://rapidsai.github.io/cuxfilter/index.html).
+Full documentation can be found [on the RAPIDS docs page](https://docs.rapids.ai/api/cuxfilter/stable/).
 
-Troubleshooting help can be found [on our troubleshooting page](https://rapidsai.github.io/cuxfilter/installation.html#troubleshooting).
+Troubleshooting help can be found [on our troubleshooting page](https://docs.rapids.ai/api/cuxfilter/stable/installation.html#troubleshooting).
 
 
 ## General Dependencies
