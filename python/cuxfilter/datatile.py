@@ -34,8 +34,8 @@ class DataTile:
         """
         if self.passive_chart.chart_type == "datasize_indicator":
             return self._calc_data_tile_for_size(data)
-        elif self.passive_chart.chart_type == "3d_choropleth":
-            return self._calc_3d_choropleth_data_tile(data.copy())
+        elif self.passive_chart.chart_type == "choropleth":
+            return self._calc_choropleth_data_tile(data.copy())
         if self.dimensions == 2:
             return self._calc_2d_data_tile(data.copy())
 
@@ -66,7 +66,7 @@ class DataTile:
             return_format=self.dtype,
         )
 
-    def _calc_3d_choropleth_data_tile(self, data):
+    def _calc_choropleth_data_tile(self, data):
         """
         calc multiple data tiles for color and elevation agg for 3d choropleth
         """
@@ -82,15 +82,16 @@ class DataTile:
             cumsum=self.cumsum,
             return_format=self.dtype,
         )
-        self.passive_chart.y = self.passive_chart.elevation_column
-        ret_datatile[
-            self.passive_chart.elevation_column
-        ] = gpu_datatile.calc_data_tile(
-            data,
-            self.active_chart,
-            self.passive_chart,
-            self.passive_chart.elevation_aggregate_fn,
-            cumsum=self.cumsum,
-            return_format=self.dtype,
-        )
+        if self.passive_chart.elevation_column is not None:
+            self.passive_chart.y = self.passive_chart.elevation_column
+            ret_datatile[
+                self.passive_chart.elevation_column
+            ] = gpu_datatile.calc_data_tile(
+                data,
+                self.active_chart,
+                self.passive_chart,
+                self.passive_chart.elevation_aggregate_fn,
+                cumsum=self.cumsum,
+                return_format=self.dtype,
+            )
         return ret_datatile
