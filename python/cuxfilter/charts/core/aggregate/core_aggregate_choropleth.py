@@ -8,7 +8,7 @@ from ....assets.numba_kernels import calc_groupby
 from ....layouts import chart_view
 from ....assets import geo_json_mapper
 
-np.seterr(divide='ignore', invalid='ignore')
+np.seterr(divide="ignore", invalid="ignore")
 
 
 class BaseChoropleth(BaseChart):
@@ -414,8 +414,8 @@ class BaseChoropleth(BaseChart):
             index = int(
                 round((index - active_chart.min_value) / active_chart.stride)
             )
-            value_sum += np.array(datatile[0][int(index)].loc[
-                self.source.data[self.x]]
+            value_sum += np.array(
+                datatile[0][int(index)].loc[self.source.data[self.x]]
             )
             value_count += np.array(
                 datatile[1][int(index)].loc[self.source.data[self.x]]
@@ -433,7 +433,7 @@ class BaseChoropleth(BaseChart):
         datatile,
         calc_new,
         remove_old,
-        key
+        key,
     ):
         """
         Description:
@@ -522,7 +522,7 @@ class BaseChoropleth(BaseChart):
                     datatile,
                     calc_new,
                     remove_old,
-                    key
+                    key,
                 )
             if isinstance(datatile_result, np.ndarray):
                 self.reset_chart(datatile_result, key)
