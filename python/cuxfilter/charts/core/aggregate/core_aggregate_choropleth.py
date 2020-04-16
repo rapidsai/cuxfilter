@@ -8,6 +8,8 @@ from ....assets.numba_kernels import calc_groupby
 from ....layouts import chart_view
 from ....assets import geo_json_mapper
 
+np.seterr(divide='ignore', invalid='ignore')
+
 
 class BaseChoropleth(BaseChart):
 
@@ -25,11 +27,6 @@ class BaseChoropleth(BaseChart):
     @datatile_loaded_state.setter
     def datatile_loaded_state(self, state: bool):
         self._datatile_loaded_state = state
-        # if self.add_interaction:
-        #     if state:
-        #         self.filter_widget.bar_color = '#8ab4f7'
-        #     else:
-        #         self.filter_widget.bar_color = '#d3d9e2'
 
     def __init__(
         self,
@@ -336,7 +333,7 @@ class BaseChoropleth(BaseChart):
             )
             if key == self.color_column:
                 temp_agg_function = self.color_aggregate_fn
-            else:
+            elif self.elevation_column is not None:
                 temp_agg_function = self.elevation_aggregate_fn
 
             if datatile_index_min == 0:
@@ -407,7 +404,7 @@ class BaseChoropleth(BaseChart):
             datatile_result = datatile_sum_0 / datatile_sum_1
             return datatile_result
 
-        len_y_axis = datatile[0][0][: self.data_points].shape[0]
+        len_y_axis = datatile[0][0].loc[self.source.data[self.x]].shape[0]
 
         datatile_result = np.zeros(shape=(len_y_axis,), dtype=np.float64)
         value_sum = np.zeros(shape=(len_y_axis,), dtype=np.float64)
@@ -417,9 +414,11 @@ class BaseChoropleth(BaseChart):
             index = int(
                 round((index - active_chart.min_value) / active_chart.stride)
             )
-            value_sum += np.array(datatile[0][int(index)][: self.data_points])
+            value_sum += np.array(datatile[0][int(index)].loc[
+                self.source.data[self.x]]
+            )
             value_count += np.array(
-                datatile[1][int(index)][: self.data_points]
+                datatile[1][int(index)].loc[self.source.data[self.x]]
             )
 
         datatile_result = value_sum / value_count
@@ -434,6 +433,7 @@ class BaseChoropleth(BaseChart):
         datatile,
         calc_new,
         remove_old,
+        key
     ):
         """
         Description:
@@ -449,12 +449,12 @@ class BaseChoropleth(BaseChart):
             return datatile_result
 
         if len(old_indices) == 0 or old_indices == [""]:
-            len_y_axis = datatile[0][: self.data_points].shape[0]
+            len_y_axis = datatile[0].loc[self.source.data[self.x]].shape[0]
             datatile_result = np.zeros(shape=(len_y_axis,), dtype=np.float64)
         else:
-            len_y_axis = datatile[0][: self.data_points].shape[0]
+            len_y_axis = datatile[0].loc[self.source.data[self.x]].shape[0]
             datatile_result = np.array(
-                self.get_source_y_axis(), dtype=np.float64
+                self.source.data[key], dtype=np.float64
             )[:len_y_axis]
 
         for index in calc_new:
@@ -462,7 +462,7 @@ class BaseChoropleth(BaseChart):
                 round((index - active_chart.min_value) / active_chart.stride)
             )
             datatile_result += np.array(
-                datatile[int(index)][: self.data_points]
+                datatile[int(index)].loc[self.source.data[self.x]]
             )
 
         for index in remove_old:
@@ -470,9 +470,8 @@ class BaseChoropleth(BaseChart):
                 round((index - active_chart.min_value) / active_chart.stride)
             )
             datatile_result -= np.array(
-                datatile[int(index)][: self.data_points]
+                datatile[int(index)].loc[self.source.data[self.x]]
             )
-
         return datatile_result
 
     def query_chart_by_indices(
@@ -503,7 +502,7 @@ class BaseChoropleth(BaseChart):
 
             if key == self.color_column:
                 temp_agg_function = self.color_aggregate_fn
-            else:
+            elif self.elevation_column is not None:
                 temp_agg_function = self.elevation_aggregate_fn
 
             if temp_agg_function == "mean":
@@ -523,6 +522,7 @@ class BaseChoropleth(BaseChart):
                     datatile,
                     calc_new,
                     remove_old,
+                    key
                 )
             if isinstance(datatile_result, np.ndarray):
                 self.reset_chart(datatile_result, key)
