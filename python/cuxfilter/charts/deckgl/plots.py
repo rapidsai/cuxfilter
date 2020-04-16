@@ -67,7 +67,6 @@ class Choropleth(BaseChoropleth):
             result_df["index"] = result_df.index
             result_df = result_df.dropna(subset=["coordinates"])
 
-            self.retained_indices = result_df.index.tolist()
             self.source_backup = result_df
 
             result_np = result_df.values
@@ -87,8 +86,6 @@ class Choropleth(BaseChoropleth):
             result_df["index"] = result_df.index
 
             result_df = result_df.dropna(subset=["coordinates"])
-
-            self.retained_indices = result_df.index.tolist()
 
             result_np = result_df.values
 
@@ -194,8 +191,6 @@ class Choropleth(BaseChoropleth):
         if column is None:
             self.source.patch(self.source_backup.to_dict(orient="list"))
         else:
-            # verifying length is same as x axis
-            data = np.take(data, self.retained_indices)
             x_axis_len = self.source.data[self.x].size
             data = data[:x_axis_len]
 
