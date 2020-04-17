@@ -229,26 +229,26 @@ class DashBoard:
         """
         use nullmasks to query to prevent higher GPU memory spike
         """
-        temp_query_array = query_str.split('and')
+        temp_query_array = query_str.split("and")
         mask_ = cp.full(df.shape[0], True)
         for temp_query in temp_query_array:
-            if '<=' in temp_query:
-                temp_query = temp_query.split('<=')
+            if "<=" in temp_query:
+                temp_query = temp_query.split("<=")
                 min_, max_, col = (
                     float(temp_query[0].strip()),
                     float(temp_query[2].strip()),
-                    temp_query[1].strip()
+                    temp_query[1].strip(),
                 )
                 mask_ = mask_ & (df[col] >= min_) & (df[col] <= max_)
-            elif '==' in temp_query:
-                temp_query = temp_query.split('==')
+            elif "==" in temp_query:
+                temp_query = temp_query.split("==")
                 val_, col = temp_query[1].strip(), temp_query[0].strip()
                 mask_ = mask_ & (df[col] == val_)
 
-        if(mask_.sum() != len(df)):
+        if mask_.sum() != len(df):
             df = df[mask_]
             df.index = cudf.core.RangeIndex(0, len(df))
-        del(mask_)
+        del mask_
         return df
 
     def _query(self, query_str, inplace=False):
