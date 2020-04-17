@@ -7,7 +7,6 @@ from ....layouts import chart_view
 
 class BaseLine(BaseAggregateChart):
     chart_type: str = "line"
-    stride = 0.0
     reset_event = None
     _datatile_loaded_state: bool = False
     filter_widget = None
@@ -127,9 +126,11 @@ class BaseLine(BaseAggregateChart):
         """
         if self.y == self.x or self.y is None:
             # it's a histogram
-            df = calc_value_counts(
-                data[self.x].to_gpu_array(), self.data_points
-            )
+            df = data[self.x].value_counts().sort_index()
+            df = [
+                df.index.to_array(),
+                df.to_array()
+            ]
         else:
             self.aggregate_fn = "mean"
             df = calc_groupby(self, data)
