@@ -1,7 +1,7 @@
 import panel as pn
 
 from .core_aggregate import BaseAggregateChart
-from ....assets.numba_kernels import calc_value_counts, calc_groupby
+from ....assets.numba_kernels import calc_groupby
 from ....layouts import chart_view
 
 
@@ -127,10 +127,7 @@ class BaseLine(BaseAggregateChart):
         if self.y == self.x or self.y is None:
             # it's a histogram
             df = data[self.x].value_counts().sort_index()
-            df = [
-                df.index.to_array(),
-                df.to_array()
-            ]
+            df = [df.index.to_array(), df.to_array()]
         else:
             self.aggregate_fn = "mean"
             df = calc_groupby(self, data)
