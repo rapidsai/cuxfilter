@@ -45,3 +45,4 @@
 - PR #114 Major refactor - added choropleth(2d and 3d) deckgl chart, updated chart import to skip library names. Major bug fixes
 - PR #122 Critical bug fix - resolves rendering issue related to deckgl charts
 - PR #127 fixed logic for calculating datatiles for 2d and 3d choropleth charts
+- PR #128 Bug fixes and test updates
