@@ -40,19 +40,17 @@ class BaseChart:
         if value is None:
             self._stride = None
         else:
-            # value = round(value, 2)
             if self.stride_type == int:
                 value = self.stride_type(value)
             if self.stride_type(value) == self.stride_type(0):
                 value = self.stride_type(1.0)
             temp_max_val = self.max_value
-            if self.min_value == 0:
-                temp_max_val += 1
+
             if self.data_points != int(
-                round((temp_max_val - self.min_value) / value)
+                round((temp_max_val - (self.min_value - 1)) / value)
             ):
                 self.data_points = int(
-                    round((temp_max_val - self.min_value) / value)
+                    round((temp_max_val - (self.min_value - 1)) / value)
                 )
             self._stride = value
 
