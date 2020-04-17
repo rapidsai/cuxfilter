@@ -235,7 +235,7 @@ class DashBoard:
             else:
                 self._data = self._backup_data
         else:
-            temp_data = self._backup_data.query(query_str)
+            temp_data = self._data.query(query_str)
             return temp_data
 
     def _generate_query_str(self, ignore_chart=""):
