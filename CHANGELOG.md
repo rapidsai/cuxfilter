@@ -3,19 +3,46 @@
 ## New Features
 
 ## Improvements
+- PR #129 optimizations to grouby query, using boolean masks
 
 ## Bug Fixes
+- PR #127 fixed logic for calculating datatiles for 2d and 3d choropleth charts
+- PR #128 Bug fixes and test updates
 
-# cuXfilter 0.13.0 (TBD)
+# cuXfilter 0.13.0 (31 March 2020)
 
 ## New Features
 
 - PR #111 Add notebooks testing to CI
 
 ## Improvements
+- PR #95 Faster import time, segregated in-notebook asset loading to save import costs, updated tests
+- PR #114 Major refactor - added choropleth(2d and 3d) deckgl chart, updated chart import to skip library names. Major bug fixes
 
 ## Bug Fixes
+- PR #100 Bug Fixes - Added NaN value handling for custom bin computations in numba kernels
+- PR #104 Bug Fixes - fixed naming issue for geo column for choropleth3d charts, which did not allow all-small-caps names
+- PR #112 - updated bokeh dependecy to be 1.* instead of >1
+- PR #122 Critical bug fix - resolves rendering issue related to deckgl charts
 
+# cuXfilter 0.12.0 (4 Feb 2020)
+
+## New Features
+
+- PR #111 Add notebooks testing to CI
+
+## Improvements
+- PR #84 Updated Docs and Readme with conda nightly install instructions for cuxfilter version 0.12
+- PR #86 Implemented #79 - cudatashader replaced by datashader(>=0.9) with cudf & dask_cudf support
+- PR #90 Implemented deck-gl_bokeh plugin and integrated with cuxfilter with layout and theme options
+- PR #93 Added typescript bindings in conda build package and added tests
+- PR #89 Fixed headless chrome sandbox for dashboard preview feature issue mentioned in #88
+  and added full support for deck.gl/polygon layer
+- PR #87 Implemented jupyter-server-proxy as discussed in #73
+
+## Bug Fixes
+- PR #78 Fix gpuCI GPU build script
+- PR #83 Fix conda upload
 
 # cuxfilter 0.2.0 (19 Sep 2019)
 
@@ -29,20 +56,3 @@
 
 ## Bug Fixes
 
-- PR #78 Fix gpuCI GPU build script
-- PR #83 Fix conda upload
-- PR #84 Updated Docs and Readme with conda nightly install instructions for cuxfilter version 0.12
-- PR #86 Implemented #79 - cudatashader replaced by datashader(>=0.9) with cudf & dask_cudf support
-- PR #87 Implemented jupyter-server-proxy as discussed in #73
-- PR #89 Fixed headless chrome sandbox for dashboard preview feature issue mentioned in #88
-- PR #90 Implemented deck-gl_bokeh plugin and integrated with cuxfilter with layout and theme options
-  and added full support for deck.gl/polygon layer
-- PR #93 Added typescript bindings in conda build package and added tests
-- PR #95 Faster import time, segregated in-notebook asset loading to save import costs, updated tests
-- PR #100 Bug Fixes - Added NaN value handling for custom bin computations in numba kernels
-- PR #104 Bug Fixes - fixed naming issue for geo column for choropleth3d charts, which did not allow all-small-caps names
-- PR #112 - updated bokeh dependecy to be 1.* instead of >1
-- PR #114 Major refactor - added choropleth(2d and 3d) deckgl chart, updated chart import to skip library names. Major bug fixes
-- PR #122 Critical bug fix - resolves rendering issue related to deckgl charts
-- PR #127 fixed logic for calculating datatiles for 2d and 3d choropleth charts
-- PR #128 Bug fixes and test updates
