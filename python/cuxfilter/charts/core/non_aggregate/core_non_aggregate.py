@@ -64,7 +64,7 @@ class BaseNonAggregate(BaseChart):
 
     def get_selection_geometry_callback(self, dashboard_cls):
         """
-        Description: generate callback for choropleth selection evetn
+        Description: generate callback for map selection event
         -------------------------------------------
         Input:
 
