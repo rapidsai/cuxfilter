@@ -203,6 +203,8 @@ class BaseLine(BaseAggregateChart):
             query_str_dict[self.name] = (
                 str(min_temp) + "<=" + str(self.x) + "<=" + str(max_temp)
             )
+        else:
+            query_str_dict.pop(self.name, None)
 
     def add_events(self, dashboard_cls):
         """

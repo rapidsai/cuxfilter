@@ -95,6 +95,8 @@ class RangeSlider(BaseWidget):
             query_str_dict[self.name] = (
                 str(min_temp) + "<=" + str(self.x) + "<=" + str(max_temp)
             )
+        else:
+            query_str_dict.pop(self.name, None)
 
 
 class IntSlider(BaseWidget):
@@ -178,7 +180,12 @@ class IntSlider(BaseWidget):
         query_dict:
             reference to dashboard.__cls__.query_dict
         """
-        query_str_dict[self.name] = str(self.x) + "==" + str(self.chart.value)
+        if len(str(self.chart.value)) > 0:
+            query_str_dict[self.name] = (
+                str(self.x) + "==" + str(self.chart.value)
+            )
+        else:
+            query_str_dict.pop(self.name, None)
 
 
 class FloatSlider(BaseWidget):
@@ -273,7 +280,12 @@ class FloatSlider(BaseWidget):
         query_dict:
             reference to dashboard.__cls__.query_dict
         """
-        query_str_dict[self.name] = str(self.x) + "==" + str(self.chart.value)
+        if len(str(self.chart.value)) > 0:
+            query_str_dict[self.name] = (
+                str(self.x) + "==" + str(self.chart.value)
+            )
+        else:
+            query_str_dict.pop(self.name, None)
 
 
 class DropDown(BaseWidget):
@@ -379,6 +391,8 @@ class DropDown(BaseWidget):
             query_str_dict[self.name] = (
                 str(self.x) + "==" + str(self.chart.value)
             )
+        else:
+            query_str_dict.pop(self.name, None)
 
 
 class MultiSelect(BaseWidget):
