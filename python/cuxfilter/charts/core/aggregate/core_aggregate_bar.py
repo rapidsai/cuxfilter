@@ -208,6 +208,8 @@ class BaseBar(BaseAggregateChart):
                 + str(self.stride_type(max_temp))
             )
             query_str_dict[self.name] = query
+        else:
+            query_str_dict.pop(self.name, None)
 
     def add_events(self, dashboard_cls):
         """
