@@ -169,6 +169,8 @@ class BaseStackedLine(BaseChart):
                 + " <= "
                 + str(self.x_range[1])
             )
+        else:
+            query_str_dict.pop(self.name, None)
 
     def add_events(self, dashboard_cls):
         """

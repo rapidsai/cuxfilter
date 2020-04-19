@@ -1,7 +1,7 @@
 import panel as pn
 
 from .core_aggregate import BaseAggregateChart
-from ....assets.numba_kernels import calc_groupby
+from ....assets.numba_kernels import calc_groupby, calc_value_counts
 from ....layouts import chart_view
 
 
@@ -126,8 +126,13 @@ class BaseLine(BaseAggregateChart):
         """
         if self.y == self.x or self.y is None:
             # it's a histogram
-            df = data[self.x].value_counts().sort_index()
-            df = [df.index.to_array(), df.to_array()]
+            if self.data_points == data[self.x].nunique():
+                df = data[self.x].value_counts().sort_index()
+                df = [df.index.to_array(), df.to_array()]
+            else:
+                df = calc_value_counts(
+                    data[self.x].to_gpu_array(), self.data_points
+                )
         else:
             self.aggregate_fn = "mean"
             df = calc_groupby(self, data)
@@ -198,6 +203,8 @@ class BaseLine(BaseAggregateChart):
             query_str_dict[self.name] = (
                 str(min_temp) + "<=" + str(self.x) + "<=" + str(max_temp)
             )
+        else:
+            query_str_dict.pop(self.name, None)
 
     def add_events(self, dashboard_cls):
         """
