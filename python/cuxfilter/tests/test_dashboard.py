@@ -61,7 +61,7 @@ class TestDashBoard:
             ),
         ],
     )
-    def test__query(self, query, inplace, result1, result2):
+    def test_query(self, query, inplace, result1, result2):
         df = cudf.DataFrame(
             {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
         )
@@ -107,13 +107,16 @@ class TestDashBoard:
         ],
     )
     def test_export(self, active_view, result):
+        dashboard = self.cux_df.dashboard(charts=[], title="test_title")
+
         bac = bokeh.bar("key")
         bac.chart_type = "chart_1"
-        self.dashboard.add_charts([bac])
-        self.dashboard._query_str_dict = {"key_chart_1": "0<=key<=3"}
-        self.dashboard._active_view = active_view
+        dashboard.add_charts([bac])
+        print(bac.filter_widget.value)
+        bac.filter_widget.value = (0, 3)
+        dashboard._active_view = active_view
 
-        assert self.dashboard.export().to_string() == result
+        assert dashboard.export().to_string() == result
 
     # unit tests for datatile and query functions are already
     # present in core_aggregate and core_non_aggregate test files
