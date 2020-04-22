@@ -7,7 +7,7 @@
 
 ## Bug Fixes
 - PR #127 fixed logic for calculating datatiles for 2d and 3d choropleth charts
-- PR #128 Bug fixes and test updates
+- PR #128, #130 Bug fixes and test updates
 
 # cuXfilter 0.13.0 (31 March 2020)
 
