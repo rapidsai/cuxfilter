@@ -5,8 +5,6 @@ import uuid
 from panel.io.server import _origin_url, get_server
 from bokeh.embed import server_document
 import re
-import cupy as cp
-import cudf
 
 from .charts.core.core_chart import BaseChart
 from .datatile import DataTile
@@ -225,32 +223,6 @@ class DashBoard:
                     chart.initiate_chart(self)
                     chart._initialized = True
 
-    def _custom_query(self, df, query_str):
-        """
-        use nullmasks to query to prevent higher GPU memory spike
-        """
-        temp_query_array = query_str.split("and")
-        mask_ = cp.full(df.shape[0], True)
-        for temp_query in temp_query_array:
-            if "<=" in temp_query:
-                temp_query = temp_query.split("<=")
-                min_, max_, col = (
-                    float(temp_query[0].strip()),
-                    float(temp_query[2].strip()),
-                    temp_query[1].strip(),
-                )
-                mask_ = mask_ & (df[col] >= min_) & (df[col] <= max_)
-            elif "==" in temp_query:
-                temp_query = temp_query.split("==")
-                val_, col = temp_query[1].strip(), temp_query[0].strip()
-                mask_ = mask_ & (df[col] == val_)
-
-        if mask_.sum() != len(df):
-            df = df[mask_]
-            df.index = cudf.core.RangeIndex(0, len(df))
-        del mask_
-        return df
-
     def _query(self, query_str, inplace=False):
         """
         Query the cudf.DataFrame, inplace or create a copy based on the
@@ -258,15 +230,10 @@ class DashBoard:
         """
         if inplace:
             if len(query_str) > 0:
-                # print('inplace querying')
-                # self._data = self._custom_query(
-                #     self._backup_data, query_str
-                # ).copy()
                 self._data = self._backup_data.query(query_str).copy()
             else:
                 self._data = self._backup_data
         else:
-            # temp_data = self._custom_query(self._data, query_str)
             temp_data = self._data.query(query_str)
             return temp_data
 
@@ -342,9 +309,6 @@ class DashBoard:
 
             if len(self._generate_query_str()) > 0:
                 print("final query", self._generate_query_str())
-                # return self._custom_query(
-                #     self._backup_data, self._generate_query_str()
-                # )
                 return self._backup_data.query(self._generate_query_str())
             else:
                 print("no querying done, returning original dataframe")

@@ -207,6 +207,7 @@ class ScatterGeo(BaseScatterGeo):
         """
 
         def temp_callback(event):
+            print(event)
             xmin, xmax = event.geometry["x0"], event.geometry["x1"]
             ymin, ymax = event.geometry["y0"], event.geometry["y1"]
             callback(xmin, xmax, ymin, ymax)
@@ -222,7 +223,7 @@ class ScatterGeo(BaseScatterGeo):
             self.color_palette = properties_dict["chart_color"][
                 "color_palette"
             ]
-            self.generate_chart()
+            self.interactive_image.update_chart()
         self.chart.xgrid.grid_line_color = properties_dict["geo_charts_grids"][
             "xgrid"
         ]
@@ -466,7 +467,7 @@ class Scatter(BaseScatter):
             self.color_palette = properties_dict["chart_color"][
                 "color_palette"
             ]
-            self.generate_chart()
+            self.interactive_image.update_chart()
         self.chart.xgrid.grid_line_color = properties_dict["geo_charts_grids"][
             "xgrid"
         ]
@@ -705,7 +706,7 @@ class Line(BaseLine):
         """
         if self.no_color_set:
             self.color = properties_dict["chart_color"]["color"]
-            self.generate_chart()
+            self.interactive_image.update_chart()
         self.chart.xgrid.grid_line_color = properties_dict["geo_charts_grids"][
             "xgrid"
         ]
@@ -961,7 +962,7 @@ class StackedLines(BaseStackedLine):
             self.colors = [properties_dict["chart_color"]["color"]] * len(
                 self.y
             )
-            self.generate_chart()
+            self.interactive_image.update_chart()
         self.chart.xgrid.grid_line_color = properties_dict["geo_charts_grids"][
             "xgrid"
         ]
