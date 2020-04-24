@@ -20,6 +20,8 @@ class BaseAggregateChart(BaseChart):
 
         Ouput:
         """
+        indices = list(datatile.index)
+
         min_val, max_val = query_tuple
         datatile_index_min = int(
             round((min_val - active_chart.min_value) / active_chart.stride)
@@ -57,7 +59,12 @@ class BaseAggregateChart(BaseChart):
                 datatile_max = datatile.loc[:, datatile_index_max]
                 datatile_min = datatile.loc[:, datatile_index_min]
                 datatile_result = np.array(datatile_max - datatile_min)
-        self.reset_chart(datatile_result)
+        if len(datatile_result) != len(self.source_backup):
+            res_final = np.zeros(len(self.source_backup))
+            np.put(res_final, indices, datatile_result)
+            self.reset_chart(res_final)
+        else:
+            self.reset_chart(datatile_result)
 
     def query_chart_by_indices_for_mean(
         self,

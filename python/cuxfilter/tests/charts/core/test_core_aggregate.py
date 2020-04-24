@@ -81,6 +81,13 @@ class TestCoreAggregateChart:
 
         active_chart.reset_chart = reset_chart
 
+        active_chart.source_backup = pd.DataFrame(
+            {
+                "x": {0: 0.0, 1: 1.0, 2: 2.0, 4: 3.0, 5: 4.0},
+                "top": {0: 0.0, 1: 1.0, 2: 2.0, 4: 3.0, 5: 4.0},
+            }
+        )
+
         datatile = pd.DataFrame(
             {
                 0: {0: 0.0, 1: 0.0, 2: 0.0, 4: 0.0, 5: 4.0},

@@ -234,8 +234,7 @@ class DashBoard:
             else:
                 self._data = self._backup_data
         else:
-            temp_data = self._data.query(query_str)
-            return temp_data
+            return self._backup_data.query(query_str).copy()
 
     def _generate_query_str(self, ignore_chart=""):
         """
@@ -549,45 +548,21 @@ class DashBoard:
         """
         Calculate data tiles for all aggregate type charts.
         """
-        query_str = self._generate_query_str(self._charts[self._active_view])
+        # query_str = self._generate_query_str(self._charts[self._active_view])
 
         # NO DATATILES for scatter types, as they are essentially all
         # points in the dataset
         if "scatter" not in self._active_view:
             for chart in list(self._charts.values()):
                 if not chart.use_data_tiles:
-                    # if chart.chart_type == 'view_dataframe':
-                    #     self._data_tiles[chart.name] = self._data
-                    # else:
                     self._data_tiles[chart.name] = None
                 elif self._active_view != chart.name:
-                    temp_query_str = self._generate_query_str(
-                        ignore_chart=chart
-                    )
-
-                    if temp_query_str == query_str:
-                        self._data_tiles[chart.name] = DataTile(
-                            self._charts[self._active_view],
-                            chart,
-                            dtype="pandas",
-                            cumsum=cumsum,
-                        ).calc_data_tile(self._data)
-                    elif len(temp_query_str) == 0:
-                        self._data_tiles[chart.name] = DataTile(
-                            self._charts[self._active_view],
-                            chart,
-                            dtype="pandas",
-                            cumsum=cumsum,
-                        ).calc_data_tile(self._backup_data)
-                    else:
-                        self._data_tiles[chart.name] = DataTile(
-                            self._charts[self._active_view],
-                            chart,
-                            dtype="pandas",
-                            cumsum=cumsum,
-                        ).calc_data_tile(
-                            self._query(temp_query_str, inplace=False)
-                        )
+                    self._data_tiles[chart.name] = DataTile(
+                        self._charts[self._active_view],
+                        chart,
+                        dtype="pandas",
+                        cumsum=cumsum,
+                    ).calc_data_tile(self._data)
 
         self._charts[self._active_view].datatile_loaded_state = True
 
