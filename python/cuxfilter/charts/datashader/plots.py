@@ -207,7 +207,6 @@ class ScatterGeo(BaseScatterGeo):
         """
 
         def temp_callback(event):
-            print(event)
             xmin, xmax = event.geometry["x0"], event.geometry["x1"]
             ymin, ymax = event.geometry["y0"], event.geometry["y1"]
             callback(xmin, xmax, ymin, ymax)
