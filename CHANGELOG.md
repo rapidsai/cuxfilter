@@ -9,6 +9,7 @@
 - PR #127 fixed logic for calculating datatiles for 2d and 3d choropleth charts
 - PR #128, #130 Bug fixes and test updates
 - PR #131 Filter fix for non aggregate charts(scatter, scattter-geo, line, stacked-lines, heatmap)
+- PR #132 Aggregate filter accuracy fix
 
 # cuXfilter 0.13.0 (31 March 2020)
 
