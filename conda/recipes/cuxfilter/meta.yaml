@@ -31,6 +31,7 @@ requirements:
     - bokeh =1.*
     - pyproj  >=2.4.*
     - geopandas >=0.6.*
+    - nodejs
     - pyppeteer
     - jupyter-server-proxy
 

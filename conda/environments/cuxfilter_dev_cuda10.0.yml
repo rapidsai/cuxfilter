@@ -16,6 +16,7 @@ dependencies:
 - panel=0.6.*
 - bokeh=1.*
 - cudatoolkit=10.0
+- nodejs
 - recommonmark
 - pytest
 - sphinx
