@@ -100,7 +100,7 @@ class BaseNonAggregate(BaseChart):
 
             dashboard_cls._query_str_dict[self.name] = query
             temp_data = dashboard_cls._query(
-                dashboard_cls._query_str_dict[self.name]
+                dashboard_cls._generate_query_str()
             )
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(
