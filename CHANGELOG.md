@@ -4,6 +4,7 @@
 
 ## Improvements
 - PR #129 optimizations to grouby query, using boolean masks
+- PR #135 implemented stateless non-aggregate querying
 
 ## Bug Fixes
 - PR #127 fixed logic for calculating datatiles for 2d and 3d choropleth charts
