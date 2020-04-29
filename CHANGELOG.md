@@ -1,6 +1,7 @@
 # cuXfilter 0.14.0 (Date TBD)
 
 ## New Features
+ - PR #136 Local gpuCI build script
 
 ## Improvements
 - PR #129 optimizations to grouby query, using boolean masks
