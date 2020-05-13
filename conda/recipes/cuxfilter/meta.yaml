@@ -25,6 +25,8 @@ requirements:
   run:
     - python
     - cudf {{ minor_version }}
+    - dask-cudf {{ minor_version }}
+    - dask-cuda {{ minor_version }}
     - datashader >=0.10.*
     - cupy  >=6*
     - panel 0.6.*
