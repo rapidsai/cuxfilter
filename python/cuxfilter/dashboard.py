@@ -5,6 +5,7 @@ import uuid
 from panel.io.server import _origin_url, get_server
 from bokeh.embed import server_document
 import re
+import dask_cudf
 
 from .charts.core.core_chart import BaseChart
 from .datatile import DataTile
@@ -230,11 +231,17 @@ class DashBoard:
         """
         if inplace:
             if len(query_str) > 0:
-                self._data = self._backup_data.query(query_str).copy()
+                if type(self._data) == dask_cudf.core.DataFrame:
+                    self._data = self._backup_data.query(query_str).compute()
+                else:
+                    self._data = self._backup_data.query(query_str).copy()
             else:
                 self._data = self._backup_data
         else:
-            return self._backup_data.query(query_str).copy()
+            if type(self._data) == dask_cudf.core.DataFrame:
+                return self._backup_data.query(query_str).compute()
+            else:
+                return self._backup_data.query(query_str).copy()
 
     def _generate_query_str(self, ignore_chart=""):
         """
