@@ -1,8 +1,5 @@
-import numpy as np
-from numba import cuda
 import cudf
 import dask_cudf
-import numba
 import gc
 from typing import Type
 
@@ -80,12 +77,8 @@ def aggregated_column_unique(chart: Type[BaseChart], data):
         list_of_unique_values
     """
 
-    a_range = cuda.to_device(np.array([chart.min_value, chart.max_value]))
     temp_df = cudf.DataFrame()
     temp_df.add_column(
-        chart.x,
-        get_binwise_reduced_column(
-            data[chart.x].copy().to_gpu_array(), chart.stride, a_range
-        ),
+        chart.x, (data[chart.x] / chart.stride) - chart.min_value
     )
     return temp_df[chart.x].unique().to_pandas().tolist()
