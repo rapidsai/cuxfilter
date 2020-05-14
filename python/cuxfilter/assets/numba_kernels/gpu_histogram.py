@@ -49,8 +49,7 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
         temp_df = cudf.DataFrame()
         temp_df.index = data.dropna(subset=[chart.x]).index
         temp_df.add_column(
-            chart.x,
-            (data[chart.x] / chart.stride) - chart.min_value,
+            chart.x, (data[chart.x] / chart.stride) - chart.min_value,
         )
         temp_df.add_column(
             chart.y, data.dropna(subset=[chart.x])[chart.y].copy()

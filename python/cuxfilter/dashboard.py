@@ -586,7 +586,7 @@ class DashBoard:
                         self._data_tiles[chart.name],
                         self._generate_query_str(
                             self._charts[self._active_view]
-                        )
+                        ),
                     )
                 else:
                     chart.query_chart_by_range(

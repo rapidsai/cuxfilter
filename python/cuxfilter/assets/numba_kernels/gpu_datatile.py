@@ -40,6 +40,7 @@ def calc_cumsum_data_tile(x, arr1):
             else:
                 arr1[col2_i][col1_i] = (arr1[col2_i][col1_i] + freq_i) / 2
 
+
 def get_arrow_stream(record_batch):
     outputStream = io.BytesIO()
     writer = pa.ipc.RecordBatchStreamWriter(outputStream, record_batch.schema)
@@ -173,10 +174,7 @@ def calc_data_tile(
     for i in aggregate_dict[key]:
         agg = {key: i}
         if type(df) == dask_cudf.core.DataFrame:
-            temp_df = getattr(
-                df.groupby(check_list, sort=False),
-                i
-            )()
+            temp_df = getattr(df.groupby(check_list, sort=False), i)()
             temp_df = temp_df.reset_index().compute()
             groupby_results.append(temp_df)
         else:
