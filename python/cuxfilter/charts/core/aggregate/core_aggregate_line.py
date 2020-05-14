@@ -1,4 +1,5 @@
 import panel as pn
+import dask_cudf
 
 from .core_aggregate import BaseAggregateChart
 from ....assets.numba_kernels import calc_groupby, calc_value_counts
@@ -84,11 +85,15 @@ class BaseLine(BaseAggregateChart):
         Ouput:
 
         """
-        self.min_value = dashboard_cls._data[self.x].min()
-        self.max_value = dashboard_cls._data[self.x].max()
+        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
+            self.min_value = dashboard_cls._data[self.x].min().compute()
+            self.max_value = dashboard_cls._data[self.x].max().compute()
+        else:
+            self.min_value = dashboard_cls._data[self.x].min()
+            self.max_value = dashboard_cls._data[self.x].max()
 
-        if self.data_points > dashboard_cls._data[self.x].shape[0]:
-            self.data_points = dashboard_cls._data[self.x].shape[0]
+        if self.data_points > len(dashboard_cls._data):
+            self.data_points = len(dashboard_cls._data)
 
         if self.stride is None:
             if self.max_value < 1 and self.stride_type == int:
@@ -126,13 +131,9 @@ class BaseLine(BaseAggregateChart):
         """
         if self.y == self.x or self.y is None:
             # it's a histogram
-            if self.data_points == data[self.x].nunique():
-                df = data[self.x].value_counts().sort_index()
-                df = [df.index.to_array(), df.to_array()]
-            else:
-                df = calc_value_counts(
-                    data[self.x].to_gpu_array(), self.data_points
-                )
+            df = calc_value_counts(
+                data[self.x], self.stride, self.min_value, self.data_points
+            )
         else:
             self.aggregate_fn = "mean"
             df = calc_groupby(self, data)
