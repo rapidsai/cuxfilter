@@ -4,7 +4,7 @@ from . import plots
 def bar(
     x,
     y=None,
-    data_points=100,
+    data_points=None,
     add_interaction=True,
     aggregate_fn="count",
     width=400,

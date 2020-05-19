@@ -30,7 +30,7 @@ class BaseLine(BaseAggregateChart):
         self,
         x,
         y=None,
-        data_points=100,
+        data_points=None,
         add_interaction=True,
         aggregate_fn="count",
         width=400,
@@ -92,12 +92,10 @@ class BaseLine(BaseAggregateChart):
             self.min_value = dashboard_cls._data[self.x].min()
             self.max_value = dashboard_cls._data[self.x].max()
 
-        if self.data_points > len(dashboard_cls._data):
-            self.data_points = len(dashboard_cls._data)
+        if self.max_value < 1 and self.stride_type == int:
+            self.stride_type = float
 
-        if self.stride is None:
-            if self.max_value < 1 and self.stride_type == int:
-                self.stride_type = float
+        if self.stride is None and self.data_points is not None:
             if self.stride_type == int:
                 self.stride = int(
                     round((self.max_value - self.min_value) / self.data_points)
@@ -131,12 +129,19 @@ class BaseLine(BaseAggregateChart):
         """
         if self.y == self.x or self.y is None:
             # it's a histogram
-            df = calc_value_counts(
+            df, self.data_points, self.custom_binning = calc_value_counts(
                 data[self.x], self.stride, self.min_value, self.data_points
             )
         else:
             self.aggregate_fn = "mean"
             df = calc_groupby(self, data)
+            if self.data_points is None:
+                self.data_points = len(df[0])
+
+        if self.stride is None:
+            self.stride = self.stride_type(
+                round((self.max_value - self.min_value) / self.data_points)
+            )
 
         dict_temp = {
             "X": list(df[0].astype(df[0].dtype)),
@@ -202,7 +207,11 @@ class BaseLine(BaseAggregateChart):
         ):
             min_temp, max_temp = self.filter_widget.value
             query_str_dict[self.name] = (
-                str(min_temp) + "<=" + str(self.x) + "<=" + str(max_temp)
+                str(self.stride_type(round(min_temp, 4)))
+                + "<="
+                + str(self.x)
+                + "<="
+                + str(self.stride_type(round(max_temp, 4)))
             )
         else:
             query_str_dict.pop(self.name, None)
