@@ -16,6 +16,7 @@ def calc_value_counts(a_gpu, stride, min_value, data_points):
     output:
         frequencies(ndarray), bin_edge_values(ndarray)
     """
+    custom_binning = False
     if type(a_gpu) == dask_cudf.core.Series:
         if stride is None:
             val_count = a_gpu.value_counts()
@@ -23,6 +24,7 @@ def calc_value_counts(a_gpu, stride, min_value, data_points):
             val_count = (
                 (a_gpu - min_value) / stride
             ).astype('int').value_counts()
+            custom_binning = True
         val_count = val_count.compute().sort_index()
     else:
         if stride is None:
@@ -31,8 +33,12 @@ def calc_value_counts(a_gpu, stride, min_value, data_points):
             val_count = (
                 (a_gpu - min_value) / stride
             ).astype('int').value_counts().sort_index()
+            custom_binning = True
 
-    return (val_count.index.to_array(), val_count.to_array()), len(val_count)
+    return (
+        (val_count.index.to_array(), val_count.to_array()),
+        len(val_count), custom_binning
+    )
 
 
 def calc_groupby(chart: Type[BaseChart], data, agg=None):
