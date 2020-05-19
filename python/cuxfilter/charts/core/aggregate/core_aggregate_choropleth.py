@@ -2,6 +2,7 @@ from typing import Dict
 import os
 import pandas as pd
 import numpy as np
+import dask_cudf
 
 from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby
@@ -37,12 +38,9 @@ class BaseChoropleth(BaseChart):
         color_factor=1,
         elevation_aggregate_fn="sum",
         elevation_factor=1,
-        data_points=100,
         add_interaction=True,
         width=800,
         height=400,
-        step_size=None,
-        step_size_type=int,
         geoJSONSource=None,
         geoJSONProperty=None,
         geo_color_palette=None,
@@ -65,13 +63,10 @@ class BaseChoropleth(BaseChart):
             elevation_factor,
             geoJSONSource
             geoJSONProperty
-            data_points
             add_interaction
             geo_color_palette
             width
             height
-            step_size
-            step_size_type
             nan_color
             mapbox_api_key
             map_style
@@ -97,7 +92,6 @@ class BaseChoropleth(BaseChart):
                 self.elevation_column
             ] = self.elevation_aggregate_fn
 
-        self.data_points = data_points
         self.add_interaction = add_interaction
 
         if geoJSONSource is None:
@@ -112,9 +106,7 @@ class BaseChoropleth(BaseChart):
         )
         self.height = height
         self.width = width
-
-        self.stride = step_size
-        self.stride_type = step_size_type
+        self.stride = 1
         self.mapbox_api_key = mapbox_api_key
         self.map_style = map_style
         self.library_specific_params = library_specific_params
@@ -141,8 +133,12 @@ class BaseChoropleth(BaseChart):
         Ouput:
 
         """
-        self.min_value = dashboard_cls._data[self.x].min()
-        self.max_value = dashboard_cls._data[self.x].max()
+        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
+            self.min_value = dashboard_cls._data[self.x].min().compute()
+            self.max_value = dashboard_cls._data[self.x].max().compute()
+        else:
+            self.min_value = dashboard_cls._data[self.x].min()
+            self.max_value = dashboard_cls._data[self.x].max()
 
         if isinstance(self.geo_mapper, pd.DataFrame):
             self.geo_mapper, x_range, y_range = geo_json_mapper(
@@ -154,21 +150,6 @@ class BaseChoropleth(BaseChart):
                 "coordinates": np.array(list(self.geo_mapper.values())),
             }
         )
-
-        if self.data_points > dashboard_cls._data[self.x].shape[0]:
-            self.data_points = dashboard_cls._data[self.x].shape[0]
-
-        if self.stride is None:
-            if self.max_value < 1 and self.stride_type == int:
-                self.stride_type = float
-            if self.stride_type == int:
-                self.stride = int(
-                    round((self.max_value - self.min_value) / self.data_points)
-                )
-            else:
-                self.stride = float(
-                    (self.max_value - self.min_value) / self.data_points
-                )
 
         self.calculate_source(dashboard_cls._data)
         self.generate_chart()
@@ -331,6 +312,8 @@ class BaseChoropleth(BaseChart):
             datatile_index_max = int(
                 round((max_val - active_chart.min_value) / active_chart.stride)
             )
+            datatile_indices = ((self.source.data[self.x] - self.min_value) / self.stride).astype('int')
+
             if key == self.color_column:
                 temp_agg_function = self.color_aggregate_fn
             elif self.elevation_column is not None:
@@ -340,28 +323,42 @@ class BaseChoropleth(BaseChart):
 
                 if temp_agg_function == "mean":
                     datatile_result_sum = np.array(
-                        datatile[0].loc[:, datatile_index_max]
+                        datatile[0].loc[
+                            datatile_indices, datatile_index_max
+                        ]
                     )
                     datatile_result_count = np.array(
-                        datatile[1].loc[:, datatile_index_max]
+                        datatile[1].loc[
+                            datatile_indices, datatile_index_max
+                        ]
                     )
                     datatile_result = (
                         datatile_result_sum / datatile_result_count
                     )
                 elif temp_agg_function in ["count", "sum", "min", "max"]:
-                    datatile_result = datatile.loc[:, datatile_index_max]
+                    datatile_result = datatile.loc[
+                        datatile_indices, datatile_index_max
+                    ]
 
             else:
                 datatile_index_min -= 1
                 if temp_agg_function == "mean":
-                    datatile_max0 = datatile[0].loc[:, datatile_index_max]
-                    datatile_min0 = datatile[0].loc[:, datatile_index_min]
+                    datatile_max0 = datatile[0].loc[
+                        datatile_indices, datatile_index_max
+                    ]
+                    datatile_min0 = datatile[0].loc[
+                        datatile_indices, datatile_index_min
+                    ]
                     datatile_result_sum = np.array(
                         datatile_max0 - datatile_min0
                     )
 
-                    datatile_max1 = datatile[1].loc[:, datatile_index_max]
-                    datatile_min1 = datatile[1].loc[:, datatile_index_min]
+                    datatile_max1 = datatile[1].loc[
+                        datatile_indices, datatile_index_max
+                    ]
+                    datatile_min1 = datatile[1].loc[
+                        datatile_indices, datatile_index_min
+                    ]
                     datatile_result_count = np.array(
                         datatile_max1 - datatile_min1
                     )
@@ -370,8 +367,12 @@ class BaseChoropleth(BaseChart):
                         datatile_result_sum / datatile_result_count
                     )
                 elif temp_agg_function in ["count", "sum", "min", "max"]:
-                    datatile_max = datatile.loc[:, datatile_index_max]
-                    datatile_min = datatile.loc[:, datatile_index_min]
+                    datatile_max = datatile.loc[
+                        datatile_indices, datatile_index_max
+                    ]
+                    datatile_min = datatile.loc[
+                        datatile_indices, datatile_index_min
+                    ]
                     datatile_result = np.array(datatile_max - datatile_min)
 
             if datatile_result is not None:
@@ -398,13 +399,22 @@ class BaseChoropleth(BaseChart):
 
         Ouput:
         """
+        datatile_indices = ((self.source.data[self.x] - self.min_value) / self.stride).astype('int')
         if len(new_indices) == 0 or new_indices == [""]:
-            datatile_sum_0 = np.array(datatile[0].sum(axis=1, skipna=True))
-            datatile_sum_1 = np.array(datatile[1].sum(axis=1, skipna=True))
+            datatile_sum_0 = np.array(
+                datatile[0]
+                .loc[datatile_indices]
+                .sum(axis=1, skipna=True)
+            )
+            datatile_sum_1 = np.array(
+                datatile[1]
+                .loc[datatile_indices]
+                .sum(axis=1, skipna=True)
+            )
             datatile_result = datatile_sum_0 / datatile_sum_1
             return datatile_result
 
-        len_y_axis = datatile[0][0].loc[self.source.data[self.x]].shape[0]
+        len_y_axis = datatile[0][0].loc[datatile_indices].shape[0]
 
         datatile_result = np.zeros(shape=(len_y_axis,), dtype=np.float64)
         value_sum = np.zeros(shape=(len_y_axis,), dtype=np.float64)
@@ -415,10 +425,10 @@ class BaseChoropleth(BaseChart):
                 round((index - active_chart.min_value) / active_chart.stride)
             )
             value_sum += np.array(
-                datatile[0][int(index)].loc[self.source.data[self.x]]
+                datatile[0][int(index)].loc[datatile_indices]
             )
             value_count += np.array(
-                datatile[1][int(index)].loc[self.source.data[self.x]]
+                datatile[1][int(index)].loc[datatile_indices]
             )
 
         datatile_result = value_sum / value_count
@@ -444,15 +454,18 @@ class BaseChoropleth(BaseChart):
 
         Ouput:
         """
+        datatile_indices = ((self.source.data[self.x] - self.min_value) / self.stride).astype('int')
         if len(new_indices) == 0 or new_indices == [""]:
-            datatile_result = np.array(datatile.sum(axis=1, skipna=True))
+            datatile_result = np.array(
+                datatile.loc[datatile_indices].sum(axis=1, skipna=True)
+            )
             return datatile_result
 
         if len(old_indices) == 0 or old_indices == [""]:
-            len_y_axis = datatile[0].loc[self.source.data[self.x]].shape[0]
+            len_y_axis = datatile[0].loc[datatile_indices].shape[0]
             datatile_result = np.zeros(shape=(len_y_axis,), dtype=np.float64)
         else:
-            len_y_axis = datatile[0].loc[self.source.data[self.x]].shape[0]
+            len_y_axis = datatile[0].loc[datatile_indices].shape[0]
             datatile_result = np.array(
                 self.source.data[key], dtype=np.float64
             )[:len_y_axis]
@@ -462,7 +475,7 @@ class BaseChoropleth(BaseChart):
                 round((index - active_chart.min_value) / active_chart.stride)
             )
             datatile_result += np.array(
-                datatile[int(index)].loc[self.source.data[self.x]]
+                datatile[int(index)].loc[datatile_indices]
             )
 
         for index in remove_old:
@@ -470,7 +483,7 @@ class BaseChoropleth(BaseChart):
                 round((index - active_chart.min_value) / active_chart.stride)
             )
             datatile_result -= np.array(
-                datatile[int(index)].loc[self.source.data[self.x]]
+                datatile[int(index)].loc[datatile_indices]
             )
         return datatile_result
 
