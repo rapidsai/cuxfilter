@@ -76,7 +76,7 @@ def calc_data_tile_for_size(
     cumsum: bool = True,
     return_format="pandas",
 ):
-    df[col_1 + "_mod"] = ((df[col_1] / stride_1) - min_1).astype("int32")
+    df[col_1 + "_mod"] = ((df[col_1] - min_1) / stride_1).astype("int32")
     if type(df) == dask_cudf.core.DataFrame:
         groupby_result = getattr(
             df[[col_1 + "_mod", col_1]].groupby(col_1 + "_mod"), "count"
@@ -158,23 +158,23 @@ def calc_data_tile(
 
     check_list = []
     if key == col_1 and col_1 + "_mod" not in df.columns:
-        df[col_1 + "_mod"] = ((df[col_1] / stride_1) - min_1).astype("int32")
+        df[col_1 + "_mod"] = ((df[col_1] - min_1) / stride_1).astype("int32")
         check_list.append(col_1 + "_mod")
     else:
-        df[col_1] = ((df[col_1] / stride_1) - min_1).astype("int32")
+        df[col_1] = ((df[col_1] - min_1) / stride_1).astype("int32")
         check_list.append(col_1)
     if key == col_2 and col_2 + "_mod" not in df.columns:
-        df[col_2 + "_mod"] = ((df[col_2] / stride_2) - min_2).astype("int32")
+        df[col_2 + "_mod"] = ((df[col_2] - min_2) / stride_2).astype("int32")
         check_list.append(col_2 + "_mod")
     else:
-        df[col_2] = ((df[col_2] / stride_2) - min_2).astype("int32")
+        df[col_2] = ((df[col_2] - min_2) / stride_2).astype("int32")
         check_list.append(col_2)
 
     groupby_results = []
     for i in aggregate_dict[key]:
         agg = {key: i}
         if type(df) == dask_cudf.core.DataFrame:
-            temp_df = getattr(df.groupby(check_list, sort=False), i)()
+            temp_df = getattr(df[check_list + [key]].groupby(check_list, sort=False), i)()
             temp_df = temp_df.reset_index().compute()
             groupby_results.append(temp_df)
         else:
@@ -212,8 +212,9 @@ def calc_data_tile(
             result_np = np.cumsum(result.copy_to_host(), axis=1)
 
         result_temp = format_result(result_np, return_format)
-
-        results.append(result_temp[result_temp.index.isin(list_of_indices)])
+        if return_format == 'pandas':
+            result_temp[~result_temp.index.isin(list_of_indices)] = 0
+        results.append(result_temp)
 
     if len(results) == 1:
         return results[0]
