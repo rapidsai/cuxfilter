@@ -1,3 +1,11 @@
+# cuXfilter 0.15.0 (Date TBD)
+
+## New Features
+
+## Improvements
+
+## Bug Fixes
+
 # cuXfilter 0.14.0 (Date TBD)
 
 ## New Features
@@ -60,4 +68,3 @@
 - Massive refactor and architecture change compared to the js (client-server) architecture
 
 ## Bug Fixes
-
