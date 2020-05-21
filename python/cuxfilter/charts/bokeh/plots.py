@@ -28,13 +28,12 @@ class Bar(BaseBar):
             handling labels in bokeh plots when max value is under 1
             """
             if len(self.x_label_map) == 0:
-                temp_mapper_index = np.array(source_dict["X"]).astype('str')
+                temp_mapper_index = np.array(source_dict["X"]).astype("str")
                 temp_mapper_value = np.round(
-                    (
-                        temp_mapper_index.astype('int') * self.stride
-                    ) + self.min_value,
-                    4
-                ).astype('str')
+                    (temp_mapper_index.astype(self.stride_type) * self.stride)
+                    + self.min_value,
+                    4,
+                ).astype("str")
                 self.x_label_map = dict(
                     zip(temp_mapper_index, temp_mapper_value)
                 )
@@ -43,7 +42,7 @@ class Bar(BaseBar):
             self.source = ColumnDataSource(
                 {
                     self.data_x_axis: np.array(source_dict["X"]),
-                    self.data_y_axis: np.array(source_dict["Y"])
+                    self.data_y_axis: np.array(source_dict["Y"]),
                 }
             )
             self.source_backup = self.source.to_df()
@@ -265,13 +264,12 @@ class Line(BaseLine):
             handling labels in bokeh plots when max value is under 1
             """
             if len(self.x_label_map) == 0:
-                temp_mapper_index = np.array(source_dict["X"]).astype('str')
+                temp_mapper_index = np.array(source_dict["X"]).astype("str")
                 temp_mapper_value = np.round(
-                    (
-                        temp_mapper_index.astype('int') * self.stride
-                    ) + self.min_value,
-                    4
-                ).astype('str')
+                    (temp_mapper_index.astype(self.stride_type) * self.stride)
+                    + self.min_value,
+                    4,
+                ).astype("str")
                 self.x_label_map = dict(
                     zip(temp_mapper_index, temp_mapper_value)
                 )
@@ -280,7 +278,7 @@ class Line(BaseLine):
             self.source = ColumnDataSource(
                 {
                     self.data_x_axis: np.array(source_dict["X"]),
-                    self.data_y_axis: np.array(source_dict["Y"])
+                    self.data_y_axis: np.array(source_dict["Y"]),
                 }
             )
             self.source_backup = self.source.to_df()
