@@ -13,7 +13,7 @@ class BaseWidget:
     height: int = None
     width: int = None
     chart = None
-    data_points: int = 100
+    data_points = None
     start: float = None
     end: float = None
     _stride = None
@@ -35,21 +35,16 @@ class BaseWidget:
 
     @stride.setter
     def stride(self, value):
-        if value is None:
-            self._stride = None
-        else:
-            if self.stride_type == int:
-                value = self.stride_type(value)
-            if self.stride_type(value) == self.stride_type(0):
-                value = self.stride_type(1.0)
-            self._stride = value
+        if value is not None:
+            self.stride_type = type(value)
+        self._stride = value
 
     def __init__(
         self,
         x,
         width=400,
         height=10,
-        data_points=100,
+        data_points=None,
         step_size=None,
         step_size_type=int,
         **params,
