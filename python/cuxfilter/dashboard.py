@@ -582,7 +582,16 @@ class DashBoard:
                 self._active_view != chart.name
                 and "widget" not in chart.chart_type
             ):
-                if not chart.use_data_tiles:
+                if chart.chart_type == "view_dataframe":
+                    chart.query_chart_by_range(
+                        self._charts[self._active_view],
+                        query_tuple,
+                        self._data,
+                        self._generate_query_str(
+                            self._charts[self._active_view]
+                        ),
+                    )
+                elif not chart.use_data_tiles:
                     chart.query_chart_by_range(
                         self._charts[self._active_view],
                         query_tuple,
@@ -608,12 +617,33 @@ class DashBoard:
                 self._active_view != chart.name
                 and "widget" not in chart.chart_type
             ):
-                chart.query_chart_by_indices(
-                    self._charts[self._active_view],
-                    old_indices,
-                    new_indices,
-                    self._data_tiles[chart.name],
-                )
+                if chart.chart_type == "view_dataframe":
+                    chart.query_chart_by_indices(
+                        self._charts[self._active_view],
+                        old_indices,
+                        new_indices,
+                        self._data,
+                        self._generate_query_str(
+                            self._charts[self._active_view]
+                        ),
+                    )
+                elif not chart.use_data_tiles:
+                    chart.query_chart_by_indices(
+                        self._charts[self._active_view],
+                        old_indices,
+                        new_indices,
+                        self._data_tiles[chart.name],
+                        self._generate_query_str(
+                            self._charts[self._active_view]
+                        ),
+                    )
+                else:
+                    chart.query_chart_by_indices(
+                        self._charts[self._active_view],
+                        old_indices,
+                        new_indices,
+                        self._data_tiles[chart.name],
+                    )
 
     def _reset_current_view(self, new_active_view: BaseChart):
         """

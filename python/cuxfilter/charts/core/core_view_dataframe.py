@@ -1,6 +1,7 @@
 import panel as pn
 import logging
 from panel.config import panel_extension
+import dask_cudf
 
 from .core_chart import BaseChart
 from ...layouts import chart_view
@@ -35,10 +36,13 @@ class ViewDataFrame:
     use_data_tiles = False
     _initialized = False
 
-    def __init__(self, columns=None, width=400, height=400):
+    def __init__(
+        self, columns=None, width=400, height=400, force_computation=False
+    ):
         self.columns = columns
         self._width = width
         self._height = height
+        self.force_computation = force_computation
 
     @property
     def name(self):
@@ -65,7 +69,19 @@ class ViewDataFrame:
             self.update_dimensions(height=value)
 
     def initiate_chart(self, dashboard_cls):
-        self.generate_chart(dashboard_cls._data)
+        if isinstance(dashboard_cls._data, dask_cudf.core.DataFrame):
+            if self.force_computation:
+                self.generate_chart(dashboard_cls._data.compute())
+            else:
+                print("displaying only 1st partitions top 1000 rows for ",
+                "view_dataframe - dask_cudf to avoid partition based ",
+                "computation use force_computation=True for viewing ",
+                "top-level view of entire DataFrame. ",
+                "Warning - would slow the dashboard down significantly"
+                )
+                self.generate_chart(dashboard_cls._data.head(1000))
+        else:
+            self.generate_chart(dashboard_cls._data)
 
     def generate_chart(self, data):
         if self.columns is None:
@@ -108,7 +124,13 @@ class ViewDataFrame:
         return chart_view(self.chart, width=self.width)
 
     def reload_chart(self, data, patch_update: bool):
-        self.chart[0].object = data[self.columns]
+        if isinstance(data, dask_cudf.core.DataFrame):
+            if self.force_computation:
+                self.chart[0].object = data[self.columns].compute()
+            else:
+                self.chart[0].object = data[self.columns].head(1000)
+        else:
+            self.chart[0].object = data[self.columns]
 
     def update_dimensions(self, width=None, height=None):
         """
@@ -123,7 +145,9 @@ class ViewDataFrame:
         if height is not None:
             self.chart.height = height
 
-    def query_chart_by_range(self, active_chart: BaseChart, query_tuple, data):
+    def query_chart_by_range(
+        self, active_chart: BaseChart, query_tuple, data, query=""
+    ):
         """
         Description:
 
@@ -137,11 +161,17 @@ class ViewDataFrame:
         Ouput:
         """
         min_val, max_val = query_tuple
-        query = str(min_val) + "<=" + active_chart.x + "<=" + str(max_val)
-        self.reload_chart(data.query(query), False)
+        final_query = (
+            str(min_val) + "<=" + active_chart.x + "<=" + str(max_val)
+        )
+        if len(query) > 0:
+            final_query += " and " + query
+        self.reload_chart(
+            data.query(final_query), False,
+        )
 
     def query_chart_by_indices(
-        self, active_chart: BaseChart, old_indices, new_indices, data
+        self, active_chart: BaseChart, old_indices, new_indices, data, query=""
     ):
         """
         Description:
@@ -162,10 +192,18 @@ class ViewDataFrame:
             # reset the chart
             self.reload_chart(data, False)
         elif len(new_indices) == 1:
+            final_query = active_chart.x + "==" + str(float(new_indices[0]))
+            if len(query) > 0:
+                final_query += " and " + query
             # just a single index
-            query = active_chart.x + "==" + str(float(new_indices[0]))
-            self.reload_chart(data.query(query), False)
+            self.reload_chart(
+                data.query(final_query), False,
+            )
         else:
             new_indices_str = ",".join(map(str, new_indices))
-            query = active_chart.x + " in (" + new_indices_str + ")"
-            self.reload_chart(data.query(query), False)
+            final_query = active_chart.x + " in (" + new_indices_str + ")"
+            if len(query) > 0:
+                final_query += " and " + query
+            self.reload_chart(
+                data.query(final_query), False,
+            )
