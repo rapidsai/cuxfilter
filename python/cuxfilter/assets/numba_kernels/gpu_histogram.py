@@ -52,12 +52,9 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
         frequencies(ndarray), bin_edge_values(ndarray)
     """
     temp_df = data[[chart.x]].dropna(subset=[chart.x])
-    temp_df[chart.x] = (
-        (data[chart.x] / chart.stride) - chart.min_value
-    ).round().astype("int32")
 
     if agg is None:
-        temp_df[chart.y] = data[[chart.y]].dropna(subset=[chart.x])
+        temp_df[chart.y] = data.dropna(subset=[chart.x])[chart.y]
         if type(temp_df) == dask_cudf.core.DataFrame:
             groupby_res = getattr(
                 temp_df.groupby(by=[chart.x]),
