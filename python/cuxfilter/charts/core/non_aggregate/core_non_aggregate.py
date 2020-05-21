@@ -1,4 +1,6 @@
 from typing import Tuple
+import dask_cudf
+import dask.dataframe as dd
 
 from ..core_chart import BaseChart
 from ....layouts import chart_view
@@ -42,6 +44,9 @@ class BaseNonAggregate(BaseChart):
                 dashboard_cls._data[self.y].min(),
                 dashboard_cls._data[self.y].max(),
             )
+        if isinstance(dashboard_cls._data, dask_cudf.core.DataFrame):
+            self.x_range = dd.compute(*self.x_range)
+            self.y_range = dd.compute(*self.y_range)
         self.calculate_source(dashboard_cls._data)
         self.generate_chart()
         self.add_events(dashboard_cls)
@@ -183,7 +188,7 @@ class BaseNonAggregate(BaseChart):
         self.add_event(self.reset_event, reset_callback)
 
     def query_chart_by_range(
-        self, active_chart: BaseChart, query_tuple, datatile=None
+        self, active_chart: BaseChart, query_tuple, datatile=None, query=""
     ):
         """
         Description:
@@ -198,15 +203,22 @@ class BaseNonAggregate(BaseChart):
         Ouput:
         """
         min_val, max_val = query_tuple
+        final_query = (
+            str(min_val) + "<=" + active_chart.x + "<=" + str(max_val)
+        )
+        if len(query) > 0:
+            final_query += " and " + query
         self.reload_chart(
-            self.source.query(
-                str(min_val) + "<=" + active_chart.x + "<=" + str(max_val)
-            ),
-            False,
+            self.source.query(final_query), False,
         )
 
     def query_chart_by_indices(
-        self, active_chart: BaseChart, old_indices, new_indices, datatile=None
+        self,
+        active_chart: BaseChart,
+        old_indices,
+        new_indices,
+        datatile=None,
+        query="",
     ):
         """
         Description:
@@ -227,20 +239,20 @@ class BaseNonAggregate(BaseChart):
             # reset the chart
             self.reload_chart(self.source, False)
         elif len(new_indices) == 1:
+            final_query = active_chart.x + "==" + str(float(new_indices[0]))
+            if len(query) > 0:
+                final_query += " and " + query
             # just a single index
             self.reload_chart(
-                self.source.query(
-                    active_chart.x + "==" + str(float(new_indices[0]))
-                ),
-                False,
+                self.source.query(final_query), False,
             )
         else:
             new_indices_str = ",".join(map(str, new_indices))
+            final_query = active_chart.x + " in (" + new_indices_str + ")"
+            if len(query) > 0:
+                final_query += " and " + query
             self.reload_chart(
-                self.source.query(
-                    active_chart.x + " in (" + new_indices_str + ")"
-                ),
-                False,
+                self.source.query(final_query), False,
             )
 
     def add_selection_geometry_event(self, callback):

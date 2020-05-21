@@ -9,6 +9,8 @@ from .custom_extensions import InteractiveImage
 import datashader as cds
 from datashader import transfer_functions as tf
 from datashader.colors import Hot
+import dask_cudf
+import dask.dataframe as dd
 import numpy as np
 from bokeh import events
 from bokeh.plotting import figure
@@ -160,6 +162,7 @@ class ScatterGeo(BaseScatterGeo):
             self.chart,
             self.generate_InteractiveImage_callback(),
             data_source=self.source,
+            timeout=0.8
         )
 
     def update_dimensions(self, width=None, height=None):
@@ -574,6 +577,9 @@ class Line(BaseLine):
         self.source = data
         self.x_range = (self.source[self.x].min(), self.source[self.x].max())
         self.y_range = (self.source[self.y].min(), self.source[self.y].max())
+        if isinstance(data, dask_cudf.core.DataFrame):
+            self.x_range = dd.compute(*self.x_range)
+            self.y_range = dd.compute(*self.y_range)
 
     def generate_InteractiveImage_callback(self):
         """
@@ -825,6 +831,9 @@ class StackedLines(BaseStackedLine):
                 self.source[self.y].min().min(),
                 self.source[self.y].max().max(),
             )
+        if isinstance(data, dask_cudf.core.DataFrame):
+            self.x_range = dd.compute(*self.x_range)
+            self.y_range = dd.compute(*self.y_range)
 
     def generate_InteractiveImage_callback(self):
         """

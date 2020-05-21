@@ -1,4 +1,5 @@
 import panel as pn
+import dask_cudf
 
 from .core_non_aggregate import BaseNonAggregate
 from ....layouts import chart_view
@@ -79,11 +80,15 @@ class BaseLine(BaseNonAggregate):
         Ouput:
 
         """
-        self.min_value = dashboard_cls._data[self.x].min()
-        self.max_value = dashboard_cls._data[self.x].max()
+        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
+            self.min_value = dashboard_cls._data[self.x].min().compute()
+            self.max_value = dashboard_cls._data[self.x].max().compute()
+        else:
+            self.min_value = dashboard_cls._data[self.x].min()
+            self.max_value = dashboard_cls._data[self.x].max()
 
-        if self.data_points > dashboard_cls._data[self.x].shape[0]:
-            self.data_points = dashboard_cls._data[self.x].shape[0]
+        if self.data_points > len(dashboard_cls._data):
+            self.data_points = len(dashboard_cls._data)
 
         if self.stride is None:
             if self.max_value < 1 and self.stride_type == int:

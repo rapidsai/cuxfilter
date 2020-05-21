@@ -216,7 +216,7 @@ class BaseStackedLine(BaseChart):
         self.add_event(self.reset_event, reset_callback)
 
     def query_chart_by_range(
-        self, active_chart: BaseChart, query_tuple, datatile=None
+        self, active_chart: BaseChart, query_tuple, datatile=None, query=""
     ):
         """
         Description:
@@ -231,15 +231,18 @@ class BaseStackedLine(BaseChart):
         Ouput:
         """
         min_val, max_val = query_tuple
+        final_query = (
+            str(min_val) + "<=" + active_chart.x + "<=" + str(max_val)
+        )
+        if len(query) > 0:
+            final_query += " and " + query
         self.reload_chart(
-            self.source.query(
-                str(min_val) + "<=" + active_chart.x + "<=" + str(max_val)
-            ),
-            False,
+            self.source.query(final_query), False,
         )
 
     def query_chart_by_indices(
-        self, active_chart: BaseChart, old_indices, new_indices, datatile=None
+        self, active_chart: BaseChart, old_indices, new_indices, datatile=None,
+        query=""
     ):
         """
         Description:
@@ -260,20 +263,20 @@ class BaseStackedLine(BaseChart):
             # reset the chart
             self.reload_chart(self.source, False)
         elif len(new_indices) == 1:
+            final_query = active_chart.x + "==" + str(float(new_indices[0]))
+            if len(query) > 0:
+                final_query += " and " + query
             # just a single index
             self.reload_chart(
-                self.source.query(
-                    active_chart.x + "==" + str(float(new_indices[0]))
-                ),
-                False,
+                self.source.query(final_query), False,
             )
         else:
             new_indices_str = ",".join(map(str, new_indices))
+            final_query = active_chart.x + " in (" + new_indices_str + ")"
+            if len(query) > 0:
+                final_query += " and " + query
             self.reload_chart(
-                self.source.query(
-                    active_chart.x + " in (" + new_indices_str + ")"
-                ),
-                False,
+                self.source.query(final_query), False,
             )
 
     def add_selection_geometry_event(self, callback):
