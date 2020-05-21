@@ -227,7 +227,10 @@ class DashBoard:
         Query the cudf.DataFrame, inplace or create a copy based on the
         value of inplace.
         """
-        return self._data.query(query_str)
+        if len(query_str) > 0:
+            return self._data.query(query_str)
+        else:
+            return self._data
 
     def _generate_query_str(self, ignore_chart=""):
         """
@@ -549,7 +552,7 @@ class DashBoard:
         # NO DATATILES for scatter types, as they are essentially all
         # points in the dataset
         query = self._generate_query_str(self._charts[self._active_view])
-        print(query)
+
         if "scatter" not in self._active_view:
             for chart in list(self._charts.values()):
                 if not chart.use_data_tiles:
@@ -631,3 +634,13 @@ class DashBoard:
         self._active_view = new_active_view.name
 
         self._query_str_dict.pop(self._active_view, None)
+        if(
+            "widget" not in self._charts[self._active_view].chart_type
+            and self._charts[self._active_view].use_data_tiles
+        ):
+            self._charts[self._active_view].reload_chart(
+                data=self._query(
+                    self._generate_query_str(ignore_chart=self._active_view)
+                ),
+                patch_update=True
+            )
