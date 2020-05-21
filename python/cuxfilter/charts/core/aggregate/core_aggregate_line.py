@@ -132,6 +132,16 @@ class BaseLine(BaseAggregateChart):
             df, self.data_points, self.custom_binning = calc_value_counts(
                 data[self.x], self.stride, self.min_value, self.data_points
             )
+            if self.data_points > 50_000:
+                print(
+                    "number of x-values for a line chart ",
+                    "exceeds 50,000 points.",
+                    "Performance may be laggy, its recommended ",
+                    "to use custom data_points parameter to ",
+                    "enforce custom binning for smooth crossfiltering.",
+                    "Also, checkout datashader.line for ",
+                    "rendering millions of points."
+                )
         else:
             self.aggregate_fn = "mean"
             df = calc_groupby(self, data)
