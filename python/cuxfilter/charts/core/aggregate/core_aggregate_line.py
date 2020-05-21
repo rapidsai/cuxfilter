@@ -165,7 +165,7 @@ class BaseLine(BaseAggregateChart):
         """
         if self.stride is None:
             self.stride = self.stride_type(
-                (self.max_value - self.min_value) / self.data_points
+                round((self.max_value - self.min_value) / self.data_points)
             )
 
         self.filter_widget = pn.widgets.RangeSlider(
