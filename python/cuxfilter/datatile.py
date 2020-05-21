@@ -28,7 +28,7 @@ class DataTile:
         self.passive_chart = passive_chart
         self.cumsum = cumsum
 
-    def calc_data_tile(self, data, query):
+    def calc_data_tile(self, data, query=""):
         """
         calc data tiles base function
         """
