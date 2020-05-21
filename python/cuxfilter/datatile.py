@@ -59,6 +59,10 @@ class DataTile:
         """
         calc data tiles
         """
+        # cumsum has to be false for aggregate charts with agg_fn = min/max
+        if self.cumsum and self.passive_chart.aggregate_fn in ["min", "max"]:
+            self.cumsum = False
+            print('cumsum false for', self.passive_chart.name)
         return_result = gpu_datatile.calc_data_tile(
             data,
             self.active_chart,
@@ -75,6 +79,12 @@ class DataTile:
         """
         ret_datatile = {}
         self.passive_chart.y = self.passive_chart.color_column
+        cumsum = self.cumsum
+        # cumsum has to be false for aggregate charts with agg_fn = min/max
+        if self.cumsum and self.passive_chart.color_aggregate_fn in ["min", "max"]:
+            cumsum = False
+            print('cumsum false for color', self.passive_chart.name)
+
         ret_datatile[
             self.passive_chart.color_column
         ] = gpu_datatile.calc_data_tile(
@@ -82,10 +92,15 @@ class DataTile:
             self.active_chart,
             self.passive_chart,
             self.passive_chart.color_aggregate_fn,
-            cumsum=self.cumsum,
+            cumsum=cumsum,
             return_format=self.dtype,
         )
         if self.passive_chart.elevation_column is not None:
+            cumsum = self.cumsum
+            # cumsum has to be false for aggregate charts with agg_fn = min/max
+            if self.cumsum and self.passive_chart.elevation_aggregate_fn in ["min", "max"]:
+                cumsum = False
+                print('cumsum false for aggregate', self.passive_chart.name)
             self.passive_chart.y = self.passive_chart.elevation_column
             ret_datatile[
                 self.passive_chart.elevation_column
@@ -94,7 +109,7 @@ class DataTile:
                 self.active_chart,
                 self.passive_chart,
                 self.passive_chart.elevation_aggregate_fn,
-                cumsum=self.cumsum,
+                cumsum=cumsum,
                 return_format=self.dtype,
             )
         return ret_datatile

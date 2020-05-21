@@ -76,7 +76,7 @@ def calc_data_tile_for_size(
     cumsum: bool = True,
     return_format="pandas",
 ):
-    df[col_1 + "_mod"] = ((df[col_1] - min_1) / stride_1).astype("int32")
+    df[col_1 + "_mod"] = ((df[col_1] - min_1) / stride_1).round().astype("int32")
     if type(df) == dask_cudf.core.DataFrame:
         groupby_result = getattr(
             df[[col_1 + "_mod", col_1]].groupby(col_1 + "_mod"), "count"
@@ -88,7 +88,7 @@ def calc_data_tile_for_size(
             .agg({col_1 + "_mod": "count"})
         )
 
-    max_s = int((max_1 - min_1) / stride_1) + 1
+    max_s = int(round((max_1 - min_1) / stride_1)) + 1
     min_s = 1
 
     result = np.zeros(shape=(min_s, max_s)).astype(np.float64)[0]
@@ -157,18 +157,11 @@ def calc_data_tile(
         aggregate_dict = {key: [aggregate_fn]}
 
     check_list = []
-    if key == col_1 and col_1 + "_mod" not in df.columns:
-        df[col_1 + "_mod"] = ((df[col_1] - min_1) / stride_1).astype("int32")
-        check_list.append(col_1 + "_mod")
-    else:
-        df[col_1] = ((df[col_1] - min_1) / stride_1).astype("int32")
-        check_list.append(col_1)
-    if key == col_2 and col_2 + "_mod" not in df.columns:
-        df[col_2 + "_mod"] = ((df[col_2] - min_2) / stride_2).astype("int32")
-        check_list.append(col_2 + "_mod")
-    else:
-        df[col_2] = ((df[col_2] - min_2) / stride_2).astype("int32")
-        check_list.append(col_2)
+
+    df[col_1 + "_mod"] = ((df[col_1] - min_1) / stride_1).round().astype("int32")
+    check_list.append(col_1 + "_mod")
+    df[col_2 + "_mod"] = ((df[col_2] - min_2) / stride_2).round().astype("int32")
+    check_list.append(col_2 + "_mod")
 
     groupby_results = []
     for i in aggregate_dict[key]:
@@ -184,12 +177,12 @@ def calc_data_tile(
                 ).agg(agg)
             )
 
-    del df
+    del(df)
     gc.collect()
 
     results = []
-    for groupby_result in groupby_results:
 
+    for groupby_result in groupby_results:
         list_of_indices = list(
             np.unique(groupby_result[check_list[-1]].to_array().astype(int))
         )
@@ -199,8 +192,8 @@ def calc_data_tile(
 
         del groupby_result
         gc.collect()
-        max_s = int((max_1 - min_1) / stride_1) + 1
-        min_s = int((max_2 - min_2) / stride_2) + 1
+        max_s = int(round((max_1 - min_1) / stride_1)) + 1
+        min_s = int(round((max_2 - min_2) / stride_2)) + 1
         result = cuda.to_device(
             np.zeros(shape=(min_s, max_s)).astype(np.float64)
         )

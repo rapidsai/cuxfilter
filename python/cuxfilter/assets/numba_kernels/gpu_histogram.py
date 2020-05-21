@@ -51,10 +51,13 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
     output:
         frequencies(ndarray), bin_edge_values(ndarray)
     """
-    if agg is None:
-        temp_df = data[[chart.x, chart.y]].dropna(subset=[chart.x])
-        temp_df[chart.x] = (data[chart.x] / chart.stride) - chart.min_value
+    temp_df = data[[chart.x]].dropna(subset=[chart.x])
+    temp_df[chart.x] = (
+        (data[chart.x] / chart.stride) - chart.min_value
+    ).round().astype("int32")
 
+    if agg is None:
+        temp_df[chart.y] = data[[chart.y]].dropna(subset=[chart.x])
         if type(temp_df) == dask_cudf.core.DataFrame:
             groupby_res = getattr(
                 temp_df.groupby(by=[chart.x]),
@@ -67,27 +70,34 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
                 .agg({chart.y: chart.aggregate_fn})
                 .to_pandas()
             )
-        del temp_df
-        gc.collect()
     else:
+        for key, agg_fn in agg.items():
+            temp_df[key] = data[key]
         if type(data) == dask_cudf.core.DataFrame:
             groupby_res = None
             for key, agg_fn in agg.items():
                 groupby_res_temp = getattr(
-                    data[[chart.x, key]].groupby(chart.x),
+                    temp_df[[chart.x, key]].groupby(chart.x),
                     agg_fn
                 )()
                 if groupby_res is None:
                     groupby_res = groupby_res_temp.reset_index().compute()
                 else:
-                    groupby_res[key] = groupby_res_temp[key].compute()
+                    groupby_res_temp = groupby_res_temp.reset_index().compute()
+                    groupby_res = groupby_res.merge(groupby_res_temp, on=chart.x)
                 del(groupby_res_temp)
                 gc.collect()
             groupby_res = groupby_res.to_pandas()
         else:
             groupby_res = (
-                data.groupby(by=[chart.x], as_index=False).agg(agg).to_pandas()
+                temp_df.groupby(
+                    by=[chart.x], as_index=False
+                ).agg(agg).to_pandas()
             )
+
+    del(temp_df)
+    gc.collect()
+
     return groupby_res.to_numpy().transpose()
 
 
