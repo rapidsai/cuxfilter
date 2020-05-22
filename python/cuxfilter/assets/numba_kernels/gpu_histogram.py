@@ -23,7 +23,7 @@ def calc_value_counts(a_gpu, stride, min_value, data_points):
         else:
             val_count = (
                 (a_gpu - min_value) / stride
-            ).astype('int').value_counts()
+            ).round().astype('int').value_counts()
             custom_binning = True
         val_count = val_count.compute().sort_index()
     else:
@@ -32,7 +32,7 @@ def calc_value_counts(a_gpu, stride, min_value, data_points):
         else:
             val_count = (
                 (a_gpu - min_value) / stride
-            ).astype('int').value_counts().sort_index()
+            ).round().astype('int').value_counts().sort_index()
             custom_binning = True
 
     return (

@@ -1,5 +1,6 @@
 import panel as pn
 import dask_cudf
+import numpy as np
 
 from .core_aggregate import BaseAggregateChart
 from ....assets.numba_kernels import calc_groupby, calc_value_counts
@@ -153,6 +154,18 @@ class BaseBar(BaseAggregateChart):
             self.stride = self.stride_type(
                 round((self.max_value - self.min_value) / self.data_points)
             )
+
+        if self.custom_binning:
+            if len(self.x_label_map) == 0:
+                temp_mapper_index = np.array(df[0]).astype("str")
+                temp_mapper_value = np.round(
+                    (temp_mapper_index.astype(self.stride_type) * self.stride)
+                    + self.min_value,
+                    4,
+                ).astype("str")
+                self.x_label_map = dict(
+                    zip(temp_mapper_index, temp_mapper_value)
+                )
 
         dict_temp = {
             "X": list(df[0].astype(df[0].dtype)),

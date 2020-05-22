@@ -23,21 +23,6 @@ class Bar(BaseBar):
         -----------
         source_dict: {'X': [], 'Y': []}
         """
-        if self.max_value < 1:
-            """
-            handling labels in bokeh plots when max value is under 1
-            """
-            if len(self.x_label_map) == 0:
-                temp_mapper_index = np.array(source_dict["X"]).astype("str")
-                temp_mapper_value = np.round(
-                    (temp_mapper_index.astype(self.stride_type) * self.stride)
-                    + self.min_value,
-                    4,
-                ).astype("str")
-                self.x_label_map = dict(
-                    zip(temp_mapper_index, temp_mapper_value)
-                )
-
         if patch_update is False:
             self.source = ColumnDataSource(
                 {
@@ -259,21 +244,6 @@ class Line(BaseLine):
         -----------
         source_dict: {'X': [], 'Y': []}
         """
-        if self.max_value < 1:
-            """
-            handling labels in bokeh plots when max value is under 1
-            """
-            if len(self.x_label_map) == 0:
-                temp_mapper_index = np.array(source_dict["X"]).astype("str")
-                temp_mapper_value = np.round(
-                    (temp_mapper_index.astype(self.stride_type) * self.stride)
-                    + self.min_value,
-                    4,
-                ).astype("str")
-                self.x_label_map = dict(
-                    zip(temp_mapper_index, temp_mapper_value)
-                )
-
         if patch_update is False:
             self.source = ColumnDataSource(
                 {
