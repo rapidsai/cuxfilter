@@ -129,9 +129,7 @@ class ScatterGeo(BaseScatterGeo):
         if type(self.tile_provider) == str:
             self.tile_provider = get_provider(self.tile_provider)
 
-        if "title" in self.library_specific_params:
-            self.title = self.library_specific_params["title"]
-        else:
+        if len(self.title) == 0:
             self.title = (
                 "Geo Scatter plot for "
                 + self.aggregate_col
@@ -162,7 +160,7 @@ class ScatterGeo(BaseScatterGeo):
             self.chart,
             self.generate_InteractiveImage_callback(),
             data_source=self.source,
-            timeout=0.8
+            timeout=self.timeout,
         )
 
     def update_dimensions(self, width=None, height=None):
@@ -373,9 +371,7 @@ class Scatter(BaseScatter):
             self.no_colors_set = True
             self.color_palette = Hot
 
-        if "title" in self.library_specific_params:
-            self.title = self.library_specific_params["title"]
-        else:
+        if len(self.title) == 0:
             self.title = (
                 "Scatter plot for "
                 + self.aggregate_col
@@ -406,6 +402,7 @@ class Scatter(BaseScatter):
             self.chart,
             self.generate_InteractiveImage_callback(),
             data_source=self.source,
+            timeout=self.timeout,
         )
 
     def update_dimensions(self, width=None, height=None):
@@ -619,9 +616,7 @@ class Line(BaseLine):
         if self.color is None:
             self.color = "#8735fb"
 
-        if "title" in self.library_specific_params:
-            self.title = self.library_specific_params["title"]
-        else:
+        if len(self.title) == 0:
             if self.x == self.y:
                 self.title = "Line plot for " + self.x
             else:
@@ -650,6 +645,7 @@ class Line(BaseLine):
             self.chart,
             self.generate_InteractiveImage_callback(),
             data_source=self.source,
+            timeout=self.timeout,
         )
 
     def update_dimensions(self, width=None, height=None):
@@ -878,9 +874,7 @@ class StackedLines(BaseStackedLine):
             self.no_colors_set = True
             self.colors = ["#8735fb"] * len(self.y)
 
-        if "title" in self.library_specific_params:
-            self.title = self.library_specific_params["title"]
-        else:
+        if len(self.title) == 0:
             self.title = "Stacked Line plots on x-axis: " + self.x
 
         self.chart = figure(
@@ -907,6 +901,7 @@ class StackedLines(BaseStackedLine):
             self.chart,
             self.generate_InteractiveImage_callback(),
             data_source=self.source,
+            timeout=self.timeout,
         )
 
     def update_dimensions(self, width=None, height=None):

@@ -33,6 +33,8 @@ class BaseStackedLine(BaseChart):
         step_size_type=int,
         width=800,
         height=400,
+        title="",
+        timeout=1,
         **library_specific_params,
     ):
         """
@@ -40,17 +42,17 @@ class BaseStackedLine(BaseChart):
 
         -------------------------------------------
         Input:
-            x
+            x,
             y
             data_points
             add_interaction
-            aggregate_fn
+            colors
             step_size
             step_size_type
-            x_label_map
-            y_label_map
             width
             height
+            title
+            timeout
             **library_specific_params
         -------------------------------------------
 
@@ -70,6 +72,9 @@ class BaseStackedLine(BaseChart):
             raise TypeError("colors must be a list of colors")
         self.colors = colors
         self.stride_type = step_size_type
+        self.title = title
+        self.timeout = timeout
+
         self.library_specific_params = library_specific_params
 
         self.width = width

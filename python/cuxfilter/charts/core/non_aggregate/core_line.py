@@ -25,6 +25,8 @@ class BaseLine(BaseNonAggregate):
         step_size_type=int,
         width=800,
         height=400,
+        title="",
+        timeout=1,
         **library_specific_params,
     ):
         """
@@ -45,6 +47,8 @@ class BaseLine(BaseNonAggregate):
             y_label_map
             width
             height
+            title
+            timeout
             **library_specific_params
         -------------------------------------------
 
@@ -64,6 +68,8 @@ class BaseLine(BaseNonAggregate):
         self.stride = step_size
         self.stride_type = step_size_type
         self.pixel_shade_type = pixel_shade_type
+        self.title = title
+        self.timeout = timeout
         self.library_specific_params = library_specific_params
         self.width = width
         self.height = height
