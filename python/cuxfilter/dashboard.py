@@ -102,8 +102,7 @@ class DashBoard:
         data_size_widget=True,
         warnings=False,
     ):
-        self._backup_data = data
-        self._data = self._backup_data
+        self._data = data
         self._charts = dict()
         self._data_tiles = dict()
         self._query_str_dict = dict()
@@ -223,18 +222,15 @@ class DashBoard:
                     chart.initiate_chart(self)
                     chart._initialized = True
 
-    def _query(self, query_str, inplace=False):
+    def _query(self, query_str):
         """
         Query the cudf.DataFrame, inplace or create a copy based on the
         value of inplace.
         """
-        if inplace:
-            if len(query_str) > 0:
-                self._data = self._backup_data.query(query_str).copy()
-            else:
-                self._data = self._backup_data
+        if len(query_str) > 0:
+            return self._data.query(query_str)
         else:
-            return self._backup_data.query(query_str).copy()
+            return self._data
 
     def _generate_query_str(self, ignore_chart=""):
         """
@@ -300,7 +296,8 @@ class DashBoard:
         # current state as final state
         if self._active_view == "":
             print("no querying done, returning original dataframe")
-            return self._backup_data
+            # return self._backup_data
+            return self._data
         else:
             self._charts[self._active_view].compute_query_dict(
                 self._query_str_dict
@@ -308,10 +305,12 @@ class DashBoard:
 
             if len(self._generate_query_str()) > 0:
                 print("final query", self._generate_query_str())
-                return self._backup_data.query(self._generate_query_str())
+                # return self._backup_data.query(self._generate_query_str())
+                return self._data.query(self._generate_query_str())
             else:
                 print("no querying done, returning original dataframe")
-                return self._backup_data
+                # return self._backup_data
+                return self._data
 
     def __str__(self):
         return self.__repr__()
@@ -552,6 +551,8 @@ class DashBoard:
 
         # NO DATATILES for scatter types, as they are essentially all
         # points in the dataset
+        query = self._generate_query_str(self._charts[self._active_view])
+
         if "scatter" not in self._active_view:
             for chart in list(self._charts.values()):
                 if not chart.use_data_tiles:
@@ -562,7 +563,7 @@ class DashBoard:
                         chart,
                         dtype="pandas",
                         cumsum=cumsum,
-                    ).calc_data_tile(self._data)
+                    ).calc_data_tile(self._data.copy(), query)
 
         self._charts[self._active_view].datatile_loaded_state = True
 
@@ -581,11 +582,30 @@ class DashBoard:
                 self._active_view != chart.name
                 and "widget" not in chart.chart_type
             ):
-                chart.query_chart_by_range(
-                    self._charts[self._active_view],
-                    query_tuple,
-                    self._data_tiles[chart.name],
-                )
+                if chart.chart_type == "view_dataframe":
+                    chart.query_chart_by_range(
+                        self._charts[self._active_view],
+                        query_tuple,
+                        self._data,
+                        self._generate_query_str(
+                            self._charts[self._active_view]
+                        ),
+                    )
+                elif not chart.use_data_tiles:
+                    chart.query_chart_by_range(
+                        self._charts[self._active_view],
+                        query_tuple,
+                        self._data_tiles[chart.name],
+                        self._generate_query_str(
+                            self._charts[self._active_view]
+                        ),
+                    )
+                else:
+                    chart.query_chart_by_range(
+                        self._charts[self._active_view],
+                        query_tuple,
+                        self._data_tiles[chart.name],
+                    )
 
     def _query_datatiles_by_indices(self, old_indices, new_indices):
         """
@@ -597,12 +617,33 @@ class DashBoard:
                 self._active_view != chart.name
                 and "widget" not in chart.chart_type
             ):
-                chart.query_chart_by_indices(
-                    self._charts[self._active_view],
-                    old_indices,
-                    new_indices,
-                    self._data_tiles[chart.name],
-                )
+                if chart.chart_type == "view_dataframe":
+                    chart.query_chart_by_indices(
+                        self._charts[self._active_view],
+                        old_indices,
+                        new_indices,
+                        self._data,
+                        self._generate_query_str(
+                            self._charts[self._active_view]
+                        ),
+                    )
+                elif not chart.use_data_tiles:
+                    chart.query_chart_by_indices(
+                        self._charts[self._active_view],
+                        old_indices,
+                        new_indices,
+                        self._data_tiles[chart.name],
+                        self._generate_query_str(
+                            self._charts[self._active_view]
+                        ),
+                    )
+                else:
+                    chart.query_chart_by_indices(
+                        self._charts[self._active_view],
+                        old_indices,
+                        new_indices,
+                        self._data_tiles[chart.name],
+                    )
 
     def _reset_current_view(self, new_active_view: BaseChart):
         """
@@ -623,9 +664,13 @@ class DashBoard:
         self._active_view = new_active_view.name
 
         self._query_str_dict.pop(self._active_view, None)
-        # generate query_str to query self._data based on current active view,
-        # before changing the active_view
-        query_str = self._generate_query_str(self._charts[self._active_view])
-        # execute the query_str using cudf.query()
-        self._query(query_str, inplace=True)
-        self._reload_charts(ignore_cols=[self._active_view])
+        if (
+            "widget" not in self._charts[self._active_view].chart_type
+            and self._charts[self._active_view].use_data_tiles
+        ):
+            self._charts[self._active_view].reload_chart(
+                data=self._query(
+                    self._generate_query_str(ignore_chart=self._active_view)
+                ),
+                patch_update=True,
+            )

@@ -33,6 +33,8 @@ class BaseStackedLine(BaseChart):
         step_size_type=int,
         width=800,
         height=400,
+        title="",
+        timeout=1,
         **library_specific_params,
     ):
         """
@@ -40,17 +42,17 @@ class BaseStackedLine(BaseChart):
 
         -------------------------------------------
         Input:
-            x
+            x,
             y
             data_points
             add_interaction
-            aggregate_fn
+            colors
             step_size
             step_size_type
-            x_label_map
-            y_label_map
             width
             height
+            title
+            timeout
             **library_specific_params
         -------------------------------------------
 
@@ -70,6 +72,9 @@ class BaseStackedLine(BaseChart):
             raise TypeError("colors must be a list of colors")
         self.colors = colors
         self.stride_type = step_size_type
+        self.title = title
+        self.timeout = timeout
+
         self.library_specific_params = library_specific_params
 
         self.width = width
@@ -216,7 +221,7 @@ class BaseStackedLine(BaseChart):
         self.add_event(self.reset_event, reset_callback)
 
     def query_chart_by_range(
-        self, active_chart: BaseChart, query_tuple, datatile=None
+        self, active_chart: BaseChart, query_tuple, datatile=None, query=""
     ):
         """
         Description:
@@ -231,15 +236,22 @@ class BaseStackedLine(BaseChart):
         Ouput:
         """
         min_val, max_val = query_tuple
+        final_query = (
+            str(min_val) + "<=" + active_chart.x + "<=" + str(max_val)
+        )
+        if len(query) > 0:
+            final_query += " and " + query
         self.reload_chart(
-            self.source.query(
-                str(min_val) + "<=" + active_chart.x + "<=" + str(max_val)
-            ),
-            False,
+            self.source.query(final_query), False,
         )
 
     def query_chart_by_indices(
-        self, active_chart: BaseChart, old_indices, new_indices, datatile=None
+        self,
+        active_chart: BaseChart,
+        old_indices,
+        new_indices,
+        datatile=None,
+        query="",
     ):
         """
         Description:
@@ -260,20 +272,20 @@ class BaseStackedLine(BaseChart):
             # reset the chart
             self.reload_chart(self.source, False)
         elif len(new_indices) == 1:
+            final_query = active_chart.x + "==" + str(float(new_indices[0]))
+            if len(query) > 0:
+                final_query += " and " + query
             # just a single index
             self.reload_chart(
-                self.source.query(
-                    active_chart.x + "==" + str(float(new_indices[0]))
-                ),
-                False,
+                self.source.query(final_query), False,
             )
         else:
             new_indices_str = ",".join(map(str, new_indices))
+            final_query = active_chart.x + " in (" + new_indices_str + ")"
+            if len(query) > 0:
+                final_query += " and " + query
             self.reload_chart(
-                self.source.query(
-                    active_chart.x + " in (" + new_indices_str + ")"
-                ),
-                False,
+                self.source.query(final_query), False,
             )
 
     def add_selection_geometry_event(self, callback):

@@ -1,4 +1,5 @@
 import panel as pn
+import dask_cudf
 
 from .core_non_aggregate import BaseNonAggregate
 from ....layouts import chart_view
@@ -24,6 +25,8 @@ class BaseLine(BaseNonAggregate):
         step_size_type=int,
         width=800,
         height=400,
+        title="",
+        timeout=1,
         **library_specific_params,
     ):
         """
@@ -44,6 +47,8 @@ class BaseLine(BaseNonAggregate):
             y_label_map
             width
             height
+            title
+            timeout
             **library_specific_params
         -------------------------------------------
 
@@ -63,6 +68,8 @@ class BaseLine(BaseNonAggregate):
         self.stride = step_size
         self.stride_type = step_size_type
         self.pixel_shade_type = pixel_shade_type
+        self.title = title
+        self.timeout = timeout
         self.library_specific_params = library_specific_params
         self.width = width
         self.height = height
@@ -79,11 +86,15 @@ class BaseLine(BaseNonAggregate):
         Ouput:
 
         """
-        self.min_value = dashboard_cls._data[self.x].min()
-        self.max_value = dashboard_cls._data[self.x].max()
+        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
+            self.min_value = dashboard_cls._data[self.x].min().compute()
+            self.max_value = dashboard_cls._data[self.x].max().compute()
+        else:
+            self.min_value = dashboard_cls._data[self.x].min()
+            self.max_value = dashboard_cls._data[self.x].max()
 
-        if self.data_points > dashboard_cls._data[self.x].shape[0]:
-            self.data_points = dashboard_cls._data[self.x].shape[0]
+        if self.data_points > len(dashboard_cls._data):
+            self.data_points = len(dashboard_cls._data)
 
         if self.stride is None:
             if self.max_value < 1 and self.stride_type == int:

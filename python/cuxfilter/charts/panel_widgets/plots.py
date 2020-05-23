@@ -1,8 +1,8 @@
 from ..core import BaseWidget
 from ..core.aggregate import BaseDataSizeIndicator
-from ...assets.numba_kernels import aggregated_column_unique
 
 import panel as pn
+import dask_cudf
 
 
 class RangeSlider(BaseWidget):
@@ -26,8 +26,16 @@ class RangeSlider(BaseWidget):
         """
         initiate chart on dashboard creation
         """
-        self.min_value = dashboard_cls._data[self.x].min()
-        self.max_value = dashboard_cls._data[self.x].max()
+        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
+            self.min_value = dashboard_cls._data[self.x].min().compute()
+            self.max_value = dashboard_cls._data[self.x].max().compute()
+        else:
+            self.min_value = dashboard_cls._data[self.x].min()
+            self.max_value = dashboard_cls._data[self.x].max()
+
+        if self.max_value < 1 and self.stride_type == int:
+            self.stride_type = float
+
         self.generate_widget()
         self.add_events(dashboard_cls)
 
@@ -43,6 +51,7 @@ class RangeSlider(BaseWidget):
                 value=(self.min_value, self.max_value),
                 **self.params,
             )
+            self.stride = self.chart.step
         else:
             self.chart = pn.widgets.RangeSlider(
                 name=self.x,
@@ -93,7 +102,11 @@ class RangeSlider(BaseWidget):
         if self.chart.value != (self.chart.start, self.chart.end):
             min_temp, max_temp = self.chart.value
             query_str_dict[self.name] = (
-                str(min_temp) + "<=" + str(self.x) + "<=" + str(max_temp)
+                str(self.stride_type(round(min_temp, 4)))
+                + "<="
+                + str(self.x)
+                + "<="
+                + str(self.stride_type(round(max_temp, 4)))
             )
         else:
             query_str_dict.pop(self.name, None)
@@ -121,8 +134,13 @@ class IntSlider(BaseWidget):
         """
         initiate chart on dashboard creation
         """
-        self.min_value = int(dashboard_cls._data[self.x].min())
-        self.max_value = int(dashboard_cls._data[self.x].max())
+        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
+            self.min_value = int(dashboard_cls._data[self.x].min().compute())
+            self.max_value = int(dashboard_cls._data[self.x].max().compute())
+        else:
+            self.min_value = int(dashboard_cls._data[self.x].min())
+            self.max_value = int(dashboard_cls._data[self.x].max())
+
         self.generate_widget()
         self.add_events(dashboard_cls)
 
@@ -132,16 +150,28 @@ class IntSlider(BaseWidget):
         """
         if self.value is None:
             self.value = self.min_value
-        self.chart = pn.widgets.IntSlider(
-            name=self.x,
-            start=self.min_value,
-            end=self.max_value,
-            value=self.value,
-            step=self.stride,
-            width=self.width,
-            height=self.height,
-            **self.params,
-        )
+        if self.stride is None:
+            self.chart = pn.widgets.IntSlider(
+                name=self.x,
+                start=self.min_value,
+                end=self.max_value,
+                value=self.value,
+                step=self.stride,
+                width=self.width,
+                height=self.height,
+                **self.params,
+            )
+            self.stride = self.chart.step
+        else:
+            self.chart = pn.widgets.IntSlider(
+                name=self.x,
+                start=self.min_value,
+                end=self.max_value,
+                value=self.value,
+                width=self.width,
+                height=self.height,
+                **self.params,
+            )
 
     def apply_theme(self, properties_dict):
         """
@@ -163,8 +193,7 @@ class IntSlider(BaseWidget):
             if dashboard_cls._active_view != self.name:
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles(cumsum=False)
-
-            dashboard_cls._query_datatiles_by_indices([event.old], [event.new])
+            dashboard_cls._query_datatiles_by_indices([], [event.new])
 
         # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
@@ -210,8 +239,12 @@ class FloatSlider(BaseWidget):
         """
         initiate chart on dashboard creation
         """
-        self.min_value = dashboard_cls._data[self.x].min()
-        self.max_value = dashboard_cls._data[self.x].max()
+        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
+            self.min_value = dashboard_cls._data[self.x].min().compute()
+            self.max_value = dashboard_cls._data[self.x].max().compute()
+        else:
+            self.min_value = dashboard_cls._data[self.x].min()
+            self.max_value = dashboard_cls._data[self.x].max()
         self.generate_widget()
         self.add_events(dashboard_cls)
 
@@ -231,6 +264,7 @@ class FloatSlider(BaseWidget):
                 height=self.height,
                 **self.params,
             )
+            self.stride = self.chart.step
         else:
             self.chart = pn.widgets.FloatSlider(
                 name=self.x,
@@ -264,7 +298,7 @@ class FloatSlider(BaseWidget):
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles(cumsum=False)
 
-            dashboard_cls._query_datatiles_by_indices([event.old], [event.new])
+            dashboard_cls._query_datatiles_by_indices([], [event.new])
 
         # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
@@ -296,15 +330,17 @@ class DropDown(BaseWidget):
         """
         initiate chart on dashboard creation
         """
-        self.min_value = dashboard_cls._data[self.x].min()
-        self.max_value = dashboard_cls._data[self.x].max()
+        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
+            self.min_value = dashboard_cls._data[self.x].min().compute()
+            self.max_value = dashboard_cls._data[self.x].max().compute()
+        else:
+            self.min_value = dashboard_cls._data[self.x].min()
+            self.max_value = dashboard_cls._data[self.x].max()
 
         if self.stride is None:
             if self.max_value < 1 and self.stride_type == int:
                 self.stride_type = float
-            self.stride = self.stride_type(
-                (self.max_value - self.min_value) / self.data_points
-            )
+            self.stride = self.stride_type(1)
 
         self.calc_list_of_values(dashboard_cls._data)
         self.generate_widget()
@@ -315,9 +351,13 @@ class DropDown(BaseWidget):
         calculate unique list of values to be included in the drop down menu
         """
         if self.label_map is None:
-            self.list_of_values = data[self.x].unique().to_pandas().tolist()
-            if len(self.list_of_values) > self.data_points:
-                self.list_of_values = aggregated_column_unique(self, data)
+            self.list_of_values = data[self.x].unique()
+            if isinstance(data, dask_cudf.core.DataFrame):
+                self.list_of_values = self.list_of_values.compute()
+
+            self.list_of_values = self.list_of_values.to_pandas().tolist()
+            # if len(self.list_of_values) > self.data_points:
+            #     self.list_of_values = aggregated_column_unique(self, data)
 
             if len(self.list_of_values) > 500:
                 print(
@@ -403,8 +443,12 @@ class MultiSelect(BaseWidget):
         """
         initiate chart on dashboard creation
         """
-        self.min_value = dashboard_cls._data[self.x].min()
-        self.max_value = dashboard_cls._data[self.x].max()
+        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
+            self.min_value = dashboard_cls._data[self.x].min().compute()
+            self.max_value = dashboard_cls._data[self.x].max().compute()
+        else:
+            self.min_value = dashboard_cls._data[self.x].min()
+            self.max_value = dashboard_cls._data[self.x].max()
 
         if self.stride is None:
             if self.max_value < 1 and self.stride_type == int:
@@ -422,7 +466,11 @@ class MultiSelect(BaseWidget):
         calculate unique list of values to be included in the multiselect menu
         """
         if self.label_map is None:
-            self.list_of_values = data[self.x].unique().to_pandas().tolist()
+            self.list_of_values = data[self.x].unique()
+            if isinstance(data, dask_cudf.core.DataFrame):
+                self.list_of_values = self.list_of_values.compute()
+
+            self.list_of_values = self.list_of_values.to_pandas().tolist()
             # if len(self.list_of_values) > self.data_points:
             #     self.list_of_values = aggregated_column_unique(self, data)
 

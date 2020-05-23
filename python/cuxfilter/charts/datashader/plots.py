@@ -9,6 +9,8 @@ from .custom_extensions import InteractiveImage
 import datashader as cds
 from datashader import transfer_functions as tf
 from datashader.colors import Hot
+import dask_cudf
+import dask.dataframe as dd
 import numpy as np
 from bokeh import events
 from bokeh.plotting import figure
@@ -127,9 +129,7 @@ class ScatterGeo(BaseScatterGeo):
         if type(self.tile_provider) == str:
             self.tile_provider = get_provider(self.tile_provider)
 
-        if "title" in self.library_specific_params:
-            self.title = self.library_specific_params["title"]
-        else:
+        if len(self.title) == 0:
             self.title = (
                 "Geo Scatter plot for "
                 + self.aggregate_col
@@ -160,6 +160,7 @@ class ScatterGeo(BaseScatterGeo):
             self.chart,
             self.generate_InteractiveImage_callback(),
             data_source=self.source,
+            timeout=self.timeout,
         )
 
     def update_dimensions(self, width=None, height=None):
@@ -370,9 +371,7 @@ class Scatter(BaseScatter):
             self.no_colors_set = True
             self.color_palette = Hot
 
-        if "title" in self.library_specific_params:
-            self.title = self.library_specific_params["title"]
-        else:
+        if len(self.title) == 0:
             self.title = (
                 "Scatter plot for "
                 + self.aggregate_col
@@ -403,6 +402,7 @@ class Scatter(BaseScatter):
             self.chart,
             self.generate_InteractiveImage_callback(),
             data_source=self.source,
+            timeout=self.timeout,
         )
 
     def update_dimensions(self, width=None, height=None):
@@ -574,6 +574,9 @@ class Line(BaseLine):
         self.source = data
         self.x_range = (self.source[self.x].min(), self.source[self.x].max())
         self.y_range = (self.source[self.y].min(), self.source[self.y].max())
+        if isinstance(data, dask_cudf.core.DataFrame):
+            self.x_range = dd.compute(*self.x_range)
+            self.y_range = dd.compute(*self.y_range)
 
     def generate_InteractiveImage_callback(self):
         """
@@ -613,9 +616,7 @@ class Line(BaseLine):
         if self.color is None:
             self.color = "#8735fb"
 
-        if "title" in self.library_specific_params:
-            self.title = self.library_specific_params["title"]
-        else:
+        if len(self.title) == 0:
             if self.x == self.y:
                 self.title = "Line plot for " + self.x
             else:
@@ -644,6 +645,7 @@ class Line(BaseLine):
             self.chart,
             self.generate_InteractiveImage_callback(),
             data_source=self.source,
+            timeout=self.timeout,
         )
 
     def update_dimensions(self, width=None, height=None):
@@ -825,6 +827,9 @@ class StackedLines(BaseStackedLine):
                 self.source[self.y].min().min(),
                 self.source[self.y].max().max(),
             )
+        if isinstance(data, dask_cudf.core.DataFrame):
+            self.x_range = dd.compute(*self.x_range)
+            self.y_range = dd.compute(*self.y_range)
 
     def generate_InteractiveImage_callback(self):
         """
@@ -869,9 +874,7 @@ class StackedLines(BaseStackedLine):
             self.no_colors_set = True
             self.colors = ["#8735fb"] * len(self.y)
 
-        if "title" in self.library_specific_params:
-            self.title = self.library_specific_params["title"]
-        else:
+        if len(self.title) == 0:
             self.title = "Stacked Line plots on x-axis: " + self.x
 
         self.chart = figure(
@@ -898,6 +901,7 @@ class StackedLines(BaseStackedLine):
             self.chart,
             self.generate_InteractiveImage_callback(),
             data_source=self.source,
+            timeout=self.timeout,
         )
 
     def update_dimensions(self, width=None, height=None):

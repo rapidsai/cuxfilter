@@ -37,6 +37,8 @@ class BaseScatter(BaseNonAggregate):
         pixel_spread="dynspread",
         width=800,
         height=400,
+        title="",
+        timeout=1,
         **library_specific_params,
     ):
         """
@@ -49,12 +51,18 @@ class BaseScatter(BaseNonAggregate):
             x_range
             y_range
             add_interaction
-            geo_color_palette
+            color_palette
             aggregate_col
             aggregate_fn
+            point_size
+            point_shape
+            pixel_shade_type
+            pixel_density
+            pixel_spread
             width
             height
-            tile_provider
+            title
+            timeout
             **library_specific_params
         -------------------------------------------
 
@@ -78,6 +86,8 @@ class BaseScatter(BaseNonAggregate):
         self.height = height
         self.point_shape = point_shape
         self.point_size = point_size
+        self.title = title
+        self.timeout = timeout
         self.pixel_shade_type = pixel_shade_type
         self.pixel_density = pixel_density
         self.pixel_spread = pixel_spread
