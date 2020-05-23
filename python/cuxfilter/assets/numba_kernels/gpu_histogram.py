@@ -22,8 +22,11 @@ def calc_value_counts(a_gpu, stride, min_value, data_points):
             val_count = a_gpu.value_counts()
         else:
             val_count = (
-                (a_gpu - min_value) / stride
-            ).round().astype('int').value_counts()
+                ((a_gpu - min_value) / stride)
+                .round()
+                .astype("int")
+                .value_counts()
+            )
             custom_binning = True
         val_count = val_count.compute().sort_index()
     else:
@@ -31,13 +34,18 @@ def calc_value_counts(a_gpu, stride, min_value, data_points):
             val_count = a_gpu.value_counts().sort_index()
         else:
             val_count = (
-                (a_gpu - min_value) / stride
-            ).round().astype('int').value_counts().sort_index()
+                ((a_gpu - min_value) / stride)
+                .round()
+                .astype("int")
+                .value_counts()
+                .sort_index()
+            )
             custom_binning = True
 
     return (
         (val_count.index.to_array(), val_count.to_array()),
-        len(val_count), custom_binning
+        len(val_count),
+        custom_binning,
     )
 
 
@@ -57,8 +65,7 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
         temp_df[chart.y] = data.dropna(subset=[chart.x])[chart.y]
         if type(temp_df) == dask_cudf.core.DataFrame:
             groupby_res = getattr(
-                temp_df.groupby(by=[chart.x]),
-                chart.aggregate_fn
+                temp_df.groupby(by=[chart.x]), chart.aggregate_fn
             )()
             groupby_res = groupby_res.reset_index().compute().to_pandas()
         else:
@@ -74,25 +81,26 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
             groupby_res = None
             for key, agg_fn in agg.items():
                 groupby_res_temp = getattr(
-                    temp_df[[chart.x, key]].groupby(chart.x),
-                    agg_fn
+                    temp_df[[chart.x, key]].groupby(chart.x), agg_fn
                 )()
                 if groupby_res is None:
                     groupby_res = groupby_res_temp.reset_index().compute()
                 else:
                     groupby_res_temp = groupby_res_temp.reset_index().compute()
-                    groupby_res = groupby_res.merge(groupby_res_temp, on=chart.x)
-                del(groupby_res_temp)
+                    groupby_res = groupby_res.merge(
+                        groupby_res_temp, on=chart.x
+                    )
+                del groupby_res_temp
                 gc.collect()
             groupby_res = groupby_res.to_pandas()
         else:
             groupby_res = (
-                temp_df.groupby(
-                    by=[chart.x], as_index=False
-                ).agg(agg).to_pandas()
+                temp_df.groupby(by=[chart.x], as_index=False)
+                .agg(agg)
+                .to_pandas()
             )
 
-    del(temp_df)
+    del temp_df
     gc.collect()
 
     return groupby_res.to_numpy().transpose()

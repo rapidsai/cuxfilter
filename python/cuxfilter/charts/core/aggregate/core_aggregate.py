@@ -31,7 +31,10 @@ class BaseAggregateChart(BaseChart):
         if self.custom_binning:
             datatile_indices = self.source.data[self.data_x_axis]
         else:
-            datatile_indices = ((self.source.data[self.data_x_axis] - self.min_value) / self.stride).astype('int')
+            datatile_indices = (
+                (self.source.data[self.data_x_axis] - self.min_value)
+                / self.stride
+            ).astype("int")
 
         if datatile_index_min == 0:
             if self.aggregate_fn == "mean":
@@ -43,16 +46,26 @@ class BaseAggregateChart(BaseChart):
                 )
                 datatile_result = datatile_result_sum / datatile_result_count
             elif self.aggregate_fn in ["count", "sum", "min", "max"]:
-                datatile_result = datatile.loc[datatile_indices, datatile_index_max]
+                datatile_result = datatile.loc[
+                    datatile_indices, datatile_index_max
+                ]
         else:
             datatile_index_min -= 1
             if self.aggregate_fn == "mean":
-                datatile_max0 = datatile[0].loc[datatile_indices, datatile_index_max]
-                datatile_min0 = datatile[0].loc[datatile_indices, datatile_index_min]
+                datatile_max0 = datatile[0].loc[
+                    datatile_indices, datatile_index_max
+                ]
+                datatile_min0 = datatile[0].loc[
+                    datatile_indices, datatile_index_min
+                ]
                 datatile_result_sum = np.array(datatile_max0 - datatile_min0)
 
-                datatile_max1 = datatile[1].loc[datatile_indices, datatile_index_max]
-                datatile_min1 = datatile[1].loc[datatile_indices, datatile_index_min]
+                datatile_max1 = datatile[1].loc[
+                    datatile_indices, datatile_index_max
+                ]
+                datatile_min1 = datatile[1].loc[
+                    datatile_indices, datatile_index_min
+                ]
                 datatile_result_count = np.array(datatile_max1 - datatile_min1)
 
                 datatile_result = datatile_result_sum / datatile_result_count
@@ -69,9 +82,9 @@ class BaseAggregateChart(BaseChart):
                     getattr(
                         datatile.loc[
                             datatile_indices,
-                            datatile_index_min:datatile_index_max
+                            datatile_index_min:datatile_index_max,
                         ],
-                        self.aggregate_fn
+                        self.aggregate_fn,
                     )(axis=1, skipna=True)
                 )
 
@@ -98,10 +111,17 @@ class BaseAggregateChart(BaseChart):
         if self.custom_binning:
             datatile_indices = self.source.data[self.data_x_axis]
         else:
-            datatile_indices = ((self.source.data[self.data_x_axis] - self.min_value) / self.stride).astype('int')
+            datatile_indices = (
+                (self.source.data[self.data_x_axis] - self.min_value)
+                / self.stride
+            ).astype("int")
         if len(new_indices) == 0 or new_indices == [""]:
-            datatile_sum_0 = np.array(datatile[0].loc[datatile_indices].sum(axis=1, skipna=True))
-            datatile_sum_1 = np.array(datatile[1].loc[datatile_indices].sum(axis=1, skipna=True))
+            datatile_sum_0 = np.array(
+                datatile[0].loc[datatile_indices].sum(axis=1, skipna=True)
+            )
+            datatile_sum_1 = np.array(
+                datatile[1].loc[datatile_indices].sum(axis=1, skipna=True)
+            )
             datatile_result = datatile_sum_0 / datatile_sum_1
             return datatile_result
 
@@ -143,9 +163,14 @@ class BaseAggregateChart(BaseChart):
         if self.custom_binning:
             datatile_indices = self.source.data[self.data_x_axis]
         else:
-            datatile_indices = ((self.source.data[self.data_x_axis] - self.min_value) / self.stride).astype('int')
+            datatile_indices = (
+                (self.source.data[self.data_x_axis] - self.min_value)
+                / self.stride
+            ).astype("int")
         if len(new_indices) == 0 or new_indices == [""]:
-            datatile_result = np.array(datatile.loc[datatile_indices, :].sum(axis=1, skipna=True))
+            datatile_result = np.array(
+                datatile.loc[datatile_indices, :].sum(axis=1, skipna=True)
+            )
             return datatile_result
 
         if len(old_indices) == 0 or old_indices == [""]:
@@ -176,11 +201,7 @@ class BaseAggregateChart(BaseChart):
         return datatile_result
 
     def query_chart_by_indices_for_minmax(
-        self,
-        active_chart,
-        old_indices,
-        new_indices,
-        datatile,
+        self, active_chart, old_indices, new_indices, datatile,
     ):
         """
         Description:
@@ -195,26 +216,28 @@ class BaseAggregateChart(BaseChart):
             datatile_indices = self.source.data[self.data_x_axis]
         else:
             datatile_indices = (
-                (self.source.data[self.data_x_axis] - self.min_value) / self.stride
-            ).astype('int')
+                (self.source.data[self.data_x_axis] - self.min_value)
+                / self.stride
+            ).astype("int")
 
         if len(new_indices) == 0 or new_indices == [""]:
             # get min or max from datatile df, skipping column 0(always 0)
             datatile_result = np.array(
-                getattr(
-                    datatile.loc[datatile_indices, 1:],
-                    self.aggregate_fn
-                )(axis=1, skipna=True))
+                getattr(datatile.loc[datatile_indices, 1:], self.aggregate_fn)(
+                    axis=1, skipna=True
+                )
+            )
         else:
             new_indices = np.array(new_indices)
             new_indices = np.round(
                 (new_indices - active_chart.min_value) / active_chart.stride
-            ).astype('int')
+            ).astype("int")
             datatile_result = np.array(
                 getattr(
                     datatile.loc[datatile_indices, list(new_indices)],
-                    self.aggregate_fn
-                )(axis=1, skipna=True))
+                    self.aggregate_fn,
+                )(axis=1, skipna=True)
+            )
 
         return datatile_result
 
@@ -262,9 +285,6 @@ class BaseAggregateChart(BaseChart):
             )
         elif self.aggregate_fn in ["min", "max"]:
             datatile_result = self.query_chart_by_indices_for_minmax(
-                active_chart,
-                old_indices,
-                new_indices,
-                datatile,
+                active_chart, old_indices, new_indices, datatile,
             )
         self.reset_chart(datatile_result)

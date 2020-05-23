@@ -142,7 +142,7 @@ class BaseBar(BaseAggregateChart):
                     "exceeds 50,000 points.",
                     "Performance may be laggy, its recommended ",
                     "to use custom data_points parameter to ",
-                    "enforce custom binning for smooth crossfiltering"
+                    "enforce custom binning for smooth crossfiltering",
                 )
         else:
             self.aggregate_fn = "mean"

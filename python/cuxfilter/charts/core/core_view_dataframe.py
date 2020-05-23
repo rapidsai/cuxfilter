@@ -73,11 +73,12 @@ class ViewDataFrame:
             if self.force_computation:
                 self.generate_chart(dashboard_cls._data.compute())
             else:
-                print("displaying only 1st partitions top 1000 rows for ",
-                "view_dataframe - dask_cudf to avoid partition based ",
-                "computation use force_computation=True for viewing ",
-                "top-level view of entire DataFrame. ",
-                "Warning - would slow the dashboard down significantly"
+                print(
+                    "displaying only 1st partitions top 1000 rows for ",
+                    "view_dataframe - dask_cudf to avoid partition based ",
+                    "computation use force_computation=True for viewing ",
+                    "top-level view of entire DataFrame. ",
+                    "Warning - would slow the dashboard down significantly",
                 )
                 self.generate_chart(dashboard_cls._data.head(1000))
         else:

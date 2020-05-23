@@ -76,7 +76,9 @@ def calc_data_tile_for_size(
     cumsum: bool = True,
     return_format="pandas",
 ):
-    df[col_1 + "_mod"] = ((df[col_1] - min_1) / stride_1).round().astype("int32")
+    df[col_1 + "_mod"] = (
+        ((df[col_1] - min_1) / stride_1).round().astype("int32")
+    )
     if type(df) == dask_cudf.core.DataFrame:
         groupby_result = getattr(
             df[[col_1 + "_mod", col_1]].groupby(col_1 + "_mod"), "count"
@@ -158,16 +160,22 @@ def calc_data_tile(
 
     check_list = []
 
-    df[col_1 + "_mod"] = ((df[col_1] - min_1) / stride_1).round().astype("int32")
+    df[col_1 + "_mod"] = (
+        ((df[col_1] - min_1) / stride_1).round().astype("int32")
+    )
     check_list.append(col_1 + "_mod")
-    df[col_2 + "_mod"] = ((df[col_2] - min_2) / stride_2).round().astype("int32")
+    df[col_2 + "_mod"] = (
+        ((df[col_2] - min_2) / stride_2).round().astype("int32")
+    )
     check_list.append(col_2 + "_mod")
 
     groupby_results = []
     for i in aggregate_dict[key]:
         agg = {key: i}
         if type(df) == dask_cudf.core.DataFrame:
-            temp_df = getattr(df[check_list + [key]].groupby(check_list, sort=False), i)()
+            temp_df = getattr(
+                df[check_list + [key]].groupby(check_list, sort=False), i
+            )()
             temp_df = temp_df.reset_index().compute()
             groupby_results.append(temp_df)
         else:
@@ -177,7 +185,7 @@ def calc_data_tile(
                 ).agg(agg)
             )
 
-    del(df)
+    del df
     gc.collect()
 
     results = []
@@ -205,7 +213,7 @@ def calc_data_tile(
             result_np = np.cumsum(result.copy_to_host(), axis=1)
 
         result_temp = format_result(result_np, return_format)
-        if return_format == 'pandas':
+        if return_format == "pandas":
             result_temp[~result_temp.index.isin(list_of_indices)] = 0
         results.append(result_temp)
 

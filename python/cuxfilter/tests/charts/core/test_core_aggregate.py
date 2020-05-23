@@ -86,14 +86,14 @@ class TestCoreAggregateChart:
         active_chart.reset_chart = reset_chart
         active_chart.source = ColumnDataSource(
             {
-                'x': np.array([10., 11., 12., 13., 14.]),
-                'y': np.array([1, 1, 1, 1, 1])
+                "x": np.array([10.0, 11.0, 12.0, 13.0, 14.0]),
+                "y": np.array([1, 1, 1, 1, 1]),
             }
         )
         active_chart.source_backup = pd.DataFrame(
             {
-                'x': np.array([10., 11., 12., 13., 14.]),
-                'y': np.array([1, 1, 1, 1, 1])
+                "x": np.array([10.0, 11.0, 12.0, 13.0, 14.0]),
+                "y": np.array([1, 1, 1, 1, 1]),
             }
         )
 
@@ -103,7 +103,7 @@ class TestCoreAggregateChart:
                 1: {0: 1.0, 1: 1.0, 2: 0.0, 3: 0.0, 4: 0.0},
                 2: {0: 1.0, 1: 1.0, 2: 1.0, 3: 0.0, 4: 0.0},
                 3: {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 0.0},
-                4: {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0}
+                4: {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0},
             }
         )
 
@@ -114,10 +114,20 @@ class TestCoreAggregateChart:
     @pytest.mark.parametrize(
         "old_indices, new_indices, prev_result,result",
         [
-            ([], [0], [0.0, 0.0, 0.0, 0.0, 0.0], [1., 0., 0., 0., 0.]),
-            ([0], [0, 1], [1., 0., 0., 0., 0.], [1., 1., 0., 0., 0.]),
-            ([0, 1], [], [1., 0., 0., 0., 0.], [1., 1., 1., 1., 1.]),
-            ([], [0, 1, 2, 3, 4], [1., 1., 1., 1., 1.], [1., 1., 1., 1., 1.]),
+            ([], [0], [0.0, 0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0, 0.0]),
+            (
+                [0],
+                [0, 1],
+                [1.0, 0.0, 0.0, 0.0, 0.0],
+                [1.0, 1.0, 0.0, 0.0, 0.0],
+            ),
+            ([0, 1], [], [1.0, 0.0, 0.0, 0.0, 0.0], [1.0, 1.0, 1.0, 1.0, 1.0]),
+            (
+                [],
+                [0, 1, 2, 3, 4],
+                [1.0, 1.0, 1.0, 1.0, 1.0],
+                [1.0, 1.0, 1.0, 1.0, 1.0],
+            ),
         ],
     )
     def test_query_chart_by_indices(
@@ -144,17 +154,20 @@ class TestCoreAggregateChart:
             self.result = datatile_result
 
         passive_chart.reset_chart = reset_chart
-        passive_chart.source = ColumnDataSource({
-            'x': np.array([2., 3., 4., 5., 6.]), 'y': np.array([1, 1, 1, 1, 1])
-        })
-        passive_chart.data_x_axis = 'x'
+        passive_chart.source = ColumnDataSource(
+            {
+                "x": np.array([2.0, 3.0, 4.0, 5.0, 6.0]),
+                "y": np.array([1, 1, 1, 1, 1]),
+            }
+        )
+        passive_chart.data_x_axis = "x"
         datatile = pd.DataFrame(
             {
                 0: {0: 1.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0},
                 1: {0: 0.0, 1: 1.0, 2: 0.0, 3: 0.0, 4: 0.0},
                 2: {0: 0.0, 1: 0.0, 2: 1.0, 3: 0.0, 4: 0.0},
                 3: {0: 0.0, 1: 0.0, 2: 0.0, 3: 1.0, 4: 0.0},
-                4: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 1.0}
+                4: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 1.0},
             }
         )
 

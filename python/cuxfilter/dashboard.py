@@ -664,7 +664,7 @@ class DashBoard:
         self._active_view = new_active_view.name
 
         self._query_str_dict.pop(self._active_view, None)
-        if(
+        if (
             "widget" not in self._charts[self._active_view].chart_type
             and self._charts[self._active_view].use_data_tiles
         ):
@@ -672,5 +672,5 @@ class DashBoard:
                 data=self._query(
                     self._generate_query_str(ignore_chart=self._active_view)
                 ),
-                patch_update=True
+                patch_update=True,
             )

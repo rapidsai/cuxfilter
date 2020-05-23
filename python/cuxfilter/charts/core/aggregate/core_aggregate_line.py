@@ -141,7 +141,7 @@ class BaseLine(BaseAggregateChart):
                     "to use custom data_points parameter to ",
                     "enforce custom binning for smooth crossfiltering.",
                     "Also, checkout datashader.line for ",
-                    "rendering millions of points."
+                    "rendering millions of points.",
                 )
         else:
             self.aggregate_fn = "mean"

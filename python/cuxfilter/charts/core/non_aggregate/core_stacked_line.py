@@ -246,8 +246,12 @@ class BaseStackedLine(BaseChart):
         )
 
     def query_chart_by_indices(
-        self, active_chart: BaseChart, old_indices, new_indices, datatile=None,
-        query=""
+        self,
+        active_chart: BaseChart,
+        old_indices,
+        new_indices,
+        datatile=None,
+        query="",
     ):
         """
         Description:
