@@ -16,10 +16,11 @@ dependencies:
 - datashader>=0.10.*
 - geopandas>=0.6.*
 - pyproj>=2.4.*
+- libwebp
 - pandoc=<2.0.0
 - panel=0.6.*
 - bokeh=1.*
-- cudatoolkit=9.2
+- cudatoolkit=10.2
 - nodejs
 - recommonmark
 - pytest

@@ -58,7 +58,7 @@ nvidia-smi
 logger "Activate conda env..."
 source activate gdf
 conda install "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" "rapids-notebook-env=$MINOR_VERSION.*" \
-              "datashader>=0.10.*" "panel=0.6.*" "bokeh=1.*" "geopandas>=0.6.*" "pytest" "pyppeteer" \
+              "datashader>=0.10.*" "panel=0.6.*" "bokeh=1.*" "geopandas>=0.6.*" "pytest" "libwebp" "pyppeteer" \
               "jupyter-server-proxy" "pyproj>=2.4.*" "nodejs" "dask-cudf=$MINOR_VERSION.*" "dask-cuda=$MINOR_VERSION.*"
 
 logger "Check versions..."
