@@ -18,11 +18,7 @@ def test_calc_cumsum_data_tile():
     )
     max_s = int(df["key"].max() - df["key"].min()) + 1
     min_s = int(df["val"].max() - df["val"].min()) + 1
-    df["val_mod"] = gpu_datatile.get_binwise_reduced_column(
-        df["val"].copy().to_gpu_array(),
-        1,
-        cuda.to_device(np.asarray([df["val"].min(), df["val"].max()])),
-    )
+    df["val_mod"] = ((df["val"] - df["val"].min()) / 1).round().astype("int32")
     groupby_as_ndarray = cuda.to_device(
         df.groupby(
             by=["key", "val_mod"], method="hash", sort=True, as_index=False
@@ -101,104 +97,6 @@ def test_calc_cumsum_data_tile():
             ]
         ),
     )
-
-
-@pytest.mark.parametrize(
-    "stride, test_arr, result",
-    [
-        (
-            2,
-            cuda.to_device(
-                np.array(
-                    [
-                        10.0,
-                        8.0,
-                        6.0,
-                        4.0,
-                        2.0,
-                        10.0,
-                        8.0,
-                        6.0,
-                        4.0,
-                        2.0,
-                        10.0,
-                        8.0,
-                        6.0,
-                    ]
-                )
-            ),
-            np.array(
-                [
-                    4.0,
-                    3.0,
-                    2.0,
-                    1.0,
-                    0.0,
-                    4.0,
-                    3.0,
-                    2.0,
-                    1.0,
-                    0.0,
-                    4.0,
-                    3.0,
-                    2.0,
-                ]
-            ),
-        ),
-        (
-            1,
-            cuda.to_device(
-                np.array(
-                    [
-                        10.0,
-                        8.0,
-                        6.0,
-                        4.0,
-                        2.0,
-                        10.0,
-                        8.0,
-                        6.0,
-                        4.0,
-                        2.0,
-                        10.0,
-                        8.0,
-                        6.0,
-                        0.0,
-                    ]
-                )
-            ),
-            cuda.to_device(
-                np.array(
-                    [
-                        10.0,
-                        8.0,
-                        6.0,
-                        4.0,
-                        2.0,
-                        10.0,
-                        8.0,
-                        6.0,
-                        4.0,
-                        2.0,
-                        10.0,
-                        8.0,
-                        6.0,
-                        0.0,
-                    ]
-                )
-            ),
-        ),
-    ],
-)
-def test_calc_binwise_reduced_column(stride, test_arr, result):
-    min, max = test_arr.copy_to_host().min(), test_arr.copy_to_host().max()
-    test_res = gpu_datatile.get_binwise_reduced_column(
-        test_arr, stride, cuda.to_device(np.asarray([min, max]))
-    ).copy_to_host()
-
-    assert np.array_equal(test_res, result)
-
-
 @pytest.mark.parametrize(
     "result, return_format_str, return_format",
     [
@@ -275,11 +173,16 @@ def test_calc_data_tile():
 
     result = pd.DataFrame(
         {
-            0: {0: 0.0, 2: 0.0, 4: 0.0, 6: 0.0, 8: 5.0},
-            1: {0: 0.0, 2: 0.0, 4: 0.0, 6: 5.0, 8: 5.0},
-            2: {0: 0.0, 2: 0.0, 4: 5.0, 6: 5.0, 8: 5.0},
-            3: {0: 0.0, 2: 5.0, 4: 5.0, 6: 5.0, 8: 5.0},
-            4: {0: 5.0, 2: 5.0, 4: 5.0, 6: 5.0, 8: 5.0},
+            0: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0,
+                5: 0.0, 6: 0.0, 7: 0.0, 8: 5.0},
+            1: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0,
+                5: 0.0, 6: 5.0, 7: 0.0, 8: 5.0},
+            2: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 5.0,
+                5: 0.0, 6: 5.0, 7: 0.0, 8: 5.0},
+            3: {0: 0.0, 1: 0.0, 2: 5.0, 3: 0.0, 4: 5.0,
+                5: 0.0, 6: 5.0, 7: 0.0, 8: 5.0},
+            4: {0: 5.0, 1: 0.0, 2: 5.0, 3: 0.0, 4: 5.0,
+                5: 0.0, 6: 5.0, 7: 0.0, 8: 5.0}
         }
     )
 

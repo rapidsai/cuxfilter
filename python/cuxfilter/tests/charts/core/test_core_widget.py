@@ -14,7 +14,7 @@ class TestBaseWidget:
         assert bw.height == 10
         assert bw.width == 400
         assert bw.chart is None
-        assert bw.data_points == 100
+        assert bw.data_points is None
         assert bw.start is None
         assert bw.end is None
         assert bw._stride is None

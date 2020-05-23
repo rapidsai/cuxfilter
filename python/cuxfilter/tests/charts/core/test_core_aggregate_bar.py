@@ -27,7 +27,7 @@ class TestBaseBar:
         assert bb.datatile_active_color == "#8ab4f7"
         assert bb.x == "test_x"
         assert bb.y is None
-        assert bb.data_points == int(100)
+        assert bb.data_points is None
         assert bb.add_interaction is True
         assert bb.aggregate_fn == "count"
         assert bb.width == 400
@@ -86,12 +86,7 @@ class TestBaseBar:
 
     def test_add_range_slider_filter(self):
         bb = BaseBar(x="key")
-        bb.min_value = self.dashboard._data[bb.x].min()
-        bb.max_value = self.dashboard._data[bb.x].max()
-        if bb.data_points > self.dashboard._data[bb.x].shape[0]:
-            bb.data_points = self.dashboard._data[bb.x].shape[0]
-        bb.add_range_slider_filter(self.dashboard)
-
+        self.dashboard.add_charts([bb])
         assert type(bb.filter_widget) == pn.widgets.RangeSlider
         assert bb.filter_widget.value == (0, 4)
 
@@ -100,11 +95,6 @@ class TestBaseBar:
     )
     def test_compute_query_dict(self, range, query):
         bb = BaseBar(x="key")
-        bb.min_value = self.dashboard._data[bb.x].min()
-        bb.max_value = self.dashboard._data[bb.x].max()
-        if bb.data_points > self.dashboard._data[bb.x].shape[0]:
-            bb.data_points = self.dashboard._data[bb.x].shape[0]
-        bb.add_range_slider_filter(self.dashboard)
         self.dashboard.add_charts([bb])
         bb.filter_widget.value = range
         # test the following function behavior

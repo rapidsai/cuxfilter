@@ -45,39 +45,27 @@ class TestDashBoard:
         ]
 
     @pytest.mark.parametrize(
-        "query, inplace, result1, result2",
+        "query, result",
         [
             (
                 "key<3",
-                True,
-                None,
                 "   key   val\n0    0  10.0\n1    1  11.0\n2    2  12.0",
             ),
             (
-                "key<3",
-                False,
-                "   key   val\n0    0  10.0\n1    1  11.0\n2    2  12.0",
-                None,
-            ),
+                "key>=3",
+                '   key   val\n3    3  13.0\n4    4  14.0',
+            )
         ],
     )
-    def test_query(self, query, inplace, result1, result2):
+    def test_query(self, query, result):
         df = cudf.DataFrame(
             {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
         )
         cux_df = cuxfilter.DataFrame.from_dataframe(df.copy())
         dashboard = cux_df.dashboard(charts=[], title="test_title")
-        query_res = dashboard._query(query_str=query, inplace=inplace)
+        query_res = dashboard._query(query_str=query)
 
-        if query_res is not None:
-            assert query_res.to_string() == result1
-        else:
-            assert query_res == result1
-
-        if result2 is not None:
-            assert dashboard._data.to_string() == result2
-        else:
-            assert dashboard._data.equals(df)
+        assert query_res.to_string() == result
 
     @pytest.mark.parametrize(
         "query_dict, query_str",
@@ -251,6 +239,3 @@ class TestDashBoard:
         assert dashboard._query_str_dict == {"key_line": "1<=key<=2"}
         assert dashboard._charts[bac.name].datatile_loaded_state is False
         assert bac1.name not in dashboard._query_str_dict
-        assert dashboard._data.equals(
-            df.query(dashboard._query_str_dict["key_line"])
-        )
