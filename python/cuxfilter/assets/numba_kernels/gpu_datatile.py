@@ -6,6 +6,7 @@ import io
 import gc
 from bokeh.models import ColumnDataSource
 from typing import Type
+import dask_cudf
 
 from ...charts.core.core_chart import BaseChart
 
@@ -38,43 +39,6 @@ def calc_cumsum_data_tile(x, arr1):
                 arr1[col2_i][col1_i] = freq_i
             else:
                 arr1[col2_i][col1_i] = (arr1[col2_i][col1_i] + freq_i) / 2
-
-
-@cuda.jit
-def calc_binwise_reduced_column(x, stride, a_range):
-    """
-    description:
-        cuda jit for creating a full-lenth column with only binned values
-    input:
-        - x -> single col nd-array
-        - stride -> stride value
-        - a_range -> min-max values (ndarray => shape(2,))
-    """
-    a_min = a_range[0]
-    a_max = a_range[1]
-    start = cuda.grid(1)
-    s = cuda.gridsize(1)
-    for i in range(start, x.shape[0], s):
-        if x[i] >= a_min and x[i] <= a_max:
-            x[i] = np.int32(round((x[i] - a_min) / stride))
-        else:
-            x[i] = -1
-
-
-def get_binwise_reduced_column(a_gpu, stride, a_range):
-    """
-    description:
-        calls the cuda jit function calc_binwise_reduced_column and
-        returns the result
-    input:
-        - a_gpu -> single col nd-array
-        - stride -> stride value
-        - a_range -> min-max values (ndarray => shape(2,))
-    output:
-        - a_gpu -> single col resulting nd-array
-    """
-    calc_binwise_reduced_column[64, 64](a_gpu, np.float64(stride), a_range)
-    return a_gpu
 
 
 def get_arrow_stream(record_batch):
@@ -112,20 +76,21 @@ def calc_data_tile_for_size(
     cumsum: bool = True,
     return_format="pandas",
 ):
-    a1_range = cuda.to_device(np.asarray([min_1, max_1], dtype=np.float64))
-    df.add_column(
-        col_1 + "_mod",
-        get_binwise_reduced_column(
-            df[col_1].copy().to_gpu_array(), stride_1, a1_range
-        ),
+    df[col_1 + "_mod"] = (
+        ((df[col_1] - min_1) / stride_1).round().astype("int32")
     )
-    groupby_result = (
-        df[[col_1 + "_mod"]]
-        .groupby(col_1 + "_mod", method="hash", as_index=True)
-        .agg({col_1 + "_mod": "count"})
-    )
+    if type(df) == dask_cudf.core.DataFrame:
+        groupby_result = getattr(
+            df[[col_1 + "_mod", col_1]].groupby(col_1 + "_mod"), "count"
+        )().compute()
+    else:
+        groupby_result = (
+            df[[col_1 + "_mod"]]
+            .groupby(col_1 + "_mod", method="hash", as_index=True)
+            .agg({col_1 + "_mod": "count"})
+        )
 
-    max_s = int((max_1 - min_1) / stride_1) + 1
+    max_s = int(round((max_1 - min_1) / stride_1)) + 1
     min_s = 1
 
     result = np.zeros(shape=(min_s, max_s)).astype(np.float64)[0]
@@ -193,51 +158,39 @@ def calc_data_tile(
     else:
         aggregate_dict = {key: [aggregate_fn]}
 
-    a1_range = cuda.to_device(np.asarray([min_1, max_1], dtype=np.float64))
-    a2_range = cuda.to_device(np.asarray([min_2, max_2], dtype=np.float64))
     check_list = []
-    if key == col_1 and col_1 + "_mod" not in df.columns:
-        df.add_column(
-            col_1 + "_mod",
-            get_binwise_reduced_column(
-                df[col_1].copy().to_gpu_array(), stride_1, a1_range
-            ),
-        )
-        check_list.append(col_1 + "_mod")
-    else:
-        df[col_1] = get_binwise_reduced_column(
-            df[col_1].copy().to_gpu_array(), stride_1, a1_range
-        )
-        check_list.append(col_1)
-    if key == col_2 and col_2 + "_mod" not in df.columns:
-        df.add_column(
-            col_2 + "_mod",
-            get_binwise_reduced_column(
-                df[col_2].copy().to_gpu_array(), stride_2, a2_range
-            ),
-        )
-        check_list.append(col_2 + "_mod")
-    else:
-        df[col_2] = get_binwise_reduced_column(
-            df[col_2].copy().to_gpu_array(), stride_2, a2_range
-        )
-        check_list.append(col_2)
+
+    df[col_1 + "_mod"] = (
+        ((df[col_1] - min_1) / stride_1).round().astype("int32")
+    )
+    check_list.append(col_1 + "_mod")
+    df[col_2 + "_mod"] = (
+        ((df[col_2] - min_2) / stride_2).round().astype("int32")
+    )
+    check_list.append(col_2 + "_mod")
 
     groupby_results = []
     for i in aggregate_dict[key]:
         agg = {key: i}
-        groupby_results.append(
-            df.groupby(
-                check_list, method="hash", sort=False, as_index=False
-            ).agg(agg)
-        )
+        if type(df) == dask_cudf.core.DataFrame:
+            temp_df = getattr(
+                df[check_list + [key]].groupby(check_list, sort=False), i
+            )()
+            temp_df = temp_df.reset_index().compute()
+            groupby_results.append(temp_df)
+        else:
+            groupby_results.append(
+                df.groupby(
+                    check_list, method="hash", sort=False, as_index=False
+                ).agg(agg)
+            )
 
     del df
     gc.collect()
 
     results = []
-    for groupby_result in groupby_results:
 
+    for groupby_result in groupby_results:
         list_of_indices = list(
             np.unique(groupby_result[check_list[-1]].to_array().astype(int))
         )
@@ -247,8 +200,8 @@ def calc_data_tile(
 
         del groupby_result
         gc.collect()
-        max_s = int((max_1 - min_1) / stride_1) + 1
-        min_s = int((max_2 - min_2) / stride_2) + 1
+        max_s = int(round((max_1 - min_1) / stride_1)) + 1
+        min_s = int(round((max_2 - min_2) / stride_2)) + 1
         result = cuda.to_device(
             np.zeros(shape=(min_s, max_s)).astype(np.float64)
         )
@@ -260,8 +213,9 @@ def calc_data_tile(
             result_np = np.cumsum(result.copy_to_host(), axis=1)
 
         result_temp = format_result(result_np, return_format)
-
-        results.append(result_temp[result_temp.index.isin(list_of_indices)])
+        if return_format == "pandas":
+            result_temp[~result_temp.index.isin(list_of_indices)] = 0
+        results.append(result_temp)
 
     if len(results) == 1:
         return results[0]

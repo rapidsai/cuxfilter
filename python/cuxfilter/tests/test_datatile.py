@@ -14,6 +14,7 @@ class TestDataTile:
     df = cudf.DataFrame(
         {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
     )
+    print(df)
     cux_df = cuxfilter.DataFrame.from_dataframe(df)
     dashboard = cux_df.dashboard(
         charts=[bac, bac1],

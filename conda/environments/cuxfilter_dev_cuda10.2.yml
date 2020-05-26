@@ -8,14 +8,19 @@ channels:
 dependencies:
 - cupy>=6*
 - python>=3.6,<3.8
-- cudf=0.15
+- cudf=0.15*
+- dask>=2.12.0
+- distributed>=2.12.0
+- dask-cuda=0.15*
+- dask-cudf=0.15*
 - datashader>=0.10.*
 - geopandas>=0.6.*
 - pyproj>=2.4.*
+- libwebp
 - pandoc=<2.0.0
 - panel=0.6.*
 - bokeh=1.*
-- cudatoolkit=9.2
+- cudatoolkit=10.2
 - nodejs
 - recommonmark
 - pytest

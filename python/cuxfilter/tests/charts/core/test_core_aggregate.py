@@ -1,6 +1,8 @@
 import pytest
 import pandas as pd
+import numpy as np
 
+from bokeh.models import ColumnDataSource
 from cuxfilter.charts.core.aggregate.core_aggregate import BaseAggregateChart
 
 
@@ -37,7 +39,9 @@ class TestCoreAggregateChart:
         # BaseAggregateChart variables
         assert bac.use_data_tiles is True
 
-    @pytest.mark.parametrize("stride, _stride", [(1, 1), (None, None), (0, 1)])
+    @pytest.mark.parametrize(
+        "stride, _stride", [(1, 1), (None, None), (0.01, 0.01)]
+    )
     def test_stride(self, stride, _stride):
         bac = BaseAggregateChart()
         bac.stride = stride
@@ -63,39 +67,43 @@ class TestCoreAggregateChart:
     @pytest.mark.parametrize(
         "query_tuple, result",
         [
-            ((10, 26), [0.0, 0.0, 2.0, 3.0, 4.0]),
-            ((10, 10), [0.0, 0.0, 0.0, 0.0, 4.0]),
-            ((10, 21), [0.0, 0.0, 0.0, 3.0, 4.0]),
+            ((10, 13), [1.0, 1.0, 1.0, 1.0, 0.0]),
+            ((10, 10), [1.0, 0.0, 0.0, 0.0, 0.0]),
+            ((10, 12), [1.0, 1.0, 1.0, 0.0, 0.0]),
         ],
     )
     def test_query_chart_by_range(self, query_tuple, result):
         active_chart = BaseAggregateChart()
 
-        active_chart.stride = 8
+        active_chart.stride = 1
         active_chart.min_value = 10.0
-
+        active_chart.data_x_axis = "x"
         self.result = ""
 
         def reset_chart(datatile_result):
             self.result = datatile_result
 
         active_chart.reset_chart = reset_chart
-
+        active_chart.source = ColumnDataSource(
+            {
+                "x": np.array([10.0, 11.0, 12.0, 13.0, 14.0]),
+                "y": np.array([1, 1, 1, 1, 1]),
+            }
+        )
         active_chart.source_backup = pd.DataFrame(
             {
-                "x": {0: 0.0, 1: 1.0, 2: 2.0, 4: 3.0, 5: 4.0},
-                "top": {0: 0.0, 1: 1.0, 2: 2.0, 4: 3.0, 5: 4.0},
+                "x": np.array([10.0, 11.0, 12.0, 13.0, 14.0]),
+                "y": np.array([1, 1, 1, 1, 1]),
             }
         )
 
         datatile = pd.DataFrame(
             {
-                0: {0: 0.0, 1: 0.0, 2: 0.0, 4: 0.0, 5: 4.0},
-                1: {0: 0.0, 1: 0.0, 2: 0.0, 4: 3.0, 5: 4.0},
-                2: {0: 0.0, 1: 0.0, 2: 2.0, 4: 3.0, 5: 4.0},
-                3: {0: 0.0, 1: 1.0, 2: 2.0, 4: 3.0, 5: 4.0},
-                4: {0: 0.0, 1: 1.0, 2: 2.0, 4: 3.0, 5: 4.0},
-                5: {0: 0.0, 1: 1.0, 2: 2.0, 4: 3.0, 5: 4.0},
+                0: {0: 1.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0},
+                1: {0: 1.0, 1: 1.0, 2: 0.0, 3: 0.0, 4: 0.0},
+                2: {0: 1.0, 1: 1.0, 2: 1.0, 3: 0.0, 4: 0.0},
+                3: {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 0.0},
+                4: {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0},
             }
         )
 
@@ -106,49 +114,64 @@ class TestCoreAggregateChart:
     @pytest.mark.parametrize(
         "old_indices, new_indices, prev_result,result",
         [
-            ([], [4.0, 8.0], [0.0, 0.0, 0.0, 0.0], [5.0, 5.0, 0.0, 0.0]),
-            ([4.0], [4.0, 8.0], [0.0, 5.0, 0.0, 0.0], [5.0, 5.0, 0.0, 0.0]),
-            ([], [4.0], [0.0, 0.0, 0.0, 0.0], [0.0, 5.0, 0.0, 0.0]),
-            ([4.0], [8.0], [0.0, 5.0, 0.0, 0.0], [5.0, 0.0, 0.0, 0.0]),
+            ([], [0], [0.0, 0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0, 0.0]),
+            (
+                [0],
+                [0, 1],
+                [1.0, 0.0, 0.0, 0.0, 0.0],
+                [1.0, 1.0, 0.0, 0.0, 0.0],
+            ),
+            ([0, 1], [], [1.0, 0.0, 0.0, 0.0, 0.0], [1.0, 1.0, 1.0, 1.0, 1.0]),
+            (
+                [],
+                [0, 1, 2, 3, 4],
+                [1.0, 1.0, 1.0, 1.0, 1.0],
+                [1.0, 1.0, 1.0, 1.0, 1.0],
+            ),
         ],
     )
     def test_query_chart_by_indices(
         self, old_indices, new_indices, prev_result, result
     ):
         active_chart = BaseAggregateChart()
+        passive_chart = BaseAggregateChart()
 
         active_chart.stride = 1
-        active_chart.min_value = 2.0
+        active_chart.min_value = 0.0
         active_chart.aggregate_fn = "count"
         active_chart.data_points = 5
+        passive_chart.stride = 1
+        passive_chart.min_value = 2.0
+        passive_chart.data_points = 5
         self.result = None
 
         def f_temp():
             return prev_result
 
-        active_chart.get_source_y_axis = f_temp
+        passive_chart.get_source_y_axis = f_temp
 
         def reset_chart(datatile_result):
             self.result = datatile_result
 
-        active_chart.reset_chart = reset_chart
-
+        passive_chart.reset_chart = reset_chart
+        passive_chart.source = ColumnDataSource(
+            {
+                "x": np.array([2.0, 3.0, 4.0, 5.0, 6.0]),
+                "y": np.array([1, 1, 1, 1, 1]),
+            }
+        )
+        passive_chart.data_x_axis = "x"
         datatile = pd.DataFrame(
             {
-                0: {0: 0.0, 1: 0.0, 3: 0.0, 4: 5.0},
-                1: {0: 0.0, 1: 0.0, 3: 0.0, 4: 0.0},
-                2: {0: 0.0, 1: 5.0, 3: 0.0, 4: 0.0},
-                3: {0: 0.0, 1: 0.0, 3: 0.0, 4: 0.0},
-                4: {0: 0.0, 1: 0.0, 3: 5.0, 4: 0.0},
-                5: {0: 0.0, 1: 0.0, 3: 0.0, 4: 0.0},
-                6: {0: 5.0, 1: 0.0, 3: 0.0, 4: 0.0},
-                7: {0: 0.0, 1: 0.0, 3: 0.0, 4: 0.0},
-                8: {0: 5.0, 1: 0.0, 3: 0.0, 4: 0.0},
+                0: {0: 1.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0},
+                1: {0: 0.0, 1: 1.0, 2: 0.0, 3: 0.0, 4: 0.0},
+                2: {0: 0.0, 1: 0.0, 2: 1.0, 3: 0.0, 4: 0.0},
+                3: {0: 0.0, 1: 0.0, 2: 0.0, 3: 1.0, 4: 0.0},
+                4: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 1.0},
             }
         )
 
-        active_chart.query_chart_by_indices(
+        passive_chart.query_chart_by_indices(
             active_chart, old_indices, new_indices, datatile
         )
-
         assert all(self.result == result)

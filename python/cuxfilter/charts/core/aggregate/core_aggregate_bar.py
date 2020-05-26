@@ -1,4 +1,6 @@
 import panel as pn
+import dask_cudf
+import numpy as np
 
 from .core_aggregate import BaseAggregateChart
 from ....assets.numba_kernels import calc_groupby, calc_value_counts
@@ -31,7 +33,7 @@ class BaseBar(BaseAggregateChart):
         self,
         x,
         y=None,
-        data_points=100,
+        data_points=None,
         add_interaction=True,
         aggregate_fn="count",
         width=400,
@@ -64,13 +66,13 @@ class BaseBar(BaseAggregateChart):
         """
         self.x = x
         self.y = y
+        self.stride = step_size
+        self.stride_type = step_size_type
         self.data_points = data_points
         self.add_interaction = add_interaction
         self.aggregate_fn = aggregate_fn
         self.height = height
         self.width = width
-        self.stride = step_size
-        self.stride_type = step_size_type
         self.library_specific_params = library_specific_params
 
     def initiate_chart(self, dashboard_cls):
@@ -85,14 +87,19 @@ class BaseBar(BaseAggregateChart):
         Ouput:
 
         """
-        self.min_value = dashboard_cls._data[self.x].min()
-        self.max_value = dashboard_cls._data[self.x].max()
-        if self.data_points > dashboard_cls._data[self.x].shape[0]:
-            self.data_points = dashboard_cls._data[self.x].shape[0]
+        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
+            self.min_value = dashboard_cls._data[self.x].min().compute()
+            self.max_value = dashboard_cls._data[self.x].max().compute()
+        else:
+            self.min_value = dashboard_cls._data[self.x].min()
+            self.max_value = dashboard_cls._data[self.x].max()
 
-        if self.stride is None:
-            if self.max_value < 1 and self.stride_type == int:
-                self.stride_type = float
+        # if self.data_points > len(dashboard_cls._data):
+        #     self.data_points = len(dashboard_cls._data)
+        if self.max_value < 1 and self.stride_type == int:
+            self.stride_type = float
+
+        if self.stride is None and self.data_points is not None:
             if self.stride_type == int:
                 self.stride = int(
                     round((self.max_value - self.min_value) / self.data_points)
@@ -126,16 +133,39 @@ class BaseBar(BaseAggregateChart):
         """
         if self.y == self.x or self.y is None:
             # it's a histogram
-            if self.data_points == data[self.x].nunique():
-                df = data[self.x].value_counts().sort_index()
-                df = [df.index.to_array(), df.to_array()]
-            else:
-                df = calc_value_counts(
-                    data[self.x].to_gpu_array(), self.data_points
+            df, self.data_points, self.custom_binning = calc_value_counts(
+                data[self.x], self.stride, self.min_value, self.data_points
+            )
+            if self.data_points > 50_000:
+                print(
+                    "number of x-values for a bar chart ",
+                    "exceeds 50,000 points.",
+                    "Performance may be laggy, its recommended ",
+                    "to use custom data_points parameter to ",
+                    "enforce custom binning for smooth crossfiltering",
                 )
         else:
             self.aggregate_fn = "mean"
             df = calc_groupby(self, data)
+            if self.data_points is None:
+                self.data_points = len(df[0])
+
+        if self.stride is None:
+            self.stride = self.stride_type(
+                round((self.max_value - self.min_value) / self.data_points)
+            )
+
+        if self.custom_binning:
+            if len(self.x_label_map) == 0:
+                temp_mapper_index = np.array(df[0]).astype("str")
+                temp_mapper_value = np.round(
+                    (temp_mapper_index.astype(self.stride_type) * self.stride)
+                    + self.min_value,
+                    4,
+                ).astype("str")
+                self.x_label_map = dict(
+                    zip(temp_mapper_index, temp_mapper_value)
+                )
 
         dict_temp = {
             "X": list(df[0].astype(df[0].dtype)),
@@ -159,7 +189,7 @@ class BaseBar(BaseAggregateChart):
         """
         if self.stride is None:
             self.stride = self.stride_type(
-                (self.max_value - self.min_value) / self.data_points
+                round((self.max_value - self.min_value) / self.data_points)
             )
 
         self.filter_widget = pn.widgets.RangeSlider(
@@ -201,11 +231,11 @@ class BaseBar(BaseAggregateChart):
         ):
             min_temp, max_temp = self.filter_widget.value
             query = (
-                str(self.stride_type(min_temp))
+                str(self.stride_type(round(min_temp, 4)))
                 + "<="
                 + str(self.x)
                 + "<="
-                + str(self.stride_type(max_temp))
+                + str(self.stride_type(round(max_temp, 4)))
             )
             query_str_dict[self.name] = query
         else:

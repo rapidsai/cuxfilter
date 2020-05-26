@@ -31,7 +31,9 @@ class TestBaseChart:
 
         assert bc.name == "test_x_test_chart_type"
 
-    @pytest.mark.parametrize("stride, _stride", [(1, 1), (None, None), (0, 1)])
+    @pytest.mark.parametrize(
+        "stride, _stride", [(1, 1), (None, None), (0.01, 0.01)]
+    )
     def test_stride(self, stride, _stride):
         bc = BaseChart()
         bc.stride = stride

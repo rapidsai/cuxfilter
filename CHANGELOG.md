@@ -9,11 +9,12 @@
 # cuXfilter 0.14.0 (Date TBD)
 
 ## New Features
- - PR #136 Local gpuCI build script
-
+- PR #136 Local gpuCI build script
+- PR #148 Added dask_cudf support to all charts
 ## Improvements
 - PR #129 optimizations to grouby query, using boolean masks
 - PR #135 implemented stateless non-aggregate querying
+- PR #148 made groupby pre-computations consistent, made dashboard querying stateless
 
 ## Bug Fixes
 - PR #127 fixed logic for calculating datatiles for 2d and 3d choropleth charts
@@ -21,6 +22,7 @@
 - PR #131 Filter fix for non aggregate charts(scatter, scattter-geo, line, stacked-lines, heatmap)
 - PR #132 Aggregate filter accuracy fix
 - PR #133 Added Nodejs dependency in build files
+- PR #148 logic fixes to datatile compute and using vectorized operations instead of numba kernels for datatile compute
 
 # cuXfilter 0.13.0 (31 March 2020)
 

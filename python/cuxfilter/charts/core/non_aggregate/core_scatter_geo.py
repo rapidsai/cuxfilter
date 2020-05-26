@@ -37,6 +37,8 @@ class BaseScatterGeo(BaseNonAggregate):
         width=800,
         height=400,
         tile_provider="CARTODBPOSITRON",
+        title="",
+        timeout=1,
         **library_specific_params,
     ):
         """
@@ -52,9 +54,16 @@ class BaseScatterGeo(BaseNonAggregate):
             color_palette
             aggregate_col
             aggregate_fn
+            point_size
+            point_shape
+            pixel_shade_type
+            pixel_density
+            pixel_spread
             width
             height
             tile_provider
+            title
+            timeout
             **library_specific_params
         -------------------------------------------
 
@@ -77,6 +86,8 @@ class BaseScatterGeo(BaseNonAggregate):
         self.width = width
         self.height = height
         self.tile_provider = tile_provider
+        self.title = title
+        self.timeout = timeout
         self.point_shape = point_shape
         self.point_size = point_size
         self.pixel_shade_type = pixel_shade_type

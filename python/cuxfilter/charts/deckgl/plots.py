@@ -70,7 +70,6 @@ class Choropleth(BaseChoropleth):
             self.source_backup = result_df
 
             result_np = result_df.values
-            # print(result_np.shape, result_df.shape)
             result_dict = {}
 
             for i in range(result_np.shape[1]):
@@ -189,7 +188,9 @@ class Choropleth(BaseChoropleth):
             update self.data_y_axis in self.source
         """
         if column is None:
-            self.source.patch(self.source_backup.to_dict(orient="list"))
+            self.format_source_data(
+                self.source_backup.to_dict(orient="list"), patch_update=True
+            )
         else:
             x_axis_len = self.source.data[self.x].size
             data = data[:x_axis_len]
