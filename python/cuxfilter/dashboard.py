@@ -227,10 +227,11 @@ class DashBoard:
             self._restart_current_server()
 
     def _restart_current_server(self):
-        self.stop()
-        getattr(self, self._current_server_type)(
-            notebook_url=self._notebook_url, port=self.server.port
-        )
+        if self.server is not None:
+            self.stop()
+            getattr(self, self._current_server_type)(
+                notebook_url=self._notebook_url, port=self.server.port
+            )
 
     def _reinit_all_charts(self):
         self._data_tiles = dict()
