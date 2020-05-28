@@ -43,7 +43,8 @@ def bar(
 
     autoscaling: bool,
 
-        set whether chart scale is updated automatically for y_axis when data updates
+        set whether chart scale is updated automatically for
+        y_axis when data updates
 
     x_label_map: dict,  default None
         label maps for x axis
@@ -119,7 +120,8 @@ def line(
 
     autoscaling: bool,
 
-        set whether chart scale is updated automatically for y_axis when data updates
+        set whether chart scale is updated automatically
+        for y_axis when data updates
 
     x_label_map: dict,  default None
         label maps for x axis

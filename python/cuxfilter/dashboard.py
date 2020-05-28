@@ -188,7 +188,8 @@ class DashBoard:
 
         Notes
         -----
-            After adding the charts, refresh the dashboard app tab to see the updated charts.
+            After adding the charts, refresh the dashboard app
+            tab to see the updated charts.
 
         Examples
         --------
