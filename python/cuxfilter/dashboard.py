@@ -91,6 +91,10 @@ class DashBoard:
     _active_view: str = ""
     _dashboard = None
     _theme = None
+    _notebook_url = "localhost:8888"
+    #_current_server_type - show(separate tab)/ app(in-notebook)
+    _current_server_type = 'show'
+    server = None
 
     def __init__(
         self,
@@ -184,8 +188,7 @@ class DashBoard:
 
         Notes
         -----
-            After adding the charts, re-run the dashboard.app()
-            or dashboard.show() cell to see the updated charts.
+            After adding the charts, refresh the dashboard app tab to see the updated charts.
 
         Examples
         --------
@@ -219,8 +222,27 @@ class DashBoard:
             for chart in charts:
                 if chart not in self._charts:
                     self._charts[chart.name] = chart
-                    chart.initiate_chart(self)
-                    chart._initialized = True
+            self._reinit_all_charts()
+            self._restart_current_server()
+    
+    def _restart_current_server(self):
+        self.stop()
+        getattr(self, self._current_server_type)(
+            notebook_url=self._notebook_url, port=self.server.port
+        )
+
+    def _reinit_all_charts(self):
+        self._data_tiles = dict()
+        self._query_str_dict = dict()
+        if self._data_size_widget:
+            temp_chart = data_size_indicator()
+            self._charts[temp_chart.name] = temp_chart
+            self._charts[temp_chart.name].initiate_chart(self)
+
+        for chart in self._charts:
+            self._charts[chart].source = None
+            self._charts[chart].initiate_chart(self)
+            self._charts[chart]._initialized = True
 
     def _query(self, query_str):
         """
@@ -391,13 +413,19 @@ class DashBoard:
         >>> await d.preview()
         displays charts in the dashboard
         """
-        port = get_open_port()
+        if self.server is not None:
+            if self.server._started:
+                self.stop()
+            self._reinit_all_charts()
+            port = self.server.port
+        else:
+            port = get_open_port()
         url = "localhost:" + str(port)
-        temp_server = self._get_server(
+        self.server = self._get_server(
             port=port, websocket_origin=url, show=False, start=True
         )
         await screengrab("http://" + url)
-        temp_server.stop()
+        self.stop()
         from IPython.core.display import Image, display
 
         display(Image("temp.png"))
@@ -436,22 +464,30 @@ class DashBoard:
         >>> d.app(notebook_url='localhost:8888')
 
         """
+        if self.server is not None:
+            if self.server._started:
+                self.stop()
+            self._reinit_all_charts()
         url = re.compile(r"https?://(www\.)?")
         notebook_url = url.sub("", notebook_url).strip().strip("/")
+        if len(notebook_url) > 0:
+            self._notebook_url = notebook_url
         if len(notebook_url) > 0:
             self.server = app(
                 self._dashboard.generate_dashboard(
                     self._title, self._charts, self._theme
                 ),
-                notebook_url=notebook_url,
+                notebook_url=self._notebook_url,
                 port=port,
             )
         else:
             self.server = app(
                 self._dashboard.generate_dashboard(
                     self._title, self._charts, self._theme
-                )
+                ),
+                port=port,
             )
+        self._current_server_type = 'app'
 
     def show(self, notebook_url="", port=0, threaded=False, **kwargs):
         """
@@ -484,43 +520,45 @@ class DashBoard:
         >>> d.show(url='localhost:8889')
 
         """
+        if self.server is not None:
+            if self.server._started:
+                self.stop()
+            self._reinit_all_charts()
         url = re.compile(r"https?://(www\.)?")
         notebook_url = url.sub("", notebook_url).strip().strip("/")
         if len(notebook_url) > 0:
-            if port == 0:
-                port = get_open_port()
+            self._notebook_url = notebook_url
+        if port == 0:
+            port = get_open_port()
 
-            dashboard_url = "http://%s%s%d%s" % (
-                notebook_url,
-                "/proxy/",
-                port,
-                "/",
+        dashboard_url = "http://%s%s%d%s" % (
+            self._notebook_url,
+            "/proxy/",
+            port,
+            "/",
+        )
+        print("Dashboard running at " + dashboard_url)
+
+        try:
+            self.server = self._get_server(
+                port=port,
+                websocket_origin=self._notebook_url,
+                show=False,
+                start=True,
+                threaded=threaded,
+                **kwargs,
             )
-            print("Dashboard running at " + dashboard_url)
-
-            try:
-                self.server = self._get_server(
-                    port=port,
-                    websocket_origin=notebook_url,
-                    show=False,
-                    start=True,
-                    threaded=threaded,
-                    **kwargs,
-                )
-            except OSError:
-                self.server.stop()
-                self.server = self._get_server(
-                    port=port,
-                    websocket_origin=notebook_url,
-                    show=False,
-                    start=True,
-                    threaded=threaded,
-                    **kwargs,
-                )
-        else:
-            self.server = self._dashboard.generate_dashboard(
-                self._title, self._charts, self._theme
-            ).show(threaded=threaded)
+        except OSError:
+            self.server.stop()
+            self.server = self._get_server(
+                port=port,
+                websocket_origin=self._notebook_url,
+                show=False,
+                start=True,
+                threaded=threaded,
+                **kwargs,
+            )
+        self._current_server_type = 'show'
 
     def stop(self):
         """
@@ -528,6 +566,8 @@ class DashBoard:
         """
         if self.server._stopped is False:
             self.server.stop()
+            self.server._started = False
+            self.server._stopped = True
             self.server._tornado.stop()
 
     def _reload_charts(self, data=None, include_cols=[], ignore_cols=[]):
