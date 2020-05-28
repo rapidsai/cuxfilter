@@ -1,3 +1,11 @@
+# cuXfilter 0.15.0 (Date TBD)
+
+## New Features
+
+## Improvements
+
+## Bug Fixes
+
 # cuXfilter 0.14.0 (Date TBD)
 
 ## New Features
@@ -7,7 +15,8 @@
 - PR #129 optimizations to grouby query, using boolean masks
 - PR #135 implemented stateless non-aggregate querying
 - PR #148 made groupby pre-computations consistent, made dashboard querying stateless
-
+- PR #151 implmented autoscaling true/false for bar, line charts
+add_chart now dynamically updates a running dashboard in real-time(page-refresh required)
 ## Bug Fixes
 - PR #127 fixed logic for calculating datatiles for 2d and 3d choropleth charts
 - PR #128, #130 Bug fixes and test updates
@@ -15,6 +24,7 @@
 - PR #132 Aggregate filter accuracy fix
 - PR #133 Added Nodejs dependency in build files
 - PR #148 logic fixes to datatile compute and using vectorized operations instead of numba kernels for datatile compute
+- PR #151 docs and minor bug fixes, also fixed dashboard server notebook issues
 
 # cuXfilter 0.13.0 (31 March 2020)
 
@@ -62,4 +72,3 @@
 - Massive refactor and architecture change compared to the js (client-server) architecture
 
 ## Bug Fixes
-
