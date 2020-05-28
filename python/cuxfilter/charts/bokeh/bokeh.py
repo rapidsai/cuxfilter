@@ -11,6 +11,8 @@ def bar(
     height=400,
     step_size=None,
     step_size_type=int,
+    title="",
+    autoscaling=True,
     **library_specific_params,
 ):
     """
@@ -35,16 +37,20 @@ def bar(
 
     step_size_type: {int, float},  default int
 
+    title: str,
+
+        chart title
+
+    autoscaling: bool,
+
+        set whether chart scale is updated automatically for y_axis when data updates
+
     x_label_map: dict,  default None
         label maps for x axis
         {value: mapped_str}
     y_label_map: dict,  default None
         label maps for y axis
         {value: mapped_str}
-
-    title: str,
-
-        chart title
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to
@@ -64,6 +70,8 @@ def bar(
         height,
         step_size,
         step_size_type,
+        title,
+        autoscaling,
         **library_specific_params,
     )
 
@@ -78,6 +86,8 @@ def line(
     height=400,
     step_size=None,
     step_size_type=int,
+    title="",
+    autoscaling=True,
     **library_specific_params,
 ):
     """
@@ -103,6 +113,14 @@ def line(
 
     step_size_type: {int, float},  default int
 
+    title: str,
+
+        chart title
+
+    autoscaling: bool,
+
+        set whether chart scale is updated automatically for y_axis when data updates
+
     x_label_map: dict,  default None
         label maps for x axis
         {value: mapped_str}
@@ -110,9 +128,6 @@ def line(
         label maps for y axis
         {value: mapped_str}
 
-    title: str,
-
-        chart title
     **library_specific_params:
         additional library specific keyword arguments to be passed to
         the function
@@ -131,5 +146,7 @@ def line(
         height,
         step_size,
         step_size_type,
+        title,
+        autoscaling,
         **library_specific_params,
     )
