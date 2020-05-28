@@ -63,7 +63,7 @@ class Bar(BaseBar):
                 top=self.data_y_axis,
                 width=0.9,
                 source=self.source,
-                **self.library_specific_params
+                **self.library_specific_params,
             )
         else:
             self.sub_chart = self.chart.vbar(
@@ -72,7 +72,7 @@ class Bar(BaseBar):
                 width=0.9,
                 source=self.source,
                 color=self.color,
-                **self.library_specific_params
+                **self.library_specific_params,
             )
         self.chart.xaxis.axis_label = self.x
         if self.autoscaling is False:
@@ -282,8 +282,10 @@ class Line(BaseLine):
 
         if self.color is None:
             self.sub_chart = self.chart.line(
-                x=self.data_x_axis, y=self.data_y_axis, source=self.source,
-                **self.library_specific_params
+                x=self.data_x_axis,
+                y=self.data_y_axis,
+                source=self.source,
+                **self.library_specific_params,
             )
         else:
             self.sub_chart = self.chart.line(
@@ -291,7 +293,7 @@ class Line(BaseLine):
                 y=self.data_y_axis,
                 source=self.source,
                 color=self.color,
-                **self.library_specific_params
+                **self.library_specific_params,
             )
 
     def update_dimensions(self, width=None, height=None):

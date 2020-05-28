@@ -96,19 +96,17 @@ class BaseBar(BaseAggregateChart):
         Ouput:
 
         """
-        if dashboard_cls._data[self.x].dtype == 'bool':
+        if dashboard_cls._data[self.x].dtype == "bool":
             self.min_value = 0
             self.max_value = 1
             self.stride = 1
-            #set axis labels:
-            dict_map = {
-                0: 'False',
-                1: 'True'
-            }
+            # set axis labels:
+            dict_map = {0: "False", 1: "True"}
             if len(self.x_label_map) == 0:
                 self.x_label_map = dict_map
             if (
-                self.y != self.x and self.y is not None
+                self.y != self.x
+                and self.y is not None
                 and len(self.y_label_map) == 0
             ):
                 self.y_label_map = dict_map
@@ -126,7 +124,10 @@ class BaseBar(BaseAggregateChart):
             if self.stride is None and self.data_points is not None:
                 if self.stride_type == int:
                     self.stride = int(
-                        round((self.max_value - self.min_value) / self.data_points)
+                        round(
+                            (self.max_value - self.min_value)
+                            / self.data_points
+                        )
                     )
                 else:
                     self.stride = float(
@@ -183,9 +184,7 @@ class BaseBar(BaseAggregateChart):
             if len(self.x_label_map) == 0:
                 temp_mapper_index = np.array(df[0])
                 temp_mapper_value = np.round(
-                    (temp_mapper_index * self.stride)
-                    + self.min_value,
-                    4,
+                    (temp_mapper_index * self.stride) + self.min_value, 4,
                 ).astype("str")
                 temp_mapper_index = temp_mapper_index.astype("str")
                 self.x_label_map = dict(

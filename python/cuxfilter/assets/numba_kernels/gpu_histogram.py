@@ -18,7 +18,7 @@ def calc_value_counts(a_gpu, stride, min_value, data_points):
     """
     custom_binning = False
     if type(a_gpu) == dask_cudf.core.Series:
-        if stride is None or a_gpu.dtype == 'bool':
+        if stride is None or a_gpu.dtype == "bool":
             val_count = a_gpu.value_counts()
         else:
             val_count = (
@@ -30,7 +30,7 @@ def calc_value_counts(a_gpu, stride, min_value, data_points):
             custom_binning = True
         val_count = val_count.compute().sort_index()
     else:
-        if stride is None or a_gpu.dtype == 'bool':
+        if stride is None or a_gpu.dtype == "bool":
             val_count = a_gpu.value_counts().sort_index()
         else:
             val_count = (

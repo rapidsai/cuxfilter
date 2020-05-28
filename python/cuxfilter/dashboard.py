@@ -92,8 +92,8 @@ class DashBoard:
     _dashboard = None
     _theme = None
     _notebook_url = "localhost:8888"
-    #_current_server_type - show(separate tab)/ app(in-notebook)
-    _current_server_type = 'show'
+    # _current_server_type - show(separate tab)/ app(in-notebook)
+    _current_server_type = "show"
     server = None
 
     def __init__(
@@ -224,7 +224,7 @@ class DashBoard:
                     self._charts[chart.name] = chart
             self._reinit_all_charts()
             self._restart_current_server()
-    
+
     def _restart_current_server(self):
         self.stop()
         getattr(self, self._current_server_type)(
@@ -487,7 +487,7 @@ class DashBoard:
                 ),
                 port=port,
             )
-        self._current_server_type = 'app'
+        self._current_server_type = "app"
 
     def show(self, notebook_url="", port=0, threaded=False, **kwargs):
         """
@@ -558,7 +558,7 @@ class DashBoard:
                 threaded=threaded,
                 **kwargs,
             )
-        self._current_server_type = 'show'
+        self._current_server_type = "show"
 
     def stop(self):
         """
