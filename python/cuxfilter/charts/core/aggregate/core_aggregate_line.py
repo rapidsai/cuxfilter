@@ -38,6 +38,8 @@ class BaseLine(BaseAggregateChart):
         height=400,
         step_size=None,
         step_size_type=int,
+        title="",
+        autoscaling=True,
         **library_specific_params,
     ):
         """
@@ -54,6 +56,8 @@ class BaseLine(BaseAggregateChart):
             height
             step_size
             step_size_type
+            title
+            autoscaling
             x_label_map
             y_label_map
             **library_specific_params
@@ -71,7 +75,11 @@ class BaseLine(BaseAggregateChart):
         self.width = width
         self.stride = step_size
         self.stride_type = step_size_type
-
+        if len(title) == 0:
+            self.title = self.x
+        else:
+            self.title = title
+        self.autoscaling = autoscaling
         self.library_specific_params = library_specific_params
 
     def initiate_chart(self, dashboard_cls):
@@ -86,25 +94,43 @@ class BaseLine(BaseAggregateChart):
         Ouput:
 
         """
-        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
-            self.min_value = dashboard_cls._data[self.x].min().compute()
-            self.max_value = dashboard_cls._data[self.x].max().compute()
+        if dashboard_cls._data[self.x].dtype == "bool":
+            self.min_value = 0
+            self.max_value = 1
+            self.stride = 1
+            # set axis labels:
+            dict_map = {0: "False", 1: "True"}
+            if len(self.x_label_map) == 0:
+                self.x_label_map = dict_map
+            if (
+                self.y != self.x
+                and self.y is not None
+                and len(self.y_label_map) == 0
+            ):
+                self.y_label_map = dict_map
         else:
-            self.min_value = dashboard_cls._data[self.x].min()
-            self.max_value = dashboard_cls._data[self.x].max()
-
-        if self.max_value < 1 and self.stride_type == int:
-            self.stride_type = float
-
-        if self.stride is None and self.data_points is not None:
-            if self.stride_type == int:
-                self.stride = int(
-                    round((self.max_value - self.min_value) / self.data_points)
-                )
+            if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
+                self.min_value = dashboard_cls._data[self.x].min().compute()
+                self.max_value = dashboard_cls._data[self.x].max().compute()
             else:
-                self.stride = float(
-                    (self.max_value - self.min_value) / self.data_points
-                )
+                self.min_value = dashboard_cls._data[self.x].min()
+                self.max_value = dashboard_cls._data[self.x].max()
+
+            if self.max_value < 1 and self.stride_type == int:
+                self.stride_type = float
+
+            if self.stride is None and self.data_points is not None:
+                if self.stride_type == int:
+                    self.stride = int(
+                        round(
+                            (self.max_value - self.min_value)
+                            / self.data_points
+                        )
+                    )
+                else:
+                    self.stride = float(
+                        (self.max_value - self.min_value) / self.data_points
+                    )
 
         self.calculate_source(dashboard_cls._data)
         self.generate_chart()
@@ -156,12 +182,11 @@ class BaseLine(BaseAggregateChart):
 
         if self.custom_binning:
             if len(self.x_label_map) == 0:
-                temp_mapper_index = np.array(df[0]).astype("str")
+                temp_mapper_index = np.array(df[0])
                 temp_mapper_value = np.round(
-                    (temp_mapper_index.astype(self.stride_type) * self.stride)
-                    + self.min_value,
-                    4,
+                    (temp_mapper_index * self.stride) + self.min_value, 4,
                 ).astype("str")
+                temp_mapper_index = temp_mapper_index.astype("str")
                 self.x_label_map = dict(
                     zip(temp_mapper_index, temp_mapper_value)
                 )

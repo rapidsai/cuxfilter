@@ -51,11 +51,6 @@ class Bar(BaseBar):
         """
         generate chart
         """
-        if "title" in self.library_specific_params:
-            self.title = self.library_specific_params["title"]
-        else:
-            self.title = self.x
-
         self.chart = figure(
             title=self.title,
             tools="pan, wheel_zoom, reset",
@@ -68,6 +63,7 @@ class Bar(BaseBar):
                 top=self.data_y_axis,
                 width=0.9,
                 source=self.source,
+                **self.library_specific_params,
             )
         else:
             self.sub_chart = self.chart.vbar(
@@ -76,8 +72,11 @@ class Bar(BaseBar):
                 width=0.9,
                 source=self.source,
                 color=self.color,
+                **self.library_specific_params,
             )
         self.chart.xaxis.axis_label = self.x
+        if self.autoscaling is False:
+            self.chart.y_range.end = self.source.data[self.data_y_axis].max()
         if self.y != self.x:
             self.chart.yaxis.axis_label = self.y
         else:
@@ -272,20 +271,21 @@ class Line(BaseLine):
         """
         generate chart
         """
-        if "title" in self.library_specific_params:
-            self.title = self.library_specific_params["title"]
-        else:
-            self.title = self.x
-
         self.chart = figure(
             title=self.title,
-            tools=" pan, wheel_zoom, reset",
+            tools="pan, wheel_zoom, reset",
             active_scroll="wheel_zoom",
             active_drag="pan",
         )
+        if self.autoscaling is False:
+            self.chart.y_range.end = self.source.data[self.data_y_axis].max()
+
         if self.color is None:
             self.sub_chart = self.chart.line(
-                x=self.data_x_axis, y=self.data_y_axis, source=self.source
+                x=self.data_x_axis,
+                y=self.data_y_axis,
+                source=self.source,
+                **self.library_specific_params,
             )
         else:
             self.sub_chart = self.chart.line(
@@ -293,6 +293,7 @@ class Line(BaseLine):
                 y=self.data_y_axis,
                 source=self.source,
                 color=self.color,
+                **self.library_specific_params,
             )
 
     def update_dimensions(self, width=None, height=None):
