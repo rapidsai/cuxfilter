@@ -56,11 +56,12 @@ class DataFrame:
     @classmethod
     def from_dataframe(cls, dataframe):
         """
-        create a cuxfilter.DataFrame from cudf.DataFrame (zero-copy reference)
+        create a cuxfilter.DataFrame from cudf.DataFrame/dask_cudf.DataFrame
+        (zero-copy reference)
 
         Parameters
         ----------
-        dataframe_location: cudf.DataFrame
+        dataframe_location: cudf.DataFrame or dask_cudf.DataFrame
 
         Returns
         -------
@@ -69,7 +70,7 @@ class DataFrame:
         Examples
         --------
 
-        Read dataframe from a cudf.DataFrame
+        Read dataframe from a cudf.DataFrame/dask_cudf.DataFrame
 
         >>> import cuxfilter
         >>> import cudf
