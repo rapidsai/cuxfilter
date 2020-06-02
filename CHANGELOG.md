@@ -1,4 +1,4 @@
-# cuXfilter 0.14.0 (Date TBD)
+# cuXfilter 0.14.0 (03 Jun 2020)
 
 ## New Features
 - PR #136 Local gpuCI build script
