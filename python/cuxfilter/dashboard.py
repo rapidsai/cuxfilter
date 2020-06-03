@@ -91,6 +91,10 @@ class DashBoard:
     _active_view: str = ""
     _dashboard = None
     _theme = None
+    _notebook_url = "localhost:8888"
+    # _current_server_type - show(separate tab)/ app(in-notebook)
+    _current_server_type = "show"
+    server = None
 
     def __init__(
         self,
@@ -102,8 +106,7 @@ class DashBoard:
         data_size_widget=True,
         warnings=False,
     ):
-        self._backup_data = data
-        self._data = self._backup_data
+        self._data = data
         self._charts = dict()
         self._data_tiles = dict()
         self._query_str_dict = dict()
@@ -185,8 +188,8 @@ class DashBoard:
 
         Notes
         -----
-            After adding the charts, re-run the dashboard.app()
-            or dashboard.show() cell to see the updated charts.
+            After adding the charts, refresh the dashboard app
+            tab to see the updated charts.
 
         Examples
         --------
@@ -220,23 +223,38 @@ class DashBoard:
             for chart in charts:
                 if chart not in self._charts:
                     self._charts[chart.name] = chart
-                    chart.initiate_chart(self)
-                    chart._initialized = True
+            self._reinit_all_charts()
+            self._restart_current_server()
 
-    def _query(self, query_str, inplace=False):
+    def _restart_current_server(self):
+        if self.server is not None:
+            self.stop()
+            getattr(self, self._current_server_type)(
+                notebook_url=self._notebook_url, port=self.server.port
+            )
+
+    def _reinit_all_charts(self):
+        self._data_tiles = dict()
+        self._query_str_dict = dict()
+        if self._data_size_widget:
+            temp_chart = data_size_indicator()
+            self._charts[temp_chart.name] = temp_chart
+            self._charts[temp_chart.name].initiate_chart(self)
+
+        for chart in self._charts:
+            self._charts[chart].source = None
+            self._charts[chart].initiate_chart(self)
+            self._charts[chart]._initialized = True
+
+    def _query(self, query_str):
         """
         Query the cudf.DataFrame, inplace or create a copy based on the
         value of inplace.
         """
-        if inplace:
-            if len(query_str) > 0:
-                # print('inplace querying')
-                self._data = self._backup_data.query(query_str).copy()
-            else:
-                self._data = self._backup_data
+        if len(query_str) > 0:
+            return self._data.query(query_str)
         else:
-            temp_data = self._backup_data.query(query_str)
-            return temp_data
+            return self._data
 
     def _generate_query_str(self, ignore_chart=""):
         """
@@ -302,7 +320,8 @@ class DashBoard:
         # current state as final state
         if self._active_view == "":
             print("no querying done, returning original dataframe")
-            return self._backup_data
+            # return self._backup_data
+            return self._data
         else:
             self._charts[self._active_view].compute_query_dict(
                 self._query_str_dict
@@ -310,10 +329,12 @@ class DashBoard:
 
             if len(self._generate_query_str()) > 0:
                 print("final query", self._generate_query_str())
-                return self._backup_data.query(self._generate_query_str())
+                # return self._backup_data.query(self._generate_query_str())
+                return self._data.query(self._generate_query_str())
             else:
                 print("no querying done, returning original dataframe")
-                return self._backup_data
+                # return self._backup_data
+                return self._data
 
     def __str__(self):
         return self.__repr__()
@@ -394,13 +415,19 @@ class DashBoard:
         >>> await d.preview()
         displays charts in the dashboard
         """
-        port = get_open_port()
+        if self.server is not None:
+            if self.server._started:
+                self.stop()
+            self._reinit_all_charts()
+            port = self.server.port
+        else:
+            port = get_open_port()
         url = "localhost:" + str(port)
-        temp_server = self._get_server(
+        self.server = self._get_server(
             port=port, websocket_origin=url, show=False, start=True
         )
         await screengrab("http://" + url)
-        temp_server.stop()
+        self.stop()
         from IPython.core.display import Image, display
 
         display(Image("temp.png"))
@@ -439,22 +466,30 @@ class DashBoard:
         >>> d.app(notebook_url='localhost:8888')
 
         """
+        if self.server is not None:
+            if self.server._started:
+                self.stop()
+            self._reinit_all_charts()
         url = re.compile(r"https?://(www\.)?")
         notebook_url = url.sub("", notebook_url).strip().strip("/")
+        if len(notebook_url) > 0:
+            self._notebook_url = notebook_url
         if len(notebook_url) > 0:
             self.server = app(
                 self._dashboard.generate_dashboard(
                     self._title, self._charts, self._theme
                 ),
-                notebook_url=notebook_url,
+                notebook_url=self._notebook_url,
                 port=port,
             )
         else:
             self.server = app(
                 self._dashboard.generate_dashboard(
                     self._title, self._charts, self._theme
-                )
+                ),
+                port=port,
             )
+        self._current_server_type = "app"
 
     def show(self, notebook_url="", port=0, threaded=False, **kwargs):
         """
@@ -487,43 +522,45 @@ class DashBoard:
         >>> d.show(url='localhost:8889')
 
         """
+        if self.server is not None:
+            if self.server._started:
+                self.stop()
+            self._reinit_all_charts()
         url = re.compile(r"https?://(www\.)?")
         notebook_url = url.sub("", notebook_url).strip().strip("/")
         if len(notebook_url) > 0:
-            if port == 0:
-                port = get_open_port()
+            self._notebook_url = notebook_url
+        if port == 0:
+            port = get_open_port()
 
-            dashboard_url = "http://%s%s%d%s" % (
-                notebook_url,
-                "/proxy/",
-                port,
-                "/",
+        dashboard_url = "http://%s%s%d%s" % (
+            self._notebook_url,
+            "/proxy/",
+            port,
+            "/",
+        )
+        print("Dashboard running at " + dashboard_url)
+
+        try:
+            self.server = self._get_server(
+                port=port,
+                websocket_origin=self._notebook_url,
+                show=False,
+                start=True,
+                threaded=threaded,
+                **kwargs,
             )
-            print("Dashboard running at " + dashboard_url)
-
-            try:
-                self.server = self._get_server(
-                    port=port,
-                    websocket_origin=notebook_url,
-                    show=False,
-                    start=True,
-                    threaded=threaded,
-                    **kwargs,
-                )
-            except OSError:
-                self.server.stop()
-                self.server = self._get_server(
-                    port=port,
-                    websocket_origin=notebook_url,
-                    show=False,
-                    start=True,
-                    threaded=threaded,
-                    **kwargs,
-                )
-        else:
-            self.server = self._dashboard.generate_dashboard(
-                self._title, self._charts, self._theme
-            ).show(threaded=threaded)
+        except OSError:
+            self.server.stop()
+            self.server = self._get_server(
+                port=port,
+                websocket_origin=self._notebook_url,
+                show=False,
+                start=True,
+                threaded=threaded,
+                **kwargs,
+            )
+        self._current_server_type = "show"
 
     def stop(self):
         """
@@ -531,6 +568,8 @@ class DashBoard:
         """
         if self.server._stopped is False:
             self.server.stop()
+            self.server._started = False
+            self.server._stopped = True
             self.server._tornado.stop()
 
     def _reload_charts(self, data=None, include_cols=[], ignore_cols=[]):
@@ -550,45 +589,23 @@ class DashBoard:
         """
         Calculate data tiles for all aggregate type charts.
         """
-        query_str = self._generate_query_str(self._charts[self._active_view])
+        # query_str = self._generate_query_str(self._charts[self._active_view])
 
         # NO DATATILES for scatter types, as they are essentially all
         # points in the dataset
+        query = self._generate_query_str(self._charts[self._active_view])
+
         if "scatter" not in self._active_view:
             for chart in list(self._charts.values()):
                 if not chart.use_data_tiles:
-                    # if chart.chart_type == 'view_dataframe':
-                    #     self._data_tiles[chart.name] = self._data
-                    # else:
                     self._data_tiles[chart.name] = None
                 elif self._active_view != chart.name:
-                    temp_query_str = self._generate_query_str(
-                        ignore_chart=chart
-                    )
-
-                    if temp_query_str == query_str:
-                        self._data_tiles[chart.name] = DataTile(
-                            self._charts[self._active_view],
-                            chart,
-                            dtype="pandas",
-                            cumsum=cumsum,
-                        ).calc_data_tile(self._data)
-                    elif len(temp_query_str) == 0:
-                        self._data_tiles[chart.name] = DataTile(
-                            self._charts[self._active_view],
-                            chart,
-                            dtype="pandas",
-                            cumsum=cumsum,
-                        ).calc_data_tile(self._backup_data)
-                    else:
-                        self._data_tiles[chart.name] = DataTile(
-                            self._charts[self._active_view],
-                            chart,
-                            dtype="pandas",
-                            cumsum=cumsum,
-                        ).calc_data_tile(
-                            self._query(temp_query_str, inplace=False)
-                        )
+                    self._data_tiles[chart.name] = DataTile(
+                        self._charts[self._active_view],
+                        chart,
+                        dtype="pandas",
+                        cumsum=cumsum,
+                    ).calc_data_tile(self._data.copy(), query)
 
         self._charts[self._active_view].datatile_loaded_state = True
 
@@ -607,11 +624,30 @@ class DashBoard:
                 self._active_view != chart.name
                 and "widget" not in chart.chart_type
             ):
-                chart.query_chart_by_range(
-                    self._charts[self._active_view],
-                    query_tuple,
-                    self._data_tiles[chart.name],
-                )
+                if chart.chart_type == "view_dataframe":
+                    chart.query_chart_by_range(
+                        self._charts[self._active_view],
+                        query_tuple,
+                        self._data,
+                        self._generate_query_str(
+                            self._charts[self._active_view]
+                        ),
+                    )
+                elif not chart.use_data_tiles:
+                    chart.query_chart_by_range(
+                        self._charts[self._active_view],
+                        query_tuple,
+                        self._data_tiles[chart.name],
+                        self._generate_query_str(
+                            self._charts[self._active_view]
+                        ),
+                    )
+                else:
+                    chart.query_chart_by_range(
+                        self._charts[self._active_view],
+                        query_tuple,
+                        self._data_tiles[chart.name],
+                    )
 
     def _query_datatiles_by_indices(self, old_indices, new_indices):
         """
@@ -623,12 +659,33 @@ class DashBoard:
                 self._active_view != chart.name
                 and "widget" not in chart.chart_type
             ):
-                chart.query_chart_by_indices(
-                    self._charts[self._active_view],
-                    old_indices,
-                    new_indices,
-                    self._data_tiles[chart.name],
-                )
+                if chart.chart_type == "view_dataframe":
+                    chart.query_chart_by_indices(
+                        self._charts[self._active_view],
+                        old_indices,
+                        new_indices,
+                        self._data,
+                        self._generate_query_str(
+                            self._charts[self._active_view]
+                        ),
+                    )
+                elif not chart.use_data_tiles:
+                    chart.query_chart_by_indices(
+                        self._charts[self._active_view],
+                        old_indices,
+                        new_indices,
+                        self._data_tiles[chart.name],
+                        self._generate_query_str(
+                            self._charts[self._active_view]
+                        ),
+                    )
+                else:
+                    chart.query_chart_by_indices(
+                        self._charts[self._active_view],
+                        old_indices,
+                        new_indices,
+                        self._data_tiles[chart.name],
+                    )
 
     def _reset_current_view(self, new_active_view: BaseChart):
         """
@@ -649,9 +706,13 @@ class DashBoard:
         self._active_view = new_active_view.name
 
         self._query_str_dict.pop(self._active_view, None)
-        # generate query_str to query self._data based on current active view,
-        # before changing the active_view
-        query_str = self._generate_query_str(self._charts[self._active_view])
-        # execute the query_str using cudf.query()
-        self._query(query_str, inplace=True)
-        self._reload_charts(ignore_cols=[self._active_view])
+        if (
+            "widget" not in self._charts[self._active_view].chart_type
+            and self._charts[self._active_view].use_data_tiles
+        ):
+            self._charts[self._active_view].reload_chart(
+                data=self._query(
+                    self._generate_query_str(ignore_chart=self._active_view)
+                ),
+                patch_update=True,
+            )

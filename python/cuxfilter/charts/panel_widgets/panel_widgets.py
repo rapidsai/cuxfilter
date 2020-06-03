@@ -13,7 +13,7 @@ def range_slider(
     width=400,
     height=20,
     data_points=100,
-    step_size=1,
+    step_size=None,
     step_size_type=int,
     **params,
 ):

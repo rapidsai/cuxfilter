@@ -38,7 +38,7 @@ class BaseDataSizeIndicator(BaseAggregateChart):
 
         """
         self.min_value = 0
-        self.max_value = dashboard_cls._data.shape[0]
+        self.max_value = len(dashboard_cls._data)
 
         self.calculate_source(dashboard_cls._data)
         self.generate_chart()
@@ -57,7 +57,7 @@ class BaseDataSizeIndicator(BaseAggregateChart):
 
         Ouput:
         """
-        dict_temp = {"X": list([1]), "Y": list([data.shape[0]])}
+        dict_temp = {"X": list([1]), "Y": list([len(data)])}
 
         self.format_source_data(dict_temp, patch_update)
 

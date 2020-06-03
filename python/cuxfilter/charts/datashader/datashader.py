@@ -18,6 +18,8 @@ def scatter_geo(
     width=800,
     height=400,
     tile_provider="CARTODBPOSITRON",
+    title="",
+    timeout=1,
     **library_specific_params,
 ):
     """
@@ -76,6 +78,12 @@ def scatter_geo(
 
         chart title
 
+    timeout: int
+        Determines the timeout after which the callback will
+        process new events without the previous one having
+        reported completion. Increase for very long running
+        callbacks and if zooming feels laggy.
+
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
         function
@@ -102,6 +110,8 @@ def scatter_geo(
         width,
         height,
         tile_provider,
+        title,
+        timeout,
         **library_specific_params,
     )
 
@@ -122,6 +132,8 @@ def scatter(
     pixel_spread="dynspread",
     width=800,
     height=400,
+    title="",
+    timeout=1,
     **library_specific_params,
 ):
     """
@@ -176,6 +188,12 @@ def scatter(
 
         chart title
 
+    timeout: int
+        Determines the timeout after which the callback will
+        process new events without the previous one having
+        reported completion. Increase for very long running
+        callbacks and if zooming feels laggy.
+
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
         function
@@ -201,6 +219,8 @@ def scatter(
         pixel_spread,
         width,
         height,
+        title,
+        timeout,
         **library_specific_params,
     )
 
@@ -218,6 +238,8 @@ def heatmap(
     point_shape="rect_vertical",
     width=800,
     height=400,
+    title="",
+    timeout=1,
     **library_specific_params,
 ):
     """
@@ -271,6 +293,12 @@ def heatmap(
 
         chart title
 
+    timeout: int
+        Determines the timeout after which the callback will
+        process new events without the previous one having
+        reported completion. Increase for very long running
+        callbacks and if zooming feels laggy.
+
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
         function
@@ -296,6 +324,8 @@ def heatmap(
         "spread",
         width,
         height,
+        title,
+        timeout,
         **library_specific_params,
     )
 
@@ -311,6 +341,8 @@ def line(
     step_size_type=int,
     width=800,
     height=400,
+    title="",
+    timeout=1,
     **library_specific_params,
 ):
     """
@@ -350,6 +382,12 @@ def line(
 
         chart title
 
+    timeout: int
+        Determines the timeout after which the callback will
+        process new events without the previous one having
+        reported completion. Increase for very long running
+        callbacks and if zooming feels laggy.
+
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
         function
@@ -370,6 +408,8 @@ def line(
         step_size_type,
         width,
         height,
+        title,
+        timeout,
         **library_specific_params,
     )
 
@@ -384,6 +424,8 @@ def stacked_lines(
     step_size_type=int,
     width=800,
     height=400,
+    title="",
+    timeout=1,
     **library_specific_params,
 ):
     """
@@ -415,6 +457,12 @@ def stacked_lines(
 
         chart title
 
+    timeout: int
+        Determines the timeout after which the callback will
+        process new events without the previous one having
+        reported completion. Increase for very long running
+        callbacks and if zooming feels laggy.
+
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
         function
@@ -436,5 +484,7 @@ def stacked_lines(
         step_size_type,
         width,
         height,
+        title,
+        timeout,
         **library_specific_params,
     )

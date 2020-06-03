@@ -26,7 +26,7 @@ class TestBaseLine:
         assert bl.use_data_tiles is True
         assert bl.x == "test_x"
         assert bl.y is None
-        assert bl.data_points == int(100)
+        assert bl.data_points is None
         assert bl.add_interaction is True
         assert bl.aggregate_fn == "count"
         assert bl.width == 400
@@ -66,8 +66,8 @@ class TestBaseLine:
             (
                 BaseLine(x="key"),
                 {
-                    "X": [0.0, 0.8, 1.6, 2.4000000000000004, 4.0],
-                    "Y": [1, 1, 1, 1, 1],
+                    "X": [0.0, 1.0, 2.0, 3.0, 4.0],
+                    "Y": [1.0, 1.0, 1.0, 1.0, 1.0],
                 },
             ),
         ],
@@ -85,10 +85,7 @@ class TestBaseLine:
 
     def test_add_range_slider_filter(self):
         bl = BaseLine(x="key")
-        bl.min_value = self.dashboard._data[bl.x].min()
-        bl.max_value = self.dashboard._data[bl.x].max()
-        if bl.data_points > self.dashboard._data[bl.x].shape[0]:
-            bl.data_points = self.dashboard._data[bl.x].shape[0]
+        self.dashboard.add_charts([bl])
         bl.add_range_slider_filter(self.dashboard)
 
         assert type(bl.filter_widget) == pn.widgets.RangeSlider
@@ -99,12 +96,6 @@ class TestBaseLine:
     )
     def test_compute_query_dict(self, range, query):
         bl = BaseLine(x="key")
-        bl.min_value = self.dashboard._data[bl.x].min()
-        bl.max_value = self.dashboard._data[bl.x].max()
-        bl.stride = 1
-        if bl.data_points > self.dashboard._data[bl.x].shape[0]:
-            bl.data_points = self.dashboard._data[bl.x].shape[0]
-        bl.add_range_slider_filter(self.dashboard)
         self.dashboard.add_charts([bl])
         bl.filter_widget.value = range
         # test the following function behavior

@@ -46,7 +46,9 @@ class TestCoreNonAggregateChart:
         assert bnac.y_range is None
         assert bnac.aggregate_col is None
 
-    @pytest.mark.parametrize("stride, _stride", [(1, 1), (None, None), (0, 1)])
+    @pytest.mark.parametrize(
+        "stride, _stride", [(1, 1), (None, None), (0.01, 0.01)]
+    )
     def test_stride(self, stride, _stride):
         bnac = BaseNonAggregate()
         bnac.stride = stride

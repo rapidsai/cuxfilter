@@ -11,7 +11,7 @@ def check_folder(dir_name):
         os.makedirs(dir_name)
 
 
-def decompress_extract_data(file_path):
+def decompress_extract_data(file_path, base_dir):
     """
     identify file (tar, gzip etc and unzip/decompress)
     """
@@ -23,11 +23,12 @@ def decompress_extract_data(file_path):
     for ext in extentions.keys():
         if file_path.endswith(ext):
             file_ext = extentions[ext]
+            break
 
     if file_ext == "tar gzip":
-        tar = tarfile.open(file_path, mode="r:gz")
-        tar.extractall()
-        tar.close()
+        with tarfile.open(file_path, mode="r:gz") as tar:
+            tar.extractall(base_dir)
+            tar.close()
         print("Extraction complete")
     elif file_ext == "gzip":
         with gzip.open(file_path, "rb") as f_in:
@@ -38,7 +39,7 @@ def decompress_extract_data(file_path):
         print("Nothing to decompress/extract")
 
 
-def download_dataset(downloaded_filename, filename, url):
+def download_dataset(downloaded_filename, filename, url, base_dir):
     print("Dataset - " + filename)
     if not os.path.isfile(downloaded_filename):
         bash_cmd = "! wget" + " -O " + downloaded_filename + " " + url
@@ -53,7 +54,7 @@ def download_dataset(downloaded_filename, filename, url):
         if not os.path.isfile(filename):
             if filename != downloaded_filename:
                 print("Extracting ....")
-                decompress_extract_data(downloaded_filename)
+                decompress_extract_data(downloaded_filename, base_dir)
 
 
 def datasets_check(*args, base_dir="./"):
@@ -78,10 +79,10 @@ def datasets_check(*args, base_dir="./"):
 
     # nyc taxi dataset
     url["nyc_taxi"] = (
-        "https://s3.amazonaws.com/nyc-tlc/trip+data/"
-        + "yellow_tripdata_2015-01.csv"
+        "https://s3.us-east-2.amazonaws.com/rapidsai-data/viz-data/"
+        + "nyc_taxi.tar.gz"
     )
-    downloaded_filename["nyc_taxi"] = dir_name + "/nyc_taxi.csv"
+    downloaded_filename["nyc_taxi"] = dir_name + "/nyc_taxi.tar.gz"
     filename["nyc_taxi"] = dir_name + "/nyc_taxi.csv"
 
     url["auto_accidents"] = (
@@ -95,8 +96,12 @@ def datasets_check(*args, base_dir="./"):
 
     if len(args) == 0:
         for i in list(url.keys()):
-            download_dataset(downloaded_filename[i], filename[i], url[i])
+            download_dataset(
+                downloaded_filename[i], filename[i], url[i], base_dir
+            )
 
     else:
         for i in args:
-            download_dataset(downloaded_filename[i], filename[i], url[i])
+            download_dataset(
+                downloaded_filename[i], filename[i], url[i], base_dir
+            )
