@@ -1,14 +1,26 @@
+# cuXfilter 0.15.0 (Date TBD)
+
+## New Features
+
+## Improvements
+- PR #158 Add docs build script
+
+## Bug Fixes
+
+
 # cuXfilter 0.14.0 (03 Jun 2020)
 
 ## New Features
 - PR #136 Local gpuCI build script
 - PR #148 Added dask_cudf support to all charts
+
 ## Improvements
 - PR #129 optimizations to grouby query, using boolean masks
 - PR #135 implemented stateless non-aggregate querying
 - PR #148 made groupby pre-computations consistent, made dashboard querying stateless
 - PR #151 implmented autoscaling true/false for bar, line charts
 add_chart now dynamically updates a running dashboard in real-time(page-refresh required)
+
 ## Bug Fixes
 - PR #127 fixed logic for calculating datatiles for 2d and 3d choropleth charts
 - PR #128, #130 Bug fixes and test updates
