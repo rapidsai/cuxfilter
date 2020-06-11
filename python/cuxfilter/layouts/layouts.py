@@ -24,6 +24,21 @@ def is_widget(obj):
 class _LayoutBase:
     _layout: str
 
+    def generate_dashboard(self, title, charts, theme):
+        tmpl = pn.Template(theme.layout_head + self._layout)
+        tmpl.add_panel(
+            "title", '<div class="nav-title"> ' + str(title) + "</div>"
+        )
+
+        widgets = pn.Column()
+
+        self._apply_themes(charts, theme)
+        self._process_widgets(charts, widgets)
+        self._process_charts(charts, tmpl)
+
+        tmpl.add_panel("widgets", widgets)
+        return tmpl
+
     def _apply_themes(self, charts, theme):
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
@@ -35,27 +50,20 @@ class _LayoutBase:
             chart.chart.width = 280
             widgets.append(chart.view())
 
+    def _process_charts(self, charts, tmpl):
+        raise NotImplementedError()
+
 
 class Layout0(_LayoutBase):
     _layout = layout_0
 
-    def generate_dashboard(self, title, charts, theme):
+    def _process_charts(self, charts, tmpl):
         """
         layout 0
         [1]
         """
 
-        tmpl = pn.Template(theme.layout_head + self._layout)
-        tmpl.add_panel(
-            "title", '<div class="nav-title"> ' + str(title) + "</div>"
-        )
-
         num_of_charts_added = 0
-
-        widgets = pn.Column()
-
-        self._apply_themes(charts, theme)
-        self._process_widgets(charts, widgets)
 
         for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
@@ -66,31 +74,19 @@ class Layout0(_LayoutBase):
                 tmpl.add_panel("chart1", chart.view())
             else:
                 break
-        tmpl.add_panel("widgets", widgets)
-        return tmpl
 
 
 class Layout1(_LayoutBase):
     _layout = layout_1
 
-    def generate_dashboard(self, title, charts, theme):
+    def _process_charts(self, charts, tmpl):
         """
         layout 1
         [1]
         [2]
         """
 
-        tmpl = pn.Template(theme.layout_head + layout_1)
-        tmpl.add_panel(
-            "title", '<div class="nav-title"> ' + str(title) + "</div>"
-        )
-
         num_of_charts_added = 0
-
-        widgets = pn.Column()
-
-        self._apply_themes(charts, theme)
-        self._process_widgets(charts, widgets)
 
         for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
@@ -112,32 +108,19 @@ class Layout1(_LayoutBase):
         for i in range(n):
             chart = 2 - i
             tmpl.add_panel("chart" + str(chart), "")
-        tmpl.add_panel("widgets", widgets)
-        return tmpl
 
 
 class Layout2(_LayoutBase):
     _layout = layout_2
 
-    def generate_dashboard(self, title, charts, theme):
+    def _process_charts(self, charts, tmpl):
         """
         layout 2
 
         [1 2]
         """
 
-        tmpl = pn.Template(theme.layout_head + self._layout)
-
-        tmpl.add_panel(
-            "title", '<div class="nav-title"> ' + str(title) + "</div>"
-        )
-
         num_of_charts_added = 0
-        widgets = pn.Column()
-
-        self._apply_themes(charts, theme)
-        self._process_widgets(charts, widgets)
-
         for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
@@ -159,32 +142,18 @@ class Layout2(_LayoutBase):
             chart = 2 - i
             tmpl.add_panel("chart" + str(chart), "")
 
-        tmpl.add_panel("widgets", widgets)
-        return tmpl
-
 
 class Layout3(_LayoutBase):
     _layout = layout_3
 
-    def generate_dashboard(self, title, charts, theme):
+    def _process_charts(self, charts, tmpl):
         """
         layout 3
         [1   2]
         [1   3]
         """
 
-        tmpl = pn.Template(theme.layout_head + self._layout)
-
-        tmpl.add_panel(
-            "title", '<div class="nav-title"> ' + str(title) + "</div>"
-        )
-
         num_of_charts_added = 0
-        widgets = pn.Column()
-
-        self._apply_themes(charts, theme)
-        self._process_widgets(charts, widgets)
-
         for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
@@ -211,31 +180,17 @@ class Layout3(_LayoutBase):
             chart = 3 - i
             tmpl.add_panel("chart" + str(chart), "")
 
-        tmpl.add_panel("widgets", widgets)
-        return tmpl
-
 
 class Layout4(_LayoutBase):
     _layout = layout_4
 
-    def generate_dashboard(self, title, charts, theme):
+    def _process_charts(self, charts, tmpl):
         """
         layout 4
         [1 2 3]
         """
 
-        tmpl = pn.Template(theme.layout_head + self._layout)
-
-        tmpl.add_panel(
-            "title", '<div class="nav-title"> ' + str(title) + "</div>"
-        )
-
         num_of_charts_added = 0
-        widgets = pn.Column()
-
-        self._apply_themes(charts, theme)
-        self._process_widgets(charts, widgets)
-
         for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
@@ -262,32 +217,18 @@ class Layout4(_LayoutBase):
             chart = 3 - i
             tmpl.add_panel("chart" + str(chart), "")
 
-        tmpl.add_panel("widgets", widgets)
-        return tmpl
-
 
 class Layout5(_LayoutBase):
     _layout = layout_5
 
-    def generate_dashboard(self, title, charts, theme):
+    def _process_charts(self, charts, tmpl):
         """
         layout 5
         [  1  ]
         [2   3]
         """
 
-        tmpl = pn.Template(theme.layout_head + self._layout)
-
-        tmpl.add_panel(
-            "title", '<div class="nav-title"> ' + str(title) + "</div>"
-        )
-
         num_of_charts_added = 0
-        widgets = pn.Column()
-
-        self._apply_themes(charts, theme)
-        self._process_widgets(charts, widgets)
-
         for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
@@ -314,14 +255,11 @@ class Layout5(_LayoutBase):
             chart = 3 - i
             tmpl.add_panel("chart" + str(chart), "")
 
-        tmpl.add_panel("widgets", widgets)
-        return tmpl
-
 
 class Layout6(_LayoutBase):
     _layout = layout_6
 
-    def generate_dashboard(self, title, charts, theme):
+    def _process_charts(self, charts, tmpl):
         """
         layout 6
 
@@ -329,18 +267,7 @@ class Layout6(_LayoutBase):
         [3  4]
         """
 
-        tmpl = pn.Template(theme.layout_head + self._layout)
-
-        tmpl.add_panel(
-            "title", '<div class="nav-title"> ' + str(title) + "</div>"
-        )
-
         num_of_charts_added = 0
-        widgets = pn.Column()
-
-        self._apply_themes(charts, theme)
-        self._process_widgets(charts, widgets)
-
         for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
@@ -372,14 +299,11 @@ class Layout6(_LayoutBase):
             chart = 4 - i
             tmpl.add_panel("chart" + str(chart), "")
 
-        tmpl.add_panel("widgets", widgets)
-        return tmpl
-
 
 class Layout7(_LayoutBase):
     _layout = layout_7
 
-    def generate_dashboard(self, title, charts, theme):
+    def _process_charts(self, charts, tmpl):
         """
         layout 7
 
@@ -387,18 +311,7 @@ class Layout7(_LayoutBase):
         [2  3  4]
         """
 
-        tmpl = pn.Template(theme.layout_head + self._layout)
-
-        tmpl.add_panel(
-            "title", '<div class="nav-title"> ' + str(title) + "</div>"
-        )
-
         num_of_charts_added = 0
-        widgets = pn.Column()
-
-        self._apply_themes(charts, theme)
-        self._process_widgets(charts, widgets)
-
         for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
@@ -430,14 +343,11 @@ class Layout7(_LayoutBase):
             chart = 4 - i
             tmpl.add_panel("chart" + str(chart), "")
 
-        tmpl.add_panel("widgets", widgets)
-        return tmpl
-
 
 class Layout8(_LayoutBase):
     _layout = layout_8
 
-    def generate_dashboard(self, title, charts, theme):
+    def _process_charts(self, charts, tmpl):
         """
         layout 8
 
@@ -445,18 +355,7 @@ class Layout8(_LayoutBase):
         [2  3   4  5]
         """
 
-        tmpl = pn.Template(theme.layout_head + self._layout)
-
-        tmpl.add_panel(
-            "title", '<div class="nav-title"> ' + str(title) + "</div>"
-        )
-
         num_of_charts_added = 0
-        widgets = pn.Column()
-
-        self._apply_themes(charts, theme)
-        self._process_widgets(charts, widgets)
-
         for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
@@ -493,14 +392,11 @@ class Layout8(_LayoutBase):
             chart = 5 - i
             tmpl.add_panel("chart" + str(chart), "")
 
-        tmpl.add_panel("widgets", widgets)
-        return tmpl
-
 
 class Layout9(_LayoutBase):
     _layout = layout_9
 
-    def generate_dashboard(self, title, charts, theme):
+    def _process_charts(self, charts, tmpl):
         """
         layout 9
 
@@ -509,18 +405,7 @@ class Layout9(_LayoutBase):
         [4  5  6]
         """
 
-        tmpl = pn.Template(theme.layout_head + self._layout)
-
-        tmpl.add_panel(
-            "title", '<div class="nav-title"> ' + str(title) + "</div>"
-        )
-
         num_of_charts_added = 0
-        widgets = pn.Column()
-
-        self._apply_themes(charts, theme)
-        self._process_widgets(charts, widgets)
-
         for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
@@ -562,14 +447,11 @@ class Layout9(_LayoutBase):
             chart = 6 - i
             tmpl.add_panel("chart" + str(chart), "")
 
-        tmpl.add_panel("widgets", widgets)
-        return tmpl
-
 
 class Layout10(_LayoutBase):
     _layout = layout_10
 
-    def generate_dashboard(self, title, charts, theme):
+    def _process_charts(self, charts, tmpl):
         """
         layout 10
 
@@ -577,18 +459,7 @@ class Layout10(_LayoutBase):
         [4  5  6]
         """
 
-        tmpl = pn.Template(theme.layout_head + self._layout)
-
-        tmpl.add_panel(
-            "title", '<div class="nav-title"> ' + str(title) + "</div>"
-        )
-
         num_of_charts_added = 0
-        widgets = pn.Column()
-
-        self._apply_themes(charts, theme)
-        self._process_widgets(charts, widgets)
-
         for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
@@ -630,14 +501,11 @@ class Layout10(_LayoutBase):
             chart = 6 - i
             tmpl.add_panel("chart" + str(chart), "")
 
-        tmpl.add_panel("widgets", widgets)
-        return tmpl
-
 
 class Layout11(_LayoutBase):
     _layout = layout_11
 
-    def generate_dashboard(self, title, charts, theme):
+    def _process_charts(self, charts, tmpl):
         """
         layout 11
 
@@ -645,18 +513,7 @@ class Layout11(_LayoutBase):
         [3   4  5   6]
         """
 
-        tmpl = pn.Template(theme.layout_head + self._layout)
-
-        tmpl.add_panel(
-            "title", '<div class="nav-title"> ' + str(title) + "</div>"
-        )
-
         num_of_charts_added = 0
-        widgets = pn.Column()
-
-        self._apply_themes(charts, theme)
-        self._process_widgets(charts, widgets)
-
         for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
@@ -698,14 +555,11 @@ class Layout11(_LayoutBase):
             chart = 6 - i
             tmpl.add_panel("chart" + str(chart), "")
 
-        tmpl.add_panel("widgets", widgets)
-        return tmpl
-
 
 class Layout12(_LayoutBase):
     _layout = layout_12
 
-    def generate_dashboard(self, title, charts, theme):
+    def _process_charts(self, charts, tmpl):
         """
         layout 12
 
@@ -714,18 +568,7 @@ class Layout12(_LayoutBase):
         [7  8  9]
         """
 
-        tmpl = pn.Template(theme.layout_head + self._layout)
-
-        tmpl.add_panel(
-            "title", '<div class="nav-title"> ' + str(title) + "</div>"
-        )
-
         num_of_charts_added = 0
-        widgets = pn.Column()
-
-        self._apply_themes(charts, theme)
-        self._process_widgets(charts, widgets)
-
         for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
@@ -781,6 +624,3 @@ class Layout12(_LayoutBase):
         for i in range(n):
             chart = 9 - i
             tmpl.add_panel("chart" + str(chart), "")
-
-        tmpl.add_panel("widgets", widgets)
-        return tmpl
