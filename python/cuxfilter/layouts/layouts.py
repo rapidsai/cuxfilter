@@ -89,8 +89,6 @@ class Layout0(_LayoutBase):
                 chart.width = 1600
                 chart.height = int(round(90 * 1.0)) * 10
                 tmpl.add_panel("chart1", chart.view())
-            else:
-                break
 
         return num_charts_added
 
@@ -119,8 +117,6 @@ class Layout1(_LayoutBase):
                 chart.width = 1600
                 chart.height = int(round(90 * 0.33)) * 10
                 tmpl.add_panel("chart2", chart.view())
-            else:
-                break
 
         return num_charts_added
 
@@ -148,8 +144,6 @@ class Layout2(_LayoutBase):
                 chart.width = 900
                 chart.height = 900
                 tmpl.add_panel("chart2", chart.view())
-            else:
-                break
 
         return num_charts_added
 
@@ -182,8 +176,6 @@ class Layout3(_LayoutBase):
                 chart.width = 800
                 chart.height = 450
                 tmpl.add_panel("chart3", chart.view())
-            else:
-                break
 
         return num_charts_added
 
@@ -215,8 +207,6 @@ class Layout4(_LayoutBase):
                 chart.width = int(1600 * 0.33)
                 chart.height = int(1600 * 0.33)
                 tmpl.add_panel("chart3", chart.view())
-            else:
-                break
 
         return num_charts_added
 
@@ -249,8 +239,6 @@ class Layout5(_LayoutBase):
                 chart.width = 800
                 chart.height = 300
                 tmpl.add_panel("chart3", chart.view())
-            else:
-                break
 
         return num_charts_added
 
@@ -289,8 +277,6 @@ class Layout6(_LayoutBase):
                 chart.width = 800
                 chart.height = 450
                 tmpl.add_panel("chart4", chart.view())
-            else:
-                break
 
         return num_charts_added
 
@@ -329,8 +315,6 @@ class Layout7(_LayoutBase):
                 chart.width = int(1600 / 3)
                 chart.height = 300
                 tmpl.add_panel("chart4", chart.view())
-            else:
-                break
 
         return num_charts_added
 
@@ -374,8 +358,6 @@ class Layout8(_LayoutBase):
                 chart.width = int(1600 / 4)
                 chart.height = 300
                 tmpl.add_panel("chart5", chart.view())
-            else:
-                break
 
         return num_charts_added
 
@@ -425,8 +407,6 @@ class Layout9(_LayoutBase):
                 chart.width = int(1600 / 3)
                 chart.height = 300
                 tmpl.add_panel("chart6", chart.view())
-            else:
-                break
 
         return num_charts_added
 
@@ -475,8 +455,6 @@ class Layout10(_LayoutBase):
                 chart.width = int(1600 / 3)
                 chart.height = 450
                 tmpl.add_panel("chart6", chart.view())
-            else:
-                break
 
         return num_charts_added
 
@@ -525,8 +503,6 @@ class Layout11(_LayoutBase):
                 chart.width = int(1600 / 4)
                 chart.height = 300
                 tmpl.add_panel("chart6", chart.view())
-            else:
-                break
 
         return num_charts_added
 
@@ -591,7 +567,5 @@ class Layout12(_LayoutBase):
                 chart.width = int(1600 / 3)
                 chart.height = 300
                 tmpl.add_panel("chart9", chart.view())
-            else:
-                break
 
         return num_charts_added
