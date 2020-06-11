@@ -87,7 +87,7 @@ class Layout0(_LayoutBase):
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 1600
                 chart.height = int(round(90 * 1.0)) * 10
-                tmpl.add_panel("chart1", chart.view())
+            tmpl.add_panel("chart{i}", chart.view())
 
         return len(charts)
 
@@ -109,12 +109,11 @@ class Layout1(_LayoutBase):
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 1600
                 chart.height = int(round(90 * 0.66)) * 10
-                tmpl.add_panel("chart1", chart.view())
             elif i == 2:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 1600
                 chart.height = int(round(90 * 0.33)) * 10
-                tmpl.add_panel("chart2", chart.view())
+            tmpl.add_panel("chart{i}", chart.view())
 
         return len(charts)
 
@@ -136,12 +135,11 @@ class Layout2(_LayoutBase):
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 900
                 chart.height = 900
-                tmpl.add_panel("chart1", chart.view())
             elif i == 2:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 900
                 chart.height = 900
-                tmpl.add_panel("chart2", chart.view())
+            tmpl.add_panel("chart{i}", chart.view())
 
         return len(charts)
 
@@ -163,17 +161,15 @@ class Layout3(_LayoutBase):
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 900
                 chart.height = 900
-                tmpl.add_panel("chart1", chart.view())
             elif i == 2:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 800
                 chart.height = 450
-                tmpl.add_panel("chart2", chart.view())
             elif i == 3:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 800
                 chart.height = 450
-                tmpl.add_panel("chart3", chart.view())
+            tmpl.add_panel("chart{i}", chart.view())
 
         return len(charts)
 
@@ -194,17 +190,15 @@ class Layout4(_LayoutBase):
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 * 0.33)
                 chart.height = int(1600 * 0.33)
-                tmpl.add_panel("chart1", chart.view())
             elif i == 2:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 * 0.33)
                 chart.height = int(1600 * 0.33)
-                tmpl.add_panel("chart2", chart.view())
             elif i == 3:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 * 0.33)
                 chart.height = int(1600 * 0.33)
-                tmpl.add_panel("chart3", chart.view())
+            tmpl.add_panel("chart{i}", chart.view())
 
         return len(charts)
 
@@ -226,17 +220,15 @@ class Layout5(_LayoutBase):
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 1600
                 chart.height = 600
-                tmpl.add_panel("chart1", chart.view())
             elif i == 2:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 800
                 chart.height = 300
-                tmpl.add_panel("chart2", chart.view())
             elif i == 3:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 800
                 chart.height = 300
-                tmpl.add_panel("chart3", chart.view())
+            tmpl.add_panel("chart{i}", chart.view())
 
         return len(charts)
 
@@ -259,22 +251,19 @@ class Layout6(_LayoutBase):
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 800
                 chart.height = 450
-                tmpl.add_panel("chart1", chart.view())
             elif i == 2:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 800
                 chart.height = 450
-                tmpl.add_panel("chart2", chart.view())
             elif i == 3:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 800
                 chart.height = 450
-                tmpl.add_panel("chart3", chart.view())
             elif i == 4:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 800
                 chart.height = 450
-                tmpl.add_panel("chart4", chart.view())
+            tmpl.add_panel("chart{i}", chart.view())
 
         return len(charts)
 
@@ -297,22 +286,19 @@ class Layout7(_LayoutBase):
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 1600
                 chart.height = 600
-                tmpl.add_panel("chart1", chart.view())
             elif i == 2:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 300
-                tmpl.add_panel("chart2", chart.view())
             elif i == 3:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 300
-                tmpl.add_panel("chart3", chart.view())
             elif i == 4:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 300
-                tmpl.add_panel("chart4", chart.view())
+            tmpl.add_panel("chart{i}", chart.view())
 
         return len(charts)
 
@@ -335,27 +321,23 @@ class Layout8(_LayoutBase):
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 1600
                 chart.height = 600
-                tmpl.add_panel("chart1", chart.view())
             elif i == 2:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 4)
                 chart.height = 300
-                tmpl.add_panel("chart2", chart.view())
             elif i == 3:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 4)
                 chart.height = 300
-                tmpl.add_panel("chart3", chart.view())
             elif i == 4:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 4)
                 chart.height = 300
-                tmpl.add_panel("chart4", chart.view())
             elif i == 5:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 4)
                 chart.height = 300
-                tmpl.add_panel("chart5", chart.view())
+            tmpl.add_panel("chart{i}", chart.view())
 
         return len(charts)
 
@@ -379,32 +361,27 @@ class Layout9(_LayoutBase):
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = 1200
                 chart.height = 600
-                tmpl.add_panel("chart1", chart.view())
             elif i == 2:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 4)
                 chart.height = 300
-                tmpl.add_panel("chart2", chart.view())
             elif i == 3:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 4)
                 chart.height = 300
-                tmpl.add_panel("chart3", chart.view())
             elif i == 4:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 300
-                tmpl.add_panel("chart4", chart.view())
             elif i == 5:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 300
-                tmpl.add_panel("chart5", chart.view())
             elif i == 6:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 300
-                tmpl.add_panel("chart6", chart.view())
+            tmpl.add_panel("chart{i}", chart.view())
 
         return len(charts)
 
@@ -427,32 +404,27 @@ class Layout10(_LayoutBase):
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 450
-                tmpl.add_panel("chart1", chart.view())
             elif i == 2:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 450
-                tmpl.add_panel("chart2", chart.view())
             elif i == 3:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 450
-                tmpl.add_panel("chart3", chart.view())
             elif i == 4:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 450
-                tmpl.add_panel("chart4", chart.view())
             elif i == 5:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 450
-                tmpl.add_panel("chart5", chart.view())
             elif i == 6:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 450
-                tmpl.add_panel("chart6", chart.view())
+            tmpl.add_panel("chart{i}", chart.view())
 
         return len(charts)
 
@@ -475,32 +447,27 @@ class Layout11(_LayoutBase):
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 2)
                 chart.height = 600
-                tmpl.add_panel("chart1", chart.view())
             elif i == 2:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 2)
                 chart.height = 600
-                tmpl.add_panel("chart2", chart.view())
             elif i == 3:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 4)
                 chart.height = 300
-                tmpl.add_panel("chart3", chart.view())
             elif i == 4:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 4)
                 chart.height = 300
-                tmpl.add_panel("chart4", chart.view())
             elif i == 5:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 4)
                 chart.height = 300
-                tmpl.add_panel("chart5", chart.view())
             elif i == 6:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 4)
                 chart.height = 300
-                tmpl.add_panel("chart6", chart.view())
+            tmpl.add_panel("chart{i}", chart.view())
 
         return len(charts)
 
@@ -524,46 +491,38 @@ class Layout12(_LayoutBase):
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 300
-                tmpl.add_panel("chart1", chart.view())
             elif i == 2:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 300
-                tmpl.add_panel("chart2", chart.view())
             elif i == 3:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 300
-                tmpl.add_panel("chart3", chart.view())
             elif i == 4:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 300
-                tmpl.add_panel("chart4", chart.view())
             elif i == 5:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 300
-                tmpl.add_panel("chart5", chart.view())
             elif i == 6:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 300
-                tmpl.add_panel("chart6", chart.view())
             elif i == 7:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 300
-                tmpl.add_panel("chart7", chart.view())
             elif i == 8:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 300
-                tmpl.add_panel("chart8", chart.view())
             elif i == 9:
                 chart.chart.sizing_mode = "scale_both"
                 chart.width = int(1600 / 3)
                 chart.height = 300
-                tmpl.add_panel("chart9", chart.view())
+            tmpl.add_panel("chart{i}", chart.view())
 
         return len(charts)
