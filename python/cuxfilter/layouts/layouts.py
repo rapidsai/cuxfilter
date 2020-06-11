@@ -22,6 +22,8 @@ def is_widget(obj):
 
 
 class _LayoutBase:
+    _layout: str
+
     def _apply_themes(self, charts, theme):
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
@@ -35,13 +37,15 @@ class _LayoutBase:
 
 
 class Layout0(_LayoutBase):
+    _layout = layout_0
+
     def generate_dashboard(self, title, charts, theme):
         """
         layout 0
         [1]
         """
 
-        tmpl = pn.Template(theme.layout_head + layout_0)
+        tmpl = pn.Template(theme.layout_head + self._layout)
         tmpl.add_panel(
             "title", '<div class="nav-title"> ' + str(title) + "</div>"
         )
@@ -67,6 +71,8 @@ class Layout0(_LayoutBase):
 
 
 class Layout1(_LayoutBase):
+    _layout = layout_1
+
     def generate_dashboard(self, title, charts, theme):
         """
         layout 1
@@ -111,6 +117,8 @@ class Layout1(_LayoutBase):
 
 
 class Layout2(_LayoutBase):
+    _layout = layout_2
+
     def generate_dashboard(self, title, charts, theme):
         """
         layout 2
@@ -118,7 +126,7 @@ class Layout2(_LayoutBase):
         [1 2]
         """
 
-        tmpl = pn.Template(theme.layout_head + layout_2)
+        tmpl = pn.Template(theme.layout_head + self._layout)
 
         tmpl.add_panel(
             "title", '<div class="nav-title"> ' + str(title) + "</div>"
@@ -156,6 +164,8 @@ class Layout2(_LayoutBase):
 
 
 class Layout3(_LayoutBase):
+    _layout = layout_3
+
     def generate_dashboard(self, title, charts, theme):
         """
         layout 3
@@ -163,7 +173,7 @@ class Layout3(_LayoutBase):
         [1   3]
         """
 
-        tmpl = pn.Template(theme.layout_head + layout_3)
+        tmpl = pn.Template(theme.layout_head + self._layout)
 
         tmpl.add_panel(
             "title", '<div class="nav-title"> ' + str(title) + "</div>"
@@ -206,13 +216,15 @@ class Layout3(_LayoutBase):
 
 
 class Layout4(_LayoutBase):
+    _layout = layout_4
+
     def generate_dashboard(self, title, charts, theme):
         """
         layout 4
         [1 2 3]
         """
 
-        tmpl = pn.Template(theme.layout_head + layout_4)
+        tmpl = pn.Template(theme.layout_head + self._layout)
 
         tmpl.add_panel(
             "title", '<div class="nav-title"> ' + str(title) + "</div>"
@@ -255,6 +267,8 @@ class Layout4(_LayoutBase):
 
 
 class Layout5(_LayoutBase):
+    _layout = layout_5
+
     def generate_dashboard(self, title, charts, theme):
         """
         layout 5
@@ -262,7 +276,7 @@ class Layout5(_LayoutBase):
         [2   3]
         """
 
-        tmpl = pn.Template(theme.layout_head + layout_5)
+        tmpl = pn.Template(theme.layout_head + self._layout)
 
         tmpl.add_panel(
             "title", '<div class="nav-title"> ' + str(title) + "</div>"
@@ -305,6 +319,8 @@ class Layout5(_LayoutBase):
 
 
 class Layout6(_LayoutBase):
+    _layout = layout_6
+
     def generate_dashboard(self, title, charts, theme):
         """
         layout 6
@@ -313,7 +329,7 @@ class Layout6(_LayoutBase):
         [3  4]
         """
 
-        tmpl = pn.Template(theme.layout_head + layout_6)
+        tmpl = pn.Template(theme.layout_head + self._layout)
 
         tmpl.add_panel(
             "title", '<div class="nav-title"> ' + str(title) + "</div>"
@@ -361,6 +377,8 @@ class Layout6(_LayoutBase):
 
 
 class Layout7(_LayoutBase):
+    _layout = layout_7
+
     def generate_dashboard(self, title, charts, theme):
         """
         layout 7
@@ -369,7 +387,7 @@ class Layout7(_LayoutBase):
         [2  3  4]
         """
 
-        tmpl = pn.Template(theme.layout_head + layout_7)
+        tmpl = pn.Template(theme.layout_head + self._layout)
 
         tmpl.add_panel(
             "title", '<div class="nav-title"> ' + str(title) + "</div>"
@@ -417,6 +435,8 @@ class Layout7(_LayoutBase):
 
 
 class Layout8(_LayoutBase):
+    _layout = layout_8
+
     def generate_dashboard(self, title, charts, theme):
         """
         layout 8
@@ -425,7 +445,7 @@ class Layout8(_LayoutBase):
         [2  3   4  5]
         """
 
-        tmpl = pn.Template(theme.layout_head + layout_8)
+        tmpl = pn.Template(theme.layout_head + self._layout)
 
         tmpl.add_panel(
             "title", '<div class="nav-title"> ' + str(title) + "</div>"
@@ -478,6 +498,8 @@ class Layout8(_LayoutBase):
 
 
 class Layout9(_LayoutBase):
+    _layout = layout_9
+
     def generate_dashboard(self, title, charts, theme):
         """
         layout 9
@@ -487,7 +509,7 @@ class Layout9(_LayoutBase):
         [4  5  6]
         """
 
-        tmpl = pn.Template(theme.layout_head + layout_9)
+        tmpl = pn.Template(theme.layout_head + self._layout)
 
         tmpl.add_panel(
             "title", '<div class="nav-title"> ' + str(title) + "</div>"
@@ -545,6 +567,8 @@ class Layout9(_LayoutBase):
 
 
 class Layout10(_LayoutBase):
+    _layout = layout_10
+
     def generate_dashboard(self, title, charts, theme):
         """
         layout 10
@@ -553,7 +577,7 @@ class Layout10(_LayoutBase):
         [4  5  6]
         """
 
-        tmpl = pn.Template(theme.layout_head + layout_10)
+        tmpl = pn.Template(theme.layout_head + self._layout)
 
         tmpl.add_panel(
             "title", '<div class="nav-title"> ' + str(title) + "</div>"
@@ -611,6 +635,8 @@ class Layout10(_LayoutBase):
 
 
 class Layout11(_LayoutBase):
+    _layout = layout_11
+
     def generate_dashboard(self, title, charts, theme):
         """
         layout 11
@@ -619,7 +645,7 @@ class Layout11(_LayoutBase):
         [3   4  5   6]
         """
 
-        tmpl = pn.Template(theme.layout_head + layout_11)
+        tmpl = pn.Template(theme.layout_head + self._layout)
 
         tmpl.add_panel(
             "title", '<div class="nav-title"> ' + str(title) + "</div>"
@@ -677,6 +703,8 @@ class Layout11(_LayoutBase):
 
 
 class Layout12(_LayoutBase):
+    _layout = layout_12
+
     def generate_dashboard(self, title, charts, theme):
         """
         layout 12
@@ -686,7 +714,7 @@ class Layout12(_LayoutBase):
         [7  8  9]
         """
 
-        tmpl = pn.Template(theme.layout_head + layout_12)
+        tmpl = pn.Template(theme.layout_head + self._layout)
 
         tmpl.add_panel(
             "title", '<div class="nav-title"> ' + str(title) + "</div>"
