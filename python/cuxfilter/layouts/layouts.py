@@ -21,7 +21,20 @@ def is_widget(obj):
     return "widget" in obj.chart_type or obj.chart_type == "datasize_indicator"
 
 
-class Layout0:
+class _LayoutBase:
+    def _apply_themes(self, charts, theme):
+        for chart in charts.values():
+            if hasattr(chart, "apply_theme"):
+                chart.apply_theme(theme.chart_properties)
+
+    def _process_widgets(self, charts, widgets):
+        for chart in (x for x in charts.values() if is_widget(x)):
+            chart.chart.sizing_mode = "scale_both"
+            chart.chart.width = 280
+            widgets.append(chart.view())
+
+
+class Layout0(_LayoutBase):
     def generate_dashboard(self, title, charts, theme):
         """
         layout 0
@@ -37,14 +50,10 @@ class Layout0:
 
         widgets = pn.Column()
 
-        for chart in charts.values():
-            if hasattr(chart, "apply_theme"):
-                chart.apply_theme(theme.chart_properties)
-            if is_widget(chart):
-                chart.chart.sizing_mode = "scale_both"
-                chart.chart.width = 280
-                widgets.append(chart.view())
-                continue
+        self._apply_themes(charts, theme)
+        self._process_widgets(charts, widgets)
+
+        for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
                 chart.chart.sizing_mode = "scale_both"
@@ -57,7 +66,7 @@ class Layout0:
         return tmpl
 
 
-class Layout1:
+class Layout1(_LayoutBase):
     def generate_dashboard(self, title, charts, theme):
         """
         layout 1
@@ -74,14 +83,10 @@ class Layout1:
 
         widgets = pn.Column()
 
-        for chart in charts.values():
-            if hasattr(chart, "apply_theme"):
-                chart.apply_theme(theme.chart_properties)
-            if is_widget(chart):
-                chart.chart.sizing_mode = "scale_both"
-                chart.chart.width = 280
-                widgets.append(chart.view())
-                continue
+        self._apply_themes(charts, theme)
+        self._process_widgets(charts, widgets)
+
+        for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
                 chart.chart.sizing_mode = "scale_both"
@@ -105,7 +110,7 @@ class Layout1:
         return tmpl
 
 
-class Layout2:
+class Layout2(_LayoutBase):
     def generate_dashboard(self, title, charts, theme):
         """
         layout 2
@@ -122,14 +127,10 @@ class Layout2:
         num_of_charts_added = 0
         widgets = pn.Column()
 
-        for chart in charts.values():
-            if hasattr(chart, "apply_theme"):
-                chart.apply_theme(theme.chart_properties)
-            if is_widget(chart):
-                chart.chart.sizing_mode = "scale_both"
-                chart.chart.width = 280
-                widgets.append(chart.view())
-                continue
+        self._apply_themes(charts, theme)
+        self._process_widgets(charts, widgets)
+
+        for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
                 chart.chart.sizing_mode = "scale_both"
@@ -154,7 +155,7 @@ class Layout2:
         return tmpl
 
 
-class Layout3:
+class Layout3(_LayoutBase):
     def generate_dashboard(self, title, charts, theme):
         """
         layout 3
@@ -171,14 +172,10 @@ class Layout3:
         num_of_charts_added = 0
         widgets = pn.Column()
 
-        for chart in charts.values():
-            if hasattr(chart, "apply_theme"):
-                chart.apply_theme(theme.chart_properties)
-            if is_widget(chart):
-                chart.chart.sizing_mode = "scale_both"
-                chart.chart.width = 280
-                widgets.append(chart.view())
-                continue
+        self._apply_themes(charts, theme)
+        self._process_widgets(charts, widgets)
+
+        for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
                 chart.chart.sizing_mode = "scale_both"
@@ -208,7 +205,7 @@ class Layout3:
         return tmpl
 
 
-class Layout4:
+class Layout4(_LayoutBase):
     def generate_dashboard(self, title, charts, theme):
         """
         layout 4
@@ -224,14 +221,10 @@ class Layout4:
         num_of_charts_added = 0
         widgets = pn.Column()
 
-        for chart in charts.values():
-            if hasattr(chart, "apply_theme"):
-                chart.apply_theme(theme.chart_properties)
-            if is_widget(chart):
-                chart.chart.sizing_mode = "scale_both"
-                chart.chart.width = 280
-                widgets.append(chart.view())
-                continue
+        self._apply_themes(charts, theme)
+        self._process_widgets(charts, widgets)
+
+        for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
                 chart.chart.sizing_mode = "scale_both"
@@ -261,7 +254,7 @@ class Layout4:
         return tmpl
 
 
-class Layout5:
+class Layout5(_LayoutBase):
     def generate_dashboard(self, title, charts, theme):
         """
         layout 5
@@ -278,14 +271,10 @@ class Layout5:
         num_of_charts_added = 0
         widgets = pn.Column()
 
-        for chart in charts.values():
-            if hasattr(chart, "apply_theme"):
-                chart.apply_theme(theme.chart_properties)
-            if is_widget(chart):
-                chart.chart.sizing_mode = "scale_both"
-                chart.chart.width = 280
-                widgets.append(chart.view())
-                continue
+        self._apply_themes(charts, theme)
+        self._process_widgets(charts, widgets)
+
+        for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
                 chart.chart.sizing_mode = "scale_both"
@@ -315,7 +304,7 @@ class Layout5:
         return tmpl
 
 
-class Layout6:
+class Layout6(_LayoutBase):
     def generate_dashboard(self, title, charts, theme):
         """
         layout 6
@@ -333,14 +322,10 @@ class Layout6:
         num_of_charts_added = 0
         widgets = pn.Column()
 
-        for chart in charts.values():
-            if hasattr(chart, "apply_theme"):
-                chart.apply_theme(theme.chart_properties)
-            if is_widget(chart):
-                chart.chart.sizing_mode = "scale_both"
-                chart.chart.width = 280
-                widgets.append(chart.view())
-                continue
+        self._apply_themes(charts, theme)
+        self._process_widgets(charts, widgets)
+
+        for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
                 chart.chart.sizing_mode = "scale_both"
@@ -375,7 +360,7 @@ class Layout6:
         return tmpl
 
 
-class Layout7:
+class Layout7(_LayoutBase):
     def generate_dashboard(self, title, charts, theme):
         """
         layout 7
@@ -393,14 +378,10 @@ class Layout7:
         num_of_charts_added = 0
         widgets = pn.Column()
 
-        for chart in charts.values():
-            if hasattr(chart, "apply_theme"):
-                chart.apply_theme(theme.chart_properties)
-            if is_widget(chart):
-                chart.chart.sizing_mode = "scale_both"
-                chart.chart.width = 280
-                widgets.append(chart.view())
-                continue
+        self._apply_themes(charts, theme)
+        self._process_widgets(charts, widgets)
+
+        for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
                 chart.chart.sizing_mode = "scale_both"
@@ -435,7 +416,7 @@ class Layout7:
         return tmpl
 
 
-class Layout8:
+class Layout8(_LayoutBase):
     def generate_dashboard(self, title, charts, theme):
         """
         layout 8
@@ -453,14 +434,10 @@ class Layout8:
         num_of_charts_added = 0
         widgets = pn.Column()
 
-        for chart in charts.values():
-            if hasattr(chart, "apply_theme"):
-                chart.apply_theme(theme.chart_properties)
-            if is_widget(chart):
-                chart.chart.sizing_mode = "scale_both"
-                chart.chart.width = 280
-                widgets.append(chart.view())
-                continue
+        self._apply_themes(charts, theme)
+        self._process_widgets(charts, widgets)
+
+        for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
                 chart.chart.sizing_mode = "scale_both"
@@ -500,7 +477,7 @@ class Layout8:
         return tmpl
 
 
-class Layout9:
+class Layout9(_LayoutBase):
     def generate_dashboard(self, title, charts, theme):
         """
         layout 9
@@ -519,14 +496,10 @@ class Layout9:
         num_of_charts_added = 0
         widgets = pn.Column()
 
-        for chart in charts.values():
-            if hasattr(chart, "apply_theme"):
-                chart.apply_theme(theme.chart_properties)
-            if is_widget(chart):
-                chart.chart.sizing_mode = "scale_both"
-                chart.chart.width = 280
-                widgets.append(chart.view())
-                continue
+        self._apply_themes(charts, theme)
+        self._process_widgets(charts, widgets)
+
+        for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
                 chart.chart.sizing_mode = "scale_both"
@@ -571,7 +544,7 @@ class Layout9:
         return tmpl
 
 
-class Layout10:
+class Layout10(_LayoutBase):
     def generate_dashboard(self, title, charts, theme):
         """
         layout 10
@@ -589,14 +562,10 @@ class Layout10:
         num_of_charts_added = 0
         widgets = pn.Column()
 
-        for chart in charts.values():
-            if hasattr(chart, "apply_theme"):
-                chart.apply_theme(theme.chart_properties)
-            if is_widget(chart):
-                chart.chart.sizing_mode = "scale_both"
-                chart.chart.width = 280
-                widgets.append(chart.view())
-                continue
+        self._apply_themes(charts, theme)
+        self._process_widgets(charts, widgets)
+
+        for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
                 chart.chart.sizing_mode = "scale_both"
@@ -641,7 +610,7 @@ class Layout10:
         return tmpl
 
 
-class Layout11:
+class Layout11(_LayoutBase):
     def generate_dashboard(self, title, charts, theme):
         """
         layout 11
@@ -659,14 +628,10 @@ class Layout11:
         num_of_charts_added = 0
         widgets = pn.Column()
 
-        for chart in charts.values():
-            if hasattr(chart, "apply_theme"):
-                chart.apply_theme(theme.chart_properties)
-            if is_widget(chart):
-                chart.chart.sizing_mode = "scale_both"
-                chart.chart.width = 280
-                widgets.append(chart.view())
-                continue
+        self._apply_themes(charts, theme)
+        self._process_widgets(charts, widgets)
+
+        for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
                 chart.chart.sizing_mode = "scale_both"
@@ -711,7 +676,7 @@ class Layout11:
         return tmpl
 
 
-class Layout12:
+class Layout12(_LayoutBase):
     def generate_dashboard(self, title, charts, theme):
         """
         layout 12
@@ -730,14 +695,10 @@ class Layout12:
         num_of_charts_added = 0
         widgets = pn.Column()
 
-        for chart in charts.values():
-            if hasattr(chart, "apply_theme"):
-                chart.apply_theme(theme.chart_properties)
-            if is_widget(chart):
-                chart.chart.sizing_mode = "scale_both"
-                chart.chart.width = 280
-                widgets.append(chart.view())
-                continue
+        self._apply_themes(charts, theme)
+        self._process_widgets(charts, widgets)
+
+        for chart in (x for x in charts.values() if not is_widget(x)):
             num_of_charts_added += 1
             if num_of_charts_added == 1:
                 chart.chart.sizing_mode = "scale_both"
