@@ -17,6 +17,10 @@ from .layout_templates import (
 )
 
 
+def is_widget(obj):
+    return "widget" in obj.chart_type or obj.chart_type == "datasize_indicator"
+
+
 class Layout0:
     def generate_dashboard(self, title, charts, theme):
         """
@@ -36,10 +40,7 @@ class Layout0:
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
                 chart.apply_theme(theme.chart_properties)
-            if (
-                "widget" in chart.chart_type
-                or chart.chart_type == "datasize_indicator"
-            ):
+            if is_widget(chart):
                 chart.chart.sizing_mode = "scale_both"
                 chart.chart.width = 280
                 widgets.append(chart.view())
@@ -76,10 +77,7 @@ class Layout1:
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
                 chart.apply_theme(theme.chart_properties)
-            if (
-                "widget" in chart.chart_type
-                or chart.chart_type == "datasize_indicator"
-            ):
+            if is_widget(chart):
                 chart.chart.sizing_mode = "scale_both"
                 chart.chart.width = 280
                 widgets.append(chart.view())
@@ -127,10 +125,7 @@ class Layout2:
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
                 chart.apply_theme(theme.chart_properties)
-            if (
-                "widget" in chart.chart_type
-                or chart.chart_type == "datasize_indicator"
-            ):
+            if is_widget(chart):
                 chart.chart.sizing_mode = "scale_both"
                 chart.chart.width = 280
                 widgets.append(chart.view())
@@ -179,10 +174,7 @@ class Layout3:
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
                 chart.apply_theme(theme.chart_properties)
-            if (
-                "widget" in chart.chart_type
-                or chart.chart_type == "datasize_indicator"
-            ):
+            if is_widget(chart):
                 chart.chart.sizing_mode = "scale_both"
                 chart.chart.width = 280
                 widgets.append(chart.view())
@@ -235,10 +227,7 @@ class Layout4:
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
                 chart.apply_theme(theme.chart_properties)
-            if (
-                "widget" in chart.chart_type
-                or chart.chart_type == "datasize_indicator"
-            ):
+            if is_widget(chart):
                 chart.chart.sizing_mode = "scale_both"
                 chart.chart.width = 280
                 widgets.append(chart.view())
@@ -292,10 +281,7 @@ class Layout5:
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
                 chart.apply_theme(theme.chart_properties)
-            if (
-                "widget" in chart.chart_type
-                or chart.chart_type == "datasize_indicator"
-            ):
+            if is_widget(chart):
                 chart.chart.sizing_mode = "scale_both"
                 chart.chart.width = 280
                 widgets.append(chart.view())
@@ -350,10 +336,7 @@ class Layout6:
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
                 chart.apply_theme(theme.chart_properties)
-            if (
-                "widget" in chart.chart_type
-                or chart.chart_type == "datasize_indicator"
-            ):
+            if is_widget(chart):
                 chart.chart.sizing_mode = "scale_both"
                 chart.chart.width = 280
                 widgets.append(chart.view())
@@ -413,10 +396,7 @@ class Layout7:
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
                 chart.apply_theme(theme.chart_properties)
-            if (
-                "widget" in chart.chart_type
-                or chart.chart_type == "datasize_indicator"
-            ):
+            if is_widget(chart):
                 chart.chart.sizing_mode = "scale_both"
                 chart.chart.width = 280
                 widgets.append(chart.view())
@@ -476,10 +456,7 @@ class Layout8:
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
                 chart.apply_theme(theme.chart_properties)
-            if (
-                "widget" in chart.chart_type
-                or chart.chart_type == "datasize_indicator"
-            ):
+            if is_widget(chart):
                 chart.chart.sizing_mode = "scale_both"
                 chart.chart.width = 280
                 widgets.append(chart.view())
@@ -545,10 +522,7 @@ class Layout9:
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
                 chart.apply_theme(theme.chart_properties)
-            if (
-                "widget" in chart.chart_type
-                or chart.chart_type == "datasize_indicator"
-            ):
+            if is_widget(chart):
                 chart.chart.sizing_mode = "scale_both"
                 chart.chart.width = 280
                 widgets.append(chart.view())
@@ -618,10 +592,7 @@ class Layout10:
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
                 chart.apply_theme(theme.chart_properties)
-            if (
-                "widget" in chart.chart_type
-                or chart.chart_type == "datasize_indicator"
-            ):
+            if is_widget(chart):
                 chart.chart.sizing_mode = "scale_both"
                 chart.chart.width = 280
                 widgets.append(chart.view())
@@ -691,10 +662,7 @@ class Layout11:
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
                 chart.apply_theme(theme.chart_properties)
-            if (
-                "widget" in chart.chart_type
-                or chart.chart_type == "datasize_indicator"
-            ):
+            if is_widget(chart):
                 chart.chart.sizing_mode = "scale_both"
                 chart.chart.width = 280
                 widgets.append(chart.view())
@@ -765,10 +733,7 @@ class Layout12:
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
                 chart.apply_theme(theme.chart_properties)
-            if (
-                "widget" in chart.chart_type
-                or chart.chart_type == "datasize_indicator"
-            ):
+            if is_widget(chart):
                 chart.chart.sizing_mode = "scale_both"
                 chart.chart.width = 280
                 widgets.append(chart.view())
