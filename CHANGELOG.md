@@ -3,8 +3,8 @@
 ## New Features
 
 ## Improvements
-- PR #157 Layouts Refactor
 - PR #158 Add docs build script
+- PR #159 Layouts Refactor
 
 ## Bug Fixes
 
