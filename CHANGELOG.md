@@ -4,6 +4,7 @@
 
 ## Improvements
 - PR #158 Add docs build script
+- PR #160 Install dependencies via meta packages
 
 ## Bug Fixes
 
