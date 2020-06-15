@@ -1,3 +1,8 @@
+# cuXfilter 0.15.0 (unreleased)
+ 
+## Improvements
+- PR #157 Layouts Refactor
+
 # cuXfilter 0.14.0 (03 Jun 2020)
 
 ## New Features
