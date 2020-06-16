@@ -5,9 +5,9 @@
 ## Improvements
 - PR #158 Add docs build script
 - PR #160 Install dependencies via meta packages
+- PR #159 Layouts Refactor
 
 ## Bug Fixes
-
 
 # cuXfilter 0.14.0 (03 Jun 2020)
 
