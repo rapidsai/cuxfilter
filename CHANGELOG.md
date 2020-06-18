@@ -1,4 +1,15 @@
-# cuXfilter 0.14.0 (Date TBD)
+# cuXfilter 0.15.0 (Date TBD)
+
+## New Features
+
+## Improvements
+- PR #158 Add docs build script
+- PR #160 Install dependencies via meta packages
+- PR #159 Layouts Refactor
+
+## Bug Fixes
+
+# cuXfilter 0.14.0 (03 Jun 2020)
 
 ## New Features
 - PR #136 Local gpuCI build script
