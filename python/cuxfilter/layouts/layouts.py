@@ -94,7 +94,7 @@ class Layout1(_LayoutBase):
     def _process_plots(self, plots, tmpl):
         """
         layout 1
-        
+
         [1]
         [2]
         """
