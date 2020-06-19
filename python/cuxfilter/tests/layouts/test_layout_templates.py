@@ -50,5 +50,5 @@ def test_template_embeds_title(layout_name):
     embed_pat = re.compile(r"embed\(roots.title\)")
     layout = getattr(m, layout_name)
 
-    # assert widgets embedded once
+    # assert one title
     assert len(embed_pat.findall(layout)) == 1
