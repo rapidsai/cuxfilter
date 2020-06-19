@@ -4,8 +4,9 @@
 
 ## Improvements
 - PR #158 Add docs build script
-- PR #160 Install dependencies via meta packages
 - PR #159 Layouts Refactor
+- PR #160 Install dependencies via meta packages
+- PR #162 Dashboard and templates cleanup and tests
 
 ## Bug Fixes
 - PR #161 fixed layouts bugs

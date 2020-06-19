@@ -21,29 +21,40 @@ _server_info = (
 EXEC_MIME = "application/vnd.holoviews_exec.v0+json"
 HTML_MIME = "text/html"
 
+DEFAULT_NOTEBOOK_URL = "localhost:8888"
 
-def app(panel_obj, notebook_url="localhost:8888", port=0):
+_URL_PAT = re.compile(r"https?://(www\.)?")
+
+
+def _create_dashboard_url(notebook_url: str, port: int):
+    return f"http://{notebook_url}/proxy/{port}/"
+
+
+def _create_app(panel_obj, notebook_url=None, port=0):
     """
     Displays a bokeh server app inline in the notebook.
     Arguments
     ---------
-    notebook_url: str
+    notebook_url: str, optional
         URL to the notebook server
     port: int (optional, default=0)
         Allows specifying a specific port
     """
     from IPython.display import publish_display_data
 
+    notebook_url = notebook_url or DEFAULT_NOTEBOOK_URL
+
     if callable(notebook_url):
         origin = notebook_url(None)
     else:
+        notebook_url = _URL_PAT.sub("", notebook_url).strip().strip("/")
         origin = _origin_url(notebook_url)
     server_id = uuid.uuid4().hex
     server = get_server(
         panel_obj, port, origin, start=True, show=False, server_id=server_id
     )
 
-    url = "http://%s%s%d%s" % (notebook_url, "/proxy/", server.port, "/")
+    url = _create_dashboard_url(notebook_url, port)
 
     script = server_document(url, resources=None)
 
@@ -64,7 +75,7 @@ class DashBoard:
 
     >>> import cudf
     >>> import cuxfilter
-    >>> from cuxfilter.charts import bokehfrom cuxfilter.charts import bokeh
+    >>> from cuxfilter.charts import bokeh
     >>> df = cudf.DataFrame(
     >>>     {'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}
     >>> )
@@ -91,7 +102,7 @@ class DashBoard:
     _active_view: str = ""
     _dashboard = None
     _theme = None
-    _notebook_url = "localhost:8888"
+    _notebook_url = DEFAULT_NOTEBOOK_URL
     # _current_server_type - show(separate tab)/ app(in-notebook)
     _current_server_type = "show"
     server = None
@@ -110,8 +121,8 @@ class DashBoard:
         self._charts = dict()
         self._data_tiles = dict()
         self._query_str_dict = dict()
-        self._data_size_widget = data_size_widget
-        if self._data_size_widget:
+        self.data_size_widget = data_size_widget
+        if self.data_size_widget:
             temp_chart = data_size_indicator()
             self._charts[temp_chart.name] = temp_chart
             self._charts[temp_chart.name].initiate_chart(self)
@@ -122,7 +133,7 @@ class DashBoard:
                 chart.initiate_chart(self)
                 chart._initialized = True
 
-        self._title = title
+        self.title = title
         self._dashboard = layout()
         self._theme = theme
         # handle dashboard warnings
@@ -135,48 +146,6 @@ class DashBoard:
         Charts in the dashboard as a dictionary.
         """
         return self._charts
-
-    @property
-    def title(self):
-        """
-        Title of the dashboard.
-        """
-        return self._title
-
-    @title.setter
-    def title(self, value):
-        if type(value) == str:
-            self._title = value
-        else:
-            raise TypeError("title must be of type str")
-
-    @property
-    def data_size_widget(self):
-        """
-        Data_size_widget flag.
-        """
-        return self._data_size_widget
-
-    @data_size_widget.setter
-    def data_size_widget(self, value):
-        if type(value) == bool:
-            self._data_size_widget = value
-        else:
-            raise TypeError("data_size_widget must be of type bool")
-
-    @property
-    def warnings(self):
-        """
-        Layout warnings flag.
-        """
-        return self._warnings
-
-    @warnings.setter
-    def warnings(self, value):
-        if type(value) == bool:
-            self._warnings = value
-        else:
-            raise TypeError("warnings must be of type bool")
 
     def add_charts(self, charts=[]):
         """
@@ -236,7 +205,7 @@ class DashBoard:
     def _reinit_all_charts(self):
         self._data_tiles = dict()
         self._query_str_dict = dict()
-        if self._data_size_widget:
+        if self.data_size_widget:
             temp_chart = data_size_indicator()
             self._charts[temp_chart.name] = temp_chart
             self._charts[temp_chart.name].initiate_chart(self)
@@ -341,7 +310,7 @@ class DashBoard:
 
     def __repr__(self):
         template_obj = self._dashboard.generate_dashboard(
-            self._title, self._charts, self._theme
+            self.title, self._charts, self._theme
         )
         cls = "#### cuxfilter " + type(self).__name__
         spacer = "\n    "
@@ -372,7 +341,7 @@ class DashBoard:
     ):
         return get_server(
             self._dashboard.generate_dashboard(
-                self._title, self._charts, self._theme
+                self.title, self._charts, self._theme
             ),
             port,
             websocket_origin,
@@ -432,7 +401,7 @@ class DashBoard:
 
         display(Image("temp.png"))
 
-    def app(self, notebook_url="", port: int = 0):
+    def app(self, notebook_url=None, port: int = 0):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
@@ -470,28 +439,24 @@ class DashBoard:
             if self.server._started:
                 self.stop()
             self._reinit_all_charts()
-        url = re.compile(r"https?://(www\.)?")
-        notebook_url = url.sub("", notebook_url).strip().strip("/")
-        if len(notebook_url) > 0:
-            self._notebook_url = notebook_url
-        if len(notebook_url) > 0:
-            self.server = app(
-                self._dashboard.generate_dashboard(
-                    self._title, self._charts, self._theme
-                ),
-                notebook_url=self._notebook_url,
-                port=port,
-            )
-        else:
-            self.server = app(
-                self._dashboard.generate_dashboard(
-                    self._title, self._charts, self._theme
-                ),
-                port=port,
-            )
+
+        self._notebook_url = notebook_url
+        self.server = _create_app(
+            self._dashboard.generate_dashboard(
+                self.title, self._charts, self._theme
+            ),
+            notebook_url=self._notebook_url,
+            port=port,
+        )
         self._current_server_type = "app"
 
-    def show(self, notebook_url="", port=0, threaded=False, **kwargs):
+    def show(
+        self,
+        notebook_url=DEFAULT_NOTEBOOK_URL,
+        port=0,
+        threaded=False,
+        **kwargs,
+    ):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
@@ -526,19 +491,13 @@ class DashBoard:
             if self.server._started:
                 self.stop()
             self._reinit_all_charts()
-        url = re.compile(r"https?://(www\.)?")
-        notebook_url = url.sub("", notebook_url).strip().strip("/")
-        if len(notebook_url) > 0:
-            self._notebook_url = notebook_url
+
+        notebook_url = _URL_PAT.sub("", notebook_url).strip().strip("/")
+        self._notebook_url = notebook_url
         if port == 0:
             port = get_open_port()
 
-        dashboard_url = "http://%s%s%d%s" % (
-            self._notebook_url,
-            "/proxy/",
-            port,
-            "/",
-        )
+        dashboard_url = _create_dashboard_url(self._notebook_url, port)
         print("Dashboard running at " + dashboard_url)
 
         try:

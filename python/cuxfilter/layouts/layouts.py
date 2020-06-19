@@ -94,6 +94,7 @@ class Layout1(_LayoutBase):
     def _process_plots(self, plots, tmpl):
         """
         layout 1
+
         [1]
         [2]
         """
@@ -132,6 +133,7 @@ class Layout3(_LayoutBase):
     def _process_plots(self, plots, tmpl):
         """
         layout 3
+
         [1   2]
         [1   3]
         """
@@ -153,6 +155,7 @@ class Layout4(_LayoutBase):
     def _process_plots(self, plots, tmpl):
         """
         layout 4
+
         [1 2 3]
         """
 
@@ -169,6 +172,7 @@ class Layout5(_LayoutBase):
     def _process_plots(self, plots, tmpl):
         """
         layout 5
+
         [  1  ]
         [2   3]
         """
