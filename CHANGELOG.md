@@ -8,6 +8,7 @@
 - PR #159 Layouts Refactor
 
 ## Bug Fixes
+- PR #161 fixed layouts bugs
 
 # cuXfilter 0.14.0 (03 Jun 2020)
 
