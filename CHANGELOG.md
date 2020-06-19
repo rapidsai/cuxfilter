@@ -21,6 +21,7 @@
 - PR #148 made groupby pre-computations consistent, made dashboard querying stateless
 - PR #151 implmented autoscaling true/false for bar, line charts
 add_chart now dynamically updates a running dashboard in real-time(page-refresh required)
+- PR #155 Add git commit to conda package
 
 ## Bug Fixes
 - PR #127 fixed logic for calculating datatiles for 2d and 3d choropleth charts
