@@ -21,12 +21,14 @@ _server_info = (
 EXEC_MIME = "application/vnd.holoviews_exec.v0+json"
 HTML_MIME = "text/html"
 
+DEFAULT_NOTEBOOK_URL = "localhost:8888"
+
 _URL_PAT = re.compile(r"https?://(www\.)?")
 
 def _create_dashboard_url(notebook_url: str, port: int):
     return f"http://{notebook_url}/proxy/{port}/"
 
-def app(panel_obj, notebook_url="localhost:8888", port=0):
+def app(panel_obj, notebook_url=DEFAULT_NOTEBOOK_URL, port=0):
     """
     Displays a bokeh server app inline in the notebook.
     Arguments
@@ -95,7 +97,7 @@ class DashBoard:
     _active_view: str = ""
     _dashboard = None
     _theme = None
-    _notebook_url = "localhost:8888"
+    _notebook_url = DEFAULT_NOTEBOOK_URL
     # _current_server_type - show(separate tab)/ app(in-notebook)
     _current_server_type = "show"
     server = None
