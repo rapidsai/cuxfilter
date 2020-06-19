@@ -119,8 +119,8 @@ class DashBoard:
         self._charts = dict()
         self._data_tiles = dict()
         self._query_str_dict = dict()
-        self._data_size_widget = data_size_widget
-        if self._data_size_widget:
+        self.data_size_widget = data_size_widget
+        if self.data_size_widget:
             temp_chart = data_size_indicator()
             self._charts[temp_chart.name] = temp_chart
             self._charts[temp_chart.name].initiate_chart(self)
@@ -131,7 +131,7 @@ class DashBoard:
                 chart.initiate_chart(self)
                 chart._initialized = True
 
-        self._title = title
+        self.title = title
         self._dashboard = layout()
         self._theme = theme
         # handle dashboard warnings
@@ -144,48 +144,6 @@ class DashBoard:
         Charts in the dashboard as a dictionary.
         """
         return self._charts
-
-    @property
-    def title(self):
-        """
-        Title of the dashboard.
-        """
-        return self._title
-
-    @title.setter
-    def title(self, value):
-        if type(value) == str:
-            self._title = value
-        else:
-            raise TypeError("title must be of type str")
-
-    @property
-    def data_size_widget(self):
-        """
-        Data_size_widget flag.
-        """
-        return self._data_size_widget
-
-    @data_size_widget.setter
-    def data_size_widget(self, value):
-        if type(value) == bool:
-            self._data_size_widget = value
-        else:
-            raise TypeError("data_size_widget must be of type bool")
-
-    @property
-    def warnings(self):
-        """
-        Layout warnings flag.
-        """
-        return self._warnings
-
-    @warnings.setter
-    def warnings(self, value):
-        if type(value) == bool:
-            self._warnings = value
-        else:
-            raise TypeError("warnings must be of type bool")
 
     def add_charts(self, charts=[]):
         """
@@ -245,7 +203,7 @@ class DashBoard:
     def _reinit_all_charts(self):
         self._data_tiles = dict()
         self._query_str_dict = dict()
-        if self._data_size_widget:
+        if self.data_size_widget:
             temp_chart = data_size_indicator()
             self._charts[temp_chart.name] = temp_chart
             self._charts[temp_chart.name].initiate_chart(self)
@@ -350,7 +308,7 @@ class DashBoard:
 
     def __repr__(self):
         template_obj = self._dashboard.generate_dashboard(
-            self._title, self._charts, self._theme
+            self.title, self._charts, self._theme
         )
         cls = "#### cuxfilter " + type(self).__name__
         spacer = "\n    "
@@ -381,7 +339,7 @@ class DashBoard:
     ):
         return get_server(
             self._dashboard.generate_dashboard(
-                self._title, self._charts, self._theme
+                self.title, self._charts, self._theme
             ),
             port,
             websocket_origin,
@@ -483,14 +441,14 @@ class DashBoard:
         self._notebook_url = notebook_url
         self.server = _create_app(
             self._dashboard.generate_dashboard(
-                self._title, self._charts, self._theme
+                self.title, self._charts, self._theme
             ),
             notebook_url=self._notebook_url,
             port=port,
         )
         self._current_server_type = "app"
 
-    def show(self, notebook_url="", port=0, threaded=False, **kwargs):
+    def show(self, notebook_url=DEFAULT_NOTEBOOK_URL, port=0, threaded=False, **kwargs):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
@@ -527,8 +485,7 @@ class DashBoard:
             self._reinit_all_charts()
 
         notebook_url = _URL_PAT.sub("", notebook_url).strip().strip("/")
-        if len(notebook_url) > 0:
-            self._notebook_url = notebook_url
+        self._notebook_url = notebook_url
         if port == 0:
             port = get_open_port()
 
