@@ -25,8 +25,10 @@ DEFAULT_NOTEBOOK_URL = "localhost:8888"
 
 _URL_PAT = re.compile(r"https?://(www\.)?")
 
+
 def _create_dashboard_url(notebook_url: str, port: int):
     return f"http://{notebook_url}/proxy/{port}/"
+
 
 def _create_app(panel_obj, notebook_url=None, port=0):
     """
@@ -448,7 +450,13 @@ class DashBoard:
         )
         self._current_server_type = "app"
 
-    def show(self, notebook_url=DEFAULT_NOTEBOOK_URL, port=0, threaded=False, **kwargs):
+    def show(
+        self,
+        notebook_url=DEFAULT_NOTEBOOK_URL,
+        port=0,
+        threaded=False,
+        **kwargs,
+    ):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
