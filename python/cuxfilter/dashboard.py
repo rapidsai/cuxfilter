@@ -28,7 +28,7 @@ _URL_PAT = re.compile(r"https?://(www\.)?")
 def _create_dashboard_url(notebook_url: str, port: int):
     return f"http://{notebook_url}/proxy/{port}/"
 
-def app(panel_obj, notebook_url=None, port=0):
+def _create_app(panel_obj, notebook_url=None, port=0):
     """
     Displays a bokeh server app inline in the notebook.
     Arguments
@@ -481,7 +481,7 @@ class DashBoard:
             self._reinit_all_charts()
 
         self._notebook_url = notebook_url
-        self.server = app(
+        self.server = _create_app(
             self._dashboard.generate_dashboard(
                 self._title, self._charts, self._theme
             ),
