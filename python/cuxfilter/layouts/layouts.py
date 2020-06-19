@@ -36,12 +36,10 @@ class _LayoutBase:
 
         widgets = [x for x in charts.values() if is_widget(x)]
         plots = [x for x in charts.values() if not is_widget(x)]
-
         self._apply_themes(charts, theme)
         widgetbox = self._process_widgets(widgets)
         self._process_plots(plots, tmpl)
         self._pad_missing_plots(len(plots), tmpl)
-
         tmpl.add_panel("widgets", widgetbox)
         return tmpl
 
@@ -56,17 +54,19 @@ class _LayoutBase:
             if hasattr(chart, "apply_theme"):
                 chart.apply_theme(theme.chart_properties)
 
-    def _process_widgets(self, widgets):
-        widgets = pn.Column()
-        for obj in widgets:
+    def _process_widgets(self, widgets_list):
+        widgets_ = pn.Column()
+        for obj in widgets_list:
             obj.chart.width = 280
-            widgets.append(obj.view())
+            obj.chart.sizing_mode = "scale_both"
+            widgets_.append(obj.view())
+        return widgets_
 
     def _pad_missing_plots(self, num_charts_added, tmpl):
         N = self.total_charts - num_charts_added
 
-        for i in range(N, num_charts_added, -1):
-            tmpl.add_panel(f"chart{i}", "")
+        for i in range(N):
+            tmpl.add_panel(f"chart{self.total_charts - i}", "")
 
     def _process_plots(self, plots, tmpl):
         raise NotImplementedError()
