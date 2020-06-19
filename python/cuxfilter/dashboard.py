@@ -28,21 +28,24 @@ _URL_PAT = re.compile(r"https?://(www\.)?")
 def _create_dashboard_url(notebook_url: str, port: int):
     return f"http://{notebook_url}/proxy/{port}/"
 
-def app(panel_obj, notebook_url=DEFAULT_NOTEBOOK_URL, port=0):
+def app(panel_obj, notebook_url=None, port=0):
     """
     Displays a bokeh server app inline in the notebook.
     Arguments
     ---------
-    notebook_url: str
+    notebook_url: str, optional
         URL to the notebook server
     port: int (optional, default=0)
         Allows specifying a specific port
     """
     from IPython.display import publish_display_data
 
+    notebook_url = notebook_url or DEFAULT_NOTEBOOK_URL
+
     if callable(notebook_url):
         origin = notebook_url(None)
     else:
+        notebook_url = _URL_PAT.sub("", notebook_url).strip().strip("/")
         origin = _origin_url(notebook_url)
     server_id = uuid.uuid4().hex
     server = get_server(
@@ -438,7 +441,7 @@ class DashBoard:
 
         display(Image("temp.png"))
 
-    def app(self, notebook_url="", port: int = 0):
+    def app(self, notebook_url=None, port: int = 0):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
@@ -476,24 +479,15 @@ class DashBoard:
             if self.server._started:
                 self.stop()
             self._reinit_all_charts()
-        notebook_url = _URL_PAT.sub("", notebook_url).strip().strip("/")
-        if len(notebook_url) > 0:
-            self._notebook_url = notebook_url
-        if len(notebook_url) > 0:
-            self.server = app(
-                self._dashboard.generate_dashboard(
-                    self._title, self._charts, self._theme
-                ),
-                notebook_url=self._notebook_url,
-                port=port,
-            )
-        else:
-            self.server = app(
-                self._dashboard.generate_dashboard(
-                    self._title, self._charts, self._theme
-                ),
-                port=port,
-            )
+
+        self._notebook_url = notebook_url
+        self.server = app(
+            self._dashboard.generate_dashboard(
+                self._title, self._charts, self._theme
+            ),
+            notebook_url=self._notebook_url,
+            port=port,
+        )
         self._current_server_type = "app"
 
     def show(self, notebook_url="", port=0, threaded=False, **kwargs):
