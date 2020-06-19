@@ -23,6 +23,9 @@ HTML_MIME = "text/html"
 
 _URL_PAT = re.compile(r"https?://(www\.)?")
 
+def _create_dashboard_url(notebook_url: str, port: int):
+    return f"http://{notebook_url}/proxy/{port}/"
+
 def app(panel_obj, notebook_url="localhost:8888", port=0):
     """
     Displays a bokeh server app inline in the notebook.
@@ -44,7 +47,7 @@ def app(panel_obj, notebook_url="localhost:8888", port=0):
         panel_obj, port, origin, start=True, show=False, server_id=server_id
     )
 
-    url = "http://%s%s%d%s" % (notebook_url, "/proxy/", server.port, "/")
+    url = _create_dashboard_url(notebook_url, port)
 
     script = server_document(url, resources=None)
 
@@ -533,12 +536,7 @@ class DashBoard:
         if port == 0:
             port = get_open_port()
 
-        dashboard_url = "http://%s%s%d%s" % (
-            self._notebook_url,
-            "/proxy/",
-            port,
-            "/",
-        )
+        dashboard_url = _create_dashboard_url(self._notebook_url, port)
         print("Dashboard running at " + dashboard_url)
 
         try:
