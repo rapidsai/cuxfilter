@@ -70,7 +70,7 @@ class DashBoard:
 
     >>> import cudf
     >>> import cuxfilter
-    >>> from cuxfilter.charts import bokehfrom cuxfilter.charts import bokeh
+    >>> from cuxfilter.charts import bokeh
     >>> df = cudf.DataFrame(
     >>>     {'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}
     >>> )
