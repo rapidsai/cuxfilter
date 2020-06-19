@@ -21,6 +21,7 @@ _server_info = (
 EXEC_MIME = "application/vnd.holoviews_exec.v0+json"
 HTML_MIME = "text/html"
 
+_URL_PAT = re.compile(r"https?://(www\.)?")
 
 def app(panel_obj, notebook_url="localhost:8888", port=0):
     """
@@ -470,8 +471,7 @@ class DashBoard:
             if self.server._started:
                 self.stop()
             self._reinit_all_charts()
-        url = re.compile(r"https?://(www\.)?")
-        notebook_url = url.sub("", notebook_url).strip().strip("/")
+        notebook_url = _URL_PAT.sub("", notebook_url).strip().strip("/")
         if len(notebook_url) > 0:
             self._notebook_url = notebook_url
         if len(notebook_url) > 0:
@@ -526,8 +526,8 @@ class DashBoard:
             if self.server._started:
                 self.stop()
             self._reinit_all_charts()
-        url = re.compile(r"https?://(www\.)?")
-        notebook_url = url.sub("", notebook_url).strip().strip("/")
+
+        notebook_url = _URL_PAT.sub("", notebook_url).strip().strip("/")
         if len(notebook_url) > 0:
             self._notebook_url = notebook_url
         if port == 0:
