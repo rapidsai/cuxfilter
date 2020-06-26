@@ -21,7 +21,10 @@ height: 30px;
 pn.extension("deckgl", raw_css=[raw_css])
 
 
-class panel_deck(param.Parameterized):
+class PanelDeck(param.Parameterized):
+    """
+    PanelDeck class for panel.pane.DeckGL + multi_select(Boolean) parameter
+    """
     x = param.String("x")
     data = param.DataFrame()
     colors = param.DataFrame()
@@ -35,17 +38,23 @@ class panel_deck(param.Parameterized):
     width = param.Integer(400)
 
     def get_tooltip_html(self):
+        """
+        get tooltip info from dataframe columns, if not already present
+        """
         html_str = ""
         tooltip_columns = list(
             set(self.data.columns)
             - set(["index", "coordinates"] + list(self.colors.columns))
         )
         for i in tooltip_columns:
-            html_str += "<b> %s </b>: {%s} <br><br>" % (i, i)
+            html_str += f"<b> {i} </b>: {{{i}}} <br><br>"
         return html_str
 
     def __init__(self, **params):
-        super(panel_deck, self).__init__(**params)
+        """
+        initialize pydeck object, and set a listener on self.data
+        """
+        super(PanelDeck, self).__init__(**params)
         self._view_state = pdk.ViewState(
             **self.spec["initialViewState"], bearing=0.45,
         )
@@ -70,10 +79,18 @@ class panel_deck(param.Parameterized):
         self.param.watch(self._update, ["data"])
 
     def selected_points(self):
+        """
+        returns a list of currently selected column_x values as a list
+        """
         return self.data[self.x].loc[self.indices].tolist()
 
     @pn.depends("pane.click_state")
     def click_event(self):
+        """
+        callback for click events, highlights the selected indices
+        (single_select/multi_select) and sets the color of
+        unselected indices to default_color
+        """
         index = self.pane.click_state.get("index", -1)
         old_indices = list(self.indices)
         if index == -1:
@@ -106,11 +123,17 @@ class panel_deck(param.Parameterized):
         )
 
     def _update(self, event):
+        """
+        trigger deck_gl pane when layer data is updated
+        """
         if event.name == "data":
             self._layers.data = self.data
         self.pane.param.trigger("object")
 
     def view(self):
+        """
+        view object
+        """
         x = pn.Column(self.param.multi_select, css_classes=["multi-select"])
 
         return pn.Column(
