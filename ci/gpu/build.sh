@@ -62,6 +62,9 @@ conda install "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
                "rapids-build-env=$MINOR_VERSION.*" \
                "rapids-notebook-env=$MINOR_VERSION.*"
 
+conda remove --force rapids-build-env rapids-notebook-env
+conda install "bokeh>=2.1.1 panel>=0.9.* pydeck>=0.3.*"
+
 # https://docs.rapids.ai/maintainers/depmgmt/ 
 # conda remove -f rapids-build-env rapids-notebook-env
 # conda install "your-pkg=1.0.0"
