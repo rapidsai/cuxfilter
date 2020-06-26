@@ -3,7 +3,7 @@ import cudf
 
 from cuxfilter import charts
 from cuxfilter import DataFrame
-from cuxfilter.charts.deckgl.bindings import panel_deck
+from cuxfilter.charts.deckgl.bindings import PanelDeck
 
 pytest
 
@@ -73,7 +73,7 @@ class TestDeckGL:
             ],
         }
 
-        assert isinstance(choropleth3d_chart.chart, panel_deck)
+        assert isinstance(choropleth3d_chart.chart, PanelDeck)
 
         assert choropleth3d_chart.chart.x == "states"
         assert choropleth3d_chart.chart.data.equals(

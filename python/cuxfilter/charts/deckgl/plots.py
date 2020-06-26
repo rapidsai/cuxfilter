@@ -1,5 +1,5 @@
 from ..core.aggregate import BaseChoropleth
-from .bindings import panel_deck
+from .bindings import PanelDeck
 
 import pandas as pd
 import numpy as np
@@ -157,7 +157,7 @@ class Choropleth(BaseChoropleth):
 
         self.deck_spec["layers"] = [self.layer_spec]
 
-        self.chart = panel_deck(
+        self.chart = PanelDeck(
             x=self.x,
             data=self.source_df,
             spec=self.deck_spec,
