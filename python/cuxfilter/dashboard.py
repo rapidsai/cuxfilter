@@ -12,6 +12,8 @@ from .layouts import single_feature
 from .charts.panel_widgets import data_size_indicator
 from .assets import screengrab, get_open_port
 from .themes import light
+from IPython.core.display import Image, display
+from IPython.display import publish_display_data
 
 _server_info = (
     "<b>Running server:</b>"
@@ -27,7 +29,7 @@ _URL_PAT = re.compile(r"https?://(www\.)?")
 
 
 def _create_dashboard_url(notebook_url: str, port: int):
-    return f"http://{notebook_url}/proxy/{port}/"
+    return f"http://{notebook_url}/proxy/{port}/ "
 
 
 def _create_app(panel_obj, notebook_url=None, port=0):
@@ -40,8 +42,6 @@ def _create_app(panel_obj, notebook_url=None, port=0):
     port: int (optional, default=0)
         Allows specifying a specific port
     """
-    from IPython.display import publish_display_data
-
     notebook_url = notebook_url or DEFAULT_NOTEBOOK_URL
 
     if callable(notebook_url):
@@ -348,6 +348,7 @@ class DashBoard:
             loop,
             show,
             start,
+            title=self.title,
             **kwargs,
         )
 
@@ -397,7 +398,6 @@ class DashBoard:
         )
         await screengrab("http://" + url)
         self.stop()
-        from IPython.core.display import Image, display
 
         display(Image("temp.png"))
 
@@ -498,7 +498,7 @@ class DashBoard:
             port = get_open_port()
 
         dashboard_url = _create_dashboard_url(self._notebook_url, port)
-        print("Dashboard running at " + dashboard_url)
+        print("Dashboard running at port " + str(port))
 
         try:
             self.server = self._get_server(
@@ -520,6 +520,11 @@ class DashBoard:
                 **kwargs,
             )
         self._current_server_type = "show"
+        b = pn.widgets.Button(name='open cuxfilter dashboard', button_type='success')
+        b.js_on_click(
+            args={'target': dashboard_url}, code='window.open(target)'
+        )
+        return pn.Row(b)
 
     def stop(self):
         """
