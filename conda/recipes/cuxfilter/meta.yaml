@@ -36,6 +36,7 @@ requirements:
     - libwebp
     - pyppeteer
     - jupyter-server-proxy
+    - pydeck >=0.3.*
 
 test:
   commands:
