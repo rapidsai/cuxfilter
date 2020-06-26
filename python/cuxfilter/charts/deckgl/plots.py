@@ -22,7 +22,6 @@ class Choropleth(BaseChoropleth):
         "opacity": 1,
         "getLineWidth": 10,
         "getPolygon": "coordinates",
-        "getElevation": "",
         "getFillColor": "[__r__, __g__, __b__, __a__]",
         "stroked": True,
         "filled": True,
@@ -161,6 +160,7 @@ class Choropleth(BaseChoropleth):
             width=self.width,
             height=self.height,
             default_color=list(ImageColor.getrgb(self.nan_color)) + [50],
+            tooltip_include_cols=self.tooltip_include_cols
         )
 
     def update_dimensions(self, width=None, height=None):

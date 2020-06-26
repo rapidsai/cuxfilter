@@ -36,6 +36,9 @@ class PanelDeck(param.Parameterized):
     sizing_mode = param.String("scale_both")
     height = param.Integer(400)
     width = param.Integer(400)
+    tooltip_include_cols = param.List(
+        [], doc="list of columns to include in tooltip"
+    )
 
     def get_tooltip_html(self):
         """
@@ -45,9 +48,10 @@ class PanelDeck(param.Parameterized):
         tooltip_columns = list(
             set(self.data.columns)
             - set(["index", "coordinates"] + list(self.colors.columns))
-        )
+        ) if len(self.tooltip_include_cols) == 0 else self.tooltip_include_cols
+
         for i in tooltip_columns:
-            html_str += f"<b> {i} </b>: {{{i}}} <br><br>"
+            html_str += f"<b> {i} </b>: {{{i}}} <br>"
         return html_str
 
     def __init__(self, **params):
