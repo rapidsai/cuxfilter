@@ -17,7 +17,7 @@ class Choropleth(BaseChoropleth):
     coordinates = "coordinates"
     source: Type[ColumnDataSource]
     source_df: Type[pd.DataFrame]
-    rgba_columns: Type[list] = ['__r__', '__g__', '__b__', '__a__']
+    rgba_columns: Type[list] = ["__r__", "__g__", "__b__", "__a__"]
     layer_spec = {
         "opacity": 1,
         "getLineWidth": 10,
@@ -58,7 +58,7 @@ class Choropleth(BaseChoropleth):
         BREAKS = np.linspace(
             self.source_df[self.color_column].min(),
             self.source_df[self.color_column].max(),
-            len(self.geo_color_palette)
+            len(self.geo_color_palette),
         )
 
         def color_scale(val):
@@ -155,7 +155,7 @@ class Choropleth(BaseChoropleth):
             self.map_style
         )
 
-        self.deck_spec['layers'] = [self.layer_spec]
+        self.deck_spec["layers"] = [self.layer_spec]
 
         self.chart = panel_deck(
             x=self.x,
@@ -164,7 +164,7 @@ class Choropleth(BaseChoropleth):
             colors=self.source_df[self.rgba_columns],
             width=self.width,
             height=self.height,
-            default_color=list(ImageColor.getrgb(self.nan_color)) + [50]
+            default_color=list(ImageColor.getrgb(self.nan_color)) + [50],
         )
 
     def update_dimensions(self, width=None, height=None):
@@ -236,7 +236,7 @@ class Choropleth(BaseChoropleth):
 
         """
         if self.geo_color_palette is None:
-            self.geo_color_palette = properties_dict[
-                "chart_color"
-            ]["color_palette"]
+            self.geo_color_palette = properties_dict["chart_color"][
+                "color_palette"
+            ]
             self.compute_colors()

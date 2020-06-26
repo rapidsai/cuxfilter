@@ -6,7 +6,6 @@ import dask_cudf
 
 from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby
-from ....layouts import chart_view
 from ....assets import geo_json_mapper
 
 np.seterr(divide="ignore", invalid="ignore")

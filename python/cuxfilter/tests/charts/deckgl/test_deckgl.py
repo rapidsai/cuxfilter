@@ -3,18 +3,12 @@ import cudf
 
 from cuxfilter import charts
 from cuxfilter import DataFrame
-from cuxfilter.charts.deckgl import PolygonDeckGL, TS_CODE
-from bokeh.util.compiler import TypeScript
+from cuxfilter.charts.deckgl.bindings import panel_deck
 
 pytest
 
 
 class TestDeckGL:
-    def test_PolygonDeckGL(self):
-        assert (
-            PolygonDeckGL.__implementation__.code == TypeScript(TS_CODE).code
-        )
-
     def test_init(self):
         cux_df = DataFrame.from_dataframe(
             cudf.DataFrame(
@@ -56,28 +50,42 @@ class TestDeckGL:
                 "max_zoom": 16,
             },
             "controller": True,
+            "layers": [
+                {
+                    "opacity": 1,
+                    "getLineWidth": 10,
+                    "getPolygon": "coordinates",
+                    "getElevation": "val_t*100000",
+                    "getFillColor": "[__r__, __g__, __b__, __a__]",
+                    "stroked": True,
+                    "filled": True,
+                    "extruded": True,
+                    "lineWidthScale": 10,
+                    "lineWidthMinPixels": 1,
+                    "highlightColor": [200, 200, 200, 200],
+                    "visible": True,
+                    "pickable": True,
+                    "getLineColor": [0, 188, 212],
+                    "autoHighlight": True,
+                    "elevationScale": 0.8,
+                    "pickMultipleObjects": True,
+                }
+            ],
         }
 
-        assert choropleth3d_chart.layer_spec == {
-            "opacity": 1,
-            "getLineWidth": 10,
-            "getPolygon": "@@=coordinates",
-            "getElevation": "@@=val_t*100000",
-            "getFillColor": "@@=__color__",
-            "stroked": True,
-            "filled": True,
-            "extruded": True,
-            "lineWidthScale": 10,
-            "lineWidthMinPixels": 1,
-            "highlightColor": [200, 200, 200, 200],
-            "visible": True,
-            "pickable": True,
-            "getLineColor": [0, 188, 212],
-            "autoHighlight": True,
-            "elevationScale": 0.8,
-            "pickMultipleObjects": True,
-        }
+        assert isinstance(choropleth3d_chart.chart, panel_deck)
 
-        assert isinstance(
-            choropleth3d_chart.chart, charts.deckgl.plots.PolygonDeckGL
+        assert choropleth3d_chart.chart.x == "states"
+        assert choropleth3d_chart.chart.data.equals(
+            choropleth3d_chart.source_df
         )
+
+        assert choropleth3d_chart.chart.colors.equals(
+            choropleth3d_chart.source_df[choropleth3d_chart.rgba_columns],
+        )
+
+        assert choropleth3d_chart.chart.indices == set()
+
+        assert choropleth3d_chart.chart.multi_select is False
+
+        assert choropleth3d_chart.chart.sizing_mode == "scale_both"

@@ -520,9 +520,11 @@ class DashBoard:
                 **kwargs,
             )
         self._current_server_type = "show"
-        b = pn.widgets.Button(name='open cuxfilter dashboard', button_type='success')
+        b = pn.widgets.Button(
+            name="open cuxfilter dashboard", button_type="success"
+        )
         b.js_on_click(
-            args={'target': dashboard_url}, code='window.open(target)'
+            args={"target": dashboard_url}, code="window.open(target)"
         )
         return pn.Row(b)
 
