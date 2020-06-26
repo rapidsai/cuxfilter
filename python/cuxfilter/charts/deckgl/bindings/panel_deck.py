@@ -70,6 +70,9 @@ class panel_deck(param.Parameterized):
         )
         self.param.watch(self._update, ['data'])
 
+    def selected_points(self):
+        return self.data[self.x].loc[self.indices].tolist()
+
     @pn.depends('pane.click_state')
     def click_event(self):
         index = self.pane.click_state.get('index', -1)

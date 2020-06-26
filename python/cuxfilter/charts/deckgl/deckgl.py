@@ -70,7 +70,7 @@ def choropleth(
 
     geo_color_palette: bokeh.palette,  default bokeh.palettes.Inferno256
 
-    nan_color: str, default white
+    nan_color: hex color code, default '#d3d3d3'
         color of the patches of value NaN in the map.
 
     mapbox_api_key: str, default os.getenv('MAPBOX_API_KEY')

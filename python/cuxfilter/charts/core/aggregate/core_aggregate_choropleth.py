@@ -18,7 +18,7 @@ class BaseChoropleth(BaseChart):
     reset_event = None
     _datatile_loaded_state: bool = False
     geo_mapper: Dict[str, str] = {}
-    nan_color = "white"
+    nan_color = "#d3d3d3"
     use_data_tiles = True
 
     @property

@@ -62,6 +62,8 @@ class Choropleth(BaseChoropleth):
         )
 
         def color_scale(val):
+            if np.isnan(val):
+                return list(ImageColor.getrgb(self.nan_color)) + [50]
             for i, b in enumerate(BREAKS):
                 if val < b:
                     return list(
@@ -162,6 +164,7 @@ class Choropleth(BaseChoropleth):
             colors=self.source_df[self.rgba_columns],
             width=self.width,
             height=self.height,
+            default_color=list(ImageColor.getrgb(self.nan_color)) + [50]
         )
 
     def update_dimensions(self, width=None, height=None):
@@ -217,7 +220,7 @@ class Choropleth(BaseChoropleth):
         get list of selected indices
         ---
         """
-        return self.map_indices_to_values(self.source.selected.indices)
+        return self.chart.selected_points()
 
     def add_selection_event(self, callback):
         """
