@@ -15,3 +15,4 @@ from .panel_widgets import (
     data_size_indicator,
 )
 from .core.core_view_dataframe import ViewDataFrame as view_dataframe
+from .constants import *
