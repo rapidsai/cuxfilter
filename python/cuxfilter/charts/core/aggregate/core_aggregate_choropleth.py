@@ -158,7 +158,7 @@ class BaseChoropleth(BaseChart):
         self.add_events(dashboard_cls)
 
     def view(self):
-        return chart_view(self.chart, width=self.width)
+        return self.chart.view()
 
     def calculate_source(self, data, patch_update=False):
         """
