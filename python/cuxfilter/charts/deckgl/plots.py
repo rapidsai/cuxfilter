@@ -64,8 +64,9 @@ class Choropleth(BaseChoropleth):
         x = self.source_df[self.color_column]
         inds = pd.cut(x, BREAKS, labels=False, include_lowest=True)
         colors = [
-            nan_color if np.isnan(i) else
-            list(ImageColor.getrgb(self.geo_color_palette[i])) + [255]
+            nan_color
+            if np.isnan(i)
+            else list(ImageColor.getrgb(self.geo_color_palette[i])) + [255]
             for i in inds
         ]
         self.source_df[self.rgba_columns] = pd.DataFrame(colors)
@@ -160,7 +161,7 @@ class Choropleth(BaseChoropleth):
             width=self.width,
             height=self.height,
             default_color=list(ImageColor.getrgb(self.nan_color)) + [50],
-            tooltip_include_cols=self.tooltip_include_cols
+            tooltip_include_cols=self.tooltip_include_cols,
         )
 
     def update_dimensions(self, width=None, height=None):

@@ -25,6 +25,7 @@ class PanelDeck(param.Parameterized):
     """
     PanelDeck class for panel.pane.DeckGL + multi_select(Boolean) parameter
     """
+
     x = param.String("x")
     data = param.DataFrame()
     colors = param.DataFrame()
@@ -45,10 +46,14 @@ class PanelDeck(param.Parameterized):
         get tooltip info from dataframe columns, if not already present
         """
         html_str = ""
-        tooltip_columns = list(
-            set(self.data.columns)
-            - set(["index", "coordinates"] + list(self.colors.columns))
-        ) if len(self.tooltip_include_cols) == 0 else self.tooltip_include_cols
+        tooltip_columns = (
+            list(
+                set(self.data.columns)
+                - set(["index", "coordinates"] + list(self.colors.columns))
+            )
+            if len(self.tooltip_include_cols) == 0
+            else self.tooltip_include_cols
+        )
 
         for i in tooltip_columns:
             html_str += f"<b> {i} </b>: {{{i}}} <br>"
