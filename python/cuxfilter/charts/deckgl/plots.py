@@ -61,19 +61,15 @@ class Choropleth(BaseChoropleth):
             len(self.geo_color_palette),
         )
 
-        def color_scale(val):
-            if np.isnan(val):
-                return list(ImageColor.getrgb(self.nan_color)) + [50]
-            for i, b in enumerate(BREAKS):
-                if val < b:
-                    return list(
-                        ImageColor.getrgb(self.geo_color_palette[i])
-                    ) + [255]
-            return list(ImageColor.getrgb(self.geo_color_palette[i])) + [255]
-
-        self.source_df[self.rgba_columns] = pd.DataFrame(
-            self.source_df[self.color_column].apply(color_scale).tolist()
-        )
+        nan_color = list(ImageColor.getrgb(self.nan_color)) + [50]
+        x = self.source_df[self.color_column]
+        inds = pd.cut(x, BREAKS, labels=False, include_lowest=True)
+        colors = [
+            nan_color if np.isnan(i) else
+            list(ImageColor.getrgb(self.geo_color_palette[i])) + [255]
+            for i in inds
+        ]
+        self.source_df[self.rgba_columns] = pd.DataFrame(colors)
 
     def format_source_data(self, source_dict, patch_update=False):
         """
