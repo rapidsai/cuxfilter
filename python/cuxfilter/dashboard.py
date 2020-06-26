@@ -29,7 +29,7 @@ _URL_PAT = re.compile(r"https?://(www\.)?")
 
 
 def _create_dashboard_url(notebook_url: str, port: int):
-    return f"http://{notebook_url}/proxy/{port}/ "
+    return f"http://{notebook_url}/proxy/{port}/"
 
 
 def _create_app(panel_obj, notebook_url=None, port=0):
