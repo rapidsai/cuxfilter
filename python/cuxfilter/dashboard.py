@@ -110,14 +110,15 @@ class DashBoard:
     def __init__(
         self,
         charts=[],
-        data=None,
+        dataframe=None,
         layout=single_feature,
         theme=light,
         title="Dashboard",
         data_size_widget=True,
         warnings=False,
     ):
-        self._data = data
+        self._cuxfilter_df = dataframe
+        self._data = self._cuxfilter_df.data
         self._charts = dict()
         self._data_tiles = dict()
         self._query_str_dict = dict()
