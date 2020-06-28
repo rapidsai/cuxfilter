@@ -99,7 +99,7 @@ class Theme:
         "geo_charts_grids": {"xgrid": None, "ygrid": None},
         "chart_color": {
             "color": "#4292c6",
-            "color_palette": palettes.Blues[9],
+            "color_palette": list(palettes.Blues[9]),
         },
         # title
         "title": {

@@ -562,9 +562,9 @@ class DataSizeIndicator(BaseDataSizeIndicator):
     """
 
     css = """
-        .non-handle-temp .bk-noUi-origin {
-        visibility: hidden;
-        color:blue;
+        .non-handle-temp .noUi-handle {
+            display: none !important;
+            color:blue;
         }
 
         .non-handle-temp [disabled] .bk-noUi-connect {

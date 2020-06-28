@@ -6,8 +6,8 @@ import dask_cudf
 
 from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby
-from ....layouts import chart_view
 from ....assets import geo_json_mapper
+from ...constants import CUXF_NAN_COLOR
 
 np.seterr(divide="ignore", invalid="ignore")
 
@@ -18,7 +18,6 @@ class BaseChoropleth(BaseChart):
     reset_event = None
     _datatile_loaded_state: bool = False
     geo_mapper: Dict[str, str] = {}
-    nan_color = "white"
     use_data_tiles = True
 
     @property
@@ -47,6 +46,8 @@ class BaseChoropleth(BaseChart):
         mapbox_api_key=os.getenv("MAPBOX_API_KEY"),
         map_style="dark",
         tooltip=True,
+        tooltip_include_cols=[],
+        nan_color=CUXF_NAN_COLOR,
         **library_specific_params,
     ):
         """
@@ -111,15 +112,13 @@ class BaseChoropleth(BaseChart):
         self.map_style = map_style
         self.library_specific_params = library_specific_params
         self.tooltip = tooltip
+        self.tooltip_include_cols = tooltip_include_cols
+        self.nan_color = nan_color
         if "x_range" not in self.library_specific_params:
             self.library_specific_params["x_range"] = x_range
 
         if "y_range" not in self.library_specific_params:
             self.library_specific_params["y_range"] = y_range
-
-        if "nan_color" in self.library_specific_params:
-            self.nan_color = self.library_specific_params["nan_color"]
-            self.library_specific_params.pop("nan_color")
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -158,7 +157,7 @@ class BaseChoropleth(BaseChart):
         self.add_events(dashboard_cls)
 
     def view(self):
-        return chart_view(self.chart, width=self.width)
+        return self.chart.view()
 
     def calculate_source(self, data, patch_update=False):
         """

@@ -18,8 +18,8 @@ dependencies:
 - pyproj>=2.4.*
 - libwebp
 - pandoc=<2.0.0
-- panel=0.6.*
-- bokeh=1.*
+- bokeh>=2.1.1
+- panel
 - cudatoolkit=10.0
 - nodejs
 - recommonmark
@@ -36,6 +36,7 @@ dependencies:
 - black
 - flake8
 - pip
+- pydeck>=0.3.*
 - pip:
   - sphinx-markdown-tables
   - jupyter-server-proxy
