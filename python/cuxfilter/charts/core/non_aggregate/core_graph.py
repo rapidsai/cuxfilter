@@ -24,11 +24,11 @@ class BaseGraph(BaseChart):
 
     def __init__(
         self,
-        node_x='x',
-        node_y='y',
-        node_id='vertex',
-        edge_source='source',
-        edge_target='target',
+        node_x="x",
+        node_y="y",
+        node_id="vertex",
+        edge_source="source",
+        edge_target="target",
         x_range=None,
         y_range=None,
         add_interaction=True,
@@ -98,8 +98,8 @@ class BaseGraph(BaseChart):
         self.edge_aggregate_col = edge_aggregate_col
         self.node_aggregate_fn = node_aggregate_fn
         self.edge_aggregate_fn = edge_aggregate_fn
-        self.node_color_palette = node_color_palette
-        self.edge_color_palette = edge_color_palette
+        self.node_color_palette = list(node_color_palette)
+        self.edge_color_palette = list(edge_color_palette)
         self.node_point_size = node_point_size
         self.node_point_shape = node_point_shape
         self.node_pixel_shade_type = node_pixel_shade_type
@@ -125,8 +125,7 @@ class BaseGraph(BaseChart):
 
         """
         if dashboard_cls._cuxfilter_df.edges is None:
-            raise ValueError('Edges dataframe not provided')
-
+            raise ValueError("Edges dataframe not provided")
         if self.x_range is None:
             self.x_range = (
                 dashboard_cls._data[self.node_x].min(),
