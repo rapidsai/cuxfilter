@@ -4,5 +4,5 @@ from .datashader import (
     line,
     heatmap,
     stacked_lines,
-    graph
+    graph,
 )

@@ -226,11 +226,11 @@ def scatter(
 
 
 def graph(
-    node_x='x',
-    node_y='y',
-    node_id='vertex',
-    edge_source='source',
-    edge_target='tartget',
+    node_x="x",
+    node_y="y",
+    node_id="vertex",
+    edge_source="source",
+    edge_target="tartget",
     x_range=None,
     y_range=None,
     add_interaction=True,
