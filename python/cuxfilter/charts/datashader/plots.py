@@ -3,7 +3,7 @@ from ..core.non_aggregate import (
     BaseScatter,
     BaseLine,
     BaseStackedLine,
-    BaseGraph
+    BaseGraph,
 )
 from .custom_extensions import InteractiveImage
 
@@ -13,11 +13,18 @@ from datashader.colors import Hot
 import dask_cudf
 import dask.dataframe as dd
 import numpy as np
+import pandas as pd
+import bokeh
 import cudf
 from bokeh import events
 from bokeh.plotting import figure
-from bokeh.models import BoxSelectTool, ColumnDataSource
-from bokeh.transform import factor_cmap
+from bokeh.models import (
+    BoxSelectTool,
+    ColumnDataSource,
+    ColorBar,
+    LinearColorMapper,
+    LogTicker,
+)
 from bokeh.tile_providers import get_provider
 
 
@@ -155,7 +162,6 @@ class ScatterGeo(BaseScatterGeo):
         self.chart.add_tools(BoxSelectTool())
         self.chart.add_tile(self.tile_provider)
         self.chart.axis.visible = False
-
         self.chart.xgrid.grid_line_color = None
         self.chart.ygrid.grid_line_color = None
 
@@ -550,71 +556,107 @@ class Graph(BaseGraph):
     no_colors_set = False
     image = None
 
+    def compute_colors(self):
+        if self.node_color_palette is None:
+            self.node_color_palette = bokeh.palettes.Purples9
+
+        BREAKS = np.linspace(
+            self.nodes[self.node_aggregate_col].min(),
+            self.nodes[self.node_aggregate_col].max(),
+            len(self.node_color_palette),
+        )
+
+        x = self.source.data[self.node_aggregate_col]
+        inds = pd.cut(x, BREAKS, labels=False, include_lowest=True)
+        colors = [self.node_color_palette[i] for i in inds]
+        self.source.data[self.node_aggregate_col] = colors
+
     def nodes_plot(self, canvas, nodes, name=None):
         if isinstance(
             nodes[self.node_id].dtype, cudf.core.dtypes.CategoricalDtype
         ):
             aggregator = ds.by(
-                self.node_aggregate_col, getattr(ds, self.node_aggregate_fn)
+                self.node_id,
+                getattr(ds, self.node_aggregate_fn)(self.node_aggregate_col),
             )
+            cmap = {
+                "color_key": {
+                    k: v
+                    for k, v in zip(
+                        list(nodes[self.node_id].cat.categories),
+                        self.node_color_palette,
+                    )
+                }
+            }
         else:
             if self.node_aggregate_fn:
-                aggregator = getattr(
-                    ds, self.node_aggregate_fn
-                )(self.node_aggregate_col)
+                aggregator = getattr(ds, self.node_aggregate_fn)(
+                    self.node_aggregate_col
+                )
             else:
                 aggregator = None
+            cmap = {"cmap": self.node_color_palette}
 
-        agg = canvas.points(nodes.sort_index(), self.node_x, self.node_y, aggregator)
+        agg = canvas.points(
+            nodes.sort_index(), self.node_x, self.node_y, aggregator
+        )
         return getattr(tf, self.node_pixel_spread)(
-            tf.shade(
-                agg, cmap=self.node_color_palette,
-                how=self.node_pixel_shade_type,
-                name=name
-            ),
+            tf.shade(agg, how=self.node_pixel_shade_type, name=name, **cmap),
             threshold=self.node_pixel_density,
             max_px=self.node_point_size,
-            shape=self.node_point_shape
+            shape=self.node_point_shape,
         )
 
     def edges_plot(self, canvas, nodes, name=None):
         if self.edge_aggregate_fn:
-            aggregator = getattr(
-                    ds, self.edge_aggregate_fn
-            )(self.edge_aggregate_col)
+            aggregator = getattr(ds, self.edge_aggregate_fn)(
+                self.edge_aggregate_col
+            )
         else:
             aggregator = None
 
         agg = canvas.line(
-            self.connected_edges(nodes, self.edges), self.node_x, self.node_y,
-            aggregator
+            self.connected_edges, self.node_x, self.node_y, aggregator
         )
 
         return tf.shade(agg, cmap=self.edge_color_palette, name=name)
 
-    def connected_edges(self, nodes, edges):
-        x1 = edges.merge(
-            nodes, left_on=self.edge_source, right_on=self.node_id
-        ).sort_values(
-            [self.edge_source, self.edge_target]
-        )[
-            [self.node_x, self.node_y]+[self.edge_aggregate_col]
-        ].reset_index(drop=True)
+    def calc_connected_edges(self, nodes, edges):
+        connected_edges_columns = [self.node_x, self.node_y] + [
+            self.edge_aggregate_col
+        ]
 
-        x2 = edges.merge(
-            nodes, left_on=self.edge_target, right_on=self.node_id
-        ).sort_values(
-            [self.edge_source, self.edge_target]
-        )[
-            [self.node_x, self.node_y]+[self.edge_aggregate_col]
-        ].reset_index(drop=True)
+        x1 = (
+            edges.merge(nodes, left_on=self.edge_source, right_on=self.node_id)
+            .sort_values([self.edge_source, self.edge_target])[
+                [self.edge_source, self.edge_target] + connected_edges_columns
+            ]
+            .reset_index(drop=True)
+        )
 
-        x3 = type(nodes)({
-            self.node_x: np.nan,
-            self.node_y: np.nan,
-        }, index=x1.index)
+        x2 = (
+            edges.merge(nodes, left_on=self.edge_target, right_on=self.node_id)
+            .sort_values([self.edge_source, self.edge_target])[
+                [self.edge_source, self.edge_target] + connected_edges_columns
+            ]
+            .reset_index(drop=True)
+        )
 
-        return cudf.concat([x1, x2, x3]).sort_index()
+        x1 = x1.merge(
+            x2, on=[self.edge_source, self.edge_target], suffixes=("", "_y")
+        )
+
+        x2 = x1[[i + "_y" for i in connected_edges_columns]].rename(
+            columns={i + "_y": i for i in connected_edges_columns}
+        )
+
+        x3 = type(nodes)(
+            {self.node_x: np.nan, self.node_y: np.nan, }, index=x1.index
+        )
+
+        self.connected_edges = cudf.concat(
+            [x1[connected_edges_columns], x2[connected_edges_columns], x3]
+        ).sort_index()
 
     def format_source_data(self, dataframe):
         """
@@ -636,6 +678,10 @@ class Graph(BaseGraph):
             self.nodes = dataframe.data
             self.edges = dataframe.edges
 
+        if self.edges is not None:
+            # update connected_edges value for datashaded edges
+            self.calc_connected_edges(self.nodes, self.edges)
+
     def generate_InteractiveImage_callback(self):
         """
         Description:
@@ -647,18 +693,63 @@ class Graph(BaseGraph):
 
         Ouput:
         """
+
         def viewInteractiveImage(
-            x_range, y_range, w, h, data_source=self.nodes,
-            nodes_plot=self.nodes_plot, edges_plot=self.edges_plot
+            x_range,
+            y_range,
+            w,
+            h,
+            data_source=self.nodes,
+            nodes_plot=self.nodes_plot,
+            edges_plot=self.edges_plot,
+            chart=self.chart,
         ):
             cvs = ds.Canvas(
                 plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
             )
-            if len(data_source) > 10_000:
+            if len(self.nodes) > 10_000:
+                if self.source is not None:
+                    self.source.data = {
+                        self.node_x: [],
+                        self.node_y: [],
+                        self.node_aggregate_col: [],
+                        self.node_aggregate_col + "_color": [],
+                    }
                 np = nodes_plot(cvs, data_source)
                 ep = edges_plot(cvs, data_source)
-                plot = tf.stack(ep, np, how='over')
+                plot = tf.stack(ep, np, how="over")
             else:
+                # if self.source is None:
+                #     self.source = ColumnDataSource(
+                #         {
+                #             self.node_x: data_source[self.node_x].to_array(),
+                #             self.node_y: data_source[self.node_y].to_array(),
+                #             self.node_aggregate_col: data_source[
+                #                 self.node_aggregate_col
+                #             ].to_array(),
+                #         }
+                #     )
+                #     self.compute_colors()
+                #     self.chart.scatter(
+                #         x=self.node_x,
+                #         y=self.node_y,
+                #         source=self.source,
+                #         radius=self.node_point_size,
+                #         fill_alpha=0.6,
+                #         fill_color=self.node_aggregate_col,
+                #         line_color=self.node_aggregate_col,
+                #         line_width=3
+                #     )
+                # else:
+                #     self.source.selected.indices = []
+                #     self.source.data = {
+                #             self.node_x: data_source[self.node_x].to_array(),
+                #             self.node_y: data_source[self.node_y].to_array(),
+                #             self.node_aggregate_col: data_source[
+                #                 self.node_aggregate_col
+                #             ].to_array(),
+                #         }
+                #     self.compute_colors()
                 plot = edges_plot(cvs, data_source)
             return plot
 
@@ -679,53 +770,24 @@ class Graph(BaseGraph):
             self.no_colors_set = True
             self.node_color_palette = Hot
 
-        if type(self.tile_provider) == str:
-            self.tile_provider = get_provider(self.tile_provider)
-
         if len(self.title) == 0:
-            self.title = (
-                "Graph"
-            )
+            self.title = "Graph"
 
         self.chart = figure(
             title=self.title,
             toolbar_location="right",
-            tools="pan, wheel_zoom, reset, hover, tap",
+            tools="pan, wheel_zoom, reset",
             active_scroll="wheel_zoom",
             active_drag="pan",
             x_range=self.x_range,
             y_range=self.y_range,
             width=self.width,
             height=self.height,
-            output_backend="webgl"
+            output_backend="webgl",
         )
-        self.chart.add_tile(self.tile_provider)
-
-        if len(self.nodes) <= 10_000:
-            self.source = ColumnDataSource(
-                {
-                    self.node_x: self.nodes[self.node_x].to_array(),
-                    self.node_y: self.nodes[self.node_y].to_array(),
-                    self.node_aggregate_col: self.nodes[
-                        self.node_aggregate_col
-                    ].to_array(),
-                }
-            )
-            colors = factor_cmap(
-                    self.node_aggregate_col, self.node_color_palette,
-                    list(
-                        self.nodes[
-                            self.node_aggregate_col
-                        ].unique().astype('str'))
-                    )
-            self.chart.scatter(
-                x=self.node_x,
-                y=self.node_y,
-                source=self.source,
-                radius=self.node_aggregate_col,
-                # fill_color=colors, line_color=colors,
-                line_width=3
-            )
+        if type(self.tile_provider) == str:
+            self.tile_provider = get_provider(self.tile_provider)
+            self.chart.add_tile(self.tile_provider)
 
         self.chart.add_tools(BoxSelectTool())
         self.chart.axis.visible = False
@@ -739,6 +801,43 @@ class Graph(BaseGraph):
             data_source=self.nodes,
             timeout=self.timeout,
         )
+
+        if len(self.nodes) <= 10_000:
+            self.source = ColumnDataSource(
+                {
+                    self.node_x: self.nodes[self.node_x].to_array(),
+                    self.node_y: self.nodes[self.node_y].to_array(),
+                    self.node_aggregate_col: self.nodes[
+                        self.node_aggregate_col
+                    ].to_array(),
+                }
+            )
+            self.compute_colors()
+            self.chart.scatter(
+                x=self.node_x,
+                y=self.node_y,
+                source=self.source,
+                radius=self.node_point_size,
+                fill_alpha=0.6,
+                fill_color=self.node_aggregate_col,
+                line_color=self.node_aggregate_col,
+                line_width=3,
+            )
+            color_mapper = LinearColorMapper(
+                palette=self.node_color_palette,
+                low=self.nodes[self.node_id].min(),
+                high=self.nodes[self.node_id].max(),
+            )
+
+            color_bar = ColorBar(
+                color_mapper=color_mapper,
+                ticker=LogTicker(),
+                label_standoff=12,
+                border_line_color=None,
+                location=(0, 0),
+            )
+
+            self.chart.add_layout(color_bar)
 
     def update_dimensions(self, width=None, height=None):
         """
@@ -768,9 +867,12 @@ class Graph(BaseGraph):
         Ouput:
         """
         if data is not None:
-            self.interactive_image.update_chart(data_source=data)
             if update_source:
                 self.format_source_data(data)
+            # update connected_edges value for datashaded edges
+            self.calc_connected_edges(data, self.edges)
+
+            self.interactive_image.update_chart(data_source=data)
 
     def add_selection_geometry_event(self, callback):
         """
