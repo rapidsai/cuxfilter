@@ -148,7 +148,7 @@ class DataFrame:
             df.edges = edges
             return df
         raise ValueError(
-            'Expected value for graph - (nodes[cuDF], edges[cuDF])'
+            "Expected value for graph - (nodes[cuDF], edges[cuDF])"
         )
 
     def __init__(self, data):
