@@ -108,7 +108,9 @@ class TestBaseStackedLine:
         bsl.x_range = x_range
         bsl.y_range = y_range
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
-        dashboard = cuxfilter.dashboard.DashBoard(data=df)
+        dashboard = cuxfilter.dashboard.DashBoard(
+            dataframe=cuxfilter.DataFrame.from_dataframe(df)
+        )
         bsl.compute_query_dict(dashboard._query_str_dict)
 
         assert dashboard._query_str_dict["a_stacked_lines"] == query
@@ -126,7 +128,9 @@ class TestBaseStackedLine:
         bsl.add_interaction = add_interaction
         bsl.reset_event = reset_event
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
-        dashboard = cuxfilter.dashboard.DashBoard(data=df)
+        dashboard = cuxfilter.dashboard.DashBoard(
+            dataframe=cuxfilter.DataFrame.from_dataframe(df)
+        )
         self.event_1 = None
         self.event_2 = None
 
@@ -149,7 +153,9 @@ class TestBaseStackedLine:
         bsl.y_range = (3, 5)
 
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
-        dashboard = cuxfilter.dashboard.DashBoard(data=df)
+        dashboard = cuxfilter.dashboard.DashBoard(
+            dataframe=cuxfilter.DataFrame.from_dataframe(df)
+        )
         dashboard._active_view = "a_stacked_lines"
 
         def t_func1(event, fn):

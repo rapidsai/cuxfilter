@@ -5,6 +5,7 @@ from cuxfilter.charts.core.non_aggregate.core_non_aggregate import (
     BaseNonAggregate,
 )
 from cuxfilter.dashboard import DashBoard
+from cuxfilter import DataFrame
 from cuxfilter.layouts import chart_view
 
 
@@ -77,7 +78,7 @@ class TestCoreNonAggregateChart:
         bnac = BaseNonAggregate()
 
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
-        dashboard = DashBoard(data=df)
+        dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         assert (
             bnac.get_selection_geometry_callback(dashboard).__name__
@@ -97,7 +98,7 @@ class TestCoreNonAggregateChart:
 
         bnac.reload_chart = t_function
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
-        dashboard = DashBoard(data=df)
+        dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         dashboard._active_view = bnac.name
 
@@ -147,7 +148,7 @@ class TestCoreNonAggregateChart:
         bnac.y_range = y_range
 
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
-        dashboard = DashBoard(data=df)
+        dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         bnac.compute_query_dict(dashboard._query_str_dict)
 
@@ -167,7 +168,7 @@ class TestCoreNonAggregateChart:
         bnac.reset_event = reset_event
 
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
-        dashboard = DashBoard(data=df)
+        dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         self.event_1 = None
         self.event_2 = None
@@ -194,7 +195,7 @@ class TestCoreNonAggregateChart:
         bnac.y_range = (3, 5)
 
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
-        dashboard = DashBoard(data=df)
+        dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
         dashboard._active_view = "a_test"
 
         def t_func1(event, fn):

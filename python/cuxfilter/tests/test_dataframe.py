@@ -12,7 +12,8 @@ class TestDataFrame:
     def test_init(self, cux_df):
         assert isinstance(cux_df.data, cudf.DataFrame)
         assert cux_df.data.equals(cudf.DataFrame())
-        assert cux_df.data.equals(cux_df.backup)
+        assert cux_df.is_graph is False
+        assert cux_df.edges is None
 
     def test_dashboard(self):
         df = cudf.DataFrame(
