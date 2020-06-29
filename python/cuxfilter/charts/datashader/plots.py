@@ -651,7 +651,7 @@ class Graph(BaseGraph):
         )
 
         x3 = type(nodes)(
-            {self.node_x: np.nan, self.node_y: np.nan, }, index=x1.index
+            {self.node_x: np.nan, self.node_y: np.nan}, index=x1.index
         )
 
         self.connected_edges = cudf.concat(
