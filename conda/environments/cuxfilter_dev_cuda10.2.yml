@@ -3,6 +3,7 @@ channels:
 - rapidsai
 - rapidsai-nightly
 - nvidia
+- pyviz
 - conda-forge
 - anaconda
 dependencies:
@@ -18,8 +19,8 @@ dependencies:
 - pyproj>=2.4.*
 - libwebp
 - pandoc=<2.0.0
-- panel=0.6.*
-- bokeh=1.*
+- bokeh>=2.1.1
+- panel
 - cudatoolkit=10.2
 - nodejs
 - recommonmark
@@ -35,6 +36,7 @@ dependencies:
 - jupyterlab
 - black
 - flake8
+- pydeck>=0.3.*
 - pip
 - pip:
   - sphinx-markdown-tables

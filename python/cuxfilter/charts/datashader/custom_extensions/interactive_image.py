@@ -12,7 +12,7 @@ from bokeh.models import ColumnDataSource
 bokeh_version = LooseVersion(bokeh.__version__)
 
 if bokeh_version > "0.12.9":
-    from bokeh.embed.notebook import encode_utf8, notebook_content
+    from bokeh.embed.notebook import notebook_content
 else:
     from bokeh.embed import notebook_div
 
@@ -40,8 +40,7 @@ def bokeh_notebook_div(image):
     """
     if bokeh_version > "0.12.9":
         js, div, _ = notebook_content(image.p, image.ref)
-        html = NOTEBOOK_DIV.format(plot_script=js, plot_div=div)
-        div = encode_utf8(html)
+        div = NOTEBOOK_DIV.format(plot_script=js, plot_div=div)
         # Ensure events are held until an update is triggered
         image.doc.hold()
     else:

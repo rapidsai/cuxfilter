@@ -7,6 +7,7 @@
 - PR #159 Layouts Refactor
 - PR #160 Install dependencies via meta packages
 - PR #162 Dashboard and templates cleanup and tests
+- PR #163 Updated Bokeh version to 2.1.1, added pydeck support
 
 ## Bug Fixes
 - PR #161 fixed layouts bugs
