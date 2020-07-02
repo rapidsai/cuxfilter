@@ -1,4 +1,5 @@
 from . import plots
+from ..constants import CUXF_DEFAULT_COLOR_PALETTE
 
 
 def scatter_geo(
@@ -7,7 +8,7 @@ def scatter_geo(
     x_range=None,
     y_range=None,
     add_interaction=True,
-    color_palette=None,
+    color_palette=CUXF_DEFAULT_COLOR_PALETTE,
     aggregate_col=None,
     aggregate_fn="count",
     point_size=1,
@@ -38,7 +39,7 @@ def scatter_geo(
     add_interaction: {True, False},  default True
 
     color_palette: bokeh.palettes or list of hex_color_codes, or list of color
-                    names,  default inferno
+                    names,  default CUXF_DEFAULT_COLOR_PALETTE(Viridis10)
 
     aggregate_col: str, default None
         Column from the gpu dataframe on which the aggregate_fn will be run on,
@@ -122,7 +123,7 @@ def scatter(
     x_range=None,
     y_range=None,
     add_interaction=True,
-    color_palette=None,
+    color_palette=CUXF_DEFAULT_COLOR_PALETTE,
     aggregate_col=None,
     aggregate_fn="count",
     point_size=1,
@@ -152,7 +153,7 @@ def scatter(
     add_interaction: {True, False},  default True
 
     color_palette: bokeh.palettes or list of hex_color_codes, or list of
-                   color names,  default inferno
+                   color names,  default CUXF_DEFAULT_COLOR_PALETTE(Virisdis10)
 
     aggregate_col: str, default None
         column from the gpu dataframe on which the aggregate_fn will be run on,
@@ -236,22 +237,115 @@ def graph(
     add_interaction=True,
     node_aggregate_col=None,
     edge_aggregate_col=None,
-    node_aggregate_fn=None,
-    edge_aggregate_fn=None,
-    node_color_palette=None,
-    edge_color_palette=None,
-    node_point_size=1,
+    node_aggregate_fn='count',
+    edge_aggregate_fn='count',
+    node_color_palette=CUXF_DEFAULT_COLOR_PALETTE,
+    edge_color_palette=["#000000"],
+    node_point_size=8,
     node_point_shape="circle",
     node_pixel_shade_type="eq_hist",
-    node_pixel_density=0.5,
+    node_pixel_density=0.8,
     node_pixel_spread="dynspread",
-    tile_provider="CARTODBPOSITRON",
+    tile_provider=None,
     width=800,
     height=400,
     title="",
     timeout=1,
     **library_specific_params,
 ):
+
+    """
+    Parameters
+    ----------
+    node_x: str, default "x"
+        x-coordinate column name for the nodes cuDF dataframe
+
+    node_y: str, default "y"
+        y-coordinate column name for the nodes cuDF dataframe
+
+    node_id: str, default "vertex"
+        node_id/label column name for the nodes cuDF dataframe
+
+    edge_source: str, default "source"
+        edge_source column name for the edges cuDF dataframe
+
+    edge_target="target",
+        edge_target column name for the edges cuDF dataframe
+
+    x_range: tuple, default(nodes_gpu_dataframe[x].min(),
+        nodes_gpu_dataframe[x].max())
+        (min, max) x-dimensions of the geo-scatter plot to be displayed
+
+    y_range: tuple, default(nodes_gpu_dataframe[y].min(),
+    nodes_gpu_dataframe[y].max())
+        (min, max) x-dimensions of the geo-scatter plot to be displayed
+
+    add_interaction: {True, False},  default True
+
+    node_aggregate_col=str, default None,
+        column from the nodes gpu dataframe on which the mode_aggregate_fn
+        will be run on
+
+    edge_aggregate_col=str, default None,
+        column from the edges gpu dataframe on which the mode_aggregate_fn
+        will be run on
+
+    node_aggregate_fn={'count', 'mean', 'max', 'min'},  default 'count'
+    edge_aggregate_fn={'count', 'mean', 'max', 'min'},  default 'count'
+
+    node_color_palette=bokeh.palettes or list of hex_color_codes, or list of
+                   color names,  default CUXF_DEFAULT_COLOR_PALETTE(viridis10)
+
+    edge_color_palette=bokeh.palettes or list of hex_color_codes, or list of
+                   color names,  default ["#000000"]
+
+    node_point_size: int, default 8
+        Point size in the scatter plot.
+
+    node_point_shape: str, default 'circle'
+        Available options: circle, square, rect_vertical, rect_horizontal.
+
+    node_pixel_shade_type: str, default 'eq_hist'
+        The "how" parameter in datashader.transfer_functions.shade()
+        function.
+        Available options: eq_hist, linear, log, cbrt
+
+    node_pixel_density: float, default 0.8
+        A tuning parameter in [0, 1], with higher values giving more dense
+        scatter plot.
+
+    node_pixel_spread: str, default 'dynspread'
+        dynspread: Spread pixels in an image dynamically based on the image
+        density.
+        spread: Spread pixels in an image.
+
+    tile_provider: str, default None
+        Underlying map type.See
+        https://bokeh.pydata.org/en/latest/docs/reference/tile_providers.html
+
+    width: int,  default 800
+
+    height: int,  default 400
+
+    title: str,
+
+        chart title
+
+    timeout: int
+        Determines the timeout after which the callback will
+        process new events without the previous one having
+        reported completion. Increase for very long running
+        callbacks and if zooming feels laggy.
+
+    **library_specific_params:
+        additional library specific keyword arguments to be passed to the
+        function
+
+    Returns
+    -------
+    A cudashader graph plot.
+    Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
+    """
     return plots.Graph(
         node_x,
         node_y,
@@ -287,7 +381,7 @@ def heatmap(
     x_range=None,
     y_range=None,
     add_interaction=True,
-    color_palette=None,
+    color_palette=CUXF_DEFAULT_COLOR_PALETTE,
     aggregate_col=None,
     aggregate_fn="mean",
     point_size=10,
@@ -318,7 +412,7 @@ def heatmap(
     add_interaction: {True, False},  default True
 
     color_palette: bokeh.palettes or list of hex_color_codes, or
-                   list of color names,  default inferno
+        list of color names,default CUXF_DEFAULT_COLOR_PALETTE(viridis10)
 
     aggregate_col: str, default None
         column from the gpu dataframe on which the aggregate_fn will be run on,
