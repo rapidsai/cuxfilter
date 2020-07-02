@@ -583,13 +583,11 @@ class Graph(BaseGraph):
                     self.node_id,
                     getattr(ds, self.node_aggregate_fn)(
                         self.node_aggregate_col
-                    )
+                    ),
                 )
             else:
-                print('only count_cat supported by datashader <=0.10')
-                aggregator = ds.count_cat(
-                    self.node_id,
-                )
+                print("only count_cat supported by datashader <=0.10")
+                aggregator = ds.count_cat(self.node_id,)
             cmap = {
                 "color_key": {
                     k: v
