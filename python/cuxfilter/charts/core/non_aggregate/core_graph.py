@@ -1,4 +1,5 @@
 from typing import Tuple
+from bokeh.palettes import Viridis10
 import dask_cudf
 import dask.dataframe as dd
 
@@ -34,10 +35,10 @@ class BaseGraph(BaseChart):
         add_interaction=True,
         node_aggregate_col=None,
         edge_aggregate_col=None,
-        node_aggregate_fn=None,
-        edge_aggregate_fn=None,
-        node_color_palette=None,
-        edge_color_palette=None,
+        node_aggregate_fn='count',
+        edge_aggregate_fn='count',
+        node_color_palette=list(Viridis10),
+        edge_color_palette=["#000000"],
         node_point_size=1,
         node_point_shape="circle",
         node_pixel_shade_type="eq_hist",
