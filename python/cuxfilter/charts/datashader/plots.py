@@ -622,9 +622,9 @@ class Graph(BaseGraph):
         return tf.shade(agg, cmap=self.edge_color_palette, name=name)
 
     def calc_connected_edges(self, nodes, edges):
-        connected_edges_columns = [self.node_x, self.node_y] + [
-            self.edge_aggregate_col
-        ]
+        connected_edges_columns = [self.node_x, self.node_y]
+        if self.edge_aggregate_col is not None:
+            connected_edges_columns += [self.edge_aggregate_col]
 
         x1 = (
             edges.merge(nodes, left_on=self.edge_source, right_on=self.node_id)
