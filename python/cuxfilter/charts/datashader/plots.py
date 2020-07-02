@@ -6,6 +6,7 @@ from ..core.non_aggregate import (
     BaseGraph,
 )
 from .custom_extensions import InteractiveImage
+from distutils.version import LooseVersion
 
 import datashader as ds
 from datashader import transfer_functions as tf
@@ -26,6 +27,8 @@ from bokeh.models import (
     LogTicker,
 )
 from bokeh.tile_providers import get_provider
+
+ds_version = LooseVersion(ds.__version__)
 
 
 def _rect_vertical_mask(px):
@@ -575,10 +578,18 @@ class Graph(BaseGraph):
         if isinstance(
             nodes[self.node_id].dtype, cudf.core.dtypes.CategoricalDtype
         ):
-            aggregator = ds.by(
-                self.node_id,
-                getattr(ds, self.node_aggregate_fn)(self.node_aggregate_col),
-            )
+            if ds_version >= "0.11":
+                aggregator = ds.by(
+                    self.node_id,
+                    getattr(ds, self.node_aggregate_fn)(
+                        self.node_aggregate_col
+                    )
+                )
+            else:
+                print('only count_cat supported by datashader <=0.10')
+                aggregator = ds.count_cat(
+                    self.node_id,
+                )
             cmap = {
                 "color_key": {
                     k: v
