@@ -125,3 +125,35 @@ Example
 
     d = cux_df.dashboard([chart1], layout=layouts.single_feature, theme=themes.dark)
     chart1.view()
+
+
+Graph chart
+--------------
+
+.. automethod:: datashader.graph
+
+
+Example
+~~~~~~~
+.. jupyter-execute::
+
+    import cuxfilter
+    import cudf
+
+    edges = cudf.DataFrame({
+        'source': [0, 0, 0, 0, 1, 1, 1, 0, 1, 2, 1, 1, 2, 0, 0],
+        'target': [1, 2, 3, 1, 2, 3, 3, 2, 2, 3, 3, 3, 3, 3, 3]
+    })
+
+    nodes = cudf.DataFrame({
+        'vertex': [0, 1, 2, 3],
+        'x': [-3.3125157356262207,-1.8728941679000854, 0.9095478653907776, 1.9572150707244873],
+        'y': [-1.6965408325195312, 2.470950126647949,-2.969928503036499,0.998791515827179]
+    })
+
+    cux_df = cuxfilter.DataFrame.load_graph((nodes, edges))
+
+    chart0 = cuxfilter.charts.datashader.graph(node_aggregate_col='vertex')
+
+    d = cux_df.dashboard([chart0], layout=cuxfilter.layouts.double_feature)
+    chart0
