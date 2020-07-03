@@ -214,7 +214,7 @@ Currently supported layout templates and example code can be found on the [layou
 | Library  | Chart type |
 | ------------- | ------------- |
 | bokeh  | bar, line  |
-| datashader  | scatter, scatter_geo, line, stacked_lines, heatmap, graph |
+| datashader  | scatter, scatter_geo, line, stacked_lines, heatmap, graph(uses bokeh for nodes<20_000) |
 | panel_widgets  | range_slider, float_slider, int_slider, drop_down, multi_select  |
 | custom    | view_dataframe |
 | pydeck    | choropleth(3d and 2d)   |
