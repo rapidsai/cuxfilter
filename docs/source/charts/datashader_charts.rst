@@ -153,7 +153,7 @@ Example
 
     cux_df = cuxfilter.DataFrame.load_graph((nodes, edges))
 
-    chart0 = cuxfilter.charts.datashader.graph(node_aggregate_col='vertex')
+    chart0 = cuxfilter.charts.datashader.graph(node_point_size=0.2)
 
     d = cux_df.dashboard([chart0], layout=cuxfilter.layouts.double_feature)
     chart0
