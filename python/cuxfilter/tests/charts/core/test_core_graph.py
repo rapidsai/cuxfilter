@@ -21,7 +21,7 @@ class TestCoreNonAggregateChart:
         assert bg.x_range is None
         assert bg.y_range is None
         assert bg.add_interaction is True
-        assert bg.node_aggregate_col is None
+        assert bg.node_aggregate_col == "vertex"
         assert bg.edge_aggregate_col is None
         assert bg.node_aggregate_fn == "count"
         assert bg.edge_aggregate_fn == "count"
