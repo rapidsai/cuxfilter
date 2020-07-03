@@ -231,7 +231,7 @@ def graph(
     node_y="y",
     node_id="vertex",
     edge_source="source",
-    edge_target="tartget",
+    edge_target="target",
     x_range=None,
     y_range=None,
     add_interaction=True,
