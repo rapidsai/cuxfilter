@@ -95,7 +95,11 @@ class BaseGraph(BaseChart):
         self.x_range = x_range
         self.y_range = y_range
         self.add_interaction = add_interaction
-        self.node_aggregate_col = node_aggregate_col
+        if node_aggregate_col is not None:
+            self.node_aggregate_col = node_aggregate_col
+        else:
+            self.node_aggregate_col = node_id
+
         self.edge_aggregate_col = edge_aggregate_col
         self.node_aggregate_fn = node_aggregate_fn
         self.edge_aggregate_fn = edge_aggregate_fn
