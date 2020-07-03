@@ -214,10 +214,10 @@ Currently supported layout templates and example code can be found on the [layou
 | Library  | Chart type |
 | ------------- | ------------- |
 | bokeh  | bar, line  |
-| cudatashader  | scatter, scatter_geo, line, stacked_lines, heatmap |
+| datashader  | scatter, scatter_geo, line, stacked_lines, heatmap, graph |
 | panel_widgets  | range_slider, float_slider, int_slider, drop_down, multi_select  |
 | custom    | view_dataframe |
-| deckgl    | choropleth   |
+| pydeck    | choropleth(3d and 2d)   |
 
 
 ## Contributing Developers Guide
