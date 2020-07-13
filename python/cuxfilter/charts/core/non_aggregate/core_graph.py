@@ -9,12 +9,9 @@ from ...constants import CUXF_DEFAULT_COLOR_PALETTE
 
 class BaseGraph(BaseChart):
     """
-        No datatiles support in non-aggregate plot charts
+        .. note::
+            Non-aggregate charts do not support Datatiles
 
-        If dataset size is greater than a few thousand points,
-        scatter geos can crash the browser tabs, and is only recommended
-        with datashader plugin, in which case an image is
-        rendered instead of points on canvas
     """
 
     chart_type: str = "graph"
