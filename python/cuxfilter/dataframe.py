@@ -22,7 +22,7 @@ class DataFrame:
     """
 
     data: Type[cudf.DataFrame] = None
-    is_graph: Type[bool] = False
+    is_graph = False
     edges: Type[cudf.DataFrame] = None
 
     @classmethod
