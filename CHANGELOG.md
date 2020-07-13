@@ -34,6 +34,7 @@ add_chart now dynamically updates a running dashboard in real-time(page-refresh 
 - PR #133 Added Nodejs dependency in build files
 - PR #148 logic fixes to datatile compute and using vectorized operations instead of numba kernels for datatile compute
 - PR #151 docs and minor bug fixes, also fixed dashboard server notebook issues
+- PR #165 Fix issue with incorrect docker image being used in local build script
 
 # cuXfilter 0.13.0 (31 March 2020)
 
