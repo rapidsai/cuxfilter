@@ -728,37 +728,6 @@ class Graph(BaseGraph):
                 ep = edges_plot(cvs, data_source)
                 plot = tf.stack(ep, np, how="over")
             else:
-                # if self.source is None:
-                #     self.source = ColumnDataSource(
-                #         {
-                #             self.node_x: data_source[self.node_x].to_array(),
-                #             self.node_y: data_source[self.node_y].to_array(),
-                #             self.node_aggregate_col: data_source[
-                #                 self.node_aggregate_col
-                #             ].to_array(),
-                #         }
-                #     )
-                #     self.compute_colors()
-                #     self.chart.scatter(
-                #         x=self.node_x,
-                #         y=self.node_y,
-                #         source=self.source,
-                #         radius=self.node_point_size,
-                #         fill_alpha=0.6,
-                #         fill_color=self.node_aggregate_col,
-                #         line_color=self.node_aggregate_col,
-                #         line_width=3
-                #     )
-                # else:
-                #     self.source.selected.indices = []
-                #     self.source.data = {
-                #             self.node_x: data_source[self.node_x].to_array(),
-                #             self.node_y: data_source[self.node_y].to_array(),
-                #             self.node_aggregate_col: data_source[
-                #                 self.node_aggregate_col
-                #             ].to_array(),
-                #         }
-                #     self.compute_colors()
                 plot = edges_plot(cvs, data_source)
             return plot
 
