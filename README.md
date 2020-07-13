@@ -28,7 +28,7 @@ cuxfilter implements cuDataTiles, a GPU accelerated version of data tiles based 
 
 cuxfilter wouldn’t be possible without using these great open source projects:
 
-- [Bokeh](https://bokeh.pydata.org/en/latest/)
+- [Bokeh](https://docs.bokeh.org/en/latest/)
 - [DataShader](http://datashader.org/)
 - [Panel](https://panel.pyviz.org/)
 - [Falcon](https://github.com/uwdata/falcon)

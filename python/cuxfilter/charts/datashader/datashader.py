@@ -73,7 +73,7 @@ def scatter_geo(
 
     tile_provider: str, default 'CARTODBPOSITRON'
         Underlying map type.See
-        https://bokeh.pydata.org/en/latest/docs/reference/tile_providers.html
+        https://docs.bokeh.org/en/latest/docs/reference/tile_providers.html
 
     title: str,
 
@@ -321,7 +321,7 @@ def graph(
 
     tile_provider: str, default None
         Underlying map type.See
-        https://bokeh.pydata.org/en/latest/docs/reference/tile_providers.html
+        https://docs.bokeh.org/en/latest/docs/reference/tile_providers.html
 
     width: int,  default 800
 
