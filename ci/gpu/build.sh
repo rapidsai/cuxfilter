@@ -58,9 +58,10 @@ nvidia-smi
 logger "Activate conda env..."
 source activate gdf
 conda install "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
+               "cugraph=$MINOR_VERSION.*" \
                "dask-cudf=$MINOR_VERSION.*" "dask-cuda=$MINOR_VERSION.*" \
                "rapids-build-env=$MINOR_VERSION.*" \
-               "rapids-notebook-env=$MINOR_VERSION.*" "cugraph=$MINOR_VERSION.*"
+               "rapids-notebook-env=$MINOR_VERSION.*"
 
 # https://docs.rapids.ai/maintainers/depmgmt/ 
 # conda remove -f rapids-build-env rapids-notebook-env
