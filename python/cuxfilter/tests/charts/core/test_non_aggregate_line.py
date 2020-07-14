@@ -54,10 +54,10 @@ class TestNonAggregateBaseLine:
 
     def test_add_range_slider_filter(self):
         bl = BaseLine(x="key", y="val")
-        bl.min_value = self.dashboard._data[bl.x].min()
-        bl.max_value = self.dashboard._data[bl.x].max()
-        if bl.data_points > self.dashboard._data[bl.x].shape[0]:
-            bl.data_points = self.dashboard._data[bl.x].shape[0]
+        bl.min_value = self.dashboard._cuxfilter_df.data[bl.x].min()
+        bl.max_value = self.dashboard._cuxfilter_df.data[bl.x].max()
+        if bl.data_points > self.dashboard._cuxfilter_df.data[bl.x].shape[0]:
+            bl.data_points = self.dashboard._cuxfilter_df.data[bl.x].shape[0]
         bl.add_range_slider_filter(self.dashboard)
 
         assert type(bl.filter_widget) == pn.widgets.RangeSlider
@@ -68,11 +68,11 @@ class TestNonAggregateBaseLine:
     )
     def test_compute_query_dict(self, range, query):
         bl = BaseLine(x="key", y="val")
-        bl.min_value = self.dashboard._data[bl.x].min()
-        bl.max_value = self.dashboard._data[bl.x].max()
+        bl.min_value = self.dashboard._cuxfilter_df.data[bl.x].min()
+        bl.max_value = self.dashboard._cuxfilter_df.data[bl.x].max()
         bl.stride = 1
-        if bl.data_points > self.dashboard._data[bl.x].shape[0]:
-            bl.data_points = self.dashboard._data[bl.x].shape[0]
+        if bl.data_points > self.dashboard._cuxfilter_df.data[bl.x].shape[0]:
+            bl.data_points = self.dashboard._cuxfilter_df.data[bl.x].shape[0]
         bl.add_range_slider_filter(self.dashboard)
         self.dashboard.add_charts([bl])
         bl.filter_widget.value = range

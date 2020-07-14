@@ -94,7 +94,7 @@ class BaseLine(BaseAggregateChart):
         Ouput:
 
         """
-        if dashboard_cls._data[self.x].dtype == "bool":
+        if dashboard_cls._cuxfilter_df.data[self.x].dtype == "bool":
             self.min_value = 0
             self.max_value = 1
             self.stride = 1
@@ -109,12 +109,19 @@ class BaseLine(BaseAggregateChart):
             ):
                 self.y_label_map = dict_map
         else:
-            if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
-                self.min_value = dashboard_cls._data[self.x].min().compute()
-                self.max_value = dashboard_cls._data[self.x].max().compute()
+            if (
+                type(dashboard_cls._cuxfilter_df.data)
+                == dask_cudf.core.DataFrame
+            ):
+                self.min_value = (
+                    dashboard_cls._cuxfilter_df.data[self.x].min().compute()
+                )
+                self.max_value = (
+                    dashboard_cls._cuxfilter_df.data[self.x].max().compute()
+                )
             else:
-                self.min_value = dashboard_cls._data[self.x].min()
-                self.max_value = dashboard_cls._data[self.x].max()
+                self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
+                self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
 
             if self.max_value < 1 and self.stride_type == int:
                 self.stride_type = float
@@ -132,7 +139,7 @@ class BaseLine(BaseAggregateChart):
                         (self.max_value - self.min_value) / self.data_points
                     )
 
-        self.calculate_source(dashboard_cls._data)
+        self.calculate_source(dashboard_cls._cuxfilter_df.data)
         self.generate_chart()
         self.apply_mappers()
 

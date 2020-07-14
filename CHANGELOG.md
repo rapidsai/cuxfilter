@@ -8,6 +8,7 @@
 - PR #160 Install dependencies via meta packages
 - PR #162 Dashboard and templates cleanup and tests
 - PR #163 Updated Bokeh version to 2.1.1, added pydeck support
+- PR #164 Added new Graph api, supports (nodes[cuDF], edges[cuDF]) input
 
 ## Bug Fixes
 - PR #161 fixed layouts bugs

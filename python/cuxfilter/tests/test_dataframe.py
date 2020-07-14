@@ -12,7 +12,8 @@ class TestDataFrame:
     def test_init(self, cux_df):
         assert isinstance(cux_df.data, cudf.DataFrame)
         assert cux_df.data.equals(cudf.DataFrame())
-        assert cux_df.data.equals(cux_df.backup)
+        assert cux_df.is_graph is False
+        assert cux_df.edges is None
 
     def test_dashboard(self):
         df = cudf.DataFrame(
@@ -22,7 +23,7 @@ class TestDataFrame:
 
         dashboard = cux_df.dashboard(charts=[], title="test_title")
 
-        assert dashboard._data.equals(df)
+        assert dashboard._cuxfilter_df.data.equals(df)
         assert dashboard.title == "test_title"
         assert (
             dashboard._dashboard.__class__ == cuxfilter.layouts.single_feature

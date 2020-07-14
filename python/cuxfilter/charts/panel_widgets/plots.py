@@ -26,12 +26,16 @@ class RangeSlider(BaseWidget):
         """
         initiate chart on dashboard creation
         """
-        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
-            self.min_value = dashboard_cls._data[self.x].min().compute()
-            self.max_value = dashboard_cls._data[self.x].max().compute()
+        if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
+            self.min_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].min().compute()
+            )
+            self.max_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].max().compute()
+            )
         else:
-            self.min_value = dashboard_cls._data[self.x].min()
-            self.max_value = dashboard_cls._data[self.x].max()
+            self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
+            self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
 
         if self.max_value < 1 and self.stride_type == int:
             self.stride_type = float
@@ -134,12 +138,20 @@ class IntSlider(BaseWidget):
         """
         initiate chart on dashboard creation
         """
-        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
-            self.min_value = int(dashboard_cls._data[self.x].min().compute())
-            self.max_value = int(dashboard_cls._data[self.x].max().compute())
+        if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
+            self.min_value = int(
+                dashboard_cls._cuxfilter_df.data[self.x].min().compute()
+            )
+            self.max_value = int(
+                dashboard_cls._cuxfilter_df.data[self.x].max().compute()
+            )
         else:
-            self.min_value = int(dashboard_cls._data[self.x].min())
-            self.max_value = int(dashboard_cls._data[self.x].max())
+            self.min_value = int(
+                dashboard_cls._cuxfilter_df.data[self.x].min()
+            )
+            self.max_value = int(
+                dashboard_cls._cuxfilter_df.data[self.x].max()
+            )
 
         self.generate_widget()
         self.add_events(dashboard_cls)
@@ -239,12 +251,16 @@ class FloatSlider(BaseWidget):
         """
         initiate chart on dashboard creation
         """
-        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
-            self.min_value = dashboard_cls._data[self.x].min().compute()
-            self.max_value = dashboard_cls._data[self.x].max().compute()
+        if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
+            self.min_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].min().compute()
+            )
+            self.max_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].max().compute()
+            )
         else:
-            self.min_value = dashboard_cls._data[self.x].min()
-            self.max_value = dashboard_cls._data[self.x].max()
+            self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
+            self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
         self.generate_widget()
         self.add_events(dashboard_cls)
 
@@ -330,19 +346,23 @@ class DropDown(BaseWidget):
         """
         initiate chart on dashboard creation
         """
-        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
-            self.min_value = dashboard_cls._data[self.x].min().compute()
-            self.max_value = dashboard_cls._data[self.x].max().compute()
+        if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
+            self.min_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].min().compute()
+            )
+            self.max_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].max().compute()
+            )
         else:
-            self.min_value = dashboard_cls._data[self.x].min()
-            self.max_value = dashboard_cls._data[self.x].max()
+            self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
+            self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
 
         if self.stride is None:
             if self.max_value < 1 and self.stride_type == int:
                 self.stride_type = float
             self.stride = self.stride_type(1)
 
-        self.calc_list_of_values(dashboard_cls._data)
+        self.calc_list_of_values(dashboard_cls._cuxfilter_df.data)
         self.generate_widget()
         self.add_events(dashboard_cls)
 
@@ -443,19 +463,23 @@ class MultiSelect(BaseWidget):
         """
         initiate chart on dashboard creation
         """
-        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
-            self.min_value = dashboard_cls._data[self.x].min().compute()
-            self.max_value = dashboard_cls._data[self.x].max().compute()
+        if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
+            self.min_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].min().compute()
+            )
+            self.max_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].max().compute()
+            )
         else:
-            self.min_value = dashboard_cls._data[self.x].min()
-            self.max_value = dashboard_cls._data[self.x].max()
+            self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
+            self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
 
         if self.stride is None:
             if self.max_value < 1 and self.stride_type == int:
                 self.stride_type = float
             self.stride = self.stride_type(1)
 
-        self.calc_list_of_values(dashboard_cls._data)
+        self.calc_list_of_values(dashboard_cls._cuxfilter_df.data)
 
         self.generate_widget()
 

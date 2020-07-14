@@ -69,9 +69,11 @@ class ViewDataFrame:
             self.update_dimensions(height=value)
 
     def initiate_chart(self, dashboard_cls):
-        if isinstance(dashboard_cls._data, dask_cudf.core.DataFrame):
+        if isinstance(
+            dashboard_cls._cuxfilter_df.data, dask_cudf.core.DataFrame
+        ):
             if self.force_computation:
-                self.generate_chart(dashboard_cls._data.compute())
+                self.generate_chart(dashboard_cls._cuxfilter_df.data.compute())
             else:
                 print(
                     "displaying only 1st partitions top 1000 rows for ",
@@ -80,9 +82,11 @@ class ViewDataFrame:
                     "top-level view of entire DataFrame. ",
                     "Warning - would slow the dashboard down significantly",
                 )
-                self.generate_chart(dashboard_cls._data.head(1000))
+                self.generate_chart(
+                    dashboard_cls._cuxfilter_df.data.head(1000)
+                )
         else:
-            self.generate_chart(dashboard_cls._data)
+            self.generate_chart(dashboard_cls._cuxfilter_df.data)
 
     def generate_chart(self, data):
         if self.columns is None:

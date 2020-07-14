@@ -28,7 +28,7 @@ cuxfilter implements cuDataTiles, a GPU accelerated version of data tiles based 
 
 cuxfilter wouldn’t be possible without using these great open source projects:
 
-- [Bokeh](https://bokeh.pydata.org/en/latest/)
+- [Bokeh](https://docs.bokeh.org/en/latest/)
 - [DataShader](http://datashader.org/)
 - [Panel](https://panel.pyviz.org/)
 - [Falcon](https://github.com/uwdata/falcon)
@@ -214,10 +214,10 @@ Currently supported layout templates and example code can be found on the [layou
 | Library  | Chart type |
 | ------------- | ------------- |
 | bokeh  | bar, line  |
-| cudatashader  | scatter, scatter_geo, line, stacked_lines, heatmap |
+| datashader  | scatter, scatter_geo, line, stacked_lines, heatmap, graph(uses bokeh for nodes<20_000) |
 | panel_widgets  | range_slider, float_slider, int_slider, drop_down, multi_select  |
 | custom    | view_dataframe |
-| deckgl    | choropleth   |
+| pydeck    | choropleth(3d and 2d)   |
 
 
 ## Contributing Developers Guide

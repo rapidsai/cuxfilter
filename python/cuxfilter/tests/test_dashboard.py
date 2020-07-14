@@ -16,7 +16,7 @@ class TestDashBoard:
     dashboard = cux_df.dashboard(charts=[], title="test_title")
 
     def test_variables(self):
-        assert self.dashboard._data.equals(self.df)
+        assert self.dashboard._cuxfilter_df.data.equals(self.df)
         assert self.dashboard.title == "test_title"
         assert (
             self.dashboard._dashboard.__class__

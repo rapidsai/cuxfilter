@@ -86,15 +86,19 @@ class BaseLine(BaseNonAggregate):
         Ouput:
 
         """
-        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
-            self.min_value = dashboard_cls._data[self.x].min().compute()
-            self.max_value = dashboard_cls._data[self.x].max().compute()
+        if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
+            self.min_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].min().compute()
+            )
+            self.max_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].max().compute()
+            )
         else:
-            self.min_value = dashboard_cls._data[self.x].min()
-            self.max_value = dashboard_cls._data[self.x].max()
+            self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
+            self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
 
-        if self.data_points > len(dashboard_cls._data):
-            self.data_points = len(dashboard_cls._data)
+        if self.data_points > len(dashboard_cls._cuxfilter_df.data):
+            self.data_points = len(dashboard_cls._cuxfilter_df.data)
 
         if self.stride is None:
             if self.max_value < 1 and self.stride_type == int:
@@ -108,7 +112,7 @@ class BaseLine(BaseNonAggregate):
                     (self.max_value - self.min_value) / self.data_points
                 )
 
-        self.calculate_source(dashboard_cls._data)
+        self.calculate_source(dashboard_cls._cuxfilter_df.data)
         self.generate_chart()
         self.apply_mappers()
 
