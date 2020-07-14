@@ -118,7 +118,6 @@ class DashBoard:
         warnings=False,
     ):
         self._cuxfilter_df = dataframe
-        self._data = self._cuxfilter_df.data
         self._charts = dict()
         self._data_tiles = dict()
         self._query_str_dict = dict()
@@ -222,9 +221,9 @@ class DashBoard:
         value of inplace.
         """
         if len(query_str) > 0:
-            return self._data.query(query_str)
+            return self._cuxfilter_df.data.query(query_str)
         else:
-            return self._data
+            return self._cuxfilter_df.data
 
     def _generate_query_str(self, ignore_chart=""):
         """
@@ -291,7 +290,7 @@ class DashBoard:
         if self._active_view == "":
             print("no querying done, returning original dataframe")
             # return self._backup_data
-            return self._data
+            return self._cuxfilter_df.data
         else:
             self._charts[self._active_view].compute_query_dict(
                 self._query_str_dict
@@ -300,11 +299,13 @@ class DashBoard:
             if len(self._generate_query_str()) > 0:
                 print("final query", self._generate_query_str())
                 # return self._backup_data.query(self._generate_query_str())
-                return self._data.query(self._generate_query_str())
+                return self._cuxfilter_df.data.query(
+                    self._generate_query_str()
+                )
             else:
                 print("no querying done, returning original dataframe")
                 # return self._backup_data
-                return self._data
+                return self._cuxfilter_df.data
 
     def __str__(self):
         return self.__repr__()
@@ -541,10 +542,10 @@ class DashBoard:
 
     def _reload_charts(self, data=None, include_cols=[], ignore_cols=[]):
         """
-        Reload charts with current self._data state.
+        Reload charts with current self._cuxfilter_df.data state.
         """
         if data is None:
-            data = self._data
+            data = self._cuxfilter_df.data
         if len(include_cols) == 0:
             include_cols = list(self._charts.keys())
         # reloading charts as per current data state
@@ -572,7 +573,7 @@ class DashBoard:
                         chart,
                         dtype="pandas",
                         cumsum=cumsum,
-                    ).calc_data_tile(self._data.copy(), query)
+                    ).calc_data_tile(self._cuxfilter_df.data.copy(), query)
 
         self._charts[self._active_view].datatile_loaded_state = True
 
@@ -595,7 +596,7 @@ class DashBoard:
                     chart.query_chart_by_range(
                         self._charts[self._active_view],
                         query_tuple,
-                        self._data,
+                        self._cuxfilter_df.data,
                         self._generate_query_str(
                             self._charts[self._active_view]
                         ),
@@ -631,7 +632,7 @@ class DashBoard:
                         self._charts[self._active_view],
                         old_indices,
                         new_indices,
-                        self._data,
+                        self._cuxfilter_df.data,
                         self._generate_query_str(
                             self._charts[self._active_view]
                         ),

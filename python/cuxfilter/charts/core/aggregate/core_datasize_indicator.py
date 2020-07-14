@@ -38,9 +38,9 @@ class BaseDataSizeIndicator(BaseAggregateChart):
 
         """
         self.min_value = 0
-        self.max_value = len(dashboard_cls._data)
+        self.max_value = len(dashboard_cls._cuxfilter_df.data)
 
-        self.calculate_source(dashboard_cls._data)
+        self.calculate_source(dashboard_cls._cuxfilter_df.data)
         self.generate_chart()
 
     def view(self):

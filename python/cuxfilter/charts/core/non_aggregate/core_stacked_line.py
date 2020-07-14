@@ -91,17 +91,17 @@ class BaseStackedLine(BaseChart):
         """
         if self.x_range is None:
             self.x_range = (
-                dashboard_cls._data[self.x].min(),
-                dashboard_cls._data[self.x].max(),
+                dashboard_cls._cuxfilter_df.data[self.x].min(),
+                dashboard_cls._cuxfilter_df.data[self.x].max(),
             )
         if self.y_range is None:
             # cudf_df[['a','b','c']].min().min() gives min value
             # between all values in columns a,b and c
             self.y_range = (
-                dashboard_cls._data[self.y].min().min(),
-                dashboard_cls._data[self.y].max().max(),
+                dashboard_cls._cuxfilter_df.data[self.y].min().min(),
+                dashboard_cls._cuxfilter_df.data[self.y].max().max(),
             )
-        self.calculate_source(dashboard_cls._data)
+        self.calculate_source(dashboard_cls._cuxfilter_df.data)
         self.generate_chart()
         self.add_events(dashboard_cls)
 
@@ -138,7 +138,7 @@ class BaseStackedLine(BaseChart):
                 # reset previous active view and
                 # set current chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
-                self.source = dashboard_cls._data
+                self.source = dashboard_cls._cuxfilter_df.data
 
             self.x_range = (xmin, xmax)
             self.y_range = (ymin, ymax)
@@ -212,7 +212,7 @@ class BaseStackedLine(BaseChart):
                 # reset previous active view and
                 # set current chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
-                self.source = dashboard_cls._data
+                self.source = dashboard_cls._cuxfilter_df.data
             self.x_range = None
             self.y_range = None
             dashboard_cls._reload_charts()

@@ -23,7 +23,7 @@ class TestDataFrame:
 
         dashboard = cux_df.dashboard(charts=[], title="test_title")
 
-        assert dashboard._data.equals(df)
+        assert dashboard._cuxfilter_df.data.equals(df)
         assert dashboard.title == "test_title"
         assert (
             dashboard._dashboard.__class__ == cuxfilter.layouts.single_feature

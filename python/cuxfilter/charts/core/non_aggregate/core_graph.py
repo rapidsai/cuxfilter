@@ -130,15 +130,17 @@ class BaseGraph(BaseChart):
             raise ValueError("Edges dataframe not provided")
         if self.x_range is None:
             self.x_range = (
-                dashboard_cls._data[self.node_x].min(),
-                dashboard_cls._data[self.node_x].max(),
+                dashboard_cls._cuxfilter_df.data[self.node_x].min(),
+                dashboard_cls._cuxfilter_df.data[self.node_x].max(),
             )
         if self.y_range is None:
             self.y_range = (
-                dashboard_cls._data[self.node_y].min(),
-                dashboard_cls._data[self.node_y].max(),
+                dashboard_cls._cuxfilter_df.data[self.node_y].min(),
+                dashboard_cls._cuxfilter_df.data[self.node_y].max(),
             )
-        if isinstance(dashboard_cls._data, dask_cudf.core.DataFrame):
+        if isinstance(
+            dashboard_cls._cuxfilter_df.data, dask_cudf.core.DataFrame
+        ):
             self.x_range = dd.compute(*self.x_range)
             self.y_range = dd.compute(*self.y_range)
 
@@ -179,7 +181,7 @@ class BaseGraph(BaseChart):
                 # reset previous active view and
                 # set current chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
-                self.nodes = dashboard_cls._data
+                self.nodes = dashboard_cls._cuxfilter_df.data
 
             self.x_range = (xmin, xmax)
             self.y_range = (ymin, ymax)
@@ -274,7 +276,7 @@ class BaseGraph(BaseChart):
                 # reset previous active view and set current
                 # chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
-                self.nodes = dashboard_cls._data
+                self.nodes = dashboard_cls._cuxfilter_df.data
             self.x_range = None
             self.y_range = None
             dashboard_cls._reload_charts()

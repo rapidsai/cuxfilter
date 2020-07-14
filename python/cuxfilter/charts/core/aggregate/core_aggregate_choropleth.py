@@ -132,12 +132,16 @@ class BaseChoropleth(BaseChart):
         Ouput:
 
         """
-        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
-            self.min_value = dashboard_cls._data[self.x].min().compute()
-            self.max_value = dashboard_cls._data[self.x].max().compute()
+        if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
+            self.min_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].min().compute()
+            )
+            self.max_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].max().compute()
+            )
         else:
-            self.min_value = dashboard_cls._data[self.x].min()
-            self.max_value = dashboard_cls._data[self.x].max()
+            self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
+            self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
 
         if isinstance(self.geo_mapper, pd.DataFrame):
             self.geo_mapper, x_range, y_range = geo_json_mapper(
@@ -150,7 +154,7 @@ class BaseChoropleth(BaseChart):
             }
         )
 
-        self.calculate_source(dashboard_cls._data)
+        self.calculate_source(dashboard_cls._cuxfilter_df.data)
         self.generate_chart()
         self.apply_mappers()
 
