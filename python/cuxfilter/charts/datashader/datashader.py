@@ -21,6 +21,8 @@ def scatter_geo(
     tile_provider="CARTODBPOSITRON",
     title="",
     timeout=1,
+    legend=True,
+    legend_position='right',
     **library_specific_params,
 ):
     """
@@ -94,7 +96,7 @@ def scatter_geo(
     A cudashader geo-scatter plot.
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
-    return plots.ScatterGeo(
+    return plots.Scatter(
         x,
         y,
         x_range,
@@ -110,9 +112,11 @@ def scatter_geo(
         pixel_spread,
         width,
         height,
-        tile_provider,
-        title,
-        timeout,
+        tile_provider=tile_provider,
+        title=title,
+        timeout=timeout,
+        legend=legend,
+        legend_position=legend_position,
         **library_specific_params,
     )
 
@@ -135,6 +139,8 @@ def scatter(
     height=400,
     title="",
     timeout=1,
+    legend=True,
+    legend_position='right',
     **library_specific_params,
 ):
     """
@@ -220,8 +226,11 @@ def scatter(
         pixel_spread,
         width,
         height,
-        title,
-        timeout,
+        tile_provider=None,
+        title=title,
+        timeout=timeout,
+        legend=legend,
+        legend_position=legend_position,
         **library_specific_params,
     )
 
@@ -390,6 +399,8 @@ def heatmap(
     height=400,
     title="",
     timeout=1,
+    legend=True,
+    legend_position='right',
     **library_specific_params,
 ):
     """
@@ -449,6 +460,13 @@ def heatmap(
         reported completion. Increase for very long running
         callbacks and if zooming feels laggy.
 
+    legend: bool, default True
+        Adds Bokeh.models.LinearColorMapper based legend if True
+
+    legend_position: str, default 'right'
+        position of legend on the chart.
+        Valid places are: ‘left’, ‘right’, ‘above’, ‘below’, ‘center’
+
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
         function
@@ -474,8 +492,11 @@ def heatmap(
         "spread",
         width,
         height,
-        title,
-        timeout,
+        tile_provider=None,
+        title=title,
+        timeout=timeout,
+        legend=legend,
+        legend_position=legend_position,
         **library_specific_params,
     )
 
