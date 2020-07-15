@@ -2,125 +2,6 @@ from . import plots
 from ..constants import CUXF_DEFAULT_COLOR_PALETTE
 
 
-def scatter_geo(
-    x,
-    y=None,
-    x_range=None,
-    y_range=None,
-    add_interaction=True,
-    color_palette=CUXF_DEFAULT_COLOR_PALETTE,
-    aggregate_col=None,
-    aggregate_fn="count",
-    point_size=1,
-    point_shape="circle",
-    pixel_shade_type="eq_hist",
-    pixel_density=0.5,
-    pixel_spread="dynspread",
-    width=800,
-    height=400,
-    tile_provider="CARTODBPOSITRON",
-    title="",
-    timeout=1,
-    legend=True,
-    legend_position='right',
-    **library_specific_params,
-):
-    """
-    Parameters
-    ----------
-
-    x: str
-        x-axis column name from the gpu dataframe
-    y: str, default None
-        y-axis column name from the gpu dataframe
-    x_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].max())
-        (min, max) x-dimensions of the geo-scatter plot to be displayed
-    y_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].max())
-        (min, max) x-dimensions of the geo-scatter plot to be displayed
-
-    add_interaction: {True, False},  default True
-
-    color_palette: bokeh.palettes or list of hex_color_codes, or list of color
-                    names,  default CUXF_DEFAULT_COLOR_PALETTE(Viridis10)
-
-    aggregate_col: str, default None
-        Column from the gpu dataframe on which the aggregate_fn will be run on,
-        if None, aggregate_fn is run on y-column.
-
-    aggregate_fn: {'count', 'mean', 'max', 'min'},  default 'count'
-
-    point_size: int, default 1
-        Point size in the scatter plot.
-
-    point_shape: str, default 'circle'
-        Available options: circle, square, rect_vertical, rect_horizontal.
-
-    pixel_shade_type: str, default 'eq_hist'
-        The "how" parameter in datashader.transfer_functions.shade()
-        function.
-        Available options: eq_hist, linear, log, cbrt
-
-    pixel_density: float, default 0.5
-        A tuning parameter in [0, 1], with higher values giving more dense
-        scatter plot.
-
-    pixel_spread: str, default 'dynspread'
-        dynspread: Spread pixels in an image dynamically based on the image
-        density.
-        spread: Spread pixels in an image.
-
-    width: int,  default 800
-
-    height: int,  default 400
-
-    tile_provider: str, default 'CARTODBPOSITRON'
-        Underlying map type.See
-        https://docs.bokeh.org/en/latest/docs/reference/tile_providers.html
-
-    title: str,
-
-        chart title
-
-    timeout: int
-        Determines the timeout after which the callback will
-        process new events without the previous one having
-        reported completion. Increase for very long running
-        callbacks and if zooming feels laggy.
-
-    **library_specific_params:
-        additional library specific keyword arguments to be passed to the
-        function
-
-    Returns
-    -------
-    A cudashader geo-scatter plot.
-    Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
-    """
-    return plots.Scatter(
-        x,
-        y,
-        x_range,
-        y_range,
-        add_interaction,
-        color_palette,
-        aggregate_col,
-        aggregate_fn,
-        point_size,
-        point_shape,
-        pixel_shade_type,
-        pixel_density,
-        pixel_spread,
-        width,
-        height,
-        tile_provider=tile_provider,
-        title=title,
-        timeout=timeout,
-        legend=legend,
-        legend_position=legend_position,
-        **library_specific_params,
-    )
-
-
 def scatter(
     x,
     y,
@@ -132,9 +13,10 @@ def scatter(
     aggregate_fn="count",
     point_size=1,
     point_shape="circle",
-    pixel_shade_type="eq_hist",
+    pixel_shade_type="linear",
     pixel_density=0.5,
     pixel_spread="dynspread",
+    tile_provider=None,
     width=800,
     height=400,
     title="",
@@ -173,7 +55,7 @@ def scatter(
     point_shape: str, default 'circle'
         Available options: circle, square, rect_vertical, rect_horizontal.
 
-    pixel_shade_type: str, default 'eq_hist'
+    pixel_shade_type: str, default 'linear'
         The "how" parameter in datashader.transfer_functions.shade()
         function.
         Available options: eq_hist, linear, log, cbrt
@@ -186,6 +68,10 @@ def scatter(
         dynspread: Spread pixels in an image dynamically based on the image
         density.
         spread: Spread pixels in an image.
+
+    tile_provider: str, default None
+        Underlying map type.See
+        https://docs.bokeh.org/en/latest/docs/reference/tile_providers.htm
 
     width: int,  default 800
 
@@ -226,7 +112,7 @@ def scatter(
         pixel_spread,
         width,
         height,
-        tile_provider=None,
+        tile_provider=tile_provider,
         title=title,
         timeout=timeout,
         legend=legend,
@@ -252,7 +138,7 @@ def graph(
     edge_color_palette=["#000000"],
     node_point_size=8,
     node_point_shape="circle",
-    node_pixel_shade_type="eq_hist",
+    node_pixel_shade_type="linear",
     node_pixel_density=0.8,
     node_pixel_spread="dynspread",
     tile_provider=None,
@@ -260,6 +146,8 @@ def graph(
     height=400,
     title="",
     timeout=1,
+    legend=True,
+    legend_position='right',
     **library_specific_params,
 ):
 
@@ -314,7 +202,7 @@ def graph(
     node_point_shape: str, default 'circle'
         Available options: circle, square, rect_vertical, rect_horizontal.
 
-    node_pixel_shade_type: str, default 'eq_hist'
+    node_pixel_shade_type: str, default 'linear'
         The "how" parameter in datashader.transfer_functions.shade()
         function.
         Available options: eq_hist, linear, log, cbrt
@@ -380,6 +268,8 @@ def graph(
         height,
         title,
         timeout,
+        legend=legend,
+        legend_position=legend_position,
         **library_specific_params,
     )
 
