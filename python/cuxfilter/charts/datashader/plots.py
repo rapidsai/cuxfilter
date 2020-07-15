@@ -1,5 +1,4 @@
 from ..core.non_aggregate import (
-    BaseScatterGeo,
     BaseScatter,
     BaseLine,
     BaseStackedLine,
@@ -12,10 +11,19 @@ from datashader.colors import Hot
 import dask_cudf
 import dask.dataframe as dd
 import numpy as np
+import cupy as cp
 from bokeh import events
 from bokeh.plotting import figure
-from bokeh.models import BoxSelectTool
+from bokeh.models import (
+    BoxSelectTool, LinearColorMapper, LogColorMapper,
+    ColorBar, BasicTicker,
+)
 from bokeh.tile_providers import get_provider
+
+_color_mapper = {
+    'linear': LinearColorMapper,
+    'log': LogColorMapper
+}
 
 
 def _rect_vertical_mask(px):
@@ -46,256 +54,11 @@ cds.transfer_functions._mask_lookup["rect_vertical"] = _rect_vertical_mask
 cds.transfer_functions._mask_lookup["rect_horizontal"] = _rect_horizontal_mask
 
 
-class ScatterGeo(BaseScatterGeo):
-    """
-        Description:
-    """
-
-    reset_event = events.Reset
-    data_y_axis = "y"
-    data_x_axis = "x"
-    no_colors_set = False
-
-    def format_source_data(self, data):
-        """
-        Description:
-            format source
-        -------------------------------------------
-        Input:
-        source_dict = {
-            'X': [],
-            'Y': []
-        }
-        -------------------------------------------
-
-        Ouput:
-        """
-        self.source = data
-
-    def generate_InteractiveImage_callback(self):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-
-        def viewInteractiveImage(x_range, y_range, w, h, data_source):
-            cvs = cds.Canvas(
-                plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
-            )
-            agg = cvs.points(
-                data_source,
-                self.x,
-                self.y,
-                getattr(cds, self.aggregate_fn)(self.aggregate_col),
-            )
-            img = tf.shade(
-                agg, cmap=self.color_palette, how=self.pixel_shade_type
-            )
-            if self.pixel_spread == "dynspread":
-                return tf.dynspread(
-                    img,
-                    threshold=self.pixel_density,
-                    max_px=self.point_size,
-                    shape=self.point_shape,
-                )
-            else:
-                return tf.spread(
-                    img, px=self.point_size, shape=self.point_shape
-                )
-
-        return viewInteractiveImage
-
-    def generate_chart(self):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-        if self.color_palette is None:
-            self.no_colors_set = True
-            self.color_palette = Hot
-
-        if type(self.tile_provider) == str:
-            self.tile_provider = get_provider(self.tile_provider)
-
-        if len(self.title) == 0:
-            self.title = (
-                "Geo Scatter plot for "
-                + self.aggregate_col
-                + " "
-                + self.aggregate_fn
-            )
-
-        self.chart = figure(
-            title=self.title,
-            toolbar_location="right",
-            tools="pan, wheel_zoom, reset",
-            active_scroll="wheel_zoom",
-            active_drag="pan",
-            x_range=self.x_range,
-            y_range=self.y_range,
-            width=self.width,
-            height=self.height,
-        )
-
-        self.chart.add_tools(BoxSelectTool())
-        self.chart.add_tile(self.tile_provider)
-        self.chart.axis.visible = False
-
-        self.chart.xgrid.grid_line_color = None
-        self.chart.ygrid.grid_line_color = None
-
-        self.interactive_image = InteractiveImage(
-            self.chart,
-            self.generate_InteractiveImage_callback(),
-            data_source=self.source,
-            timeout=self.timeout,
-        )
-
-    def update_dimensions(self, width=None, height=None):
-        """
-        Description:
-
-
-        Input:
-
-
-
-        Ouput:
-        """
-        if width is not None:
-            self.chart.plot_width = width
-        if height is not None:
-            self.chart.plot_height = height
-
-    def reload_chart(self, data, update_source=False):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-        if data is not None:
-            self.interactive_image.update_chart(data_source=data)
-            if update_source:
-                self.format_source_data(data)
-
-    def add_selection_geometry_event(self, callback):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-
-        def temp_callback(event):
-            xmin, xmax = event.geometry["x0"], event.geometry["x1"]
-            ymin, ymax = event.geometry["y0"], event.geometry["y1"]
-            callback(xmin, xmax, ymin, ymax)
-
-        self.chart.on_event(events.SelectionGeometry, temp_callback)
-
-    def apply_theme(self, properties_dict):
-        """
-        apply thematic changes to the chart based on the input
-        properties dictionary.
-        """
-        if self.no_colors_set:
-            self.color_palette = properties_dict["chart_color"][
-                "color_palette"
-            ]
-            self.interactive_image.update_chart()
-        self.chart.xgrid.grid_line_color = properties_dict["geo_charts_grids"][
-            "xgrid"
-        ]
-        self.chart.ygrid.grid_line_color = properties_dict["geo_charts_grids"][
-            "ygrid"
-        ]
-
-        # title
-        self.chart.title.text_color = properties_dict["title"]["text_color"]
-        self.chart.title.text_font = properties_dict["title"]["text_font"]
-        self.chart.title.text_font_style = properties_dict["title"][
-            "text_font_style"
-        ]
-        self.chart.title.text_font_size = properties_dict["title"][
-            "text_font_size"
-        ]
-
-        # background, border, padding
-        self.chart.background_fill_color = properties_dict[
-            "background_fill_color"
-        ]
-        self.chart.border_fill_color = properties_dict["border_fill_color"]
-        self.chart.min_border = properties_dict["min_border"]
-        self.chart.outline_line_width = properties_dict["outline_line_width"]
-        self.chart.outline_line_alpha = properties_dict["outline_line_alpha"]
-        self.chart.outline_line_color = properties_dict["outline_line_color"]
-
-        # x axis title
-        self.chart.xaxis.major_label_text_color = properties_dict["xaxis"][
-            "major_label_text_color"
-        ]
-        self.chart.xaxis.axis_line_width = properties_dict["xaxis"][
-            "axis_line_width"
-        ]
-        self.chart.xaxis.axis_line_color = properties_dict["xaxis"][
-            "axis_line_color"
-        ]
-
-        # y axis title
-        self.chart.yaxis.major_label_text_color = properties_dict["yaxis"][
-            "major_label_text_color"
-        ]
-        self.chart.yaxis.axis_line_width = properties_dict["yaxis"][
-            "axis_line_width"
-        ]
-        self.chart.yaxis.axis_line_color = properties_dict["yaxis"][
-            "axis_line_color"
-        ]
-
-        # axis ticks
-        self.chart.axis.major_tick_line_color = properties_dict["axis"][
-            "major_tick_line_color"
-        ]
-        self.chart.axis.minor_tick_line_color = properties_dict["axis"][
-            "minor_tick_line_color"
-        ]
-        self.chart.axis.minor_tick_out = properties_dict["axis"][
-            "minor_tick_out"
-        ]
-        self.chart.axis.major_tick_out = properties_dict["axis"][
-            "major_tick_out"
-        ]
-        self.chart.axis.major_tick_in = properties_dict["axis"][
-            "major_tick_in"
-        ]
-
-
 class Scatter(BaseScatter):
     """
         Description:
     """
-
+    chart_type: str = "scatter"
     reset_event = events.Reset
     data_y_axis = "y"
     data_x_axis = "x"
@@ -339,6 +102,14 @@ class Scatter(BaseScatter):
                 self.y,
                 getattr(cds, self.aggregate_fn)(self.aggregate_col),
             )
+            if self.legend and (
+                self.pixel_shade_type == 'linear' or
+                self.pixel_shade_type == 'log'
+            ):
+                self.color_bar.color_mapper.palette = self.color_palette
+                self.color_bar.color_mapper.low = float(cp.nanmin(agg.data))
+                self.color_bar.color_mapper.high = float(cp.nanmax(agg.data))
+
             img = tf.shade(
                 agg, cmap=self.color_palette, how=self.pixel_shade_type
             )
@@ -392,8 +163,30 @@ class Scatter(BaseScatter):
         )
 
         self.chart.add_tools(BoxSelectTool())
-        # self.chart.add_tile(self.tile_provider)
-        # self.chart.axis.visible = False
+
+        if self.tile_provider is not None and type(self.tile_provider) == str:
+            self.tile_provider = get_provider(self.tile_provider)
+            self.chart.add_tile(self.tile_provider)
+            self.chart.axis.visible = False
+
+        if self.legend and (
+            self.pixel_shade_type == 'linear' or self.pixel_shade_type == 'log'
+        ):
+            self.mapper = _color_mapper[self.pixel_shade_type](
+                palette=self.color_palette,
+                low=0,
+                high=1
+            )
+
+            self.color_bar = ColorBar(
+                color_mapper=self.mapper, location=(0, 0),
+                ticker=BasicTicker(
+                    desired_num_ticks=len(self.color_palette)
+                ),
+            )
+            self.chart.add_layout(
+                self.color_bar, self.legend_position
+            )
 
         self.chart.xgrid.grid_line_color = None
         self.chart.ygrid.grid_line_color = None
