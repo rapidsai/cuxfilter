@@ -22,7 +22,7 @@ def scatter(
     title="",
     timeout=1,
     legend=True,
-    legend_position='center',
+    legend_position="center",
     **library_specific_params,
 ):
     """
@@ -147,7 +147,7 @@ def graph(
     title="",
     timeout=1,
     legend=True,
-    legend_position='center',
+    legend_position="center",
     **library_specific_params,
 ):
 
@@ -297,7 +297,7 @@ def heatmap(
     title="",
     timeout=1,
     legend=True,
-    legend_position='center',
+    legend_position="center",
     **library_specific_params,
 ):
     """
@@ -495,7 +495,7 @@ def stacked_lines(
     title="",
     timeout=1,
     legend=True,
-    legend_position='center',
+    legend_position="center",
     **library_specific_params,
 ):
     """
