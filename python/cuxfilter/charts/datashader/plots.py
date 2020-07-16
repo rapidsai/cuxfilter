@@ -117,23 +117,22 @@ def _get_legend_title(aggregate_fn, aggregate_col):
 
 
 def _generate_legend(
-    pixel_shade_type, color_palette, legend_title
+    pixel_shade_type, color_palette, legend_title, constant_limit,
+    color_bar=None, update=False
 ):
     mapper = _color_mapper[pixel_shade_type](
-        palette=color_palette, low=0, high=1
+        palette=color_palette, low=constant_limit[0], high=constant_limit[1]
     )
+    if update and color_bar:
+        color_bar.color_mapper = mapper
+        return color_bar
+
     color_bar = ColorBar(
         color_mapper=mapper, location=(0, 0),
         ticker=BasicTicker(desired_num_ticks=len(color_palette)),
         title=legend_title, background_fill_alpha=0
     )
     return color_bar
-
-
-def _update_legend(pixel_shade_type, color_palette, constant_limit):
-    return _color_mapper[pixel_shade_type](
-        palette=color_palette, low=constant_limit[0], high=constant_limit[1]
-    )
 
 
 ds.transfer_functions._mask_lookup["rect_vertical"] = _rect_vertical_mask
@@ -150,6 +149,7 @@ class Scatter(BaseScatter):
     data_x_axis = "x"
     no_colors_set = False
     constant_limit = None
+    color_bar = None
 
     def format_source_data(self, data):
         """
@@ -171,6 +171,19 @@ class Scatter(BaseScatter):
         return self.legend and (
             self.pixel_shade_type in list(_color_mapper.keys())
         )
+
+    def render_legend(self):
+        if self.show_legend():
+            update = self.color_bar is not None
+            self.color_bar = _generate_legend(
+                self.pixel_shade_type, self.color_palette,
+                _get_legend_title(self.aggregate_fn, self.aggregate_col),
+                self.constant_limit,
+                color_bar=self.color_bar,
+                update=update
+            )
+            if update is False:
+                self.chart.add_layout(self.color_bar, self.legend_position)
 
     def generate_InteractiveImage_callback(self):
         """
@@ -204,14 +217,15 @@ class Scatter(BaseScatter):
                 self.constant_limit = [
                     float(cp.nanmin(agg.data)), float(cp.nanmax(agg.data))
                 ]
-                self.color_bar.color_mapper = _update_legend(
-                    self.pixel_shade_type, self.color_palette,
-                    self.constant_limit
-                )
+                self.render_legend()
+
+            span = {'span': self.constant_limit}
+            if self.pixel_shade_type == 'eq_hist':
+                span = {}
 
             img = tf.shade(
                 agg, how=self.pixel_shade_type,
-                span=self.constant_limit, **cmap
+                **cmap, **span
             )
 
             if self.pixel_spread == "dynspread":
@@ -272,15 +286,6 @@ class Scatter(BaseScatter):
 
         self.chart.xgrid.grid_line_color = None
         self.chart.ygrid.grid_line_color = None
-
-        if self.show_legend():
-            self.color_bar = _generate_legend(
-                self.pixel_shade_type, self.color_palette,
-                _get_legend_title(self.aggregate_fn, self.aggregate_col)
-            )
-            self.chart.add_layout(
-                self.color_bar, self.legend_position
-            )
 
         self.interactive_image = InteractiveImage(
             self.chart,
@@ -435,6 +440,7 @@ class Graph(BaseGraph):
     no_colors_set = False
     image = None
     constant_limit = None
+    color_bar = None
 
     def compute_colors(self):
         if self.node_color_palette is None:
@@ -452,11 +458,34 @@ class Graph(BaseGraph):
         self.source.data[self.node_aggregate_col] = colors
 
     def show_legend(self):
+        """
+        return if legend=True and pixel_shade_type is ['linear', 'log']
+        """
         return self.legend and (
             self.node_pixel_shade_type in list(_color_mapper.keys())
         )
 
+    def render_legend(self):
+        """
+        render legend
+        """
+        if self.show_legend():
+            update = self.color_bar is not None
+            self.color_bar = _generate_legend(
+                self.node_pixel_shade_type, self.node_color_palette,
+                _get_legend_title(
+                    self.node_aggregate_fn, self.node_aggregate_col),
+                self.constant_limit,
+                color_bar=self.color_bar,
+                update=update
+            )
+            if update is False:
+                self.chart.add_layout(self.color_bar, self.legend_position)
+
     def nodes_plot(self, canvas, nodes, name=None):
+        """
+        plot nodes(scatter)
+        """
         aggregator, cmap = _compute_datashader_assets(
             nodes, self.node_id, self.node_aggregate_col,
             self.node_aggregate_fn, self.node_color_palette
@@ -470,15 +499,16 @@ class Graph(BaseGraph):
             self.constant_limit = [
                 float(cp.nanmin(agg.data)), float(cp.nanmax(agg.data))
             ]
-            self.color_bar.color_mapper = _update_legend(
-                self.node_pixel_shade_type, self.node_color_palette,
-                self.constant_limit
-            )
+            self.render_legend()
+
+        span = {'span': self.constant_limit}
+        if self.node_pixel_shade_type == 'eq_hist':
+            span = {}
 
         return getattr(tf, self.node_pixel_spread)(
             tf.shade(
                 agg, how=self.node_pixel_shade_type, name=name,
-                span=self.constant_limit, **cmap
+                **cmap, **span
             ),
             threshold=self.node_pixel_density,
             max_px=self.node_point_size,
@@ -486,6 +516,9 @@ class Graph(BaseGraph):
         )
 
     def edges_plot(self, canvas, nodes, name=None):
+        """
+        plot edges(lines)
+        """
         aggregator, cmap = _compute_datashader_assets(
             self.connected_edges, self.node_x, self.edge_aggregate_col,
             self.edge_aggregate_fn, self.edge_color_palette
@@ -498,6 +531,9 @@ class Graph(BaseGraph):
         return tf.shade(agg, name=name, **cmap)
 
     def calc_connected_edges(self, nodes, edges):
+        """
+        calculate directly connected edges
+        """
         connected_edges_columns = [self.node_x, self.node_y]
         if self.edge_aggregate_col is not None:
             connected_edges_columns += [self.edge_aggregate_col]
@@ -642,17 +678,6 @@ class Graph(BaseGraph):
         if self.tile_provider is not None:
             self.chart.add_tile(self.tile_provider)
             self.chart.axis.visible = False
-
-        if self.show_legend():
-            self.color_bar = _generate_legend(
-                self.node_pixel_shade_type, self.node_color_palette,
-                _get_legend_title(
-                    self.node_aggregate_fn, self.node_aggregate_col
-                )
-            )
-            self.chart.add_layout(
-                self.color_bar, self.legend_position
-            )
 
         self.chart.add_tools(BoxSelectTool())
 
@@ -1075,6 +1100,7 @@ class StackedLines(BaseStackedLine):
     data_x_axis = "x"
     use_data_tiles = False
     no_colors_set = False
+    color_bar = None
 
     def calculate_source(self, data):
         """
