@@ -141,6 +141,7 @@ class Scatter(BaseScatter):
     no_colors_set = False
     constant_limit = None
     color_bar = None
+    legend_added = False
 
     def format_source_data(self, data):
         """
@@ -174,7 +175,7 @@ class Scatter(BaseScatter):
                 color_bar=self.color_bar,
                 update=update,
             )
-            if update is False:
+            if (update and self.legend_added) is False:
                 self.chart.add_layout(self.color_bar, self.legend_position)
 
     def generate_InteractiveImage_callback(self):
@@ -271,6 +272,9 @@ class Scatter(BaseScatter):
         if self.tile_provider is not None:
             self.chart.add_tile(self.tile_provider)
             self.chart.axis.visible = False
+        # reset legend and color_bar
+        self.legend_added = False
+        self.color_bar = None
 
         self.chart.xgrid.grid_line_color = None
         self.chart.ygrid.grid_line_color = None
@@ -281,6 +285,9 @@ class Scatter(BaseScatter):
             data_source=self.source,
             timeout=self.timeout,
         )
+
+        if self.legend_added is False:
+            self.render_legend()
 
     def update_dimensions(self, width=None, height=None):
         """
@@ -431,6 +438,7 @@ class Graph(BaseGraph):
     image = None
     constant_limit = None
     color_bar = None
+    legend_added = False
 
     def compute_colors(self):
         if self.node_color_palette is None:
@@ -471,8 +479,9 @@ class Graph(BaseGraph):
                 color_bar=self.color_bar,
                 update=update,
             )
-            if update is False:
+            if (update and self.legend_added) is False:
                 self.chart.add_layout(self.color_bar, self.legend_position)
+                self.legend_added = True
 
     def nodes_plot(self, canvas, nodes, name=None):
         """
@@ -676,6 +685,9 @@ class Graph(BaseGraph):
         if self.tile_provider is not None:
             self.chart.add_tile(self.tile_provider)
             self.chart.axis.visible = False
+        # reset legend and color_bar
+        self.legend_added = False
+        self.color_bar = None
 
         self.chart.add_tools(BoxSelectTool())
 
@@ -688,6 +700,9 @@ class Graph(BaseGraph):
             data_source=self.nodes,
             timeout=self.timeout,
         )
+
+        if self.legend_added is False:
+            self.render_legend()
 
         if len(self.nodes) <= 10_000:
             self.source = ColumnDataSource(
