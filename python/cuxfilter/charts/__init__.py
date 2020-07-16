@@ -4,7 +4,7 @@
 # from .panel_widgets import panel_widgets
 
 from .bokeh import bar, line
-from .datashader import scatter, stacked_lines, heatmap
+from .datashader import scatter, stacked_lines, heatmap, graph
 from .deckgl import choropleth
 from .panel_widgets import (
     range_slider,
