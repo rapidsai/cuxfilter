@@ -487,6 +487,8 @@ def stacked_lines(
     height=400,
     title="",
     timeout=1,
+    legend=True,
+    legend_position='right',
     **library_specific_params,
 ):
     """
@@ -524,6 +526,14 @@ def stacked_lines(
         reported completion. Increase for very long running
         callbacks and if zooming feels laggy.
 
+    legend: bool, default True
+        Adds Bokeh.models.LinearColorMapper based legend if True
+
+    legend_position: str, default 'right'
+        position of legend on the chart.
+        Valid places are: ‘left’, ‘right’, ‘above’, ‘below’, ‘center’
+
+
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
         function
@@ -547,5 +557,7 @@ def stacked_lines(
         height,
         title,
         timeout,
+        legend=legend,
+        legend_position=legend_position,
         **library_specific_params,
     )

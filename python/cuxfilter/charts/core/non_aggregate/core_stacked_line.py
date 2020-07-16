@@ -35,6 +35,8 @@ class BaseStackedLine(BaseChart):
         height=400,
         title="",
         timeout=1,
+        legend=True,
+        legend_position='right',
         **library_specific_params,
     ):
         """
@@ -53,6 +55,8 @@ class BaseStackedLine(BaseChart):
             height
             title
             timeout
+            legend
+            legend_position
             **library_specific_params
         -------------------------------------------
 
@@ -74,9 +78,9 @@ class BaseStackedLine(BaseChart):
         self.stride_type = step_size_type
         self.title = title
         self.timeout = timeout
-
+        self.legend = legend
+        self.legend_position = legend_position
         self.library_specific_params = library_specific_params
-
         self.width = width
         self.height = height
 
