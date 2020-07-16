@@ -36,7 +36,7 @@ class BaseStackedLine(BaseChart):
         title="",
         timeout=1,
         legend=True,
-        legend_position='right',
+        legend_position='center',
         **library_specific_params,
     ):
         """
