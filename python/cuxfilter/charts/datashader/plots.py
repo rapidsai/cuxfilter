@@ -25,8 +25,8 @@ from bokeh.models import (
     ColorBar,
     LinearColorMapper,
     LogColorMapper,
-    LogTicker,
-    BasicTicker
+    BasicTicker,
+    FixedTicker,
 )
 from bokeh.tile_providers import get_provider
 
@@ -62,6 +62,80 @@ def _rect_horizontal_mask(px):
     return np.concatenate((x_bool, zero_bool), axis=0)
 
 
+def _compute_datashader_assets(
+    data, x, aggregate_col, aggregate_fn, color_palette
+):
+    aggregator = None
+    cmap = {"cmap": color_palette}
+
+    if isinstance(
+        data[x].dtype,
+        cudf.core.dtypes.CategoricalDtype
+    ):
+        if ds_version >= "0.11":
+            aggregator = ds.by(
+                x,
+                getattr(ds, aggregate_fn)(
+                    aggregate_col
+                ),
+            )
+        else:
+            print("only count_cat supported by datashader <=0.10")
+            aggregator = ds.count_cat(x)
+        cmap = {
+            "color_key": {
+                k: v
+                for k, v in zip(
+                    list(data[x].cat.categories),
+                    color_palette,
+                )
+            }
+        }
+    else:
+        if aggregate_fn:
+            aggregator = getattr(ds, aggregate_fn)(
+                aggregate_col
+            )
+    return aggregator, cmap
+
+
+def _get_provider(tile_provider):
+    if tile_provider is None:
+        return None
+    elif type(tile_provider) == str:
+        return get_provider(tile_provider)
+    elif isinstance(tile_provider, bokeh.models.tiles.WMTSTileSource):
+        return tile_provider
+    return None
+
+
+def _get_legend_title(aggregate_fn, aggregate_col):
+    if aggregate_fn == "count":
+        return aggregate_fn
+    else:
+        return aggregate_fn + " " + aggregate_col
+
+
+def _generate_legend(
+    pixel_shade_type, color_palette, legend_title
+):
+    mapper = _color_mapper[pixel_shade_type](
+        palette=color_palette, low=0, high=1
+    )
+    color_bar = ColorBar(
+        color_mapper=mapper, location=(0, 0),
+        ticker=BasicTicker(desired_num_ticks=len(color_palette)),
+        title=legend_title, background_fill_alpha=0
+    )
+    return color_bar
+
+
+def _update_legend(pixel_shade_type, color_palette, constant_limit):
+    return _color_mapper[pixel_shade_type](
+        palette=color_palette, low=constant_limit[0], high=constant_limit[1]
+    )
+
+
 ds.transfer_functions._mask_lookup["rect_vertical"] = _rect_vertical_mask
 ds.transfer_functions._mask_lookup["rect_horizontal"] = _rect_horizontal_mask
 
@@ -75,6 +149,7 @@ class Scatter(BaseScatter):
     data_y_axis = "y"
     data_x_axis = "x"
     no_colors_set = False
+    constant_limit = None
 
     def format_source_data(self, data):
         """
@@ -92,6 +167,11 @@ class Scatter(BaseScatter):
         """
         self.source = data
 
+    def show_legend(self):
+        return self.legend and (
+            self.pixel_shade_type in list(_color_mapper.keys())
+        )
+
     def generate_InteractiveImage_callback(self):
         """
         Description:
@@ -108,23 +188,32 @@ class Scatter(BaseScatter):
             cvs = ds.Canvas(
                 plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
             )
+            aggregator, cmap = _compute_datashader_assets(
+                data_source, self.x, self.aggregate_col, self.aggregate_fn,
+                self.color_palette
+            )
+
             agg = cvs.points(
                 data_source,
                 self.x,
                 self.y,
-                getattr(ds, self.aggregate_fn)(self.aggregate_col),
+                aggregator,
             )
-            if self.legend and (
-                self.pixel_shade_type == 'linear' or
-                self.pixel_shade_type == 'log'
-            ):
-                self.color_bar.color_mapper.palette = self.color_palette
-                self.color_bar.color_mapper.low = float(cp.nanmin(agg.data))
-                self.color_bar.color_mapper.high = float(cp.nanmax(agg.data))
+
+            if self.constant_limit is None or self.aggregate_fn == 'count':
+                self.constant_limit = [
+                    float(cp.nanmin(agg.data)), float(cp.nanmax(agg.data))
+                ]
+                self.color_bar.color_mapper = _update_legend(
+                    self.pixel_shade_type, self.color_palette,
+                    self.constant_limit
+                )
 
             img = tf.shade(
-                agg, cmap=self.color_palette, how=self.pixel_shade_type
+                agg, how=self.pixel_shade_type,
+                span=self.constant_limit, **cmap
             )
+
             if self.pixel_spread == "dynspread":
                 return tf.dynspread(
                     img,
@@ -176,32 +265,22 @@ class Scatter(BaseScatter):
 
         self.chart.add_tools(BoxSelectTool())
 
-        if self.tile_provider is not None and type(self.tile_provider) == str:
-            self.tile_provider = get_provider(self.tile_provider)
+        self.tile_provider = _get_provider(self.tile_provider)
+        if self.tile_provider is not None:
             self.chart.add_tile(self.tile_provider)
             self.chart.axis.visible = False
 
-        if self.legend and (
-            self.pixel_shade_type == 'linear' or self.pixel_shade_type == 'log'
-        ):
-            self.mapper = _color_mapper[self.pixel_shade_type](
-                palette=self.color_palette,
-                low=0,
-                high=1
-            )
+        self.chart.xgrid.grid_line_color = None
+        self.chart.ygrid.grid_line_color = None
 
-            self.color_bar = ColorBar(
-                color_mapper=self.mapper, location=(0, 0),
-                ticker=BasicTicker(
-                    desired_num_ticks=len(self.color_palette)
-                ),
+        if self.show_legend():
+            self.color_bar = _generate_legend(
+                self.pixel_shade_type, self.color_palette,
+                _get_legend_title(self.aggregate_fn, self.aggregate_col)
             )
             self.chart.add_layout(
                 self.color_bar, self.legend_position
             )
-
-        self.chart.xgrid.grid_line_color = None
-        self.chart.ygrid.grid_line_color = None
 
         self.interactive_image = InteractiveImage(
             self.chart,
@@ -289,6 +368,12 @@ class Scatter(BaseScatter):
             "text_font_size"
         ]
 
+        if self.show_legend():
+            self.color_bar.major_label_text_color = properties_dict["title"][
+                "text_color"]
+            self.color_bar.title_text_color = properties_dict["title"][
+                "text_color"]
+
         # background, border, padding
         self.chart.background_fill_color = properties_dict[
             "background_fill_color"
@@ -349,6 +434,7 @@ class Graph(BaseGraph):
     data_x_axis = "node_x"
     no_colors_set = False
     image = None
+    constant_limit = None
 
     def compute_colors(self):
         if self.node_color_palette is None:
@@ -365,61 +451,51 @@ class Graph(BaseGraph):
         colors = [self.node_color_palette[i] for i in inds]
         self.source.data[self.node_aggregate_col] = colors
 
+    def show_legend(self):
+        return self.legend and (
+            self.node_pixel_shade_type in list(_color_mapper.keys())
+        )
+
     def nodes_plot(self, canvas, nodes, name=None):
-        if isinstance(
-            nodes[self.node_id].dtype, cudf.core.dtypes.CategoricalDtype
-        ):
-            if ds_version >= "0.11":
-                aggregator = ds.by(
-                    self.node_id,
-                    getattr(ds, self.node_aggregate_fn)(
-                        self.node_aggregate_col
-                    ),
-                )
-            else:
-                print("only count_cat supported by datashader <=0.10")
-                aggregator = ds.count_cat(self.node_id,)
-            cmap = {
-                "color_key": {
-                    k: v
-                    for k, v in zip(
-                        list(nodes[self.node_id].cat.categories),
-                        self.node_color_palette,
-                    )
-                }
-            }
-        else:
-            if self.node_aggregate_fn:
-                aggregator = getattr(ds, self.node_aggregate_fn)(
-                    self.node_aggregate_col
-                )
-            else:
-                aggregator = None
-            cmap = {"cmap": self.node_color_palette}
+        aggregator, cmap = _compute_datashader_assets(
+            nodes, self.node_id, self.node_aggregate_col,
+            self.node_aggregate_fn, self.node_color_palette
+        )
 
         agg = canvas.points(
             nodes.sort_index(), self.node_x, self.node_y, aggregator
         )
+
+        if self.constant_limit is None or self.node_aggregate_fn == 'count':
+            self.constant_limit = [
+                float(cp.nanmin(agg.data)), float(cp.nanmax(agg.data))
+            ]
+            self.color_bar.color_mapper = _update_legend(
+                self.node_pixel_shade_type, self.node_color_palette,
+                self.constant_limit
+            )
+
         return getattr(tf, self.node_pixel_spread)(
-            tf.shade(agg, how=self.node_pixel_shade_type, name=name, **cmap),
+            tf.shade(
+                agg, how=self.node_pixel_shade_type, name=name,
+                span=self.constant_limit, **cmap
+            ),
             threshold=self.node_pixel_density,
             max_px=self.node_point_size,
             shape=self.node_point_shape,
         )
 
     def edges_plot(self, canvas, nodes, name=None):
-        if self.edge_aggregate_fn:
-            aggregator = getattr(ds, self.edge_aggregate_fn)(
-                self.edge_aggregate_col
-            )
-        else:
-            aggregator = None
+        aggregator, cmap = _compute_datashader_assets(
+            self.connected_edges, self.node_x, self.edge_aggregate_col,
+            self.edge_aggregate_fn, self.edge_color_palette
+        )
 
         agg = canvas.line(
             self.connected_edges, self.node_x, self.node_y, aggregator
         )
 
-        return tf.shade(agg, cmap=self.edge_color_palette, name=name)
+        return tf.shade(agg, name=name, **cmap)
 
     def calc_connected_edges(self, nodes, edges):
         connected_edges_columns = [self.node_x, self.node_y]
@@ -541,7 +617,14 @@ class Graph(BaseGraph):
 
         if len(self.title) == 0:
             self.title = "Graph"
-
+        self.x_range = (
+            self.x_range[0] - self.node_point_size,
+            self.x_range[1] + self.node_point_size
+        )
+        self.y_range = (
+            self.y_range[0] - self.node_point_size,
+            self.y_range[1] + self.node_point_size
+        )
         self.chart = figure(
             title=self.title,
             toolbar_location="right",
@@ -554,12 +637,24 @@ class Graph(BaseGraph):
             height=self.height,
             output_backend="webgl",
         )
-        if type(self.tile_provider) == str:
-            self.tile_provider = get_provider(self.tile_provider)
+
+        self.tile_provider = _get_provider(self.tile_provider)
+        if self.tile_provider is not None:
             self.chart.add_tile(self.tile_provider)
+            self.chart.axis.visible = False
+
+        if self.show_legend():
+            self.color_bar = _generate_legend(
+                self.node_pixel_shade_type, self.node_color_palette,
+                _get_legend_title(
+                    self.node_aggregate_fn, self.node_aggregate_col
+                )
+            )
+            self.chart.add_layout(
+                self.color_bar, self.legend_position
+            )
 
         self.chart.add_tools(BoxSelectTool())
-        self.chart.axis.visible = False
 
         self.chart.xgrid.grid_line_color = None
         self.chart.ygrid.grid_line_color = None
@@ -592,21 +687,6 @@ class Graph(BaseGraph):
                 line_color=self.node_aggregate_col,
                 line_width=3,
             )
-            color_mapper = LinearColorMapper(
-                palette=self.node_color_palette,
-                low=self.nodes[self.node_id].min(),
-                high=self.nodes[self.node_id].max(),
-            )
-
-            color_bar = ColorBar(
-                color_mapper=color_mapper,
-                ticker=LogTicker(),
-                label_standoff=12,
-                border_line_color=None,
-                location=(0, 0),
-            )
-
-            self.chart.add_layout(color_bar)
 
     def update_dimensions(self, width=None, height=None):
         """
@@ -688,6 +768,11 @@ class Graph(BaseGraph):
         self.chart.title.text_font_size = properties_dict["title"][
             "text_font_size"
         ]
+        if self.show_legend():
+            self.color_bar.major_label_text_color = properties_dict["title"][
+                "text_color"]
+            self.color_bar.title_text_color = properties_dict["title"][
+                "text_color"]
 
         # background, border, padding
         self.chart.background_fill_color = properties_dict[
@@ -1096,8 +1181,23 @@ class StackedLines(BaseStackedLine):
         )
 
         self.chart.add_tools(BoxSelectTool(dimensions="width"))
-        # self.chart.add_tile(self.tile_provider)
-        # self.chart.axis.visible = False
+
+        if self.legend:
+            mapper = LinearColorMapper(
+                palette=self.colors, low=1, high=len(self.y)
+            )
+            self.color_bar = ColorBar(
+                color_mapper=mapper, location=(0, 0),
+                ticker=FixedTicker(ticks=list(range(1, len(self.y)+1))),
+                major_label_overrides=dict(
+                    zip(list(range(1, len(self.y)+1)), self.y)
+                ),
+                major_label_text_baseline='top',
+                major_label_text_align='left',
+                major_tick_in=0,
+                major_tick_out=0
+            )
+            self.chart.add_layout(self.color_bar, self.legend_position)
 
         self.chart.xgrid.grid_line_color = None
         self.chart.ygrid.grid_line_color = None
@@ -1187,6 +1287,11 @@ class StackedLines(BaseStackedLine):
         self.chart.title.text_font_size = properties_dict["title"][
             "text_font_size"
         ]
+        if self.legend:
+            self.color_bar.major_label_text_color = properties_dict["title"][
+                "text_color"]
+            self.color_bar.title_text_color = properties_dict["title"][
+                "text_color"]
 
         # background, border, padding
         self.chart.background_fill_color = properties_dict[
