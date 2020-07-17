@@ -305,7 +305,7 @@ class Scatter(BaseScatter):
         if height is not None:
             self.chart.plot_height = height
 
-    def reload_chart(self, data, update_source=False):
+    def reload_chart(self, data=None, update_source=False):
         """
         Description:
 
@@ -318,6 +318,8 @@ class Scatter(BaseScatter):
         """
         if data is not None:
             self.interactive_image.update_chart(data_source=data)
+        else:
+            self.interactive_image.update_chart(data_source=self.source)
             if update_source:
                 self.format_source_data(data)
 

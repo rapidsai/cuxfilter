@@ -20,7 +20,7 @@ def scatter(
     width=800,
     height=400,
     title="",
-    timeout=1,
+    timeout=100,
     legend=True,
     legend_position="center",
     **library_specific_params,
@@ -81,7 +81,7 @@ def scatter(
 
         chart title
 
-    timeout: int
+    timeout: int (milliseconds), default 100
         Determines the timeout after which the callback will
         process new events without the previous one having
         reported completion. Increase for very long running
@@ -145,7 +145,7 @@ def graph(
     width=800,
     height=400,
     title="",
-    timeout=1,
+    timeout=100,
     legend=True,
     legend_position="center",
     **library_specific_params,
@@ -228,7 +228,7 @@ def graph(
 
         chart title
 
-    timeout: int
+    timeout: int (milliseconds), default 100
         Determines the timeout after which the callback will
         process new events without the previous one having
         reported completion. Increase for very long running
@@ -295,7 +295,7 @@ def heatmap(
     width=800,
     height=400,
     title="",
-    timeout=1,
+    timeout=100,
     legend=True,
     legend_position="center",
     **library_specific_params,
@@ -351,7 +351,7 @@ def heatmap(
 
         chart title
 
-    timeout: int
+    timeout: int (milliseconds), default 100
         Determines the timeout after which the callback will
         process new events without the previous one having
         reported completion. Increase for very long running
@@ -410,7 +410,7 @@ def line(
     width=800,
     height=400,
     title="",
-    timeout=1,
+    timeout=100,
     **library_specific_params,
 ):
     """
@@ -450,7 +450,7 @@ def line(
 
         chart title
 
-    timeout: int
+    timeout: int (milliseconds), default 100
         Determines the timeout after which the callback will
         process new events without the previous one having
         reported completion. Increase for very long running
@@ -493,7 +493,7 @@ def stacked_lines(
     width=800,
     height=400,
     title="",
-    timeout=1,
+    timeout=100,
     legend=True,
     legend_position="center",
     **library_specific_params,
@@ -527,7 +527,7 @@ def stacked_lines(
 
         chart title
 
-    timeout: int
+    timeout: int (milliseconds), default 100
         Determines the timeout after which the callback will
         process new events without the previous one having
         reported completion. Increase for very long running

@@ -45,7 +45,7 @@ class BaseGraph(BaseChart):
         width=800,
         height=400,
         title="",
-        timeout=1,
+        timeout=100,
         legend=True,
         legend_position="center",
         **library_specific_params,

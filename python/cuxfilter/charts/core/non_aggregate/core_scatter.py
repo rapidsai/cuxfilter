@@ -34,7 +34,7 @@ class BaseScatter(BaseNonAggregate):
         height=400,
         tile_provider=None,
         title="",
-        timeout=1,
+        timeout=100,
         legend=True,
         legend_position="center",
         **library_specific_params,

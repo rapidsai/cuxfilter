@@ -26,7 +26,7 @@ class BaseLine(BaseNonAggregate):
         width=800,
         height=400,
         title="",
-        timeout=1,
+        timeout=100,
         **library_specific_params,
     ):
         """
