@@ -110,10 +110,8 @@ class InteractiveImage(object):
 
         """
         return CustomJS(
-            args=dict(
-                hidden_chart=self.hidden_chart,
-                __timeout=self.timeout,
-            ), code=js_code
+            args=dict(hidden_chart=self.hidden_chart, __timeout=self.timeout,),
+            code=js_code,
         )
 
     def callback_py(self, attr, old, new):
@@ -134,8 +132,7 @@ class InteractiveImage(object):
     _callbacks = {}
 
     def __init__(
-        self, bokeh_plot, callback, delay=200, timeout=10000,
-        **kwargs
+        self, bokeh_plot, callback, delay=200, timeout=10000, **kwargs
     ):
         self.p = bokeh_plot
         self.callback = callback
