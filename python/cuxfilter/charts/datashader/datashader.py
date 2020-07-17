@@ -373,7 +373,7 @@ def heatmap(
     A cudashader heatmap (scatter object).
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
-    return plots.Scatter(
+    p = plots.Scatter(
         x,
         y,
         x_range,
@@ -396,6 +396,10 @@ def heatmap(
         legend_position=legend_position,
         **library_specific_params,
     )
+    # since it's built using the scatter api,
+    # changing the chart_type after the chart is created
+    p.chart_type = "heatmap"
+    return p
 
 
 def line(

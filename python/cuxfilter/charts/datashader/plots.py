@@ -134,7 +134,6 @@ class Scatter(BaseScatter):
         Description:
     """
 
-    chart_type: str = "scatter"
     reset_event = events.Reset
     data_y_axis = "y"
     data_x_axis = "x"

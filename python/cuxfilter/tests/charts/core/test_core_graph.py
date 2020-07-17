@@ -36,7 +36,7 @@ class TestCoreNonAggregateChart:
         assert bg.width == 800
         assert bg.height == 400
         assert bg.title == ""
-        assert bg.timeout == 1
+        assert bg.timeout == 100
 
         # test chart name setter
         bg.x = "test_x"

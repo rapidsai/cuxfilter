@@ -10,6 +10,7 @@ class BaseScatter(BaseNonAggregate):
 
     """
 
+    chart_type: str = "scatter"
     reset_event = None
     x_range: Tuple = None
     y_range: Tuple = None
