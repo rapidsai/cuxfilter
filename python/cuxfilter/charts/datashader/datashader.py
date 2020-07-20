@@ -87,6 +87,14 @@ def scatter(
         reported completion. Increase for very long running
         callbacks and if zooming feels laggy.
 
+    legend: bool, default True
+        Adds Bokeh.models.LinearColorMapper based legend if True,
+        Note: legend currently only works with pixel_shade_type='linear'/'log'
+
+    legend_position: str, default 'center'
+        position of legend on the chart.
+        Valid places are: ‘left’, ‘right’, ‘above’, ‘below’, ‘center’
+
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
         function
@@ -235,7 +243,8 @@ def graph(
         callbacks and if zooming feels laggy.
 
     legend: bool, default True
-        Adds Bokeh.models.LinearColorMapper based legend if True
+        Adds Bokeh.models.LinearColorMapper based legend if True,
+        Note: legend currently only works with pixel_shade_type='linear'/'log'
 
     legend_position: str, default 'center'
         position of legend on the chart.
@@ -358,7 +367,7 @@ def heatmap(
         callbacks and if zooming feels laggy.
 
     legend: bool, default True
-        Adds Bokeh.models.LinearColorMapper based legend if True
+        Adds Bokeh.models.LinearColorMapper based legend if True,
 
     legend_position: str, default 'center'
         position of legend on the chart.
@@ -538,7 +547,8 @@ def stacked_lines(
         callbacks and if zooming feels laggy.
 
     legend: bool, default True
-        Adds Bokeh.models.LinearColorMapper based legend if True
+        Adds Bokeh.models.LinearColorMapper based legend if True,
+        Note: legend currently only works with pixel_shade_type='linear'/'log'
 
     legend_position: str, default 'center'
         position of legend on the chart.
