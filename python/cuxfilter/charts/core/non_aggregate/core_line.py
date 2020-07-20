@@ -19,7 +19,7 @@ class BaseLine(BaseNonAggregate):
         y=None,
         data_points=100,
         add_interaction=True,
-        pixel_shade_type="linear",
+        pixel_shade_type="eq_hist",
         color=None,
         step_size=None,
         step_size_type=int,
