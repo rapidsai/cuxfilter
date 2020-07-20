@@ -176,6 +176,7 @@ class Scatter(BaseScatter):
             )
             if (update and self.legend_added) is False:
                 self.chart.add_layout(self.color_bar, self.legend_position)
+                self.legend_added = True
 
     def generate_InteractiveImage_callback(self):
         """
