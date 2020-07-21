@@ -46,9 +46,8 @@ Example
     import random
 
     cux_df = DataFrame.from_dataframe(cudf.DataFrame({'x': [float(random.randrange(-8239000,-8229000)) for i in range(100000)], 'y':[float(random.randrange(4960000, 4980000)) for i in range(100000)]}))
-
-    scatter_geo_chart = scatter_geo(x='x',
-                                        y='y')
+    # setting pixel_shade_type='log' to display legend (currently supports only log/linear)
+    scatter_geo_chart = scatter_geo(x='x',y='y', pixel_shade_type="log")
 
     d = cux_df.dashboard([scatter_geo_chart])
     scatter_geo_chart.view()
@@ -68,9 +67,8 @@ Example
     import random
 
     cux_df = DataFrame.from_dataframe(cudf.DataFrame({'x': [float(random.randrange(-8239000,-8229000)) for i in range(10000)], 'y':[float(random.randrange(4960000, 4980000)) for i in range(10000)]}))
-
-    scatter_chart = scatter(x='x',
-                                         y='y')
+    # setting pixel_shade_type='linear' to display legend (currently supports only log/linear)
+    scatter_chart = scatter(x='x',y='y', pixel_shade_type="linear")
 
     d = cux_df.dashboard([scatter_chart])
     scatter_chart.view()
