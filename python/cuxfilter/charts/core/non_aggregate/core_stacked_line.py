@@ -14,7 +14,6 @@ class BaseStackedLine(BaseChart):
         rendered instead of points on canvas
     """
 
-    chart_type = "stacked_lines"
     reset_event = None
     x_range: Tuple = None
     y_range: Tuple = None

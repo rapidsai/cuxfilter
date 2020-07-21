@@ -27,7 +27,6 @@ pn.config.raw_css += [css]
 
 
 class ViewDataFrame:
-    chart_type: str = "view_dataframe"
     _height: int = 0
     columns = None
     _width: int = 0

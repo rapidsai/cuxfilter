@@ -55,7 +55,7 @@ def scatter(
     point_shape: str, default 'circle'
         Available options: circle, square, rect_vertical, rect_horizontal.
 
-    pixel_shade_type: str, default 'linear'
+    pixel_shade_type: str, default 'eq_hist'
         The "how" parameter in datashader.transfer_functions.shade()
         function.
         Available options: eq_hist, linear, log, cbrt
@@ -104,7 +104,7 @@ def scatter(
     A cudashader scatter plot.
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
-    return plots.Scatter(
+    plot = plots.Scatter(
         x,
         y,
         x_range,
@@ -127,6 +127,9 @@ def scatter(
         legend_position=legend_position,
         **library_specific_params,
     )
+
+    plot.chart_type = "scatter"
+    return plot
 
 
 def graph(
@@ -210,7 +213,7 @@ def graph(
     node_point_shape: str, default 'circle'
         Available options: circle, square, rect_vertical, rect_horizontal.
 
-    node_pixel_shade_type: str, default 'linear'
+    node_pixel_shade_type: str, default 'eq_hist'
         The "how" parameter in datashader.transfer_functions.shade()
         function.
         Available options: eq_hist, linear, log, cbrt
@@ -259,7 +262,7 @@ def graph(
     A cudashader graph plot.
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
-    return plots.Graph(
+    plot = plots.Graph(
         node_x,
         node_y,
         node_id,
@@ -288,6 +291,9 @@ def graph(
         legend_position=legend_position,
         **library_specific_params,
     )
+
+    plot.chart_type = "graph"
+    return plot
 
 
 def heatmap(
@@ -382,7 +388,7 @@ def heatmap(
     A cudashader heatmap (scatter object).
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
-    p = plots.Scatter(
+    plot = plots.Scatter(
         x,
         y,
         x_range,
@@ -405,10 +411,8 @@ def heatmap(
         legend_position=legend_position,
         **library_specific_params,
     )
-    # since it's built using the scatter api,
-    # changing the chart_type after the chart is created
-    p.chart_type = "heatmap"
-    return p
+    plot.chart_type = "heatmap"
+    return plot
 
 
 def line(
@@ -416,7 +420,7 @@ def line(
     y,
     data_points=100,
     add_interaction=True,
-    pixel_shade_type="eq_hist",
+    pixel_shade_type="linear",
     color=None,
     step_size=None,
     step_size_type=int,
@@ -478,7 +482,7 @@ def line(
     A cudashader scatter plot.
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
-    return plots.Line(
+    plot = plots.Line(
         x,
         y,
         data_points,
@@ -493,6 +497,8 @@ def line(
         timeout,
         **library_specific_params,
     )
+    plot.chart_type = "non_aggregate_line"
+    return plot
 
 
 def stacked_lines(
@@ -566,7 +572,7 @@ def stacked_lines(
     """
     if type(y) is not list or len(y) == 0:
         raise ValueError("y must be a list of atleast one column name")
-    return plots.StackedLines(
+    plot = plots.StackedLines(
         x,
         y,
         data_points,
@@ -582,3 +588,5 @@ def stacked_lines(
         legend_position=legend_position,
         **library_specific_params,
     )
+    plot.chart_type = "stacked_lines"
+    return plot

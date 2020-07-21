@@ -8,7 +8,6 @@ from ....layouts import chart_view
 
 
 class BaseLine(BaseAggregateChart):
-    chart_type: str = "line"
     reset_event = None
     _datatile_loaded_state: bool = False
     filter_widget = None

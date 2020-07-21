@@ -14,7 +14,6 @@ class BaseGraph(BaseChart):
 
     """
 
-    chart_type: str = "graph"
     reset_event = None
     x_range: Tuple = None
     y_range: Tuple = None

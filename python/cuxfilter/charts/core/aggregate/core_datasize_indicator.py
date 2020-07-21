@@ -3,7 +3,6 @@ from ....layouts import chart_view
 
 
 class BaseDataSizeIndicator(BaseAggregateChart):
-    chart_type: str = "datasize_indicator"
     x: str = ""
     use_data_tiles = True
 
