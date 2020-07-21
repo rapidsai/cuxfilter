@@ -20,7 +20,6 @@ class TestNonAggregateBaseLine:
     def test_variables(self):
         bl = BaseLine(x="test_x", y="test_y", color="#8735fb")
         print(bl.color)
-        assert bl.chart_type == "line"
         assert bl.x == "test_x"
         assert bl.y == "test_y"
         assert bl.filter_widget is None
@@ -33,6 +32,7 @@ class TestNonAggregateBaseLine:
         assert bl.library_specific_params == {}
         assert bl.data_points == 100
         assert bl.add_interaction is True
+        assert bl.chart_type is None
 
     def test_initiate_chart(self):
         bl = BaseLine(x="key", y="val")
@@ -68,6 +68,7 @@ class TestNonAggregateBaseLine:
     )
     def test_compute_query_dict(self, range, query):
         bl = BaseLine(x="key", y="val")
+        bl.chart_type = "non_aggregate_line"
         bl.min_value = self.dashboard._cuxfilter_df.data[bl.x].min()
         bl.max_value = self.dashboard._cuxfilter_df.data[bl.x].max()
         bl.stride = 1
@@ -79,7 +80,9 @@ class TestNonAggregateBaseLine:
         # test the following function behavior
         bl.compute_query_dict(self.dashboard._query_str_dict)
 
-        assert self.dashboard._query_str_dict["key_line"] == query
+        assert (
+            self.dashboard._query_str_dict["key_non_aggregate_line"] == query
+        )
 
     @pytest.mark.parametrize(
         "event, result", [(None, None), (ButtonClick, "func_Called")]
