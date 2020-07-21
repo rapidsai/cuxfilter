@@ -98,7 +98,7 @@ def choropleth(
     -------
     A bokeh chart object of type 3dchoropleth
     """
-    return plots.Choropleth(
+    plot = plots.Choropleth(
         x,
         color_column,
         elevation_column,
@@ -119,3 +119,5 @@ def choropleth(
         nan_color,
         **library_specific_params,
     )
+    plot.chart_type = "choropleth"
+    return plot

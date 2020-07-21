@@ -6,8 +6,6 @@ from ....layouts import chart_view
 
 
 class BaseLine(BaseNonAggregate):
-
-    chart_type: str = "line"
     stride = 0.0
     reset_event = None
     filter_widget = None
@@ -26,7 +24,7 @@ class BaseLine(BaseNonAggregate):
         width=800,
         height=400,
         title="",
-        timeout=1,
+        timeout=100,
         **library_specific_params,
     ):
         """

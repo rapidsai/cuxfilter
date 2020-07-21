@@ -6,7 +6,6 @@ import dask_cudf
 
 
 class RangeSlider(BaseWidget):
-    chart_type: str = "widget_range_slider"
     _datatile_loaded_state: bool = False
     datatile_active_color = "#8ab4f7"
 
@@ -117,7 +116,6 @@ class RangeSlider(BaseWidget):
 
 
 class IntSlider(BaseWidget):
-    chart_type: str = "widget_int_slider"
     _datatile_loaded_state: bool = False
     value = None
     datatile_active_color = "#8ab4f7"
@@ -230,7 +228,6 @@ class IntSlider(BaseWidget):
 
 
 class FloatSlider(BaseWidget):
-    chart_type: str = "widget_float_slider"
     _datatile_loaded_state: bool = False
     value = None
     datatile_active_color = "#8ab4f7"
@@ -339,7 +336,6 @@ class FloatSlider(BaseWidget):
 
 
 class DropDown(BaseWidget):
-    chart_type: str = "widget_dropdown"
     value = None
 
     def initiate_chart(self, dashboard_cls):
@@ -456,7 +452,6 @@ class DropDown(BaseWidget):
 
 
 class MultiSelect(BaseWidget):
-    chart_type: str = "widget_multi_select"
     value = None
 
     def initiate_chart(self, dashboard_cls):

@@ -6,7 +6,7 @@ import cuxfilter
 from cuxfilter.charts.core.aggregate.core_datasize_indicator import (
     BaseDataSizeIndicator,
 )
-from cuxfilter.charts.core.aggregate.core_aggregate_bar import BaseBar
+from cuxfilter.charts import bar
 from cuxfilter.layouts import chart_view
 
 
@@ -21,12 +21,11 @@ class TestBaseDataSizeIndicator:
         bdsi = BaseDataSizeIndicator()
 
         # BaseChart variables
-        assert bdsi.chart_type == "datasize_indicator"
         assert bdsi.x == ""
         assert bdsi.height == 400
         assert bdsi.width == 400
         assert bdsi._library_specific_params == {}
-        assert bdsi.name == "_datasize_indicator"
+        assert bdsi.chart_type is None
         assert bdsi.use_data_tiles is True
 
     def test_initiate_chart(self):
@@ -67,7 +66,7 @@ class TestBaseDataSizeIndicator:
     )
     def test_query_chart_by_range(self, query_tuple, result):
         dashboard = self.cux_df.dashboard(charts=[])
-        active_chart = BaseBar(x="key")
+        active_chart = bar(x="key")
         active_chart.stride = 1
         active_chart.min_value = 0
         bdsi = dashboard._charts["_datasize_indicator"]
@@ -89,7 +88,7 @@ class TestBaseDataSizeIndicator:
     def test_query_chart_by_indices(
         self, old_indices, new_indices, prev_value, result
     ):
-        active_chart = BaseBar(x="key")
+        active_chart = bar(x="key")
         active_chart.stride = 1
         active_chart.min_value = 0
         self.result = ""

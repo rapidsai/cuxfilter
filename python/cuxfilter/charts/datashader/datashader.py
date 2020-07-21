@@ -2,121 +2,6 @@ from . import plots
 from ..constants import CUXF_DEFAULT_COLOR_PALETTE
 
 
-def scatter_geo(
-    x,
-    y=None,
-    x_range=None,
-    y_range=None,
-    add_interaction=True,
-    color_palette=CUXF_DEFAULT_COLOR_PALETTE,
-    aggregate_col=None,
-    aggregate_fn="count",
-    point_size=1,
-    point_shape="circle",
-    pixel_shade_type="eq_hist",
-    pixel_density=0.5,
-    pixel_spread="dynspread",
-    width=800,
-    height=400,
-    tile_provider="CARTODBPOSITRON",
-    title="",
-    timeout=1,
-    **library_specific_params,
-):
-    """
-    Parameters
-    ----------
-
-    x: str
-        x-axis column name from the gpu dataframe
-    y: str, default None
-        y-axis column name from the gpu dataframe
-    x_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].max())
-        (min, max) x-dimensions of the geo-scatter plot to be displayed
-    y_range: tuple, default(gpu_dataframe[x].min(), gpu_dataframe[x].max())
-        (min, max) x-dimensions of the geo-scatter plot to be displayed
-
-    add_interaction: {True, False},  default True
-
-    color_palette: bokeh.palettes or list of hex_color_codes, or list of color
-                    names,  default CUXF_DEFAULT_COLOR_PALETTE(Viridis10)
-
-    aggregate_col: str, default None
-        Column from the gpu dataframe on which the aggregate_fn will be run on,
-        if None, aggregate_fn is run on y-column.
-
-    aggregate_fn: {'count', 'mean', 'max', 'min'},  default 'count'
-
-    point_size: int, default 1
-        Point size in the scatter plot.
-
-    point_shape: str, default 'circle'
-        Available options: circle, square, rect_vertical, rect_horizontal.
-
-    pixel_shade_type: str, default 'eq_hist'
-        The "how" parameter in datashader.transfer_functions.shade()
-        function.
-        Available options: eq_hist, linear, log, cbrt
-
-    pixel_density: float, default 0.5
-        A tuning parameter in [0, 1], with higher values giving more dense
-        scatter plot.
-
-    pixel_spread: str, default 'dynspread'
-        dynspread: Spread pixels in an image dynamically based on the image
-        density.
-        spread: Spread pixels in an image.
-
-    width: int,  default 800
-
-    height: int,  default 400
-
-    tile_provider: str, default 'CARTODBPOSITRON'
-        Underlying map type.See
-        https://docs.bokeh.org/en/latest/docs/reference/tile_providers.html
-
-    title: str,
-
-        chart title
-
-    timeout: int
-        Determines the timeout after which the callback will
-        process new events without the previous one having
-        reported completion. Increase for very long running
-        callbacks and if zooming feels laggy.
-
-    **library_specific_params:
-        additional library specific keyword arguments to be passed to the
-        function
-
-    Returns
-    -------
-    A cudashader geo-scatter plot.
-    Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
-    """
-    return plots.ScatterGeo(
-        x,
-        y,
-        x_range,
-        y_range,
-        add_interaction,
-        color_palette,
-        aggregate_col,
-        aggregate_fn,
-        point_size,
-        point_shape,
-        pixel_shade_type,
-        pixel_density,
-        pixel_spread,
-        width,
-        height,
-        tile_provider,
-        title,
-        timeout,
-        **library_specific_params,
-    )
-
-
 def scatter(
     x,
     y,
@@ -131,10 +16,13 @@ def scatter(
     pixel_shade_type="eq_hist",
     pixel_density=0.5,
     pixel_spread="dynspread",
+    tile_provider=None,
     width=800,
     height=400,
     title="",
-    timeout=1,
+    timeout=100,
+    legend=True,
+    legend_position="center",
     **library_specific_params,
 ):
     """
@@ -181,6 +69,10 @@ def scatter(
         density.
         spread: Spread pixels in an image.
 
+    tile_provider: str, default None
+        Underlying map type.See
+        https://docs.bokeh.org/en/latest/docs/reference/tile_providers.htm
+
     width: int,  default 800
 
     height: int,  default 400
@@ -189,11 +81,19 @@ def scatter(
 
         chart title
 
-    timeout: int
+    timeout: int (milliseconds), default 100
         Determines the timeout after which the callback will
         process new events without the previous one having
         reported completion. Increase for very long running
         callbacks and if zooming feels laggy.
+
+    legend: bool, default True
+        Adds Bokeh.models.LinearColorMapper based legend if True,
+        Note: legend currently only works with pixel_shade_type='linear'/'log'
+
+    legend_position: str, default 'center'
+        position of legend on the chart.
+        Valid places are: ‘left’, ‘right’, ‘above’, ‘below’, ‘center’
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
@@ -204,7 +104,7 @@ def scatter(
     A cudashader scatter plot.
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
-    return plots.Scatter(
+    plot = plots.Scatter(
         x,
         y,
         x_range,
@@ -220,10 +120,16 @@ def scatter(
         pixel_spread,
         width,
         height,
-        title,
-        timeout,
+        tile_provider=tile_provider,
+        title=title,
+        timeout=timeout,
+        legend=legend,
+        legend_position=legend_position,
         **library_specific_params,
     )
+
+    plot.chart_type = "scatter"
+    return plot
 
 
 def graph(
@@ -250,7 +156,9 @@ def graph(
     width=800,
     height=400,
     title="",
-    timeout=1,
+    timeout=100,
+    legend=True,
+    legend_position="center",
     **library_specific_params,
 ):
 
@@ -331,11 +239,19 @@ def graph(
 
         chart title
 
-    timeout: int
+    timeout: int (milliseconds), default 100
         Determines the timeout after which the callback will
         process new events without the previous one having
         reported completion. Increase for very long running
         callbacks and if zooming feels laggy.
+
+    legend: bool, default True
+        Adds Bokeh.models.LinearColorMapper based legend if True,
+        Note: legend currently only works with pixel_shade_type='linear'/'log'
+
+    legend_position: str, default 'center'
+        position of legend on the chart.
+        Valid places are: ‘left’, ‘right’, ‘above’, ‘below’, ‘center’
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
@@ -346,7 +262,7 @@ def graph(
     A cudashader graph plot.
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
-    return plots.Graph(
+    plot = plots.Graph(
         node_x,
         node_y,
         node_id,
@@ -371,8 +287,13 @@ def graph(
         height,
         title,
         timeout,
+        legend=legend,
+        legend_position=legend_position,
         **library_specific_params,
     )
+
+    plot.chart_type = "graph"
+    return plot
 
 
 def heatmap(
@@ -389,7 +310,9 @@ def heatmap(
     width=800,
     height=400,
     title="",
-    timeout=1,
+    timeout=100,
+    legend=True,
+    legend_position="center",
     **library_specific_params,
 ):
     """
@@ -443,11 +366,18 @@ def heatmap(
 
         chart title
 
-    timeout: int
+    timeout: int (milliseconds), default 100
         Determines the timeout after which the callback will
         process new events without the previous one having
         reported completion. Increase for very long running
         callbacks and if zooming feels laggy.
+
+    legend: bool, default True
+        Adds Bokeh.models.LinearColorMapper based legend if True,
+
+    legend_position: str, default 'center'
+        position of legend on the chart.
+        Valid places are: ‘left’, ‘right’, ‘above’, ‘below’, ‘center’
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
@@ -458,7 +388,7 @@ def heatmap(
     A cudashader heatmap (scatter object).
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
-    return plots.Scatter(
+    plot = plots.Scatter(
         x,
         y,
         x_range,
@@ -474,10 +404,15 @@ def heatmap(
         "spread",
         width,
         height,
-        title,
-        timeout,
+        tile_provider=None,
+        title=title,
+        timeout=timeout,
+        legend=legend,
+        legend_position=legend_position,
         **library_specific_params,
     )
+    plot.chart_type = "heatmap"
+    return plot
 
 
 def line(
@@ -492,7 +427,7 @@ def line(
     width=800,
     height=400,
     title="",
-    timeout=1,
+    timeout=100,
     **library_specific_params,
 ):
     """
@@ -532,7 +467,7 @@ def line(
 
         chart title
 
-    timeout: int
+    timeout: int (milliseconds), default 100
         Determines the timeout after which the callback will
         process new events without the previous one having
         reported completion. Increase for very long running
@@ -547,7 +482,7 @@ def line(
     A cudashader scatter plot.
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
-    return plots.Line(
+    plot = plots.Line(
         x,
         y,
         data_points,
@@ -562,6 +497,8 @@ def line(
         timeout,
         **library_specific_params,
     )
+    plot.chart_type = "non_aggregate_line"
+    return plot
 
 
 def stacked_lines(
@@ -575,7 +512,9 @@ def stacked_lines(
     width=800,
     height=400,
     title="",
-    timeout=1,
+    timeout=100,
+    legend=True,
+    legend_position="center",
     **library_specific_params,
 ):
     """
@@ -607,11 +546,20 @@ def stacked_lines(
 
         chart title
 
-    timeout: int
+    timeout: int (milliseconds), default 100
         Determines the timeout after which the callback will
         process new events without the previous one having
         reported completion. Increase for very long running
         callbacks and if zooming feels laggy.
+
+    legend: bool, default True
+        Adds Bokeh.models.LinearColorMapper based legend if True,
+        Note: legend currently only works with pixel_shade_type='linear'/'log'
+
+    legend_position: str, default 'center'
+        position of legend on the chart.
+        Valid places are: ‘left’, ‘right’, ‘above’, ‘below’, ‘center’
+
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
@@ -624,7 +572,7 @@ def stacked_lines(
     """
     if type(y) is not list or len(y) == 0:
         raise ValueError("y must be a list of atleast one column name")
-    return plots.StackedLines(
+    plot = plots.StackedLines(
         x,
         y,
         data_points,
@@ -636,5 +584,9 @@ def stacked_lines(
         height,
         title,
         timeout,
+        legend=legend,
+        legend_position=legend_position,
         **library_specific_params,
     )
+    plot.chart_type = "stacked_lines"
+    return plot

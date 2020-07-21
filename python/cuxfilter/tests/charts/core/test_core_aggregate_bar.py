@@ -19,7 +19,7 @@ class TestBaseBar:
     def test_variables(self):
         bb = BaseBar(x="test_x")
 
-        assert bb.chart_type == "bar"
+        assert bb.chart_type is None
         assert bb.reset_event is None
         assert bb._datatile_loaded_state is False
         assert bb.filter_widget is None
@@ -86,6 +86,7 @@ class TestBaseBar:
 
     def test_add_range_slider_filter(self):
         bb = BaseBar(x="key")
+        bb.chart_type = "bar"
         self.dashboard.add_charts([bb])
         assert type(bb.filter_widget) == pn.widgets.RangeSlider
         assert bb.filter_widget.value == (0, 4)
@@ -95,6 +96,7 @@ class TestBaseBar:
     )
     def test_compute_query_dict(self, range, query):
         bb = BaseBar(x="key")
+        bb.chart_type = "bar"
         self.dashboard.add_charts([bb])
         bb.filter_widget.value = range
         # test the following function behavior

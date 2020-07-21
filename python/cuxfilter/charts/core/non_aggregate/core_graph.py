@@ -14,7 +14,6 @@ class BaseGraph(BaseChart):
 
     """
 
-    chart_type: str = "graph"
     reset_event = None
     x_range: Tuple = None
     y_range: Tuple = None
@@ -45,7 +44,9 @@ class BaseGraph(BaseChart):
         width=800,
         height=400,
         title="",
-        timeout=1,
+        timeout=100,
+        legend=True,
+        legend_position="center",
         **library_specific_params,
     ):
         """
@@ -77,6 +78,8 @@ class BaseGraph(BaseChart):
             height
             title
             timeout
+            legend
+            legend_position
             **library_specific_params
         -------------------------------------------
 
@@ -112,6 +115,8 @@ class BaseGraph(BaseChart):
         self.height = height
         self.title = title
         self.timeout = timeout
+        self.legend = legend
+        self.legend_position = legend_position
         self.library_specific_params = library_specific_params
 
     def initiate_chart(self, dashboard_cls):
