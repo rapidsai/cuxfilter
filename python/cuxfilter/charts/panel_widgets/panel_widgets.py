@@ -45,9 +45,11 @@ def range_slider(
 
 
     """
-    return RangeSlider(
+    plot = RangeSlider(
         x, width, height, data_points, step_size, step_size_type, **params
     )
+    plot.chart_type = "widget_range_slider"
+    return plot
 
 
 def int_slider(
@@ -79,9 +81,11 @@ def int_slider(
 
 
     """
-    return IntSlider(
+    plot = IntSlider(
         x, width, height, data_points, step_size, step_size_type=int, **params
     )
+    plot.chart_type = "widget_int_slider"
+    return plot
 
 
 def float_slider(
@@ -113,7 +117,7 @@ def float_slider(
 
 
     """
-    return FloatSlider(
+    plot = FloatSlider(
         x,
         width,
         height,
@@ -122,6 +126,8 @@ def float_slider(
         step_size_type=float,
         **params,
     )
+    plot.chart_type = "widget_float_slider"
+    return plot
 
 
 def drop_down(x, width=400, height=50, **params):
@@ -148,7 +154,9 @@ def drop_down(x, width=400, height=50, **params):
         documentation for more info
 
     """
-    return DropDown(x, width, height, **params)
+    plot = DropDown(x, width, height, **params)
+    plot.chart_type = "widget_dropdown"
+    return plot
 
 
 def multi_select(x, width=400, height=200, **params):
@@ -175,7 +183,9 @@ def multi_select(x, width=400, height=200, **params):
         documentation for more info
 
     """
-    return MultiSelect(x, width, height, **params)
+    plot = MultiSelect(x, width, height, **params)
+    plot.chart_type = "widget_multi_select"
+    return plot
 
 
 def data_size_indicator(width=400, height=50, **library_specific_params):
@@ -197,4 +207,6 @@ def data_size_indicator(width=400, height=50, **library_specific_params):
         documentation for more info
 
     """
-    return DataSizeIndicator(width, height, **library_specific_params)
+    plot = DataSizeIndicator(width, height, **library_specific_params)
+    plot.chart_type = "datasize_indicator"
+    return plot

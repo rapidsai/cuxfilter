@@ -8,8 +8,6 @@ from ....layouts import chart_view
 
 
 class BaseBar(BaseAggregateChart):
-
-    chart_type: str = "bar"
     reset_event = None
     _datatile_loaded_state: bool = False
     filter_widget = None

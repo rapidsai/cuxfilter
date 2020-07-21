@@ -1,6 +1,8 @@
 # cuXfilter 0.15.0 (Date TBD)
 
 ## New Features
+- PR #164 Added new Graph api, supports (nodes[cuDF], edges[cuDF]) input
+- PR #168 Added legends to non_aggregate charts
 
 ## Improvements
 - PR #158 Add docs build script
@@ -8,7 +10,7 @@
 - PR #160 Install dependencies via meta packages
 - PR #162 Dashboard and templates cleanup and tests
 - PR #163 Updated Bokeh version to 2.1.1, added pydeck support
-- PR #164 Added new Graph api, supports (nodes[cuDF], edges[cuDF]) input
+- PR #168 Replaced interactive datashader callback throttling to debouncing
 
 ## Bug Fixes
 - PR #161 fixed layouts bugs

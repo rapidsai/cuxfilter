@@ -19,7 +19,6 @@ class TestBaseStackedLine:
         bsl = BaseStackedLine(x="key", y=["val"])
 
         # BaseChart variables
-        assert bsl.chart_type == "stacked_lines"
         assert bsl.x == "key"
         assert bsl.y == ["val"]
         assert bsl.data_points == 100
@@ -34,8 +33,7 @@ class TestBaseStackedLine:
         assert bsl.source_backup is None
         assert bsl.min_value == 0.0
         assert bsl.max_value == 0.0
-        assert bsl.name == "key_stacked_lines"
-
+        assert bsl.chart_type is None
         # BaseStackedLineChart variables
         assert bsl.use_data_tiles is False
         assert bsl.reset_event is None
@@ -90,6 +88,7 @@ class TestBaseStackedLine:
 
     def test_selection_callback(self):
         bsl = BaseStackedLine("key", ["val"])
+        bsl.chart_type = "stacked_lines"
         self.dashboard._active_view = bsl.name
         t = bsl.get_selection_geometry_callback(self.dashboard)
         t(xmin=1, xmax=2, ymin=3, ymax=4)
@@ -105,6 +104,7 @@ class TestBaseStackedLine:
     )
     def test_compute_query_dict(self, x_range, y_range, query):
         bsl = BaseStackedLine("a", ["b"])
+        bsl.chart_type = "stacked_lines"
         bsl.x_range = x_range
         bsl.y_range = y_range
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
@@ -149,6 +149,7 @@ class TestBaseStackedLine:
 
     def test_add_reset_event(self):
         bsl = BaseStackedLine("a", ["b"])
+        bsl.chart_type = "stacked_lines"
         bsl.x_range = (0, 2)
         bsl.y_range = (3, 5)
 

@@ -8,7 +8,7 @@ from cuxfilter.layouts import chart_view
 from cuxfilter.charts import constants
 
 
-class TestCoreNonAggregateChart:
+class TestCoreGraph:
     def test_variables(self):
         bg = BaseGraph()
 
@@ -36,13 +36,8 @@ class TestCoreNonAggregateChart:
         assert bg.width == 800
         assert bg.height == 400
         assert bg.title == ""
-        assert bg.timeout == 1
-
-        # test chart name setter
-        bg.x = "test_x"
-        bg.chart_type = "test_chart_type"
-
-        assert bg.name == "test_x_test_chart_type"
+        assert bg.timeout == 100
+        assert bg.chart_type is None
         assert bg.use_data_tiles is False
         assert bg.reset_event is None
 

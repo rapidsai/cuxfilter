@@ -19,7 +19,7 @@ class TestBaseLine:
     def test_variables(self):
         bl = BaseLine(x="test_x")
 
-        assert bl.chart_type == "line"
+        assert bl.chart_type is None
         assert bl.reset_event is None
         assert bl._datatile_loaded_state is False
         assert bl.filter_widget is None
@@ -85,6 +85,7 @@ class TestBaseLine:
 
     def test_add_range_slider_filter(self):
         bl = BaseLine(x="key")
+        bl.chart_type = "line"
         self.dashboard.add_charts([bl])
         bl.add_range_slider_filter(self.dashboard)
 
@@ -96,6 +97,7 @@ class TestBaseLine:
     )
     def test_compute_query_dict(self, range, query):
         bl = BaseLine(x="key")
+        bl.chart_type = "line"
         self.dashboard.add_charts([bl])
         bl.filter_widget.value = range
         # test the following function behavior

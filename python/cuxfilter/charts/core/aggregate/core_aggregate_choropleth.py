@@ -13,8 +13,6 @@ np.seterr(divide="ignore", invalid="ignore")
 
 
 class BaseChoropleth(BaseChart):
-
-    chart_type: str = "choropleth"
     reset_event = None
     _datatile_loaded_state: bool = False
     geo_mapper: Dict[str, str] = {}

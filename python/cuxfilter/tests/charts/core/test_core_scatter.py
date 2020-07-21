@@ -9,7 +9,7 @@ class TestBaseScatter:
     def test_variables(self):
         bs = BaseScatter(x="test_x", y="test_y", aggregate_col="test_agg_col")
 
-        assert bs.chart_type == "scatter"
+        assert bs.chart_type is None
         assert bs.x == "test_x"
         assert bs.y == "test_y"
         assert bs.reset_event is None

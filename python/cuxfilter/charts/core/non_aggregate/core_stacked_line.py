@@ -14,7 +14,6 @@ class BaseStackedLine(BaseChart):
         rendered instead of points on canvas
     """
 
-    chart_type = "stacked_lines"
     reset_event = None
     x_range: Tuple = None
     y_range: Tuple = None
@@ -34,7 +33,9 @@ class BaseStackedLine(BaseChart):
         width=800,
         height=400,
         title="",
-        timeout=1,
+        timeout=100,
+        legend=True,
+        legend_position="center",
         **library_specific_params,
     ):
         """
@@ -53,6 +54,8 @@ class BaseStackedLine(BaseChart):
             height
             title
             timeout
+            legend
+            legend_position
             **library_specific_params
         -------------------------------------------
 
@@ -74,9 +77,9 @@ class BaseStackedLine(BaseChart):
         self.stride_type = step_size_type
         self.title = title
         self.timeout = timeout
-
+        self.legend = legend
+        self.legend_position = legend_position
         self.library_specific_params = library_specific_params
-
         self.width = width
         self.height = height
 
