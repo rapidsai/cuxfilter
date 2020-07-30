@@ -8,49 +8,60 @@ from math import ceil
 maxThreadsPerBlock = cuda.get_current_device().MAX_THREADS_PER_BLOCK
 
 
-def bundle_edges(edges, src='src', dst='dst'):
+def bundle_edges(edges, src="src", dst="dst"):
     # Create a duplicate table with:
     # * all the [src, dst] in the upper half
     # * all the [dst, src] pairs as the lower half, but flipped so dst->src,
     # src->dst
-    edges['eid'] = edges.index
-    edges_duplicated = cudf.DataFrame({
-        'eid': cudf.concat([edges['eid'], edges['eid']]),
-        # concat [src, dst] into the 'src' column
-        src: cudf.concat([edges[src], edges[dst]]),
-        # concat [dst, src] into the dst column
-        dst: cudf.concat([edges[dst], edges[src]])
-    })
+    edges["eid"] = edges.index
+    edges_duplicated = cudf.DataFrame(
+        {
+            "eid": cudf.concat([edges["eid"], edges["eid"]]),
+            # concat [src, dst] into the 'src' column
+            src: cudf.concat([edges[src], edges[dst]]),
+            # concat [dst, src] into the dst column
+            dst: cudf.concat([edges[dst], edges[src]]),
+        }
+    )
     # Group the duplicated edgelist by [src, dst] and get the min edge id.
     # Since all the [dst, src] pairs have been flipped to [src, dst], each
     # edge with the same [src, dst] or [dst, src] vertices will be assigned
     # the same bundle id
-    bundles = edges_duplicated \
-        .groupby([src, dst]).agg({'eid': 'min'}) \
-        .reset_index().rename(columns={'eid': 'bid'}, copy=False)
+    bundles = (
+        edges_duplicated.groupby([src, dst])
+        .agg({"eid": "min"})
+        .reset_index()
+        .rename(columns={"eid": "bid"}, copy=False)
+    )
 
     # Join the bundle ids into the edgelist
-    edges = edges.merge(bundles, on=[src, dst], how='inner')
+    edges = edges.merge(bundles, on=[src, dst], how="inner")
     # Determine each bundle's size and relative offset
-    bundles = edges['bid'].sort_values()
+    bundles = edges["bid"].sort_values()
     lengths = bundles.value_counts(sort=False)
     offsets = lengths.cumsum() - lengths
     # Join the bundle segment lengths + offsets into the edgelist
-    edges = edges.merge(cudf.DataFrame({
-        'start': offsets.reset_index(drop=True),
-        'count': lengths.reset_index(drop=True),
-        'bid': bundles.unique().reset_index(drop=True),
-    }), on='bid', how='left')
+    edges = edges.merge(
+        cudf.DataFrame(
+            {
+                "start": offsets.reset_index(drop=True),
+                "count": lengths.reset_index(drop=True),
+                "bid": bundles.unique().reset_index(drop=True),
+            }
+        ),
+        on="bid",
+        how="left",
+    )
 
     # Determine each edge's index relative to its bundle
-    edges = edges.sort_values(by='bid').reset_index(drop=True)
-    edges['_index'] = (
-        cudf.core.index.RangeIndex(0, len(edges)) - edges['start']
-    ).astype('int32')
+    edges = edges.sort_values(by="bid").reset_index(drop=True)
+    edges["_index"] = (
+        cudf.core.index.RangeIndex(0, len(edges)) - edges["start"]
+    ).astype("int32")
 
     # Re-sort the edgelist by edge id and cleanup
-    edges = edges.sort_values('eid').reset_index(drop=True)
-    edges = edges.rename(columns={'eid': 'id'}, copy=False)
+    edges = edges.sort_values("eid").reset_index(drop=True)
+    edges = edges.rename(columns={"eid": "id"}, copy=False)
     return edges
 
 
@@ -58,9 +69,9 @@ def bundle_edges(edges, src='src', dst='dst'):
 def bezier(start, end, control_point, steps, result):
     for i in range(steps.shape[0]):
         result[i] = (
-            start*(1-steps[i])**2
-            +
-            2*(1-steps[i])*steps[i]*control_point+end*steps[i]**2
+            start * (1 - steps[i]) ** 2
+            + 2 * (1 - steps[i]) * steps[i] * control_point
+            + end * steps[i] ** 2
         )
 
 
@@ -86,12 +97,20 @@ def compute_curves(nodes, control_points, result, steps):
         bezier(v1_y, v2_y, control_points[i, 1], steps, result[i, 1])
         result[i, 1, -1] = np.nan
         if nodes.shape[1] == 5:
-            add_aggregate_col(nodes[i, 4], steps, result[i,2])
+            add_aggregate_col(nodes[i, 4], steps, result[i, 2])
 
 
 def control_point_compute_kernel(
-    x_src, y_src, count, _index, x_dst, y_dst, ctrl_point_x, ctrl_point_y,
-    curvature, MAX_BUNDLE_SIZE
+    x_src,
+    y_src,
+    count,
+    _index,
+    x_dst,
+    y_dst,
+    ctrl_point_x,
+    ctrl_point_y,
+    curvature,
+    MAX_BUNDLE_SIZE,
 ):
     """
     GPU kernel to compute control points for each edge
@@ -100,49 +119,47 @@ def control_point_compute_kernel(
         midp_x = (x_src[i] + x_dst[i]) * 0.5
         midp_y = (y_src[i] + y_dst[i]) * 0.5
 
-        if idx > MAX_BUNDLE_SIZE-1:
+        if idx > MAX_BUNDLE_SIZE - 1:
             delta_x = 0
             delta_y = 0
             ctrl_point_x[i] = midp_x
             ctrl_point_y[i] = midp_y
         else:
             if x_dst[i] - x_src[i] == 0:
-                delta_x = (midp_x)*idx/(count_)
+                delta_x = (midp_x) * idx / (count_)
                 delta_y = 0
             elif y_dst[i] - y_src[i] == 0:
-                delta_y = (midp_y)*idx/(count_)
+                delta_y = (midp_y) * idx / (count_)
                 delta_x = 0
             else:
-                perpendicular_slope = -1/(
-                    (y_dst[i] - y_src[i])/(x_dst[i] - x_src[i])
+                perpendicular_slope = -1 / (
+                    (y_dst[i] - y_src[i]) / (x_dst[i] - x_src[i])
                 )
-                delta_x = (x_dst[i] - midp_x)*idx/(count_*2)
-                delta_y = perpendicular_slope*delta_x
+                delta_x = (x_dst[i] - midp_x) * idx / (count_ * 2)
+                delta_y = perpendicular_slope * delta_x
             direction = 1
             if idx % 2 == 0:
                 direction *= -1
                 if idx != 0:
                     idx -= 1
                 ctrl_point_x[i] = min(
-                    x_dst[i], midp_x + delta_x*direction*curvature
+                    x_dst[i], midp_x + delta_x * direction * curvature
                 )
                 ctrl_point_y[i] = min(
-                    y_dst[i], midp_y + delta_y*direction*curvature
+                    y_dst[i], midp_y + delta_y * direction * curvature
                 )
 
             else:
                 ctrl_point_x[i] = max(
-                    x_src[i], midp_x + delta_x*direction*curvature
+                    x_src[i], midp_x + delta_x * direction * curvature
                 )
                 ctrl_point_y[i] = max(
-                    y_src[i], midp_y + delta_y*direction*curvature
+                    y_src[i], midp_y + delta_y * direction * curvature
                 )
 
 
 def curved_connect_edges(
-    edges, edge_source, edge_target,
-    connected_edge_columns,
-    curve_params
+    edges, edge_source, edge_target, connected_edge_columns, curve_params
 ):
     """
         edges: cudf DataFrame(x_src, y_src, x_dst, y_dst)
@@ -159,9 +176,9 @@ def curved_connect_edges(
     # if aggregate column exists, ignore it for bundled edges compute
     fin_df_ = bundled_edges.apply_rows(
         control_point_compute_kernel,
-        incols=connected_edge_columns[:4]+['count', '_index'],
+        incols=connected_edge_columns[:4] + ["count", "_index"],
         outcols=dict(ctrl_point_x=np.float32, ctrl_point_y=np.float32),
-        kwargs=curve_params
+        kwargs=curve_params,
     )
 
     shape = (fin_df_.shape[0], len(connected_edge_columns) - 2, 101)
@@ -171,20 +188,23 @@ def curved_connect_edges(
     bpg = int(ceil(edges.shape[0] / maxThreadsPerBlock))
     compute_curves[bpg, maxThreadsPerBlock](
         fin_df_[connected_edge_columns].to_gpu_matrix(),
-        fin_df_[['ctrl_point_x', 'ctrl_point_y']].to_gpu_matrix(),
-        result, steps)
+        fin_df_[["ctrl_point_x", "ctrl_point_y"]].to_gpu_matrix(),
+        result,
+        steps,
+    )
 
     if len(connected_edge_columns) == 5:
-        return cudf.DataFrame({
-            'x': result[:, 0].flatten(),
-            'y': result[:, 1].flatten(),
-            connected_edge_columns[-1]: result[:, 2].flatten()
-        }).fillna(np.nan)
+        return cudf.DataFrame(
+            {
+                "x": result[:, 0].flatten(),
+                "y": result[:, 1].flatten(),
+                connected_edge_columns[-1]: result[:, 2].flatten(),
+            }
+        ).fillna(np.nan)
     else:
-        return cudf.DataFrame({
-            'x': result[:, 0].flatten(),
-            'y': result[:, 1].flatten(),
-        }).fillna(np.nan)
+        return cudf.DataFrame(
+            {"x": result[:, 0].flatten(), "y": result[:, 1].flatten()}
+        ).fillna(np.nan)
 
 
 @cuda.jit
@@ -218,27 +238,32 @@ def directly_connect_edges(edges):
         shape=(edges.shape[0], edges.shape[1] - 2, 3), dtype=cp.float32
     )
     bpg = int(ceil(edges.shape[0] / maxThreadsPerBlock))
-    connect_edges[bpg, maxThreadsPerBlock](
-        edges.to_gpu_matrix(), result
-    )
+    connect_edges[bpg, maxThreadsPerBlock](edges.to_gpu_matrix(), result)
     if edges.shape[1] == 5:
-        return cudf.DataFrame({
-            'x': result[:, 0].flatten(),
-            'y': result[:, 1].flatten(),
-            edges.columns[-1]: result[:, 2].flatten()
-        }).fillna(np.nan)
+        return cudf.DataFrame(
+            {
+                "x": result[:, 0].flatten(),
+                "y": result[:, 1].flatten(),
+                edges.columns[-1]: result[:, 2].flatten(),
+            }
+        ).fillna(np.nan)
     else:
-        return cudf.DataFrame({
-            'x': result[:, 0].flatten(),
-            'y': result[:, 1].flatten(),
-        }).fillna(np.nan)
+        return cudf.DataFrame(
+            {"x": result[:, 0].flatten(), "y": result[:, 1].flatten()}
+        ).fillna(np.nan)
 
 
 def calc_connected_edges(
-    nodes, edges,
-    node_x, node_y, node_id,
-    edge_source, edge_target, edge_aggregate_col,
-    edge_render_type="direct", curve_params=None
+    nodes,
+    edges,
+    node_x,
+    node_y,
+    node_id,
+    edge_source,
+    edge_target,
+    edge_aggregate_col,
+    edge_render_type="direct",
+    curve_params=None,
 ):
     """
         calculate directly connected edges
@@ -247,24 +272,28 @@ def calc_connected_edges(
         edge_type: direct/curved
     """
     edges_columns = [
-        edge_source, edge_target, edge_aggregate_col, node_x, node_y
+        edge_source,
+        edge_target,
+        edge_aggregate_col,
+        node_x,
+        node_y,
     ]
 
     connected_edge_columns = [
-        node_x+"_src", node_y+"_src",
-        node_x+"_dst", node_y+"_dst",
-        edge_aggregate_col
+        node_x + "_src",
+        node_y + "_src",
+        node_x + "_dst",
+        node_y + "_dst",
+        edge_aggregate_col,
     ]
     # removing edge_aggregate_col if its None
     if edge_aggregate_col is None:
         edges_columns.remove(None)
         connected_edge_columns.remove(None)
 
-    connected_edges_df = (
-        edges.merge(nodes, left_on=edge_source, right_on=node_id)
-        [edges_columns]
-        .reset_index(drop=True)
-    )
+    connected_edges_df = edges.merge(
+        nodes, left_on=edge_source, right_on=node_id
+    )[edges_columns].reset_index(drop=True)
 
     connected_edges_df = connected_edges_df.merge(
         nodes, left_on=edge_target, right_on=node_id, suffixes=("_src", "_dst")
@@ -277,13 +306,14 @@ def calc_connected_edges(
     elif edge_render_type == "curved":
         result = curved_connect_edges(
             connected_edges_df,
-            edge_source, edge_target,
+            edge_source,
+            edge_target,
             connected_edge_columns,
-            curve_params
+            curve_params,
         )
 
     if result.shape[0] == 0:
-        result = cudf.DataFrame({k: np.nan for k in ['x', 'y']})
+        result = cudf.DataFrame({k: np.nan for k in ["x", "y"]})
         if edge_aggregate_col is not None:
             result[edge_aggregate_col] = np.nan
     return result

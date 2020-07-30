@@ -6,7 +6,9 @@ from ..core.non_aggregate import (
 )
 from ..constants import BOKEH_POINT_RENDERING_THRESHOLD
 from .custom_extensions import (
-    InteractiveImage, CustomInspectTool, calc_connected_edges
+    InteractiveImage,
+    CustomInspectTool,
+    calc_connected_edges,
 )
 from distutils.version import LooseVersion
 
@@ -467,9 +469,11 @@ class Graph(BaseGraph):
         """
         return if legend=True and pixel_shade_type is ['linear', 'log']
         """
-        return self.legend and (
-            self.node_pixel_shade_type in list(_color_mapper.keys())
-        ) and self.nodes.shape[0] > BOKEH_POINT_RENDERING_THRESHOLD
+        return (
+            self.legend
+            and (self.node_pixel_shade_type in list(_color_mapper.keys()))
+            and self.nodes.shape[0] > BOKEH_POINT_RENDERING_THRESHOLD
+        )
 
     def render_legend(self):
         """
@@ -508,8 +512,8 @@ class Graph(BaseGraph):
         )
 
         if (
-            self.constant_limit_nodes is None or
-            self.node_aggregate_fn == "count"
+            self.constant_limit_nodes is None
+            or self.node_aggregate_fn == "count"
         ):
             self.constant_limit_nodes = [
                 float(cp.nanmin(agg.data)),
@@ -547,8 +551,8 @@ class Graph(BaseGraph):
         )
 
         if (
-            self.constant_limit_edges is None or
-            self.edge_aggregate_fn == "count"
+            self.constant_limit_edges is None
+            or self.edge_aggregate_fn == "count"
         ):
             self.constant_limit_edges = [
                 float(cp.nanmin(agg.data)),
@@ -558,8 +562,7 @@ class Graph(BaseGraph):
         span = {"span": self.constant_limit_nodes}
 
         return getattr(tf, self.node_pixel_spread)(
-            tf.shade(agg, name=name, how="linear", **cmap, **span),
-            max_px=1,
+            tf.shade(agg, name=name, how="linear", **cmap, **span), max_px=1,
         )
 
     def format_source_data(self, dataframe):
@@ -585,10 +588,16 @@ class Graph(BaseGraph):
         if self.edges is not None:
             # update connected_edges value for datashaded edges
             self.connected_edges = calc_connected_edges(
-                self.nodes, self.edges,
-                self.node_x, self.node_y, self.node_id,
-                self.edge_source, self.edge_target, self.edge_aggregate_col,
-                self.edge_render_type, self.curve_params
+                self.nodes,
+                self.edges,
+                self.node_x,
+                self.node_y,
+                self.node_id,
+                self.edge_source,
+                self.edge_target,
+                self.edge_aggregate_col,
+                self.edge_render_type,
+                self.curve_params,
             )
 
     def generate_InteractiveImage_callback(self):
@@ -680,19 +689,15 @@ class Graph(BaseGraph):
         self.legend_added = False
         self.color_bar = None
 
-        impath = os.path.join(scriptDir, './icons/graph.png')
+        impath = os.path.join(scriptDir, "./icons/graph.png")
 
         self.inspect_neighbors = CustomInspectTool(
-            icon=impath,
-            _active=True,
-            tool_name="Inspect Neighboring Edges"
+            icon=impath, _active=True, tool_name="Inspect Neighboring Edges"
         )
 
-        impath = os.path.join(scriptDir, './icons/XPan.png')
+        impath = os.path.join(scriptDir, "./icons/XPan.png")
         self.display_edges = CustomInspectTool(
-            icon=impath,
-            _active=True,
-            tool_name="Display Edges"
+            icon=impath, _active=True, tool_name="Display Edges"
         )
 
         def cb(attr, old, new):
@@ -716,7 +721,6 @@ class Graph(BaseGraph):
 
         if self.legend_added is False:
             self.render_legend()
-
 
     def update_dimensions(self, width=None, height=None):
         """
@@ -750,10 +754,16 @@ class Graph(BaseGraph):
                 self.format_source_data(nodes)
             # update connected_edges value for datashaded edges
             self.connected_edges = calc_connected_edges(
-                nodes, self.edges if edges is None else edges,
-                self.node_x, self.node_y, self.node_id,
-                self.edge_source, self.edge_target, self.edge_aggregate_col,
-                self.edge_render_type, self.curve_params
+                nodes,
+                self.edges if edges is None else edges,
+                self.node_x,
+                self.node_y,
+                self.node_id,
+                self.edge_source,
+                self.edge_target,
+                self.edge_aggregate_col,
+                self.edge_render_type,
+                self.curve_params,
             )
             self.interactive_image.update_chart(data_source=nodes)
 

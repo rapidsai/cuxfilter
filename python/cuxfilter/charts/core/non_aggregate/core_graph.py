@@ -185,19 +185,19 @@ class BaseGraph(BaseChart):
             edges_ = edges.loc[
                 inspect_type(
                     edges[self.edge_source].isin(node_ids),
-                    edges[self.edge_target].isin(node_ids)
-                ).values]
+                    edges[self.edge_target].isin(node_ids),
+                ).values
+            ]
             if edges_.shape[0] == 0:
                 nodes = nodes.loc[nodes[self.node_id].isin(node_ids).values]
             else:
                 edges = edges_
                 nodes = nodes.loc[
                     cudf.logical_or(
-                        nodes[self.node_id].isin(
-                            edges[self.edge_source]),
-                        nodes[self.node_id].isin(
-                            edges[self.edge_target])
-                    ).values]
+                        nodes[self.node_id].isin(edges[self.edge_source]),
+                        nodes[self.node_id].isin(edges[self.edge_target]),
+                    ).values
+                ]
             return nodes, edges
         else:
             nodes = cudf.DataFrame({k: np.nan for k in nodes.columns})
@@ -246,17 +246,11 @@ class BaseGraph(BaseChart):
                 dashboard_cls._generate_query_str()
             )[self.node_id]
 
-            nodes, edges = self.query_graph(
-                node_ids, self.nodes, self.edges
-            )
+            nodes, edges = self.query_graph(node_ids, self.nodes, self.edges)
 
             # reload all charts with new queried data (cudf.DataFrame only)
-            dashboard_cls._reload_charts(
-                data=nodes, ignore_cols=[self.name]
-            )
-            self.reload_chart(
-                nodes=nodes, edges=edges, patch_update=False
-            )
+            dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])
+            self.reload_chart(nodes=nodes, edges=edges, patch_update=False)
             del nodes, edges
 
         return selection_callback
@@ -353,9 +347,7 @@ class BaseGraph(BaseChart):
         )
         if len(query) > 0:
             final_query += " and " + query
-        self.reload_chart(
-            self.nodes.query(final_query), patch_update=False
-        )
+        self.reload_chart(self.nodes.query(final_query), patch_update=False)
 
     def query_chart_by_indices(
         self,

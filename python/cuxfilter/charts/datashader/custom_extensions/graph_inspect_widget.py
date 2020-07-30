@@ -3,7 +3,8 @@ from bokeh.models import Tool
 from bokeh.util.compiler import TypeScript
 
 TS_CODE = """
-import {InspectTool, InspectToolView} from "models/tools/inspectors/inspect_tool"
+import {InspectTool, InspectToolView} from
+                    "models/tools/inspectors/inspect_tool"
 import * as p from "core/properties"
 
 export class CustomInspectToolView extends InspectToolView {
