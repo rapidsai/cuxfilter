@@ -43,6 +43,7 @@ class BaseGraph(BaseChart):
         node_pixel_density=0.5,
         node_pixel_spread="dynspread",
         edge_render_type="direct",
+        edge_transparency=0,
         curve_params=dict(curvature=0.01, MAX_BUNDLE_SIZE=5),
         tile_provider="CARTODBPOSITRON",
         width=800,
@@ -78,6 +79,7 @@ class BaseGraph(BaseChart):
             node_pixel_density
             node_pixel_spread
             edge_render_type
+            edge_transparency
             curve_params
             tile_provider
             width
@@ -117,6 +119,7 @@ class BaseGraph(BaseChart):
         self.node_pixel_density = node_pixel_density
         self.node_pixel_spread = node_pixel_spread
         self.edge_render_type = edge_render_type
+        self.edge_transparency = edge_transparency
         self.curve_params = curve_params
         self.tile_provider = tile_provider
         self.width = width

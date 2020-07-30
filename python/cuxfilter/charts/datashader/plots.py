@@ -560,7 +560,10 @@ class Graph(BaseGraph):
         span = {"span": self.constant_limit_nodes}
 
         return getattr(tf, self.node_pixel_spread)(
-            tf.shade(agg, name=name, how="linear", **cmap, **span), max_px=1,
+            tf.shade(
+                agg, name=name, how="linear",
+                alpha=255 - 255*self.edge_transparency,
+                **cmap, **span), max_px=1
         )
 
     def format_source_data(self, dataframe):

@@ -153,6 +153,7 @@ def graph(
     node_pixel_density=0.8,
     node_pixel_spread="dynspread",
     edge_render_type="direct",
+    edge_transparency=0,
     curve_params=dict(curvature=0.01, MAX_BUNDLE_SIZE=5),
     tile_provider=None,
     width=800,
@@ -234,6 +235,10 @@ def graph(
         *Note: Curved edge rendering is an experimental feature and may throw
         out of memory errors
 
+    edge_transparency: float, default 0
+        value in range [0,1] to specify transparency level of edges, with
+        1 being completely transparent
+
     curve_params: dict, default dict(curvature=0.01, MAX_BUNDLE_SIZE=5)
         control curvature and max_bundle_size if edge_render_type='curved'
 
@@ -293,6 +298,7 @@ def graph(
         node_pixel_density,
         node_pixel_spread,
         edge_render_type,
+        edge_transparency,
         curve_params,
         tile_provider,
         width,
