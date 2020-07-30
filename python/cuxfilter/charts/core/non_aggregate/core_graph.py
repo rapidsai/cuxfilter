@@ -1,5 +1,7 @@
 from typing import Tuple
 import dask_cudf
+import cudf
+import numpy as np
 import dask.dataframe as dd
 
 from ..core_chart import BaseChart
@@ -40,6 +42,8 @@ class BaseGraph(BaseChart):
         node_pixel_shade_type="eq_hist",
         node_pixel_density=0.5,
         node_pixel_spread="dynspread",
+        edge_render_type="direct",
+        curve_params=dict(curvature=0.01, MAX_BUNDLE_SIZE=5),
         tile_provider="CARTODBPOSITRON",
         width=800,
         height=400,
@@ -73,6 +77,8 @@ class BaseGraph(BaseChart):
             node_pixel_shade_type
             node_pixel_density
             node_pixel_spread
+            edge_render_type
+            curve_params
             tile_provider
             width
             height
@@ -110,6 +116,8 @@ class BaseGraph(BaseChart):
         self.node_pixel_shade_type = node_pixel_shade_type
         self.node_pixel_density = node_pixel_density
         self.node_pixel_spread = node_pixel_spread
+        self.edge_render_type = edge_render_type
+        self.curve_params = curve_params
         self.tile_provider = tile_provider
         self.width = width
         self.height = height
@@ -169,6 +177,33 @@ class BaseGraph(BaseChart):
         """
         self.format_source_data(cuxfilter_df)
 
+    def query_graph(self, node_ids, nodes, edges):
+        inspect_type = cudf.logical_and
+        if self.inspect_neighbors._active:
+            inspect_type = cudf.logical_or
+        if node_ids.shape[0] > 0:
+            edges_ = edges.loc[
+                inspect_type(
+                    edges[self.edge_source].isin(node_ids),
+                    edges[self.edge_target].isin(node_ids)
+                ).values]
+            if edges_.shape[0] == 0:
+                nodes = nodes.loc[nodes[self.node_id].isin(node_ids).values]
+            else:
+                edges = edges_
+                nodes = nodes.loc[
+                    cudf.logical_or(
+                        nodes[self.node_id].isin(
+                            edges[self.edge_source]),
+                        nodes[self.node_id].isin(
+                            edges[self.edge_target])
+                    ).values]
+            return nodes, edges
+        else:
+            nodes = cudf.DataFrame({k: np.nan for k in nodes.columns})
+            edges = cudf.DataFrame({k: np.nan for k in edges.columns})
+            return nodes, edges
+
     def get_selection_geometry_callback(self, dashboard_cls):
         """
         Description: generate callback for map selection event
@@ -206,15 +241,23 @@ class BaseGraph(BaseChart):
             )
 
             dashboard_cls._query_str_dict[self.name] = query
-            temp_data = dashboard_cls._query(
+
+            node_ids = dashboard_cls._query(
                 dashboard_cls._generate_query_str()
+            )[self.node_id]
+
+            nodes, edges = self.query_graph(
+                node_ids, self.nodes, self.edges
             )
+
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(
-                data=temp_data, ignore_cols=[self.name]
+                data=nodes, ignore_cols=[self.name]
             )
-            self.reload_chart(temp_data, False)
-            del temp_data
+            self.reload_chart(
+                nodes=nodes, edges=edges, patch_update=False
+            )
+            del nodes, edges
 
         return selection_callback
 
@@ -311,7 +354,7 @@ class BaseGraph(BaseChart):
         if len(query) > 0:
             final_query += " and " + query
         self.reload_chart(
-            self.nodes.query(final_query), False,
+            self.nodes.query(final_query), patch_update=False
         )
 
     def query_chart_by_indices(
@@ -339,14 +382,14 @@ class BaseGraph(BaseChart):
         if len(new_indices) == 0:
             # case: all selected indices were reset
             # reset the chart
-            self.reload_chart(self.nodes, False)
+            self.reload_chart(self.nodes, patch_update=False)
         elif len(new_indices) == 1:
             final_query = active_chart.x + "==" + str(float(new_indices[0]))
             if len(query) > 0:
                 final_query += " and " + query
             # just a single index
             self.reload_chart(
-                self.nodes.query(final_query), False,
+                self.nodes.query(final_query), patch_update=False
             )
         else:
             new_indices_str = ",".join(map(str, new_indices))
@@ -354,7 +397,7 @@ class BaseGraph(BaseChart):
             if len(query) > 0:
                 final_query += " and " + query
             self.reload_chart(
-                self.nodes.query(final_query), False,
+                self.nodes.query(final_query), patch_update=False
             )
 
     def add_selection_geometry_event(self, callback):
