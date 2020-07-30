@@ -4,7 +4,10 @@ from ..core.non_aggregate import (
     BaseStackedLine,
     BaseGraph,
 )
-from .custom_extensions import InteractiveImage
+from ..constants import BOKEH_POINT_RENDERING_THRESHOLD
+from .custom_extensions import (
+    InteractiveImage, CustomInspectTool, calc_connected_edges
+)
 from distutils.version import LooseVersion
 
 import datashader as ds
@@ -21,7 +24,6 @@ from bokeh import events
 from bokeh.plotting import figure
 from bokeh.models import (
     BoxSelectTool,
-    ColumnDataSource,
     ColorBar,
     LinearColorMapper,
     LogColorMapper,
@@ -29,6 +31,9 @@ from bokeh.models import (
     FixedTicker,
 )
 from bokeh.tile_providers import get_provider
+import os
+
+scriptDir = os.path.dirname(__file__)
 
 ds_version = LooseVersion(ds.__version__)
 
@@ -305,7 +310,7 @@ class Scatter(BaseScatter):
         if height is not None:
             self.chart.plot_height = height
 
-    def reload_chart(self, data=None, update_source=False):
+    def reload_chart(self, data=None, patch_update=False):
         """
         Description:
 
@@ -320,7 +325,7 @@ class Scatter(BaseScatter):
             self.interactive_image.update_chart(data_source=data)
         else:
             self.interactive_image.update_chart(data_source=self.source)
-            if update_source:
+            if patch_update:
                 self.format_source_data(data)
 
     def add_selection_geometry_event(self, callback):
@@ -438,7 +443,8 @@ class Graph(BaseGraph):
     data_x_axis = "node_x"
     no_colors_set = False
     image = None
-    constant_limit = None
+    constant_limit_nodes = None
+    constant_limit_edges = None
     color_bar = None
     legend_added = False
 
@@ -463,7 +469,7 @@ class Graph(BaseGraph):
         """
         return self.legend and (
             self.node_pixel_shade_type in list(_color_mapper.keys())
-        )
+        ) and self.nodes.shape[0] > BOKEH_POINT_RENDERING_THRESHOLD
 
     def render_legend(self):
         """
@@ -477,7 +483,7 @@ class Graph(BaseGraph):
                 _get_legend_title(
                     self.node_aggregate_fn, self.node_aggregate_col
                 ),
-                self.constant_limit,
+                self.constant_limit_nodes,
                 color_bar=self.color_bar,
                 update=update,
             )
@@ -501,14 +507,17 @@ class Graph(BaseGraph):
             nodes.sort_index(), self.node_x, self.node_y, aggregator
         )
 
-        if self.constant_limit is None or self.node_aggregate_fn == "count":
-            self.constant_limit = [
+        if (
+            self.constant_limit_nodes is None or
+            self.node_aggregate_fn == "count"
+        ):
+            self.constant_limit_nodes = [
                 float(cp.nanmin(agg.data)),
                 float(cp.nanmax(agg.data)),
             ]
             self.render_legend()
 
-        span = {"span": self.constant_limit}
+        span = {"span": self.constant_limit_nodes}
         if self.node_pixel_shade_type == "eq_hist":
             span = {}
 
@@ -537,47 +546,21 @@ class Graph(BaseGraph):
             self.connected_edges, self.node_x, self.node_y, aggregator
         )
 
-        return tf.shade(agg, name=name, **cmap)
-
-    def calc_connected_edges(self, nodes, edges):
-        """
-        calculate directly connected edges
-        """
-        connected_edges_columns = [self.node_x, self.node_y]
-        if self.edge_aggregate_col is not None:
-            connected_edges_columns += [self.edge_aggregate_col]
-
-        x1 = (
-            edges.merge(nodes, left_on=self.edge_source, right_on=self.node_id)
-            .sort_values([self.edge_source, self.edge_target])[
-                [self.edge_source, self.edge_target] + connected_edges_columns
+        if (
+            self.constant_limit_edges is None or
+            self.edge_aggregate_fn == "count"
+        ):
+            self.constant_limit_edges = [
+                float(cp.nanmin(agg.data)),
+                float(cp.nanmax(agg.data)),
             ]
-            .reset_index(drop=True)
-        )
 
-        x2 = (
-            edges.merge(nodes, left_on=self.edge_target, right_on=self.node_id)
-            .sort_values([self.edge_source, self.edge_target])[
-                [self.edge_source, self.edge_target] + connected_edges_columns
-            ]
-            .reset_index(drop=True)
-        )
+        span = {"span": self.constant_limit_nodes}
 
-        x1 = x1.merge(
-            x2, on=[self.edge_source, self.edge_target], suffixes=("", "_y")
+        return getattr(tf, self.node_pixel_spread)(
+            tf.shade(agg, name=name, how="linear", **cmap, **span),
+            max_px=1,
         )
-
-        x2 = x1[[i + "_y" for i in connected_edges_columns]].rename(
-            columns={i + "_y": i for i in connected_edges_columns}
-        )
-
-        x3 = type(nodes)(
-            {self.node_x: np.nan, self.node_y: np.nan}, index=x1.index
-        )
-
-        self.connected_edges = cudf.concat(
-            [x1[connected_edges_columns], x2[connected_edges_columns], x3]
-        ).sort_index()
 
     def format_source_data(self, dataframe):
         """
@@ -601,7 +584,12 @@ class Graph(BaseGraph):
 
         if self.edges is not None:
             # update connected_edges value for datashaded edges
-            self.calc_connected_edges(self.nodes, self.edges)
+            self.connected_edges = calc_connected_edges(
+                self.nodes, self.edges,
+                self.node_x, self.node_y, self.node_id,
+                self.edge_source, self.edge_target, self.edge_aggregate_col,
+                self.edge_render_type, self.curve_params
+            )
 
     def generate_InteractiveImage_callback(self):
         """
@@ -628,19 +616,21 @@ class Graph(BaseGraph):
             cvs = ds.Canvas(
                 plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
             )
-            if len(self.nodes) > 10_000:
-                if self.source is not None:
-                    self.source.data = {
-                        self.node_x: [],
-                        self.node_y: [],
-                        self.node_aggregate_col: [],
-                        self.node_aggregate_col + "_color": [],
-                    }
-                np = nodes_plot(cvs, data_source)
+            plot = None
+            if self.source is not None:
+                self.source.data = {
+                    self.node_x: [],
+                    self.node_y: [],
+                    self.node_aggregate_col: [],
+                    self.node_aggregate_col + "_color": [],
+                }
+            np = nodes_plot(cvs, data_source)
+            if self.display_edges._active:
                 ep = edges_plot(cvs, data_source)
                 plot = tf.stack(ep, np, how="over")
             else:
-                plot = edges_plot(cvs, data_source)
+                plot = np
+
             return plot
 
         return viewInteractiveImage
@@ -680,7 +670,6 @@ class Graph(BaseGraph):
             y_range=self.y_range,
             width=self.width,
             height=self.height,
-            output_backend="webgl",
         )
 
         self.tile_provider = _get_provider(self.tile_provider)
@@ -691,7 +680,29 @@ class Graph(BaseGraph):
         self.legend_added = False
         self.color_bar = None
 
+        impath = os.path.join(scriptDir, './icons/graph.png')
+
+        self.inspect_neighbors = CustomInspectTool(
+            icon=impath,
+            _active=True,
+            tool_name="Inspect Neighboring Edges"
+        )
+
+        impath = os.path.join(scriptDir, './icons/XPan.png')
+        self.display_edges = CustomInspectTool(
+            icon=impath,
+            _active=True,
+            tool_name="Display Edges"
+        )
+
+        def cb(attr, old, new):
+            self.interactive_image.update_chart()
+
+        self.display_edges.on_change("_active", cb)
+
         self.chart.add_tools(BoxSelectTool())
+        self.chart.add_tools(self.inspect_neighbors)
+        self.chart.add_tools(self.display_edges)
 
         self.chart.xgrid.grid_line_color = None
         self.chart.ygrid.grid_line_color = None
@@ -706,27 +717,6 @@ class Graph(BaseGraph):
         if self.legend_added is False:
             self.render_legend()
 
-        if len(self.nodes) <= 10_000:
-            self.source = ColumnDataSource(
-                {
-                    self.node_x: self.nodes[self.node_x].to_array(),
-                    self.node_y: self.nodes[self.node_y].to_array(),
-                    self.node_aggregate_col: self.nodes[
-                        self.node_aggregate_col
-                    ].to_array(),
-                }
-            )
-            self.compute_colors()
-            self.chart.scatter(
-                x=self.node_x,
-                y=self.node_y,
-                source=self.source,
-                radius=self.node_point_size,
-                fill_alpha=0.6,
-                fill_color=self.node_aggregate_col,
-                line_color=self.node_aggregate_col,
-                line_width=3,
-            )
 
     def update_dimensions(self, width=None, height=None):
         """
@@ -744,7 +734,7 @@ class Graph(BaseGraph):
         if height is not None:
             self.chart.plot_height = height
 
-    def reload_chart(self, data, update_source=False):
+    def reload_chart(self, nodes, edges=None, patch_update=False):
         """
         Description:
 
@@ -755,13 +745,17 @@ class Graph(BaseGraph):
 
         Ouput:
         """
-        if data is not None:
-            if update_source:
-                self.format_source_data(data)
+        if nodes is not None:
+            if patch_update:
+                self.format_source_data(nodes)
             # update connected_edges value for datashaded edges
-            self.calc_connected_edges(data, self.edges)
-
-            self.interactive_image.update_chart(data_source=data)
+            self.connected_edges = calc_connected_edges(
+                nodes, self.edges if edges is None else edges,
+                self.node_x, self.node_y, self.node_id,
+                self.edge_source, self.edge_target, self.edge_aggregate_col,
+                self.edge_render_type, self.curve_params
+            )
+            self.interactive_image.update_chart(data_source=nodes)
 
     def add_selection_geometry_event(self, callback):
         """
@@ -996,7 +990,7 @@ class Line(BaseLine):
         if height is not None:
             self.chart.plot_height = height
 
-    def reload_chart(self, data, update_source=False):
+    def reload_chart(self, data, patch_update=False):
         """
         Description:
 
@@ -1009,7 +1003,7 @@ class Line(BaseLine):
         """
         if data is not None:
             self.interactive_image.update_chart(data_source=data)
-            if update_source:
+            if patch_update:
                 self.format_source_data(data)
 
     def add_selection_geometry_event(self, callback):
@@ -1269,7 +1263,7 @@ class StackedLines(BaseStackedLine):
         if height is not None:
             self.chart.plot_height = height
 
-    def reload_chart(self, data, update_source=False):
+    def reload_chart(self, data, patch_update=False):
         """
         Description:
 
@@ -1282,7 +1276,7 @@ class StackedLines(BaseStackedLine):
         """
         if data is not None:
             self.interactive_image.update_chart(data_source=data)
-            if update_source:
+            if patch_update:
                 self.format_source_data(data)
 
     def add_selection_geometry_event(self, callback):
