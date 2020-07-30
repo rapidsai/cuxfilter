@@ -63,35 +63,31 @@ class TestCoreGraph:
         assert callable(type(bg.get_selection_geometry_callback(dashboard)))
 
     @pytest.mark.parametrize(
-        "inspect_neighbors, result", [
+        "inspect_neighbors, result",
+        [
             (
                 CustomInspectTool(_active=True),
-                cudf.DataFrame({
-                    'vertex': [0, 1, 2, 3],
-                    'x': [0, 1, 1, 2],
-                    'y': [0, 1, 2, 0]
-                })
+                cudf.DataFrame(
+                    {
+                        "vertex": [0, 1, 2, 3],
+                        "x": [0, 1, 1, 2],
+                        "y": [0, 1, 2, 0],
+                    }
+                ),
             ),
             (
                 CustomInspectTool(_active=False),
-                cudf.DataFrame({
-                    'vertex': [1, 3],
-                    'x': [1, 2],
-                    'y': [1, 0]
-                })
-            )
-        ]
+                cudf.DataFrame({"vertex": [1, 3], "x": [1, 2], "y": [1, 0]}),
+            ),
+        ],
     )
     def test_selection_callback(self, inspect_neighbors, result):
-        nodes = cudf.DataFrame({
-            'vertex': [0, 1, 2, 3],
-            'x': [0, 1, 1, 2],
-            'y': [0, 1, 2, 0]
-        })
-        edges = cudf.DataFrame({
-            'source': [1, 1, 1, 1],
-            'target': [0, 1, 2, 3]
-        })
+        nodes = cudf.DataFrame(
+            {"vertex": [0, 1, 2, 3], "x": [0, 1, 1, 2], "y": [0, 1, 2, 0]}
+        )
+        edges = cudf.DataFrame(
+            {"source": [1, 1, 1, 1], "target": [0, 1, 2, 3]}
+        )
         dashboard = DashBoard(dataframe=DataFrame.load_graph((nodes, edges)))
 
         bg = BaseGraph()

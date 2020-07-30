@@ -468,9 +468,8 @@ class Graph(BaseGraph):
         """
         return if legend=True and pixel_shade_type is ['linear', 'log']
         """
-        return (
-            self.legend
-            and (self.node_pixel_shade_type in list(_color_mapper.keys()))
+        return self.legend and (
+            self.node_pixel_shade_type in list(_color_mapper.keys())
         )
 
     def render_legend(self):
@@ -561,9 +560,14 @@ class Graph(BaseGraph):
 
         return getattr(tf, self.node_pixel_spread)(
             tf.shade(
-                agg, name=name, how="linear",
-                alpha=255 - 255*self.edge_transparency,
-                **cmap, **span), max_px=1
+                agg,
+                name=name,
+                how="linear",
+                alpha=255 - 255 * self.edge_transparency,
+                **cmap,
+                **span,
+            ),
+            max_px=1,
         )
 
     def format_source_data(self, dataframe):
