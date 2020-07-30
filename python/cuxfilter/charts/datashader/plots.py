@@ -4,7 +4,6 @@ from ..core.non_aggregate import (
     BaseStackedLine,
     BaseGraph,
 )
-from ..constants import BOKEH_POINT_RENDERING_THRESHOLD
 from .custom_extensions import (
     InteractiveImage,
     CustomInspectTool,
@@ -472,7 +471,6 @@ class Graph(BaseGraph):
         return (
             self.legend
             and (self.node_pixel_shade_type in list(_color_mapper.keys()))
-            and self.nodes.shape[0] > BOKEH_POINT_RENDERING_THRESHOLD
         )
 
     def render_legend(self):
