@@ -3,9 +3,8 @@ import cupy as cp
 import cudf
 import numba
 from numba import cuda
-from math import ceil
 
-maxThreadsPerBlock = cuda.get_current_device().MAX_THREADS_PER_BLOCK
+maxThreadsPerBlock = 64
 
 
 def bundle_edges(edges, src="src", dst="dst"):
@@ -185,8 +184,7 @@ def curved_connect_edges(
     result = cp.zeros(shape=shape, dtype=cp.float32)
     steps = cp.linspace(0, 1, 100)
 
-    bpg = int(ceil(edges.shape[0] / maxThreadsPerBlock))
-    compute_curves[bpg, maxThreadsPerBlock](
+    compute_curves[maxThreadsPerBlock, maxThreadsPerBlock](
         fin_df_[connected_edge_columns].to_gpu_matrix(),
         fin_df_[["ctrl_point_x", "ctrl_point_y"]].to_gpu_matrix(),
         result,
@@ -237,8 +235,9 @@ def directly_connect_edges(edges):
     result = cp.zeros(
         shape=(edges.shape[0], edges.shape[1] - 2, 3), dtype=cp.float32
     )
-    bpg = int(ceil(edges.shape[0] / maxThreadsPerBlock))
-    connect_edges[bpg, maxThreadsPerBlock](edges.to_gpu_matrix(), result)
+    connect_edges[maxThreadsPerBlock, maxThreadsPerBlock](
+        edges.to_gpu_matrix(), result
+    )
     if edges.shape[1] == 5:
         return cudf.DataFrame(
             {
@@ -303,6 +302,7 @@ def calc_connected_edges(
         result = directly_connect_edges(
             connected_edges_df[connected_edge_columns]
         )
+
     elif edge_render_type == "curved":
         result = curved_connect_edges(
             connected_edges_df,
@@ -316,4 +316,5 @@ def calc_connected_edges(
         result = cudf.DataFrame({k: np.nan for k in ["x", "y"]})
         if edge_aggregate_col is not None:
             result[edge_aggregate_col] = np.nan
+
     return result
