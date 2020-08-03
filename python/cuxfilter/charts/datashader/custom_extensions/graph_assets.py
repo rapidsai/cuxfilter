@@ -3,6 +3,7 @@ import cupy as cp
 import cudf
 import numba
 from numba import cuda
+from math import sqrt
 
 maxThreadsPerBlock = 64
 
@@ -108,53 +109,32 @@ def control_point_compute_kernel(
     y_dst,
     ctrl_point_x,
     ctrl_point_y,
-    curvature,
-    MAX_BUNDLE_SIZE,
+    strokeWidth,
 ):
     """
     GPU kernel to compute control points for each edge
     """
-    for i, (count_, idx) in enumerate(zip(count, _index)):
+    for i, (bcount, eindex) in enumerate(zip(count, _index)):
         midp_x = (x_src[i] + x_dst[i]) * 0.5
         midp_y = (y_src[i] + y_dst[i]) * 0.5
+        diff_x = x_dst[i] - x_src[i]
+        diff_y = y_dst[i] - y_src[i]
+        normalized_x = diff_x / sqrt(float(diff_x ** 2 + diff_y ** 2))
+        normalized_y = diff_y / sqrt(float(diff_x ** 2 + diff_y ** 2))
 
-        if idx > MAX_BUNDLE_SIZE - 1:
-            delta_x = 0
-            delta_y = 0
-            ctrl_point_x[i] = midp_x
-            ctrl_point_y[i] = midp_y
-        else:
-            if x_dst[i] - x_src[i] == 0:
-                delta_x = (midp_x) * idx / (count_)
-                delta_y = 0
-            elif y_dst[i] - y_src[i] == 0:
-                delta_y = (midp_y) * idx / (count_)
-                delta_x = 0
-            else:
-                perpendicular_slope = -1 / (
-                    (y_dst[i] - y_src[i]) / (x_dst[i] - x_src[i])
-                )
-                delta_x = (x_dst[i] - midp_x) * idx / (count_ * 2)
-                delta_y = perpendicular_slope * delta_x
-            direction = 1
-            if idx % 2 == 0:
-                direction *= -1
-                if idx != 0:
-                    idx -= 1
-                ctrl_point_x[i] = min(
-                    x_dst[i], midp_x + delta_x * direction * curvature
-                )
-                ctrl_point_y[i] = min(
-                    y_dst[i], midp_y + delta_y * direction * curvature
-                )
+        unit_x = -1 * normalized_y
+        unit_y = normalized_x
 
-            else:
-                ctrl_point_x[i] = max(
-                    x_src[i], midp_x + delta_x * direction * curvature
-                )
-                ctrl_point_y[i] = max(
-                    y_src[i], midp_y + delta_y * direction * curvature
-                )
+        maxBundleSize = sqrt(float((diff_x ** 2 + diff_y ** 2))) * 0.15
+        direction = (1 - bcount % 2.0) + (-1) * bcount % 2.0
+        size = (maxBundleSize / strokeWidth) * (eindex / bcount)
+        if maxBundleSize < bcount * strokeWidth * 2.0:
+            size = strokeWidth * 2.0 * eindex
+
+        size += maxBundleSize
+
+        ctrl_point_x[i] = midp_x + (unit_x * size * direction)
+        ctrl_point_y[i] = midp_y + (unit_y * size * direction)
 
 
 def curved_connect_edges(

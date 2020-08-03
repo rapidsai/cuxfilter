@@ -44,7 +44,7 @@ class BaseGraph(BaseChart):
         node_pixel_spread="dynspread",
         edge_render_type="direct",
         edge_transparency=0,
-        curve_params=dict(curvature=0.01, MAX_BUNDLE_SIZE=5),
+        curve_params=dict(strokeWidth=1),
         tile_provider="CARTODBPOSITRON",
         width=800,
         height=400,
