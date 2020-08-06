@@ -9,11 +9,11 @@ channels:
 dependencies:
 - cupy>=6*
 - python>=3.6,<3.8
-- cudf=0.15*
+- cudf=0.16
 - dask>=2.12.0
 - distributed>=2.12.0
 - dask-cuda=0.15*
-- dask-cudf=0.15*
+- dask-cudf=0.16
 - datashader>=0.10.*
 - geopandas>=0.6.*
 - pyproj>=2.4.*
