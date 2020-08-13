@@ -66,7 +66,8 @@ class Choropleth(BaseChoropleth):
         colors = [
             nan_color
             if np.isnan(i)
-            else list(ImageColor.getrgb(self.geo_color_palette[i])) + [255]
+            else list(ImageColor.getrgb(self.geo_color_palette[int(i)]))
+            + [255]
             for i in inds
         ]
         self.source_df[self.rgba_columns] = pd.DataFrame(colors)
