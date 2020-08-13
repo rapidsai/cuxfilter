@@ -1,6 +1,5 @@
 from typing import Dict
 import os
-import pandas as pd
 import numpy as np
 import dask_cudf
 
@@ -100,7 +99,7 @@ class BaseChoropleth(BaseChart):
 
         self.geo_color_palette = geo_color_palette
         self.geoJSONProperty = geoJSONProperty
-        self.geo_mapper, x_range, y_range = geo_json_mapper(
+        _, x_range, y_range = geo_json_mapper(
             self.geoJSONSource, self.geoJSONProperty, projection=4326
         )
         self.height = height
@@ -141,17 +140,12 @@ class BaseChoropleth(BaseChart):
             self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
             self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
 
-        if isinstance(self.geo_mapper, pd.DataFrame):
-            self.geo_mapper, x_range, y_range = geo_json_mapper(
-                self.geoJSONSource, self.geoJSONProperty, projection=4326
-            )
-        self.geo_mapper = pd.DataFrame(
-            {
-                self.x: np.array(list(self.geo_mapper.keys())),
-                "coordinates": np.array(
-                    list(self.geo_mapper.values()), dtype=np.object
-                ),
-            }
+        self.geo_mapper, x_range, y_range = geo_json_mapper(
+            self.geoJSONSource,
+            self.geoJSONProperty,
+            4326,
+            self.x,
+            dashboard_cls._cuxfilter_df.data[self.x].dtype,
         )
 
         self.calculate_source(dashboard_cls._cuxfilter_df.data)
