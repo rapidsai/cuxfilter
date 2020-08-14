@@ -152,6 +152,9 @@ def graph(
     node_pixel_shade_type="eq_hist",
     node_pixel_density=0.8,
     node_pixel_spread="dynspread",
+    edge_render_type="direct",
+    edge_transparency=0,
+    curve_params=dict(strokeWidth=1),
     tile_provider=None,
     width=800,
     height=400,
@@ -227,6 +230,18 @@ def graph(
         density.
         spread: Spread pixels in an image.
 
+    edge_render_type: str, default 'direct'
+        type of edge render. Available options are 'direct'/'curved'
+        *Note: Curved edge rendering is an experimental feature and may throw
+        out of memory errors
+
+    edge_transparency: float, default 0
+        value in range [0,1] to specify transparency level of edges, with
+        1 being completely transparent
+
+    curve_params: dict, default dict(strokeWidth=1)
+        control curvature and max_bundle_size if edge_render_type='curved'
+
     tile_provider: str, default None
         Underlying map type.See
         https://docs.bokeh.org/en/latest/docs/reference/tile_providers.html
@@ -282,6 +297,9 @@ def graph(
         node_pixel_shade_type,
         node_pixel_density,
         node_pixel_spread,
+        edge_render_type,
+        edge_transparency,
+        curve_params,
         tile_provider,
         width,
         height,

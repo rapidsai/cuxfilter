@@ -19,6 +19,8 @@
 - PR #162 Dashboard and templates cleanup and tests
 - PR #163 Updated Bokeh version to 2.1.1, added pydeck support
 - PR #168 Replaced interactive datashader callback throttling to debouncing
+- PR #169 Added Node-Inspect Neighbor widget to graph charts
+Added edge-curving
 
 ## Bug Fixes
 - PR #161 fixed layouts bugs

@@ -98,7 +98,9 @@ def test_calc_groupby_for_nulls(x, y, aggregate_fn, result):
     print(gpu_histogram.calc_groupby(bc, df))
     print(result)
     assert np.allclose(
-        gpu_histogram.calc_groupby(bc, df), result, equal_nan=True
+        gpu_histogram.calc_groupby(bc, df).astype(np.float32),
+        result.astype(np.float32),
+        equal_nan=True,
     )
 
 

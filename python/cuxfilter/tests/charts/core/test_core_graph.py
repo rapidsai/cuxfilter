@@ -3,6 +3,7 @@ import cudf
 
 from cuxfilter.charts.core.non_aggregate.core_graph import BaseGraph
 from cuxfilter.dashboard import DashBoard
+from cuxfilter.charts.datashader.custom_extensions import CustomInspectTool
 from cuxfilter import DataFrame
 from cuxfilter.layouts import chart_view
 from cuxfilter.charts import constants
@@ -61,25 +62,52 @@ class TestCoreGraph:
         )
         assert callable(type(bg.get_selection_geometry_callback(dashboard)))
 
-    def test_selection_callback(self):
+    @pytest.mark.parametrize(
+        "inspect_neighbors, result",
+        [
+            (
+                CustomInspectTool(_active=True),
+                cudf.DataFrame(
+                    {
+                        "vertex": [0, 1, 2, 3],
+                        "x": [0, 1, 1, 2],
+                        "y": [0, 1, 2, 0],
+                    }
+                ),
+            ),
+            (
+                CustomInspectTool(_active=False),
+                cudf.DataFrame({"vertex": [1, 3], "x": [1, 2], "y": [1, 0]}),
+            ),
+        ],
+    )
+    def test_selection_callback(self, inspect_neighbors, result):
+        nodes = cudf.DataFrame(
+            {"vertex": [0, 1, 2, 3], "x": [0, 1, 1, 2], "y": [0, 1, 2, 0]}
+        )
+        edges = cudf.DataFrame(
+            {"source": [1, 1, 1, 1], "target": [0, 1, 2, 3]}
+        )
+        dashboard = DashBoard(dataframe=DataFrame.load_graph((nodes, edges)))
+
         bg = BaseGraph()
-        bg.node_x = "a"
-        bg.node_y = "b"
         bg.chart_type = "temp"
+        bg.nodes = nodes
+        bg.edges = edges
+        bg.inspect_neighbors = inspect_neighbors
+        print(bg.inspect_neighbors._active)
         self.result = None
 
-        def t_function(data, patch_update=False):
-            self.result = data
+        def t_function(nodes, edges=None, patch_update=False):
+            self.result = nodes.reset_index(drop=True)
 
         bg.reload_chart = t_function
-        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
-        dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         dashboard._active_view = bg.name
 
         t = bg.get_selection_geometry_callback(dashboard)
-        t(xmin=1, xmax=2, ymin=3, ymax=4)
-        assert self.result.equals(df.query("1<=a<=2 and 3<=b<=4"))
+        t(xmin=1, xmax=3, ymin=0, ymax=1)
+        assert self.result.equals(result)
 
     @pytest.mark.parametrize(
         "x_range, y_range, query",

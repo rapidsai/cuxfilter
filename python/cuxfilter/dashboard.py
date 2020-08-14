@@ -551,7 +551,7 @@ class DashBoard:
         # reloading charts as per current data state
         for chart in self._charts.values():
             if chart.name not in ignore_cols and chart.name in include_cols:
-                self._charts[chart.name].reload_chart(data, True)
+                self._charts[chart.name].reload_chart(data, patch_update=True)
 
     def _calc_data_tiles(self, cumsum=True):
         """

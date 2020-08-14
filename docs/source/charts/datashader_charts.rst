@@ -31,27 +31,6 @@ Example
     d = cux_df.dashboard([line_chart_1])
     line_chart_1.view()
 
-Scatter_geo chart
------------------
-
-.. automethod:: datashader.scatter_geo
-
-Example
-~~~~~~~
-.. jupyter-execute::
-
-    from cuxfilter import DataFrame
-    from cuxfilter.charts import scatter_geo
-    import cudf
-    import random
-
-    cux_df = DataFrame.from_dataframe(cudf.DataFrame({'x': [float(random.randrange(-8239000,-8229000)) for i in range(100000)], 'y':[float(random.randrange(4960000, 4980000)) for i in range(100000)]}))
-    # setting pixel_shade_type='log' to display legend (currently supports only log/linear)
-    scatter_geo_chart = scatter_geo(x='x',y='y', pixel_shade_type="log")
-
-    d = cux_df.dashboard([scatter_geo_chart])
-    scatter_geo_chart.view()
-
 Scatter chart
 -------------
 .. automethod:: datashader.scatter
@@ -151,7 +130,7 @@ Example
 
     cux_df = cuxfilter.DataFrame.load_graph((nodes, edges))
 
-    chart0 = cuxfilter.charts.datashader.graph(node_point_size=0.2)
+    chart0 = cuxfilter.charts.datashader.graph(node_pixel_shade_type='linear')
 
     d = cux_df.dashboard([chart0], layout=cuxfilter.layouts.double_feature)
-    chart0
+    chart0.view()
