@@ -39,6 +39,8 @@ requirements:
     - pydeck >=0.3.*
 
 test:
+  requires:
+    - cudatoolkit {{ cuda_version }}.*
   commands:
     - python -c "import cuxfilter"
 
