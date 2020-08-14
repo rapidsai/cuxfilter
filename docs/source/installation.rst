@@ -83,7 +83,7 @@ While in the directory you want the datasets to be saved, execute the following
 .. code-block:: bash
 
     #go the the environment where cuxfilter is installed. Skip if in a docker container
-    source activate test_env
+    conda activate test_env
 
     #download and extract the datasets
     curl https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2015-01.csv --create-dirs -o ./nyc_taxi.csv
