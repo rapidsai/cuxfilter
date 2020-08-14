@@ -96,7 +96,7 @@ to automatically run `Black`, and `flake8` when you make a git commit.
 This can be done by installing `pre-commit` via `conda` or `pip`:
 
 ```bash
-conda install pre_commit
+conda install -c conda-forge pre_commit
 ```
 
 ```bash

@@ -10,7 +10,7 @@ cuxfilter conda example installation:
 .. code-block:: bash
 
     conda install -c rapidsai -c nvidia -c conda-forge \
-        -c defaults cuxfilter=0.12 python=3.6 cudatoolkit=10.0
+        -c defaults cuxfilter=0.15 python=3.7 cudatoolkit=10.0
 
 Docker container
 ----------------
@@ -30,7 +30,7 @@ cuxfilter docker example installation:
 Build/Install from Source
 -------------------------
 
-See `build instructions <https://github.com/rapidsai/cuxfilter/blob/branch-0.13/CONTRIBUTING.md#setting-up-your-build-environment>`_.
+See `build instructions <https://github.com/rapidsai/cuxfilter/blob/branch-0.15/CONTRIBUTING.md#setting-up-your-build-environment>`_.
 
 
 
@@ -44,7 +44,7 @@ Troubleshooting
 
     conda install -c conda-forge jupyterlab
     jupyter labextension install @pyviz/jupyterlab_pyviz
-    jupyter labextension install jupyterlab_bokeh
+    jupyter labextension install @bokeh/jupyter_bokeh
 
 2.running the server
 ********************
@@ -83,7 +83,7 @@ While in the directory you want the datasets to be saved, execute the following
 .. code-block:: bash
 
     #go the the environment where cuxfilter is installed. Skip if in a docker container
-    source activate test_env
+    conda activate test_env
 
     #download and extract the datasets
     curl https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2015-01.csv --create-dirs -o ./nyc_taxi.csv
