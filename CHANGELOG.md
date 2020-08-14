@@ -13,6 +13,7 @@
 - PR #168 Replaced interactive datashader callback throttling to debouncing
 - PR #169 Added Node-Inspect Neighbor widget to graph charts
 Added edge-curving
+- PR #173 Updates to installation docs
 
 ## Bug Fixes
 - PR #161 fixed layouts bugs
