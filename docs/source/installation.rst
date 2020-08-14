@@ -44,7 +44,7 @@ Troubleshooting
 
     conda install -c conda-forge jupyterlab
     jupyter labextension install @pyviz/jupyterlab_pyviz
-    jupyter labextension install jupyterlab_bokeh
+    jupyter labextension install @bokeh/jupyter_bokeh
 
 2.running the server
 ********************
