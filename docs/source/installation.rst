@@ -10,7 +10,7 @@ cuxfilter conda example installation:
 .. code-block:: bash
 
     conda install -c rapidsai -c nvidia -c conda-forge \
-        -c defaults cuxfilter=0.12 python=3.6 cudatoolkit=10.0
+        -c defaults cuxfilter=0.15 python=3.7 cudatoolkit=10.0
 
 Docker container
 ----------------
