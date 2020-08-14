@@ -30,7 +30,7 @@ cuxfilter docker example installation:
 Build/Install from Source
 -------------------------
 
-See `build instructions <https://github.com/rapidsai/cuxfilter/blob/branch-0.13/CONTRIBUTING.md#setting-up-your-build-environment>`_.
+See `build instructions <https://github.com/rapidsai/cuxfilter/blob/branch-0.15/CONTRIBUTING.md#setting-up-your-build-environment>`_.
 
 
 
