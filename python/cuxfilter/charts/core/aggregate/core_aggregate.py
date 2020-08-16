@@ -16,11 +16,10 @@ class BaseAggregateChart(BaseChart):
         update_data_x: updated_data_x, np.array()
         update_data_y: updated_data_x, np.array()
         """
-
-        result_array = np.zeros(shape=(source_x.max(),))
+        result_array = np.zeros(shape=(int(source_x.max()),))
         # -1 for 0-based indexing
-        np.put(result_array, update_data_x - 1, update_data_y)
-        return result_array[source_x - 1]
+        np.put(result_array, update_data_x.astype("int") - 1, update_data_y)
+        return result_array[source_x.astype("int") - 1]
 
     def query_chart_by_range(self, active_chart, query_tuple, datatile):
         """

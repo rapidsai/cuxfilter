@@ -168,7 +168,7 @@ class BaseChoropleth(BaseChart):
         """
 
         result_array = np.zeros(
-            shape=(max(source_x.max(), update_data_x.max()))
+            shape=(int(max(source_x.max(), update_data_x.max())),)
         )
         # -1 for 0-based indexing, making sure indexes are type int
         np.put(result_array, (update_data_x - 1).astype("int"), update_data_y)
