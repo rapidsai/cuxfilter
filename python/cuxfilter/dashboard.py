@@ -544,7 +544,8 @@ class DashBoard:
         Reload charts with current self._cuxfilter_df.data state.
         """
         if data is None:
-            data = self._cuxfilter_df.data
+            # get current data as per the active queries
+            data = self._query(self._generate_query_str())
         if len(include_cols) == 0:
             include_cols = list(self._charts.keys())
         # reloading charts as per current data state
