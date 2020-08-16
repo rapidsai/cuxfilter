@@ -7,6 +7,26 @@ class BaseAggregateChart(BaseChart):
     use_data_tiles = True
     custom_binning = False
 
+    def _compute_array_all_bins(
+        self, source_x, source_y, update_data_x, update_data_y
+    ):
+        """
+        source_x: current_source_x, np.array()
+        source_y: current_source_y, np.array()
+        update_data_x: updated_data_x, np.array()
+        update_data_y: updated_data_x, np.array()
+        """
+
+        result_array = np.zeros(
+            shape=(source_x.max(),)
+        )
+        # -1 for 0-based indexing
+        np.put(
+            result_array, update_data_x - 1,
+            update_data_y
+        )
+        return result_array[source_x - 1]
+
     def query_chart_by_range(self, active_chart, query_tuple, datatile):
         """
         Description:

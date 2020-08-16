@@ -157,6 +157,28 @@ class BaseChoropleth(BaseChart):
     def view(self):
         return self.chart.view()
 
+    def _compute_array_all_bins(
+        self, source_x, source_y, update_data_x, update_data_y
+    ):
+        """
+        source_x: current_source_x, np.array()
+        source_y: current_source_y, np.array()
+        update_data_x: updated_data_x, np.array()
+        update_data_y: updated_data_x, np.array()
+        """
+
+        result_array = np.zeros(
+            shape=(
+                max(source_x.max(), update_data_x.max())
+            )
+        )
+        # -1 for 0-based indexing, making sure indexes are type int
+        np.put(
+            result_array, (update_data_x - 1).astype('int'),
+            update_data_y
+        )
+        return result_array[source_x.astype('int') - 1]
+
     def calculate_source(self, data, patch_update=False):
         """
         Description:
@@ -171,11 +193,37 @@ class BaseChoropleth(BaseChart):
         df = calc_groupby(self, data, agg=self.aggregate_dict)
 
         dict_temp = {
-            self.x: list(df[0].astype(df[0].dtype)),
-            self.color_column: list(df[1].astype(df[1].dtype)),
+            self.x: df[0],
+            self.color_column: df[1],
         }
         if self.elevation_column is not None:
-            dict_temp[self.elevation_column] = list(df[2].astype(df[2].dtype))
+            dict_temp[self.elevation_column] = df[2]
+
+        if (
+            patch_update and
+            len(dict_temp[self.x]) < len(self.source.data[self.x])
+        ):
+            # if not all X axis bins are provided, filling bins not updated
+            # with zeros
+            color_axis_data = self._compute_array_all_bins(
+                self.source.data[self.x],
+                self.source.data[self.color_column],
+                dict_temp[self.x],
+                dict_temp[self.color_column]
+            )
+
+            dict_temp[self.color_column] = color_axis_data
+
+            if self.elevation_column is not None:
+                elevation_axis_data = self._compute_array_all_bins(
+                    self.source.data[self.x],
+                    self.source.data[self.elevation_column],
+                    dict_temp[self.x],
+                    dict_temp[self.elevation_column]
+                )
+                dict_temp[self.elevation_column] = elevation_axis_data
+
+            dict_temp[self.x] = self.source.data[self.x]
 
         self.format_source_data(dict_temp, patch_update)
 
