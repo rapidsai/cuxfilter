@@ -1,5 +1,7 @@
 from typing import Tuple
 import dask_cudf
+import cudf
+import cupy as cp
 import dask.dataframe as dd
 
 from ..core_chart import BaseChart
@@ -109,6 +111,8 @@ class BaseNonAggregate(BaseChart):
             temp_data = dashboard_cls._query(
                 dashboard_cls._generate_query_str()
             )
+            if len(temp_data) == 0:
+                temp_data = cudf.DataFrame({k: cp.nan for k in self.source})
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(
                 data=temp_data, ignore_cols=[self.name]
@@ -184,6 +188,7 @@ class BaseNonAggregate(BaseChart):
                 self.source = dashboard_cls._cuxfilter_df.data
             self.x_range = None
             self.y_range = None
+            dashboard_cls._query_str_dict.pop(self.name, None)
             dashboard_cls._reload_charts()
 
         # add callback to reset chart button
