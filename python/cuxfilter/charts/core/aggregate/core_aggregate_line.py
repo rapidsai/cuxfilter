@@ -169,8 +169,11 @@ class BaseLine(BaseAggregateChart):
         if self.y == self.x or self.y is None:
             # it's a histogram
             df, self.data_points = calc_value_counts(
-                data[self.x], self.stride, self.min_value, self.data_points,
-                self.custom_binning
+                data[self.x],
+                self.stride,
+                self.min_value,
+                self.data_points,
+                self.custom_binning,
             )
             if self.data_points > 50_000:
                 print(
@@ -209,9 +212,8 @@ class BaseLine(BaseAggregateChart):
             "Y": list(df[1].astype(df[1].dtype)),
         }
 
-        if (
-            patch_update and
-            len(dict_temp["X"]) < len(self.source.data[self.data_x_axis])
+        if patch_update and len(dict_temp["X"]) < len(
+            self.source.data[self.data_x_axis]
         ):
             # if not all X axis bins are provided, filling bins not updated
             # with zeros
@@ -219,7 +221,7 @@ class BaseLine(BaseAggregateChart):
                 self.source.data[self.data_x_axis],
                 self.source.data[self.data_y_axis],
                 dict_temp["X"],
-                dict_temp["Y"]
+                dict_temp["Y"],
             )
 
             dict_temp = {

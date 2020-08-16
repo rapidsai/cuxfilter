@@ -168,16 +168,11 @@ class BaseChoropleth(BaseChart):
         """
 
         result_array = np.zeros(
-            shape=(
-                max(source_x.max(), update_data_x.max())
-            )
+            shape=(max(source_x.max(), update_data_x.max()))
         )
         # -1 for 0-based indexing, making sure indexes are type int
-        np.put(
-            result_array, (update_data_x - 1).astype('int'),
-            update_data_y
-        )
-        return result_array[source_x.astype('int') - 1]
+        np.put(result_array, (update_data_x - 1).astype("int"), update_data_y)
+        return result_array[source_x.astype("int") - 1]
 
     def calculate_source(self, data, patch_update=False):
         """
@@ -199,9 +194,8 @@ class BaseChoropleth(BaseChart):
         if self.elevation_column is not None:
             dict_temp[self.elevation_column] = df[2]
 
-        if (
-            patch_update and
-            len(dict_temp[self.x]) < len(self.source.data[self.x])
+        if patch_update and len(dict_temp[self.x]) < len(
+            self.source.data[self.x]
         ):
             # if not all X axis bins are provided, filling bins not updated
             # with zeros
@@ -209,7 +203,7 @@ class BaseChoropleth(BaseChart):
                 self.source.data[self.x],
                 self.source.data[self.color_column],
                 dict_temp[self.x],
-                dict_temp[self.color_column]
+                dict_temp[self.color_column],
             )
 
             dict_temp[self.color_column] = color_axis_data
@@ -219,7 +213,7 @@ class BaseChoropleth(BaseChart):
                     self.source.data[self.x],
                     self.source.data[self.elevation_column],
                     dict_temp[self.x],
-                    dict_temp[self.elevation_column]
+                    dict_temp[self.elevation_column],
                 )
                 dict_temp[self.elevation_column] = elevation_axis_data
 
