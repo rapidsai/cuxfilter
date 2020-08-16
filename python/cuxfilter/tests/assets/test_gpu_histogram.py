@@ -36,13 +36,12 @@ def test_calc_value_counts():
     bins = 8
     stride = (x.max() - x.min()) / bins
 
-    result, data_points, custom_binning = gpu_histogram.calc_value_counts(
-        x, stride, x.min(), None
+    result, data_points = gpu_histogram.calc_value_counts(
+        x, stride, x.min(), None, custom_binning=False
     )
     assert np.array_equal(result[0], np.array([0, 1, 2, 3, 7, 8]))
     assert np.array_equal(result[1], np.array([100, 150, 300, 100, 50, 150]))
     assert data_points == 6
-    assert custom_binning is True
 
 
 @pytest.mark.parametrize(
