@@ -78,11 +78,15 @@ class Choropleth(BaseChoropleth):
 
         Parameters:
         -----------
-        source_dict: {'X': [], 'Y': []}
+        source_dict: {
+            self.x: [], self.color_column: [],
+            self.elevation_column: []  # optional
+        }
 
         ColumnDataSource: {
-            'X': np.array(list),
-            'Y': np.array(list)
+            self.x: np.array(list),
+            self.color_column: np.array(list),
+            self.elevation_column: np.array(list) # optional
         }
         """
         res_df = pd.DataFrame(source_dict)
