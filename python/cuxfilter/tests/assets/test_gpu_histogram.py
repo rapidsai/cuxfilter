@@ -8,7 +8,54 @@ from numba import cuda
 from cuxfilter.charts.core.core_chart import BaseChart
 
 
-def test_calc_value_counts():
+@pytest.mark.parametrize(
+    "custom_binning, result",
+    [
+        (True, np.array([[0, 1, 2, 3, 7, 8], [100, 150, 300, 100, 50, 150]]),),
+        (
+            False,
+            np.array(
+                [
+                    [
+                        1,
+                        5,
+                        10,
+                        11,
+                        15,
+                        22,
+                        23,
+                        25,
+                        27,
+                        30,
+                        35,
+                        39,
+                        99,
+                        104,
+                        109,
+                    ],
+                    [
+                        50,
+                        50,
+                        50,
+                        50,
+                        50,
+                        50,
+                        100,
+                        50,
+                        50,
+                        50,
+                        50,
+                        50,
+                        50,
+                        50,
+                        100,
+                    ],
+                ]
+            ),
+        ),
+    ],
+)
+def test_calc_value_counts(custom_binning, result):
     x = cudf.Series(
         np.array(
             [
@@ -36,12 +83,10 @@ def test_calc_value_counts():
     bins = 8
     stride = (x.max() - x.min()) / bins
 
-    result, data_points = gpu_histogram.calc_value_counts(
-        x, stride, x.min(), None, custom_binning=False
+    _result, data_points = gpu_histogram.calc_value_counts(
+        x, stride, x.min(), None, custom_binning=custom_binning
     )
-    assert np.array_equal(result[0], np.array([0, 1, 2, 3, 7, 8]))
-    assert np.array_equal(result[1], np.array([100, 150, 300, 100, 50, 150]))
-    assert data_points == 6
+    assert np.array_equal(_result, result)
 
 
 @pytest.mark.parametrize(
