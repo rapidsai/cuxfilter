@@ -97,7 +97,6 @@ class TestDashBoard:
         bac = bokeh.bar("key")
         bac.chart_type = "chart_1"
         dashboard.add_charts([bac])
-        print(bac.filter_widget.value)
         bac.filter_widget.value = (0, 3)
         dashboard._active_view = active_view
 

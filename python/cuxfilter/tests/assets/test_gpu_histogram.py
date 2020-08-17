@@ -131,7 +131,6 @@ def test_calc_groupby(aggregate_fn, result):
 )
 def test_calc_groupby_for_nulls(x, y, aggregate_fn, result):
     df = cudf.DataFrame({"key": [1, 2], "val": [np.NaN, 3]})
-    print(df, x, y)
     bc = BaseChart()
     bc.x = x
     bc.y = y
@@ -139,8 +138,6 @@ def test_calc_groupby_for_nulls(x, y, aggregate_fn, result):
     bc.min_value = df[x].min()
     bc.max_value = df[x].max()
     bc.aggregate_fn = aggregate_fn
-    print(gpu_histogram.calc_groupby(bc, df))
-    print(result)
     assert np.allclose(
         gpu_histogram.calc_groupby(bc, df).astype(np.float32),
         result.astype(np.float32),

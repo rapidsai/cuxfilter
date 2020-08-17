@@ -99,7 +99,8 @@ class TestBaseChart:
         from bokeh.models import Button
 
         def callback(event):
-            print("Python:Click")
+            # Python:Click
+            pass
 
         bc.chart = Button()
         bc.add_event(ButtonClick, callback)
