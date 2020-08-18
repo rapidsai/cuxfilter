@@ -25,6 +25,7 @@ Added edge-curving
 
 ## Bug Fixes
 - PR #161 fixed layouts bugs
+- PR #171 pydeck 0.4.1 fixes and geo_mapper optimizations
 
 # cuXfilter 0.14.0 (03 Jun 2020)
 

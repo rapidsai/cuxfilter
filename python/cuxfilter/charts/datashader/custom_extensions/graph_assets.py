@@ -1,11 +1,34 @@
 import numpy as np
 import cupy as cp
 import cudf
-import numba
 from numba import cuda
-from math import sqrt
+from math import sqrt, ceil
 
-maxThreadsPerBlock = 64
+
+def cuda_args(shape):
+    """
+    Compute the blocks-per-grid and threads-per-block parameters for use when
+    invoking cuda kernels
+    Parameters
+    ----------
+    shape: int or tuple of ints
+        The shape of the input array that the kernel will parallelize over
+    Returns
+    -------
+    tuple
+        Tuple of (blocks_per_grid, threads_per_block)
+    """
+    if isinstance(shape, int):
+        shape = (shape,)
+
+    max_threads = cuda.get_current_device().MAX_THREADS_PER_BLOCK
+    # Note: We divide max_threads by 2.0 to leave room for the registers
+    # occupied by the kernel. For some discussion, see
+    # https://github.com/numba/numba/issues/3798.
+    threads_per_block = int(ceil(max_threads / 2.0) ** (1.0 / len(shape)))
+    tpb = (threads_per_block,) * len(shape)
+    bpg = tuple(int(ceil(d / threads_per_block)) for d in shape)
+    return bpg, tpb
 
 
 def bundle_edges(edges, src="src", dst="dst"):
@@ -65,7 +88,7 @@ def bundle_edges(edges, src="src", dst="dst"):
     return edges
 
 
-@numba.jit
+@cuda.jit(device=True)
 def bezier(start, end, control_point, steps, result):
     for i in range(steps.shape[0]):
         result[i] = (
@@ -75,7 +98,7 @@ def bezier(start, end, control_point, steps, result):
         )
 
 
-@numba.jit
+@cuda.jit(device=True)
 def add_aggregate_col(aggregate_col, steps, result):
     for i in range(steps.shape[0]):
         result[i] = aggregate_col
@@ -151,7 +174,7 @@ def curved_connect_edges(
         ) as the input to datashader.line
     """
     bundled_edges = bundle_edges(edges, src=edge_source, dst=edge_target)
-
+    curve_total_steps = curve_params.pop("curve_total_steps")
     # if aggregate column exists, ignore it for bundled edges compute
     fin_df_ = bundled_edges.apply_rows(
         control_point_compute_kernel,
@@ -162,9 +185,8 @@ def curved_connect_edges(
 
     shape = (fin_df_.shape[0], len(connected_edge_columns) - 2, 101)
     result = cp.zeros(shape=shape, dtype=cp.float32)
-    steps = cp.linspace(0, 1, 100)
-
-    compute_curves[maxThreadsPerBlock, maxThreadsPerBlock](
+    steps = cp.linspace(0, 1, curve_total_steps)
+    compute_curves[cuda_args(fin_df_.shape[0])](
         fin_df_[connected_edge_columns].to_gpu_matrix(),
         fin_df_[["ctrl_point_x", "ctrl_point_y"]].to_gpu_matrix(),
         result,
@@ -188,7 +210,8 @@ def curved_connect_edges(
 @cuda.jit
 def connect_edges(edges, result):
     start = cuda.grid(1)
-    for i in range(start, edges.shape[0], 1):
+    stride = cuda.gridsize(1)
+    for i in range(start, edges.shape[0], stride):
         result[i, 0, 0] = edges[i, 0]
         result[i, 0, 1] = edges[i, 2]
         result[i, 0, 2] = np.nan
@@ -215,9 +238,7 @@ def directly_connect_edges(edges):
     result = cp.zeros(
         shape=(edges.shape[0], edges.shape[1] - 2, 3), dtype=cp.float32
     )
-    connect_edges[maxThreadsPerBlock, maxThreadsPerBlock](
-        edges.to_gpu_matrix(), result
-    )
+    connect_edges[cuda_args(edges.shape[0])](edges.to_gpu_matrix(), result)
     if edges.shape[1] == 5:
         return cudf.DataFrame(
             {
@@ -270,31 +291,45 @@ def calc_connected_edges(
         edges_columns.remove(None)
         connected_edge_columns.remove(None)
 
-    connected_edges_df = edges.merge(
-        nodes, left_on=edge_source, right_on=node_id
-    )[edges_columns].reset_index(drop=True)
+    connected_edges_df = (
+        edges.merge(nodes, left_on=edge_source, right_on=node_id)[
+            edges_columns
+        ]
+        .reset_index(drop=True)
+        .drop_duplicates()
+    )
 
-    connected_edges_df = connected_edges_df.merge(
-        nodes, left_on=edge_target, right_on=node_id, suffixes=("_src", "_dst")
-    ).reset_index(drop=True)
-
-    if edge_render_type == "direct":
-        result = directly_connect_edges(
-            connected_edges_df[connected_edge_columns]
+    connected_edges_df = (
+        connected_edges_df.merge(
+            nodes,
+            left_on=edge_target,
+            right_on=node_id,
+            suffixes=("_src", "_dst"),
         )
+        .reset_index(drop=True)
+        .drop_duplicates()
+    )
 
-    elif edge_render_type == "curved":
-        result = curved_connect_edges(
-            connected_edges_df,
-            edge_source,
-            edge_target,
-            connected_edge_columns,
-            curve_params,
-        )
+    if connected_edges_df.shape[0] > 0:
+        if edge_render_type == "direct":
+            result = directly_connect_edges(
+                connected_edges_df[connected_edge_columns]
+            )
+
+        elif edge_render_type == "curved":
+            result = curved_connect_edges(
+                connected_edges_df,
+                edge_source,
+                edge_target,
+                connected_edge_columns,
+                curve_params.copy(),
+            )
+    else:
+        result = cudf.DataFrame()
 
     if result.shape[0] == 0:
-        result = cudf.DataFrame({k: np.nan for k in ["x", "y"]})
+        result = cudf.DataFrame({k: cp.nan for k in ["x", "y"]})
         if edge_aggregate_col is not None:
-            result[edge_aggregate_col] = np.nan
+            result[edge_aggregate_col] = cp.nan
 
     return result

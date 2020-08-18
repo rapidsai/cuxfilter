@@ -7,42 +7,45 @@ from numba import cuda
 
 from cuxfilter.charts.core.core_chart import BaseChart
 
+test_arr1 = [1, 5, 10, 11, 15, 22, 23, 25, 27, 30, 35, 39, 99, 104, 109]
+test_arr2 = [50, 50, 50, 50, 50, 50, 100, 50, 50, 50, 50, 50, 50, 50, 100]
+test_arr3 = [
+    1,
+    5,
+    10,
+    15,
+    25,
+    27,
+    30,
+    23,
+    22,
+    35,
+    39,
+    99,
+    109,
+    109,
+    104,
+    11,
+    23,
+]
 
-def test_calc_value_counts():
-    x = cudf.Series(
-        np.array(
-            [
-                1,
-                5,
-                10,
-                15,
-                25,
-                27,
-                30,
-                23,
-                22,
-                35,
-                39,
-                99,
-                109,
-                109,
-                104,
-                11,
-                23,
-            ]
-            * 50
-        )
-    )
+
+@pytest.mark.parametrize(
+    "custom_binning, result",
+    [
+        (True, np.array([[0, 1, 2, 3, 7, 8], [100, 150, 300, 100, 50, 150]]),),
+        (False, np.array([test_arr1, test_arr2]),),
+    ],
+)
+def test_calc_value_counts(custom_binning, result):
+    x = cudf.Series(np.array(test_arr3 * 50))
     bins = 8
     stride = (x.max() - x.min()) / bins
 
-    result, data_points, custom_binning = gpu_histogram.calc_value_counts(
-        x, stride, x.min(), None
+    _result, data_points = gpu_histogram.calc_value_counts(
+        x, stride, x.min(), None, custom_binning=custom_binning
     )
-    assert np.array_equal(result[0], np.array([0, 1, 2, 3, 7, 8]))
-    assert np.array_equal(result[1], np.array([100, 150, 300, 100, 50, 150]))
-    assert data_points == 6
-    assert custom_binning is True
+    assert np.array_equal(_result, result)
 
 
 @pytest.mark.parametrize(
@@ -87,7 +90,6 @@ def test_calc_groupby(aggregate_fn, result):
 )
 def test_calc_groupby_for_nulls(x, y, aggregate_fn, result):
     df = cudf.DataFrame({"key": [1, 2], "val": [np.NaN, 3]})
-    print(df, x, y)
     bc = BaseChart()
     bc.x = x
     bc.y = y
@@ -95,8 +97,6 @@ def test_calc_groupby_for_nulls(x, y, aggregate_fn, result):
     bc.min_value = df[x].min()
     bc.max_value = df[x].max()
     bc.aggregate_fn = aggregate_fn
-    print(gpu_histogram.calc_groupby(bc, df))
-    print(result)
     assert np.allclose(
         gpu_histogram.calc_groupby(bc, df).astype(np.float32),
         result.astype(np.float32),

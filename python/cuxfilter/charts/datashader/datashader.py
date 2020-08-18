@@ -154,7 +154,7 @@ def graph(
     node_pixel_spread="dynspread",
     edge_render_type="direct",
     edge_transparency=0,
-    curve_params=dict(strokeWidth=1),
+    curve_params=dict(strokeWidth=1, curve_total_steps=100),
     tile_provider=None,
     width=800,
     height=400,
@@ -239,7 +239,7 @@ def graph(
         value in range [0,1] to specify transparency level of edges, with
         1 being completely transparent
 
-    curve_params: dict, default dict(strokeWidth=1)
+    curve_params: dict, default dict(strokeWidth=1, curve_total_steps=100)
         control curvature and max_bundle_size if edge_render_type='curved'
 
     tile_provider: str, default None

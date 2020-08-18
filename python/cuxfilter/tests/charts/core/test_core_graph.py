@@ -95,7 +95,6 @@ class TestCoreGraph:
         bg.nodes = nodes
         bg.edges = edges
         bg.inspect_neighbors = inspect_neighbors
-        print(bg.inspect_neighbors._active)
         self.result = None
 
         def t_function(nodes, edges=None, patch_update=False):
@@ -126,7 +125,6 @@ class TestCoreGraph:
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         bg.compute_query_dict(dashboard._query_str_dict)
-        print(dashboard._query_str_dict)
         assert dashboard._query_str_dict["x_test"] == query
 
     @pytest.mark.parametrize(
@@ -164,6 +162,7 @@ class TestCoreGraph:
 
     def test_add_reset_event(self):
         bg = BaseGraph()
+        bg.edges = None
         bg.chart_type = "test"
         bg.x = "a"
         bg.x_range = (0, 2)
@@ -176,8 +175,11 @@ class TestCoreGraph:
         def t_func1(event, fn):
             fn("event")
 
-        bg.add_event = t_func1
+        def reload_fn(nodes, edges=None, patch_update=False):
+            pass
 
+        bg.add_event = t_func1
+        bg.reload_chart = reload_fn
         bg.add_reset_event(dashboard)
 
         assert bg.x_range is None

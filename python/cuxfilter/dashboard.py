@@ -203,7 +203,6 @@ class DashBoard:
             )
 
     def _reinit_all_charts(self):
-        self._data_tiles = dict()
         self._query_str_dict = dict()
         if self.data_size_widget:
             temp_chart = data_size_indicator()
@@ -403,7 +402,7 @@ class DashBoard:
 
         display(Image("temp.png"))
 
-    def app(self, notebook_url=None, port: int = 0):
+    def app(self, notebook_url=DEFAULT_NOTEBOOK_URL, port: int = 0):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
@@ -545,7 +544,8 @@ class DashBoard:
         Reload charts with current self._cuxfilter_df.data state.
         """
         if data is None:
-            data = self._cuxfilter_df.data
+            # get current data as per the active queries
+            data = self._query(self._generate_query_str())
         if len(include_cols) == 0:
             include_cols = list(self._charts.keys())
         # reloading charts as per current data state
