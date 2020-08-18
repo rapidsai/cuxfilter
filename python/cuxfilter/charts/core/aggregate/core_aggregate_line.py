@@ -137,6 +137,12 @@ class BaseLine(BaseAggregateChart):
                     self.stride = float(
                         (self.max_value - self.min_value) / self.data_points
                     )
+        if self.stride is None:
+            # No stride for bins specified, in this we case,
+            # we compute cudf.Series.value_counts() for histogram
+            self.custom_binning = False
+        else:
+            self.custom_binning = True
 
         self.calculate_source(dashboard_cls._cuxfilter_df.data)
         self.generate_chart()
@@ -162,8 +168,12 @@ class BaseLine(BaseAggregateChart):
         """
         if self.y == self.x or self.y is None:
             # it's a histogram
-            df, self.data_points, self.custom_binning = calc_value_counts(
-                data[self.x], self.stride, self.min_value, self.data_points
+            df, self.data_points = calc_value_counts(
+                data[self.x],
+                self.stride,
+                self.min_value,
+                self.data_points,
+                self.custom_binning,
             )
             if self.data_points > 50_000:
                 print(
@@ -201,6 +211,23 @@ class BaseLine(BaseAggregateChart):
             "X": list(df[0].astype(df[0].dtype)),
             "Y": list(df[1].astype(df[1].dtype)),
         }
+
+        if patch_update and len(dict_temp["X"]) < len(
+            self.source.data[self.data_x_axis]
+        ):
+            # if not all X axis bins are provided, filling bins not updated
+            # with zeros
+            y_axis_data = self._compute_array_all_bins(
+                self.source.data[self.data_x_axis],
+                self.source.data[self.data_y_axis],
+                dict_temp["X"],
+                dict_temp["Y"],
+            )
+
+            dict_temp = {
+                "X": self.source.data[self.data_x_axis],
+                "Y": y_axis_data,
+            }
 
         self.format_source_data(dict_temp, patch_update)
 

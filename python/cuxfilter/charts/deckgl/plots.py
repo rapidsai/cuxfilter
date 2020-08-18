@@ -66,7 +66,8 @@ class Choropleth(BaseChoropleth):
         colors = [
             nan_color
             if np.isnan(i)
-            else list(ImageColor.getrgb(self.geo_color_palette[i])) + [255]
+            else list(ImageColor.getrgb(self.geo_color_palette[int(i)]))
+            + [255]
             for i in inds
         ]
         self.source_df[self.rgba_columns] = pd.DataFrame(colors)
@@ -77,11 +78,15 @@ class Choropleth(BaseChoropleth):
 
         Parameters:
         -----------
-        source_dict: {'X': [], 'Y': []}
+        source_dict: {
+            self.x: [], self.color_column: [],
+            self.elevation_column: []  # optional
+        }
 
         ColumnDataSource: {
-            'X': np.array(list),
-            'Y': np.array(list)
+            self.x: np.array(list),
+            self.color_column: np.array(list),
+            self.elevation_column: np.array(list) # optional
         }
         """
         res_df = pd.DataFrame(source_dict)

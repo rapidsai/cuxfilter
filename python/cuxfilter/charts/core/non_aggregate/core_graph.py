@@ -1,7 +1,6 @@
 from typing import Tuple
 import dask_cudf
 import cudf
-import numpy as np
 import dask.dataframe as dd
 
 from ..core_chart import BaseChart
@@ -44,7 +43,7 @@ class BaseGraph(BaseChart):
         node_pixel_spread="dynspread",
         edge_render_type="direct",
         edge_transparency=0,
-        curve_params=dict(strokeWidth=1),
+        curve_params=dict(strokeWidth=1, curve_total_steps=100),
         tile_provider="CARTODBPOSITRON",
         width=800,
         height=400,
@@ -184,28 +183,23 @@ class BaseGraph(BaseChart):
         inspect_type = cudf.logical_and
         if self.inspect_neighbors._active:
             inspect_type = cudf.logical_or
-        if node_ids.shape[0] > 0:
-            edges_ = edges.loc[
-                inspect_type(
-                    edges[self.edge_source].isin(node_ids),
-                    edges[self.edge_target].isin(node_ids),
+        edges_ = edges.loc[
+            inspect_type(
+                edges[self.edge_source].isin(node_ids),
+                edges[self.edge_target].isin(node_ids),
+            ).values
+        ]
+        if edges_.shape[0] == 0:
+            nodes = nodes.loc[nodes[self.node_id].isin(node_ids).values]
+        else:
+            edges = edges_
+            nodes = nodes.loc[
+                cudf.logical_or(
+                    nodes[self.node_id].isin(edges[self.edge_source]),
+                    nodes[self.node_id].isin(edges[self.edge_target]),
                 ).values
             ]
-            if edges_.shape[0] == 0:
-                nodes = nodes.loc[nodes[self.node_id].isin(node_ids).values]
-            else:
-                edges = edges_
-                nodes = nodes.loc[
-                    cudf.logical_or(
-                        nodes[self.node_id].isin(edges[self.edge_source]),
-                        nodes[self.node_id].isin(edges[self.edge_target]),
-                    ).values
-                ]
-            return nodes, edges
-        else:
-            nodes = cudf.DataFrame({k: np.nan for k in nodes.columns})
-            edges = cudf.DataFrame({k: np.nan for k in edges.columns})
-            return nodes, edges
+        return nodes, edges
 
     def get_selection_geometry_callback(self, dashboard_cls):
         """
@@ -253,6 +247,8 @@ class BaseGraph(BaseChart):
 
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])
+
+            # reload graph chart separately as it has an extra edges argument
             self.reload_chart(nodes=nodes, edges=edges, patch_update=False)
             del nodes, edges
 
@@ -321,10 +317,17 @@ class BaseGraph(BaseChart):
                 # reset previous active view and set current
                 # chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
-                self.nodes = dashboard_cls._cuxfilter_df.data
             self.x_range = None
             self.y_range = None
-            dashboard_cls._reload_charts()
+            dashboard_cls._query_str_dict.pop(self.name, None)
+
+            nodes = dashboard_cls._query(dashboard_cls._generate_query_str())
+            dashboard_cls._reload_charts(nodes)
+            # reload graph chart separately as it has an extra edges argument
+            self.reload_chart(
+                nodes=nodes, edges=self.edges, patch_update=False
+            )
+            del nodes
 
         # add callback to reset chart button
         self.add_event(self.reset_event, reset_callback)

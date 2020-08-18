@@ -32,13 +32,18 @@ from bokeh.models import (
     FixedTicker,
 )
 from bokeh.tile_providers import get_provider
-import os
-
-scriptDir = os.path.dirname(__file__)
+from PIL import Image
+import requests
+from io import BytesIO
 
 ds_version = LooseVersion(ds.__version__)
 
 _color_mapper = {"linear": LinearColorMapper, "log": LogColorMapper}
+
+
+def load_image(url):
+    response = requests.get(url)
+    return Image.open(BytesIO(response.content))
 
 
 def _rect_vertical_mask(px):
@@ -323,9 +328,9 @@ class Scatter(BaseScatter):
         Ouput:
         """
         if data is not None:
+            if len(data) == 0:
+                data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.interactive_image.update_chart(data_source=data)
-        else:
-            self.interactive_image.update_chart(data_source=self.source)
             if patch_update:
                 self.format_source_data(data)
 
@@ -693,19 +698,40 @@ class Graph(BaseGraph):
         # reset legend and color_bar
         self.legend_added = False
         self.color_bar = None
-
-        impath = os.path.join(scriptDir, "./icons/graph.png")
-
-        self.inspect_neighbors = CustomInspectTool(
-            icon=impath, _active=True, tool_name="Inspect Neighboring Edges"
+        # loading icon from a url
+        impath = (
+            "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
+            + "branch-0.15/python/cuxfilter/charts/datashader/icons/graph.png"
         )
 
-        impath = os.path.join(scriptDir, "./icons/XPan.png")
+        self.inspect_neighbors = CustomInspectTool(
+            icon=load_image(impath),
+            _active=True,
+            tool_name="Inspect Neighboring Edges",
+        )
+        # loading icon from a url
+        impath = (
+            "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
+            + "branch-0.15/python/cuxfilter/charts/datashader/icons/XPan.png"
+        )
         self.display_edges = CustomInspectTool(
-            icon=impath, _active=True, tool_name="Display Edges"
+            icon=load_image(impath), _active=True, tool_name="Display Edges"
         )
 
         def cb(attr, old, new):
+            if new:
+                self.connected_edges = calc_connected_edges(
+                    self.interactive_image.kwargs["data_source"],
+                    self.edges,
+                    self.node_x,
+                    self.node_y,
+                    self.node_id,
+                    self.edge_source,
+                    self.edge_target,
+                    self.edge_aggregate_col,
+                    self.edge_render_type,
+                    self.curve_params,
+                )
             self.interactive_image.update_chart()
 
         self.display_edges.on_change("_active", cb)
@@ -755,21 +781,24 @@ class Graph(BaseGraph):
         Ouput:
         """
         if nodes is not None:
-            if patch_update:
-                self.format_source_data(nodes)
+            if len(nodes) == 0:
+                nodes = cudf.DataFrame({k: cp.nan for k in self.nodes.columns})
+
             # update connected_edges value for datashaded edges
-            self.connected_edges = calc_connected_edges(
-                nodes,
-                self.edges if edges is None else edges,
-                self.node_x,
-                self.node_y,
-                self.node_id,
-                self.edge_source,
-                self.edge_target,
-                self.edge_aggregate_col,
-                self.edge_render_type,
-                self.curve_params,
-            )
+            # if display edge toggle is active
+            if self.display_edges._active and patch_update is False:
+                self.connected_edges = calc_connected_edges(
+                    nodes,
+                    self.edges if edges is None else edges,
+                    self.node_x,
+                    self.node_y,
+                    self.node_id,
+                    self.edge_source,
+                    self.edge_target,
+                    self.edge_aggregate_col,
+                    self.edge_render_type,
+                    self.curve_params,
+                )
             self.interactive_image.update_chart(data_source=nodes)
 
     def add_selection_geometry_event(self, callback):
@@ -1017,6 +1046,8 @@ class Line(BaseLine):
         Ouput:
         """
         if data is not None:
+            if len(data) == 0:
+                data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.interactive_image.update_chart(data_source=data)
             if patch_update:
                 self.format_source_data(data)
@@ -1290,6 +1321,8 @@ class StackedLines(BaseStackedLine):
         Ouput:
         """
         if data is not None:
+            if len(data) == 0:
+                data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.interactive_image.update_chart(data_source=data)
             if patch_update:
                 self.format_source_data(data)

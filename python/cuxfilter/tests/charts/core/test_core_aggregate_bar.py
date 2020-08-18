@@ -82,7 +82,8 @@ class TestBaseBar:
 
         bb.format_source_data = func1
         bb.calculate_source(self.df)
-        assert self.result == result
+        assert all(result["X"] == self.result["X"])
+        assert all(result["Y"] == self.result["Y"])
 
     def test_add_range_slider_filter(self):
         bb = BaseBar(x="key")

@@ -218,6 +218,7 @@ class BaseStackedLine(BaseChart):
                 self.source = dashboard_cls._cuxfilter_df.data
             self.x_range = None
             self.y_range = None
+            dashboard_cls._query_str_dict.pop(self.name, None)
             dashboard_cls._reload_charts()
 
         # add callback to reset chart button

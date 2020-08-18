@@ -2,7 +2,7 @@ import panel as pn
 import param
 import pydeck as pdk
 
-raw_css = """
+css = """
 .multi-select {
 color: white;
 z-index: 100;
@@ -18,7 +18,7 @@ height: 30px;
 }
 """
 
-pn.extension("deckgl", raw_css=[raw_css])
+pn.config.raw_css += [css]
 
 
 class PanelDeck(param.Parameterized):
@@ -65,7 +65,7 @@ class PanelDeck(param.Parameterized):
         """
         super(PanelDeck, self).__init__(**params)
         self._view_state = pdk.ViewState(
-            **self.spec["initialViewState"], bearing=0.45,
+            **self.spec["initialViewState"], bearing=0.45
         )
         self._layers = pdk.Layer(
             "PolygonLayer", data=self.data, **self.spec["layers"][0]
@@ -74,6 +74,14 @@ class PanelDeck(param.Parameterized):
 
         self._deck = pdk.Deck(
             mapbox_key=self.spec["mapboxApiAccessToken"],
+            views=[
+                pdk.View(
+                    type="MapView",
+                    controller=True,
+                    height="100%",
+                    width="100%",
+                )
+            ],
             layers=[self._layers],
             initial_view_state=self._view_state,
             tooltip=self._tooltip,
@@ -82,7 +90,6 @@ class PanelDeck(param.Parameterized):
             self._deck,
             sizing_mode=self.sizing_mode,
             height=self.height,
-            width=self.width,
             css_classes=["deck-chart"],
         )
         self.param.watch(self._update, ["data"])

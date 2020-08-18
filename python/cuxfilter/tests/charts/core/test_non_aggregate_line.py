@@ -19,7 +19,6 @@ class TestNonAggregateBaseLine:
 
     def test_variables(self):
         bl = BaseLine(x="test_x", y="test_y", color="#8735fb")
-        print(bl.color)
         assert bl.x == "test_x"
         assert bl.y == "test_y"
         assert bl.filter_widget is None
