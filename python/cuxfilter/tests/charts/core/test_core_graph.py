@@ -162,6 +162,7 @@ class TestCoreGraph:
 
     def test_add_reset_event(self):
         bg = BaseGraph()
+        bg.edges = None
         bg.chart_type = "test"
         bg.x = "a"
         bg.x_range = (0, 2)
@@ -174,8 +175,11 @@ class TestCoreGraph:
         def t_func1(event, fn):
             fn("event")
 
-        bg.add_event = t_func1
+        def reload_fn(nodes, edges=None, patch_update=False):
+            pass
 
+        bg.add_event = t_func1
+        bg.reload_chart = reload_fn
         bg.add_reset_event(dashboard)
 
         assert bg.x_range is None
