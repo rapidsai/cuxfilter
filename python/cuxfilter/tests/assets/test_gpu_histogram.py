@@ -7,79 +7,38 @@ from numba import cuda
 
 from cuxfilter.charts.core.core_chart import BaseChart
 
+test_arr1 = [1, 5, 10, 11, 15, 22, 23, 25, 27, 30, 35, 39, 99, 104, 109]
+test_arr2 = [50, 50, 50, 50, 50, 50, 100, 50, 50, 50, 50, 50, 50, 50, 100]
+test_arr3 = [
+    1,
+    5,
+    10,
+    15,
+    25,
+    27,
+    30,
+    23,
+    22,
+    35,
+    39,
+    99,
+    109,
+    109,
+    104,
+    11,
+    23,
+]
+
 
 @pytest.mark.parametrize(
     "custom_binning, result",
     [
         (True, np.array([[0, 1, 2, 3, 7, 8], [100, 150, 300, 100, 50, 150]]),),
-        (
-            False,
-            np.array(
-                [
-                    [
-                        1,
-                        5,
-                        10,
-                        11,
-                        15,
-                        22,
-                        23,
-                        25,
-                        27,
-                        30,
-                        35,
-                        39,
-                        99,
-                        104,
-                        109,
-                    ],
-                    [
-                        50,
-                        50,
-                        50,
-                        50,
-                        50,
-                        50,
-                        100,
-                        50,
-                        50,
-                        50,
-                        50,
-                        50,
-                        50,
-                        50,
-                        100,
-                    ],
-                ]
-            ),
-        ),
+        (False, np.array([test_arr1, test_arr2]),),
     ],
 )
 def test_calc_value_counts(custom_binning, result):
-    x = cudf.Series(
-        np.array(
-            [
-                1,
-                5,
-                10,
-                15,
-                25,
-                27,
-                30,
-                23,
-                22,
-                35,
-                39,
-                99,
-                109,
-                109,
-                104,
-                11,
-                23,
-            ]
-            * 50
-        )
-    )
+    x = cudf.Series(np.array(test_arr3 * 50))
     bins = 8
     stride = (x.max() - x.min()) / bins
 

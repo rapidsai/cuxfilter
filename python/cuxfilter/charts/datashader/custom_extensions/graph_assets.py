@@ -174,7 +174,7 @@ def curved_connect_edges(
         ) as the input to datashader.line
     """
     bundled_edges = bundle_edges(edges, src=edge_source, dst=edge_target)
-    curve_total_steps = curve_params.pop('curve_total_steps')
+    curve_total_steps = curve_params.pop("curve_total_steps")
     # if aggregate column exists, ignore it for bundled edges compute
     fin_df_ = bundled_edges.apply_rows(
         control_point_compute_kernel,
@@ -238,9 +238,7 @@ def directly_connect_edges(edges):
     result = cp.zeros(
         shape=(edges.shape[0], edges.shape[1] - 2, 3), dtype=cp.float32
     )
-    connect_edges[cuda_args(edges.shape[0])](
-        edges.to_gpu_matrix(), result
-    )
+    connect_edges[cuda_args(edges.shape[0])](edges.to_gpu_matrix(), result)
     if edges.shape[1] == 5:
         return cudf.DataFrame(
             {
@@ -293,13 +291,24 @@ def calc_connected_edges(
         edges_columns.remove(None)
         connected_edge_columns.remove(None)
 
-    connected_edges_df = edges.merge(
-        nodes, left_on=edge_source, right_on=node_id
-    )[edges_columns].reset_index(drop=True).drop_duplicates()
+    connected_edges_df = (
+        edges.merge(nodes, left_on=edge_source, right_on=node_id)[
+            edges_columns
+        ]
+        .reset_index(drop=True)
+        .drop_duplicates()
+    )
 
-    connected_edges_df = connected_edges_df.merge(
-        nodes, left_on=edge_target, right_on=node_id, suffixes=("_src", "_dst")
-    ).reset_index(drop=True).drop_duplicates()
+    connected_edges_df = (
+        connected_edges_df.merge(
+            nodes,
+            left_on=edge_target,
+            right_on=node_id,
+            suffixes=("_src", "_dst"),
+        )
+        .reset_index(drop=True)
+        .drop_duplicates()
+    )
 
     if connected_edges_df.shape[0] > 0:
         if edge_render_type == "direct":

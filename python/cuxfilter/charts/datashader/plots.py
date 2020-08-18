@@ -708,11 +708,16 @@ class Graph(BaseGraph):
         def cb(attr, old, new):
             if new:
                 self.connected_edges = calc_connected_edges(
-                    self.interactive_image.kwargs['data_source'],
-                    self.edges, self.node_x,
-                    self.node_y, self.node_id, self.edge_source,
-                    self.edge_target, self.edge_aggregate_col,
-                    self.edge_render_type, self.curve_params,
+                    self.interactive_image.kwargs["data_source"],
+                    self.edges,
+                    self.node_x,
+                    self.node_y,
+                    self.node_id,
+                    self.edge_source,
+                    self.edge_target,
+                    self.edge_aggregate_col,
+                    self.edge_render_type,
+                    self.curve_params,
                 )
             self.interactive_image.update_chart()
 
@@ -771,10 +776,15 @@ class Graph(BaseGraph):
             if self.display_edges._active and patch_update is False:
                 self.connected_edges = calc_connected_edges(
                     nodes,
-                    self.edges if edges is None else edges, self.node_x,
-                    self.node_y, self.node_id, self.edge_source,
-                    self.edge_target, self.edge_aggregate_col,
-                    self.edge_render_type, self.curve_params,
+                    self.edges if edges is None else edges,
+                    self.node_x,
+                    self.node_y,
+                    self.node_id,
+                    self.edge_source,
+                    self.edge_target,
+                    self.edge_aggregate_col,
+                    self.edge_render_type,
+                    self.curve_params,
                 )
             self.interactive_image.update_chart(data_source=nodes)
 
