@@ -32,13 +32,18 @@ from bokeh.models import (
     FixedTicker,
 )
 from bokeh.tile_providers import get_provider
-import os
-
-scriptDir = os.path.dirname(__file__)
+from PIL import Image
+import requests
+from io import BytesIO
 
 ds_version = LooseVersion(ds.__version__)
 
 _color_mapper = {"linear": LinearColorMapper, "log": LogColorMapper}
+
+
+def load_image(url):
+    response = requests.get(url)
+    return Image.open(BytesIO(response.content))
 
 
 def _rect_vertical_mask(px):
@@ -693,16 +698,24 @@ class Graph(BaseGraph):
         # reset legend and color_bar
         self.legend_added = False
         self.color_bar = None
-
-        impath = os.path.join(scriptDir, "./icons/graph.png")
-
-        self.inspect_neighbors = CustomInspectTool(
-            icon=impath, _active=True, tool_name="Inspect Neighboring Edges"
+        # loading icon from a url
+        impath = (
+            "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
+            + "branch-0.15/python/cuxfilter/charts/datashader/icons/graph.png"
         )
 
-        impath = os.path.join(scriptDir, "./icons/XPan.png")
+        self.inspect_neighbors = CustomInspectTool(
+            icon=load_image(impath),
+            _active=True,
+            tool_name="Inspect Neighboring Edges",
+        )
+        # loading icon from a url
+        impath = (
+            "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
+            + "branch-0.15/python/cuxfilter/charts/datashader/icons/XPan.png"
+        )
         self.display_edges = CustomInspectTool(
-            icon=impath, _active=True, tool_name="Display Edges"
+            icon=load_image(impath), _active=True, tool_name="Display Edges"
         )
 
         def cb(attr, old, new):
