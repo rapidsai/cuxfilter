@@ -171,8 +171,8 @@ class BaseChoropleth(BaseChart):
             shape=(int(max(source_x.max(), update_data_x.max())),)
         )
         # -1 for 0-based indexing, making sure indexes are type int
-        np.put(result_array, (update_data_x - 1).astype("int"), update_data_y)
-        return result_array[source_x.astype("int") - 1]
+        np.put(result_array, (update_data_x - 1).astype(int), update_data_y)
+        return result_array[source_x.astype(int) - 1]
 
     def calculate_source(self, data, patch_update=False):
         """
@@ -353,7 +353,7 @@ class BaseChoropleth(BaseChart):
             )
             datatile_indices = (
                 (self.source.data[self.x] - self.min_value) / self.stride
-            ).astype("int")
+            ).astype(int)
 
             if key == self.color_column:
                 temp_agg_function = self.color_aggregate_fn
@@ -454,7 +454,7 @@ class BaseChoropleth(BaseChart):
         """
         datatile_indices = (
             (self.source.data[self.x] - self.min_value) / self.stride
-        ).astype("int")
+        ).astype(int)
         if len(new_indices) == 0 or new_indices == [""]:
             datatile_sum_0 = np.array(
                 datatile[0].loc[datatile_indices].sum(axis=1, skipna=True)
@@ -507,7 +507,7 @@ class BaseChoropleth(BaseChart):
         """
         datatile_indices = (
             (self.source.data[self.x] - self.min_value) / self.stride
-        ).astype("int")
+        ).astype(int)
         if len(new_indices) == 0 or new_indices == [""]:
             datatile_result = np.array(
                 datatile.loc[datatile_indices, :].sum(axis=1, skipna=True)
@@ -559,7 +559,7 @@ class BaseChoropleth(BaseChart):
         """
         datatile_indices = (
             (self.source.data[self.x] - self.min_value) / self.stride
-        ).astype("int")
+        ).astype(int)
 
         if len(new_indices) == 0 or new_indices == [""]:
             # get min or max from datatile df, skipping column 0(always 0)
@@ -572,7 +572,7 @@ class BaseChoropleth(BaseChart):
             new_indices = np.array(new_indices)
             new_indices = np.round(
                 (new_indices - active_chart.min_value) / active_chart.stride
-            ).astype("int")
+            ).astype(int)
             datatile_result = np.array(
                 getattr(
                     datatile.loc[datatile_indices, list(new_indices)],

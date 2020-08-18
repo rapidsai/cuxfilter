@@ -18,8 +18,8 @@ class BaseAggregateChart(BaseChart):
         """
         result_array = np.zeros(shape=(int(source_x.max()),))
         # -1 for 0-based indexing
-        np.put(result_array, update_data_x.astype("int") - 1, update_data_y)
-        return result_array[source_x.astype("int") - 1]
+        np.put(result_array, update_data_x.astype(int) - 1, update_data_y)
+        return result_array[source_x.astype(int) - 1]
 
     def query_chart_by_range(self, active_chart, query_tuple, datatile):
         """
@@ -48,7 +48,7 @@ class BaseAggregateChart(BaseChart):
             datatile_indices = (
                 (self.source.data[self.data_x_axis] - self.min_value)
                 / self.stride
-            ).astype("int")
+            ).astype(int)
 
         if datatile_index_min == 0:
             if self.aggregate_fn == "mean":
@@ -128,7 +128,7 @@ class BaseAggregateChart(BaseChart):
             datatile_indices = (
                 (self.source.data[self.data_x_axis] - self.min_value)
                 / self.stride
-            ).astype("int")
+            ).astype(int)
         if len(new_indices) == 0 or new_indices == [""]:
             datatile_sum_0 = np.array(
                 datatile[0].loc[datatile_indices].sum(axis=1, skipna=True)
@@ -180,7 +180,7 @@ class BaseAggregateChart(BaseChart):
             datatile_indices = (
                 (self.source.data[self.data_x_axis] - self.min_value)
                 / self.stride
-            ).astype("int")
+            ).astype(int)
         if len(new_indices) == 0 or new_indices == [""]:
             datatile_result = np.array(
                 datatile.loc[datatile_indices, :].sum(axis=1, skipna=True)
@@ -232,7 +232,7 @@ class BaseAggregateChart(BaseChart):
             datatile_indices = (
                 (self.source.data[self.data_x_axis] - self.min_value)
                 / self.stride
-            ).astype("int")
+            ).astype(int)
 
         if len(new_indices) == 0 or new_indices == [""]:
             # get min or max from datatile df, skipping column 0(always 0)
@@ -245,7 +245,7 @@ class BaseAggregateChart(BaseChart):
             new_indices = np.array(new_indices)
             new_indices = np.round(
                 (new_indices - active_chart.min_value) / active_chart.stride
-            ).astype("int")
+            ).astype(int)
             datatile_result = np.array(
                 getattr(
                     datatile.loc[datatile_indices, list(new_indices)],
