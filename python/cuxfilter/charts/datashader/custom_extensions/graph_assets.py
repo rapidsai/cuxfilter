@@ -210,7 +210,7 @@ def curved_connect_edges(
 @cuda.jit
 def connect_edges(edges, result):
     start = cuda.grid(1)
-    stride = cuda.grid(1)
+    stride = cuda.gridsize(1)
     for i in range(start, edges.shape[0], stride):
         result[i, 0, 0] = edges[i, 0]
         result[i, 0, 1] = edges[i, 2]
