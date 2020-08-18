@@ -111,8 +111,7 @@ class BaseNonAggregate(BaseChart):
             temp_data = dashboard_cls._query(
                 dashboard_cls._generate_query_str()
             )
-            if len(temp_data) == 0:
-                temp_data = cudf.DataFrame({k: cp.nan for k in self.source})
+
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(
                 data=temp_data, ignore_cols=[self.name]
@@ -185,9 +184,6 @@ class BaseNonAggregate(BaseChart):
                 # reset previous active view and set current
                 # chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
-                self.source = dashboard_cls._cuxfilter_df.data
-            self.x_range = None
-            self.y_range = None
             dashboard_cls._query_str_dict.pop(self.name, None)
             dashboard_cls._reload_charts()
 
