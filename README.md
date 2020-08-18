@@ -52,22 +52,22 @@ DATA_DIR = './data'
 from cuxfilter.sampledata import datasets_check
 datasets_check('auto_accidents', base_dir=DATA_DIR)
 
-cux_df = cuxfilter.DataFrame.from_arrow('./data/auto_accidents.arrow')
+cux_df = cuxfilter.DataFrame.from_arrow(DATA_DIR+'/auto_accidents.arrow')
 cux_df.data['ST_CASE'] = cux_df.data['ST_CASE'].astype('float64')
 
 label_map = {1: 'Sunday',    2: 'Monday',    3: 'Tuesday',    4: 'Wednesday',   5: 'Thursday',    6: 'Friday',    7: 'Saturday',    9: 'Unknown'}
-gtc_demo_red_blue_palette = [ (49,130,189), (107,174,214), (123, 142, 216), (226,103,152), (255,0,104) , (50,50,50) ]
+gtc_demo_red_blue_palette = [ "#3182bd", "#6baed6", "#7b8ed8", "#e26798", "#ff0068" , "#323232" ]
 
 #declare charts
-chart1 = cuxfilter.charts.scatter_geo(x='dropoff_x', y='dropoff_y', aggregate_col='ST_CASE',
-                                         color_palette=gtc_demo_red_blue_palette)
+chart1 = cuxfilter.charts.scatter(x='dropoff_x', y='dropoff_y', aggregate_col='DAY_WEEK', aggregate_fn='mean',
+                                color_palette=gtc_demo_red_blue_palette, tile_provider='CARTODBPOSITRON',
+                                pixel_shade_type='linear')
 chart2 = cuxfilter.charts.multi_select('YEAR')
 chart3 = cuxfilter.charts.bar('DAY_WEEK', x_label_map=label_map)
 chart4 = cuxfilter.charts.bar('MONTH')
 
 #declare dashboard
-d = cux_df.dashboard([chart1, chart2, chart3, chart4], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Auto Accident Dataset')
-
+d = cux_df.dashboard([chart1, chart2, chart3, chart4], layout=cuxfilter.layouts.feature_and_double_base, title='Auto Accident Dataset')
 #run the dashboard as a webapp:
 d.show('jupyter-notebook/lab-url')
 ```
@@ -136,9 +136,9 @@ For the most customized way of installing RAPIDS and cuxfilter, visit the select
 *cuxfilter conda example installation:*
 
 ```bash
-# ex. for CUDA 10.0
+# ex. for CUDA 10.2
 conda install -c rapidsai -c nvidia -c conda-forge \
-    -c defaults cuxfilter=0.12 python=3.6 cudatoolkit=10.0
+    -c defaults cuxfilter=0.15 python=3.6 cudatoolkit=10.2
 ```
 
 ### Docker container
@@ -148,10 +148,10 @@ For the most customized way of installing RAPIDS and cuxfilter, visit the select
 *cuxfilter docker example installation:*
 
 ```bash
-# ex. for CUDA 10.0
-docker pull rapidsai/rapidsai:cuda10.0-runtime-ubuntu16.04
+# ex. for CUDA 10.2
+docker pull rapidsai/rapidsai:cuda10.2-runtime-ubuntu16.04
 docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 \
-    rapidsai/rapidsai:cuda10.0-runtime-ubuntu16.04
+    rapidsai/rapidsai:cuda10.2-runtime-ubuntu16.04
 
 # open http://localhost:8888
 ```
@@ -214,7 +214,7 @@ Currently supported layout templates and example code can be found on the [layou
 | Library  | Chart type |
 | ------------- | ------------- |
 | bokeh  | bar, line  |
-| datashader  | scatter, scatter_geo, line, stacked_lines, heatmap, graph(uses bokeh for nodes<20_000) |
+| datashader  | scatter, scatter_geo, line, stacked_lines, heatmap, graph |
 | panel_widgets  | range_slider, float_slider, int_slider, drop_down, multi_select  |
 | custom    | view_dataframe |
 | pydeck    | choropleth(3d and 2d)   |
