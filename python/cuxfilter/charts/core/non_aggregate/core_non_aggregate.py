@@ -184,6 +184,8 @@ class BaseNonAggregate(BaseChart):
                 # reset previous active view and set current
                 # chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
+            self.x_range = None
+            self.y_range = None
             dashboard_cls._query_str_dict.pop(self.name, None)
             dashboard_cls._reload_charts()
 
