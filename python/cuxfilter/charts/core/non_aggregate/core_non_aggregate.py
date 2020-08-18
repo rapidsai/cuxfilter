@@ -1,7 +1,5 @@
 from typing import Tuple
 import dask_cudf
-import cudf
-import cupy as cp
 import dask.dataframe as dd
 
 from ..core_chart import BaseChart
