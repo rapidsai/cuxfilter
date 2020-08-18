@@ -13,7 +13,7 @@ dependencies:
 - distributed>=2.12.0
 - dask-cuda=0.15*
 - dask-cudf=0.15*
-- datashader>=0.10.*
+- datashader>=0.11.1
 - geopandas>=0.6.*
 - pyproj>=2.4.*
 - libwebp
@@ -33,8 +33,8 @@ dependencies:
 - ipython
 - pyppeteer
 - jupyterlab
-- black
-- flake8
+- flake8=3.8.3
+- black=19.10
 - pydeck>=0.3.*
 - pip
 - pip:
