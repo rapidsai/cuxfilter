@@ -25,6 +25,7 @@ requirements:
   run:
     - python
     - cudf {{ minor_version }}
+    - cuspatial {{ minor_version }}
     - dask-cudf {{ minor_version }}
     - dask-cuda {{ minor_version }}
     - datashader >=0.11.1

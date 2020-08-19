@@ -1,4 +1,6 @@
 from typing import Tuple
+import cudf
+import cuspatial
 import dask_cudf
 import dask.dataframe as dd
 
@@ -81,13 +83,26 @@ class BaseNonAggregate(BaseChart):
 
         """
 
-        def selection_callback(xmin, xmax, ymin, ymax):
-            if dashboard_cls._active_view != self.name:
-                # reset previous active view and
-                # set current chart as active view
-                dashboard_cls._reset_current_view(new_active_view=self)
-                self.source = dashboard_cls._cuxfilter_df.data
+        def lasso_callback(xs, ys):
+            indices = cuspatial.point_in_polygon(
+                self.source[self.x],
+                self.source[self.y],
+                cudf.Series([0], index=['selection']),
+                [0],
+                xs, 
+                ys
+            )
+            temp_data = self.source[indices.selection] 
 
+            # reload all charts with new queried data (cudf.DataFrame only)
+            dashboard_cls._reload_charts(
+                data=temp_data, ignore_cols=[self.name]
+            )
+            self.reload_chart(temp_data, False)
+            del temp_data
+            del indices
+
+        def box_callback(xmin, xmax, ymin, ymax):
             self.x_range = (xmin, xmax)
             self.y_range = (ymin, ymax)
 
@@ -116,6 +131,22 @@ class BaseNonAggregate(BaseChart):
             )
             self.reload_chart(temp_data, False)
             del temp_data
+
+        def selection_callback(event):
+            if dashboard_cls._active_view != self.name:
+                # reset previous active view and
+                # set current chart as active view
+                dashboard_cls._reset_current_view(new_active_view=self)
+                self.source = dashboard_cls._cuxfilter_df.data
+
+            if event.geometry["type"] == "rect":
+                xmin, xmax = event.geometry["x0"], event.geometry["x1"]
+                ymin, ymax = event.geometry["y0"], event.geometry["y1"]
+                box_callback(xmin, xmax, ymin, ymax)
+            elif event.geometry["type"] == "poly" and event.final:
+                xs = event.geometry["x"]
+                ys = event.geometry["y"]
+                lasso_callback(xs, ys)
 
         return selection_callback
 

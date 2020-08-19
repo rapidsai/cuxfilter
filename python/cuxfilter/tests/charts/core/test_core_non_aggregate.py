@@ -1,5 +1,6 @@
 import pytest
 import cudf
+import mock
 
 from cuxfilter.charts.core.non_aggregate.core_non_aggregate import (
     BaseNonAggregate,
@@ -86,7 +87,7 @@ class TestCoreNonAggregateChart:
         )
         assert callable(type(bnac.get_selection_geometry_callback(dashboard)))
 
-    def test_selection_callback(self):
+    def test_box_election_callback(self):
         bnac = BaseNonAggregate()
         bnac.x = "a"
         bnac.y = "b"
@@ -102,9 +103,41 @@ class TestCoreNonAggregateChart:
 
         dashboard._active_view = bnac.name
 
+        class evt:
+            geometry = dict(x0=1, x1=2, y0=3, y1=4, type="rect")
+
         t = bnac.get_selection_geometry_callback(dashboard)
-        t(xmin=1, xmax=2, ymin=3, ymax=4)
+        t(evt)
         assert self.result.equals(df.query("1<=a<=2 and 3<=b<=4"))
+
+    def test_lasso_election_callback(self):
+        bnac = BaseNonAggregate()
+        bnac.x = "a"
+        bnac.y = "b"
+        bnac.source = dict(a=[], b=[], s=[])
+        bnac.chart_type = "temp"
+        self.result = None
+
+        def t_function(data, patch_update=False):
+            self.result = data
+
+        bnac.reload_chart = t_function
+        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
+        dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
+
+        dashboard._active_view = bnac.name
+
+        class evt:
+            geometry = dict(x=[1,1,2], y=[1,2,1], type="poly")
+            final = True
+
+        t = bnac.get_selection_geometry_callback(dashboard)
+        with mock.patch("cuspatial.point_in_polygon") as pip:
+            class _indices:
+                selection = "s"
+            pip.return_value = _indices
+            t(evt)
+            assert pip.called
 
     @pytest.mark.parametrize(
         "data, _data",
