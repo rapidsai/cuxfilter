@@ -1,4 +1,4 @@
-# cuXfilter 0.15.0 (Date TBD)
+# cuxfilter 0.15.0 (Date TBD)
 
 ## New Features
 - PR #164 Added new Graph api, supports (nodes[cuDF], edges[cuDF]) input
@@ -14,12 +14,14 @@
 - PR #169 Added Node-Inspect Neighbor widget to graph charts
 Added edge-curving
 - PR #173 Updates to installation docs
+- PR #180 Added documentation for deploying as a multi-user dashboard
 
 ## Bug Fixes
 - PR #161 fixed layouts bugs
 - PR #171 pydeck 0.4.1 fixes and geo_mapper optimizations
+- PR #180 Datashader version pin fixing issues with cuDF 0.14+
 
-# cuXfilter 0.14.0 (03 Jun 2020)
+# cuxfilter 0.14.0 (03 Jun 2020)
 
 ## New Features
 - PR #136 Local gpuCI build script
@@ -43,7 +45,7 @@ add_chart now dynamically updates a running dashboard in real-time(page-refresh 
 - PR #151 docs and minor bug fixes, also fixed dashboard server notebook issues
 - PR #165 Fix issue with incorrect docker image being used in local build script
 
-# cuXfilter 0.13.0 (31 March 2020)
+# cuxfilter 0.13.0 (31 March 2020)
 
 ## New Features
 
@@ -59,7 +61,7 @@ add_chart now dynamically updates a running dashboard in real-time(page-refresh 
 - PR #112 - updated bokeh dependecy to be 1.* instead of >1
 - PR #122 Critical bug fix - resolves rendering issue related to deckgl charts
 
-# cuXfilter 0.12.0 (4 Feb 2020)
+# cuxfilter 0.12.0 (4 Feb 2020)
 
 ## New Features
 
