@@ -6,11 +6,9 @@ set -e
 
 export CUXFILTER_FILE=`conda build conda/recipes/cuxfilter --python=$PYTHON --output`
 
-SOURCE_BRANCH=master
 CUDA_REL=${CUDA_VERSION%.*}
 
-# Restrict uploads to master branch
-if [ ${GIT_BRANCH} != ${SOURCE_BRANCH} ]; then
+if [ ${BUILD_MODE} != "branch" ]; then
   echo "Skipping upload"
   return 0
 fi
