@@ -15,6 +15,7 @@ dependencies:
 - dask-cuda=0.15*
 - dask-cudf=0.15*
 - datashader>=0.11.1
+- numba>=0.51.2
 - geopandas>=0.6.*
 - pyproj>=2.4.*
 - libwebp
