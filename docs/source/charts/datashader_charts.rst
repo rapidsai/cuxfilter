@@ -1,5 +1,5 @@
 Datashader Charts
-===================
+=================
 
 
 .. currentmodule:: cuxfilter.charts
@@ -9,6 +9,12 @@ line chart
 ----------
 
 .. automethod:: datashader.line
+
+.. jupyter-execute::
+    :hide-code:
+
+    import panel as pn
+    pn.extension()
 
 Example
 ~~~~~~~
@@ -31,6 +37,7 @@ Example
     d = cux_df.dashboard([line_chart_1])
     line_chart_1.view()
 
+
 Scatter chart
 -------------
 .. automethod:: datashader.scatter
@@ -51,6 +58,7 @@ Example
 
     d = cux_df.dashboard([scatter_chart])
     scatter_chart.view()
+
 
 Stacked_Lines chart
 -------------------
@@ -113,6 +121,12 @@ Graph chart
 Example
 ~~~~~~~
 .. jupyter-execute::
+    :hide-code:
+
+    from bokeh.io import show, output_notebook
+    output_notebook()
+    
+.. jupyter-execute::
 
     import cuxfilter
     import cudf
@@ -134,3 +148,4 @@ Example
 
     d = cux_df.dashboard([chart0], layout=cuxfilter.layouts.double_feature)
     chart0.view()
+

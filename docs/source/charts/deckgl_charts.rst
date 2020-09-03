@@ -8,6 +8,14 @@ Choropleth Chart
 
 .. automethod:: deckgl.choropleth
 
+
+.. jupyter-execute::
+    :hide-code:
+
+    import panel as pn
+    pn.extension()
+
+
 Example 3d-Choropleth
 ~~~~~~~~~~~~~~~~~~~~~
 .. jupyter-execute::
@@ -34,9 +42,9 @@ Example 3d-Choropleth
 
     #declare dashboard
     d = cux_df.dashboard([chart0],theme = cuxfilter.themes.dark, title='Mortgage Dashboard')
-
-    # cuxfilter.load_notebook_assets()
     chart0.view()
+    # use chart0.view() in a notebook cell to view the individual charts
+    await d.preview()
     
     
 Example 2d-Choropleth
@@ -65,5 +73,5 @@ Example 2d-Choropleth
     #declare dashboard
     d = cux_df.dashboard([chart0],theme = cuxfilter.themes.dark, title='Mortgage Dashboard')
 
-    # cuxfilter.load_notebook_assets()
-    chart0.view()
+    # use chart0.view() in a notebook cell to view the individual charts
+    await d.preview()
