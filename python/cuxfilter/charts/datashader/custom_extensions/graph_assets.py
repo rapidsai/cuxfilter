@@ -297,6 +297,8 @@ def calc_connected_edges(
         edges_columns.remove(None)
         connected_edge_columns.remove(None)
 
+    nodes = nodes[[node_id, node_x, node_y]].drop_duplicates()
+
     connected_edges_df = edges.merge(
         nodes, left_on=edge_source, right_on=node_id
     )[edges_columns].reset_index(drop=True)

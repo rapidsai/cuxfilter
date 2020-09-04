@@ -20,6 +20,7 @@ Added edge-curving
 - PR #161 fixed layouts bugs
 - PR #171 pydeck 0.4.1 fixes and geo_mapper optimizations
 - PR #180 Datashader version pin fixing issues with cuDF 0.14+
+- PR #186 syntax fixes to avoid CI failure
 
 # cuxfilter 0.14.0 (03 Jun 2020)
 
