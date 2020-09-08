@@ -1,4 +1,12 @@
-# cuxfilter 0.15.0 (Date TBD)
+# cuXfilter 0.16.0 (Date TBD)
+
+## New Features
+
+## Improvements
+
+## Bug Fixes
+
+# cuXfilter 0.15.0 (Date TBD)
 
 ## New Features
 - PR #164 Added new Graph api, supports (nodes[cuDF], edges[cuDF]) input
