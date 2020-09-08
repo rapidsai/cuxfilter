@@ -27,7 +27,8 @@ requirements:
     - cudf {{ minor_version }}
     - dask-cudf {{ minor_version }}
     - dask-cuda {{ minor_version }}
-    - datashader >=0.10.*
+    - datashader >=0.11.1
+    - numba >=0.51.2
     - cupy  >=6*
     - panel >=0.9.*
     - bokeh >=2.1.1

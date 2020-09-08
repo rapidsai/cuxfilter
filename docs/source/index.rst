@@ -10,6 +10,7 @@ cuxfilter acts as a connector library, which provides the connections between di
     
    ./installation.rst
    ./dataframe.rst
+   ./deployment.rst
    ./10 minutes to cuxfilter.ipynb
    ./charts/charts.rst
    ./layouts/Layouts.ipynb
