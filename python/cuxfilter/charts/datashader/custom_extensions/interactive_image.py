@@ -4,15 +4,14 @@ from distutils.version import LooseVersion
 
 import bokeh
 import uuid
-import time
 
 from bokeh.document import Document
-from bokeh.models import ColumnDataSource
+from bokeh.models import ColumnDataSource, CustomJS, Slider
 
 bokeh_version = LooseVersion(bokeh.__version__)
 
 if bokeh_version > "0.12.9":
-    from bokeh.embed.notebook import encode_utf8, notebook_content
+    from bokeh.embed.notebook import notebook_content
 else:
     from bokeh.embed import notebook_div
 
@@ -40,8 +39,7 @@ def bokeh_notebook_div(image):
     """
     if bokeh_version > "0.12.9":
         js, div, _ = notebook_content(image.p, image.ref)
-        html = NOTEBOOK_DIV.format(plot_script=js, plot_div=div)
-        div = encode_utf8(html)
+        div = NOTEBOOK_DIV.format(plot_script=js, plot_div=div)
         # Ensure events are held until an update is triggered
         image.doc.hold()
     else:
@@ -69,7 +67,7 @@ class InteractiveImage(object):
               w, h, **kwargs)
 
         and returning a PIL image object.
-    timeout: int
+    timeout: int (milliseconds), default 100
         Determines the timeout after which the callback will
         process new events without the previous one having
         reported completion. Increase for very long running
@@ -79,14 +77,45 @@ class InteractiveImage(object):
         function.
     """
 
+    def callback_js(self):
+        js_code = """
+
+            //debouncing
+
+            function update_plot() {
+                if(Bokeh._queued.length){
+                    if (hidden_chart.value == 0){
+                        hidden_chart.value = 1
+                    }else{
+                        hidden_chart.value = 0
+                    }
+                    Bokeh._timeout = Date.now();
+                    Bokeh._queued = [];
+                }
+            }
+
+            if (!Bokeh._queued) {{
+                Bokeh._queued = [];
+                //so that first callback is executed
+                Bokeh._timeout = Date.now() - __timeout;
+            }}
+
+            if((Date.now() - Bokeh._timeout) < __timeout){
+                Bokeh._queued = [cb_obj]
+            }else{
+                Bokeh._queued = [cb_obj];
+                update_plot()
+                setTimeout(update_plot, __timeout)
+            }
+
+        """
+        return CustomJS(
+            args=dict(hidden_chart=self.hidden_chart, __timeout=self.timeout,),
+            code=js_code,
+        )
+
     def callback_py(self, attr, old, new):
-        now = time.time()
-        if now - self.last_run < self.timeout:
-            pass
-        else:
-            self.last_run = time.time()
-            # time.sleep(self.timeout)
-            self.update_chart()
+        self.update_chart()
 
     def update_chart(self, **kwargs):
         dict_temp = {
@@ -102,19 +131,20 @@ class InteractiveImage(object):
 
     _callbacks = {}
 
-    def __init__(self, bokeh_plot, callback, delay=200, timeout=0.4, **kwargs):
+    def __init__(
+        self, bokeh_plot, callback, delay=200, timeout=10000, **kwargs
+    ):
         self.p = bokeh_plot
         self.callback = callback
         self.kwargs = kwargs
         self.ref = str(uuid.uuid4())
-
         self.timeout = timeout
-
+        self.hidden_chart = Slider(visible=False, start=0, end=1, value=0)
         # Initialize the image and callback
         self.ds, self.renderer = self._init_image()
-        self.last_run = time.time()
-        self.p.x_range.on_change("start", self.callback_py)
-        self.p.y_range.on_change("start", self.callback_py)
+        self.p.x_range.js_on_change("start", self.callback_js())
+        self.p.y_range.js_on_change("start", self.callback_js())
+        self.hidden_chart.on_change("value", self.callback_py)
 
     def _init_image(self):
         """

@@ -22,6 +22,8 @@ class DataFrame:
     """
 
     data: Type[cudf.DataFrame] = None
+    is_graph = False
+    edges: Type[cudf.DataFrame] = None
 
     @classmethod
     def from_arrow(cls, dataframe_location):
@@ -51,7 +53,7 @@ class DataFrame:
             df = cudf.DataFrame.from_arrow(read_arrow(dataframe_location))
         else:
             df = cudf.DataFrame.from_arrow(dataframe_location)
-        return DataFrame(df)
+        return cls(df)
 
     @classmethod
     def from_dataframe(cls, dataframe):
@@ -83,11 +85,73 @@ class DataFrame:
         >>> cux_df = cuxfilter.DataFrame.from_dataframe(cudf_df)
 
         """
-        return DataFrame(dataframe)
+        return cls(dataframe)
+
+    @classmethod
+    def load_graph(cls, graph):
+        """
+        create a cuxfilter.DataFrame from cudf.DataFrame/dask_cudf.DataFrame
+        (zero-copy reference) from a graph object
+
+        Parameters
+        ----------
+        tuple object (nodes, edges) where nodes and edges are cudf DataFrames
+
+        Returns
+        -------
+        cuxfilter.DataFrame object
+
+        Examples
+        --------
+
+        load graph from cugraph object
+
+        >>> import cuxfilter
+        >>> import cudf, cugraph
+        >>> edges = cudf.DataFrame(
+        >>>     {
+        >>>         'source': [0, 1, 2, 3, 4],
+        >>>         'target':[0,1,2,3,4],
+        >>>         'weight':[4,4,2,6,7],
+        >>>     }
+        >>> )
+        >>> G = cugraph.Graph()
+        >>> G.from_cudf_edgelist(edges)
+        >>> cux_df = cuxfilter.DataFrame.load_graph((G.nodes(), G.edges()))
+
+        load graph from (nodes, edges)
+
+        >>> import cuxfilter
+        >>> import cudf
+        >>> nodes = cudf.DataFrame(
+        >>>     {
+        >>>         'vertex': [0, 1, 2, 3, 4],
+        >>>         'x':[0,1,2,3,4],
+        >>>         'y':[4,4,2,6,7],
+        >>>         'attr': [0,1,1,1,1]
+        >>>     }
+        >>> )
+        >>> edges = cudf.DataFrame(
+        >>>     {
+        >>>         'source': [0, 1, 2, 3, 4],
+        >>>         'target':[0,1,2,3,4],
+        >>>         'weight':[4,4,2,6,7],
+        >>>     }
+        >>> )
+        >>> cux_df = cuxfilter.DataFrame.load_graph((nodes,edges))
+
+        """
+        if isinstance(graph, tuple):
+            nodes, edges = graph
+            df = cls(nodes)
+            df.is_graph = True
+            df.edges = edges
+            return df
+        raise ValueError(
+            "Expected value for graph - (nodes[cuDF], edges[cuDF])"
+        )
 
     def __init__(self, data):
-        # pn.extension()
-        self.backup = data
         self.data = data
 
     def dashboard(
@@ -149,5 +213,5 @@ class DataFrame:
             notebook_assets.load_notebook_assets()
 
         return DashBoard(
-            charts, self.data, layout, theme, title, data_size_widget, warnings
+            charts, self, layout, theme, title, data_size_widget, warnings
         )

@@ -1,11 +1,19 @@
-layout_0 = """
-<!-- goes in body -->
-{% block contents %}
+# Note: curly braces for Jinja must be escaped in format string
+_content = """
+{{% block contents %}}
+{nav}
+{layout}
+{{% endblock %}}
+"""
+
+_nav = """
 <nav>
     {{embed(roots.title)}}
     <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-
 </nav>
+"""
+
+_layout_0 = """
 <div class="container">
     <div class="pure-g">
         <div class="pure-u-1">
@@ -13,16 +21,11 @@ layout_0 = """
         </div>
     </div>
 </div>
-{% endblock %}
 """
+layout_0 = _content.format(nav=_nav, layout=_layout_0)
 
-layout_1 = """
-<!-- goes in body -->
-{% block contents %}
-<nav>
-    {{embed(roots.title)}}
-    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-</nav>
+
+_layout_1 = """
 <div class="container">
     <div class="pure-g">
         <div class="pure-u-1">
@@ -35,16 +38,11 @@ layout_1 = """
         </div>
     </div>
 </div>
-{% endblock %}
 """
+layout_1 = _content.format(nav=_nav, layout=_layout_1)
 
-layout_2 = """
-<!-- goes in body -->
-{% block contents %}
-<nav>
-    {{embed(roots.title)}}
-    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-</nav>
+
+_layout_2 = """
 <div class="container">
     <div class="pure-g">
         <div class="pure-u-1 pure-u-md-1-2" >
@@ -55,17 +53,11 @@ layout_2 = """
         </div>
     </div>
 </div>
-{% endblock %}
 """
+layout_2 = _content.format(nav=_nav, layout=_layout_2)
 
-layout_3 = """
-<!-- goes in body -->
-{% block contents %}
-<nav>
-    {{embed(roots.title)}}
-    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
 
-</nav>
+_layout_3 = """
 <div class="container">
     <div class="pure-g">
         <div class="pure-u-1 pure-u-md-3-5">
@@ -80,18 +72,12 @@ layout_3 = """
             </div>
         </div>
     </div>
-
 </div>
-{% endblock %}
 """
+layout_3 = _content.format(nav=_nav, layout=_layout_3)
 
-layout_4 = """
-<!-- goes in body -->
-{% block contents %}
-<nav>
-    {{embed(roots.title)}}
-    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-</nav>
+
+_layout_4 = """
 <div class="container">
     <div class="pure-g vertical-3-center" >
         <div class="pure-u-1 pure-u-md-1-3">
@@ -105,18 +91,11 @@ layout_4 = """
         </div>
     </div>
 </div>
-{% endblock %}
 """
+layout_4 = _content.format(nav=_nav, layout=_layout_4)
 
 
-layout_5 = """
-<!-- goes in body -->
-{% block contents %}
-<nav>
-    {{embed(roots.title)}}
-    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-
-</nav>
+_layout_5 = """
 <div class="container">
     <div class="pure-g">
         <div class="pure-u-1">
@@ -132,17 +111,11 @@ layout_5 = """
         </div>
     </div>
 </div>
-{% endblock %}
 """
+layout_5 = _content.format(nav=_nav, layout=_layout_5)
 
-layout_6 = """
-<!-- goes in body -->
-{% block contents %}
-<nav>
-    {{embed(roots.title)}}
-    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
 
-</nav>
+_layout_6 = """
 <div class="container">
     <div class="pure-g">
         <div class="pure-u-1 pure-u-md-1-2">
@@ -161,18 +134,11 @@ layout_6 = """
         </div>
     </div>
 </div>
-{% endblock %}
 """
+layout_6 = _content.format(nav=_nav, layout=_layout_6)
 
 
-layout_7 = """
-<!-- goes in body -->
-{% block contents %}
-<nav>
-    {{embed(roots.title)}}
-    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-
-</nav>
+_layout_7 = """
 <div class="container">
     <div class="pure-g">
         <div class="pure-u-1">
@@ -191,18 +157,11 @@ layout_7 = """
         </div>
     </div>
 </div>
-{% endblock %}
 """
+layout_7 = _content.format(nav=_nav, layout=_layout_7)
 
 
-layout_8 = """
-<!-- goes in body -->
-{% block contents %}
-<nav>
-    {{embed(roots.title)}}
-    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-
-</nav>
+_layout_8 = """
 <div class="container">
     <div class="pure-g">
         <div class="pure-u-1">
@@ -224,18 +183,11 @@ layout_8 = """
         </div>
     </div>
 </div>
-{% endblock %}
 """
+layout_8 = _content.format(nav=_nav, layout=_layout_8)
 
 
-layout_9 = """
-<!-- goes in body -->
-{% block contents %}
-<nav>
-    {{embed(roots.title)}}
-    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-
-</nav>
+_layout_9 = """
 <div class="container">
     <div class="pure-g">
         <div class="pure-u-1 pure-u-md-3-4">
@@ -262,18 +214,11 @@ layout_9 = """
         </div>
     </div>
 </div>
-{% endblock %}
 """
+layout_9 = _content.format(nav=_nav, layout=_layout_9)
 
 
-layout_10 = """
-<!-- goes in body -->
-{% block contents %}
-<nav>
-    {{embed(roots.title)}}
-    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-
-</nav>
+_layout_10 = """
 <div class="container">
     <div class="pure-g">
         <div class="pure-u-1 pure-u-md-1-3">
@@ -298,18 +243,11 @@ layout_10 = """
         </div>
     </div>
 </div>
-{% endblock %}
 """
+layout_10 = _content.format(nav=_nav, layout=_layout_10)
 
 
-layout_11 = """
-<!-- goes in body -->
-{% block contents %}
-<nav>
-    {{embed(roots.title)}}
-    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-
-</nav>
+_layout_11 = """
 <div class="container">
     <div class="pure-g">
         <div class="pure-u-1 pure-u-md-1-2">
@@ -335,18 +273,11 @@ layout_11 = """
         </div>
     </div>
 </div>
-{% endblock %}
 """
+layout_11 = _content.format(nav=_nav, layout=_layout_11)
 
 
-layout_12 = """
-<!-- goes in body -->
-{% block contents %}
-<nav>
-    {{embed(roots.title)}}
-    <div class="nav-container"> {{ embed(roots.widgets) }} </div>
-
-</nav>
+_layout_12 = """
 <div class="container">
     <div class="pure-g">
         <div class="pure-u-1 pure-u-md-1-3">
@@ -382,5 +313,5 @@ layout_12 = """
         </div>
     </div>
 </div>
-{% endblock %}
 """
+layout_12 = _content.format(nav=_nav, layout=_layout_12)

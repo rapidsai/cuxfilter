@@ -1,24 +1,20 @@
 from typing import Dict
 import os
-import pandas as pd
 import numpy as np
 import dask_cudf
 
 from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby
-from ....layouts import chart_view
 from ....assets import geo_json_mapper
+from ...constants import CUXF_NAN_COLOR
 
 np.seterr(divide="ignore", invalid="ignore")
 
 
 class BaseChoropleth(BaseChart):
-
-    chart_type: str = "choropleth"
     reset_event = None
     _datatile_loaded_state: bool = False
     geo_mapper: Dict[str, str] = {}
-    nan_color = "white"
     use_data_tiles = True
 
     @property
@@ -47,6 +43,8 @@ class BaseChoropleth(BaseChart):
         mapbox_api_key=os.getenv("MAPBOX_API_KEY"),
         map_style="dark",
         tooltip=True,
+        tooltip_include_cols=[],
+        nan_color=CUXF_NAN_COLOR,
         **library_specific_params,
     ):
         """
@@ -101,7 +99,7 @@ class BaseChoropleth(BaseChart):
 
         self.geo_color_palette = geo_color_palette
         self.geoJSONProperty = geoJSONProperty
-        self.geo_mapper, x_range, y_range = geo_json_mapper(
+        _, x_range, y_range = geo_json_mapper(
             self.geoJSONSource, self.geoJSONProperty, projection=4326
         )
         self.height = height
@@ -111,15 +109,13 @@ class BaseChoropleth(BaseChart):
         self.map_style = map_style
         self.library_specific_params = library_specific_params
         self.tooltip = tooltip
+        self.tooltip_include_cols = tooltip_include_cols
+        self.nan_color = nan_color
         if "x_range" not in self.library_specific_params:
             self.library_specific_params["x_range"] = x_range
 
         if "y_range" not in self.library_specific_params:
             self.library_specific_params["y_range"] = y_range
-
-        if "nan_color" in self.library_specific_params:
-            self.nan_color = self.library_specific_params["nan_color"]
-            self.library_specific_params.pop("nan_color")
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -133,32 +129,50 @@ class BaseChoropleth(BaseChart):
         Ouput:
 
         """
-        if type(dashboard_cls._data) == dask_cudf.core.DataFrame:
-            self.min_value = dashboard_cls._data[self.x].min().compute()
-            self.max_value = dashboard_cls._data[self.x].max().compute()
-        else:
-            self.min_value = dashboard_cls._data[self.x].min()
-            self.max_value = dashboard_cls._data[self.x].max()
-
-        if isinstance(self.geo_mapper, pd.DataFrame):
-            self.geo_mapper, x_range, y_range = geo_json_mapper(
-                self.geoJSONSource, self.geoJSONProperty, projection=4326
+        if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
+            self.min_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].min().compute()
             )
-        self.geo_mapper = pd.DataFrame(
-            {
-                self.x: np.array(list(self.geo_mapper.keys())),
-                "coordinates": np.array(list(self.geo_mapper.values())),
-            }
+            self.max_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].max().compute()
+            )
+        else:
+            self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
+            self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
+
+        self.geo_mapper, x_range, y_range = geo_json_mapper(
+            self.geoJSONSource,
+            self.geoJSONProperty,
+            4326,
+            self.x,
+            dashboard_cls._cuxfilter_df.data[self.x].dtype,
         )
 
-        self.calculate_source(dashboard_cls._data)
+        self.calculate_source(dashboard_cls._cuxfilter_df.data)
         self.generate_chart()
         self.apply_mappers()
 
         self.add_events(dashboard_cls)
 
     def view(self):
-        return chart_view(self.chart, width=self.width)
+        return self.chart.view()
+
+    def _compute_array_all_bins(
+        self, source_x, source_y, update_data_x, update_data_y
+    ):
+        """
+        source_x: current_source_x, np.array()
+        source_y: current_source_y, np.array()
+        update_data_x: updated_data_x, np.array()
+        update_data_y: updated_data_x, np.array()
+        """
+
+        result_array = np.zeros(
+            shape=(int(max(source_x.max(), update_data_x.max())),)
+        )
+        # -1 for 0-based indexing, making sure indexes are type int
+        np.put(result_array, (update_data_x - 1).astype(int), update_data_y)
+        return result_array[source_x.astype(int) - 1]
 
     def calculate_source(self, data, patch_update=False):
         """
@@ -174,11 +188,36 @@ class BaseChoropleth(BaseChart):
         df = calc_groupby(self, data, agg=self.aggregate_dict)
 
         dict_temp = {
-            self.x: list(df[0].astype(df[0].dtype)),
-            self.color_column: list(df[1].astype(df[1].dtype)),
+            self.x: df[0],
+            self.color_column: df[1],
         }
         if self.elevation_column is not None:
-            dict_temp[self.elevation_column] = list(df[2].astype(df[2].dtype))
+            dict_temp[self.elevation_column] = df[2]
+
+        if patch_update and len(dict_temp[self.x]) < len(
+            self.source.data[self.x]
+        ):
+            # if not all X axis bins are provided, filling bins not updated
+            # with zeros
+            color_axis_data = self._compute_array_all_bins(
+                self.source.data[self.x],
+                self.source.data[self.color_column],
+                dict_temp[self.x],
+                dict_temp[self.color_column],
+            )
+
+            dict_temp[self.color_column] = color_axis_data
+
+            if self.elevation_column is not None:
+                elevation_axis_data = self._compute_array_all_bins(
+                    self.source.data[self.x],
+                    self.source.data[self.elevation_column],
+                    dict_temp[self.x],
+                    dict_temp[self.elevation_column],
+                )
+                dict_temp[self.elevation_column] = elevation_axis_data
+
+            dict_temp[self.x] = self.source.data[self.x]
 
         self.format_source_data(dict_temp, patch_update)
 
@@ -314,7 +353,7 @@ class BaseChoropleth(BaseChart):
             )
             datatile_indices = (
                 (self.source.data[self.x] - self.min_value) / self.stride
-            ).astype("int")
+            ).astype(int)
 
             if key == self.color_column:
                 temp_agg_function = self.color_aggregate_fn
@@ -415,7 +454,7 @@ class BaseChoropleth(BaseChart):
         """
         datatile_indices = (
             (self.source.data[self.x] - self.min_value) / self.stride
-        ).astype("int")
+        ).astype(int)
         if len(new_indices) == 0 or new_indices == [""]:
             datatile_sum_0 = np.array(
                 datatile[0].loc[datatile_indices].sum(axis=1, skipna=True)
@@ -468,7 +507,7 @@ class BaseChoropleth(BaseChart):
         """
         datatile_indices = (
             (self.source.data[self.x] - self.min_value) / self.stride
-        ).astype("int")
+        ).astype(int)
         if len(new_indices) == 0 or new_indices == [""]:
             datatile_result = np.array(
                 datatile.loc[datatile_indices, :].sum(axis=1, skipna=True)
@@ -520,7 +559,7 @@ class BaseChoropleth(BaseChart):
         """
         datatile_indices = (
             (self.source.data[self.x] - self.min_value) / self.stride
-        ).astype("int")
+        ).astype(int)
 
         if len(new_indices) == 0 or new_indices == [""]:
             # get min or max from datatile df, skipping column 0(always 0)
@@ -533,7 +572,7 @@ class BaseChoropleth(BaseChart):
             new_indices = np.array(new_indices)
             new_indices = np.round(
                 (new_indices - active_chart.min_value) / active_chart.stride
-            ).astype("int")
+            ).astype(int)
             datatile_result = np.array(
                 getattr(
                     datatile.loc[datatile_indices, list(new_indices)],

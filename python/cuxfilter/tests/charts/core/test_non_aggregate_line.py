@@ -19,8 +19,6 @@ class TestNonAggregateBaseLine:
 
     def test_variables(self):
         bl = BaseLine(x="test_x", y="test_y", color="#8735fb")
-        print(bl.color)
-        assert bl.chart_type == "line"
         assert bl.x == "test_x"
         assert bl.y == "test_y"
         assert bl.filter_widget is None
@@ -33,6 +31,7 @@ class TestNonAggregateBaseLine:
         assert bl.library_specific_params == {}
         assert bl.data_points == 100
         assert bl.add_interaction is True
+        assert bl.chart_type is None
 
     def test_initiate_chart(self):
         bl = BaseLine(x="key", y="val")
@@ -54,10 +53,10 @@ class TestNonAggregateBaseLine:
 
     def test_add_range_slider_filter(self):
         bl = BaseLine(x="key", y="val")
-        bl.min_value = self.dashboard._data[bl.x].min()
-        bl.max_value = self.dashboard._data[bl.x].max()
-        if bl.data_points > self.dashboard._data[bl.x].shape[0]:
-            bl.data_points = self.dashboard._data[bl.x].shape[0]
+        bl.min_value = self.dashboard._cuxfilter_df.data[bl.x].min()
+        bl.max_value = self.dashboard._cuxfilter_df.data[bl.x].max()
+        if bl.data_points > self.dashboard._cuxfilter_df.data[bl.x].shape[0]:
+            bl.data_points = self.dashboard._cuxfilter_df.data[bl.x].shape[0]
         bl.add_range_slider_filter(self.dashboard)
 
         assert type(bl.filter_widget) == pn.widgets.RangeSlider
@@ -68,18 +67,21 @@ class TestNonAggregateBaseLine:
     )
     def test_compute_query_dict(self, range, query):
         bl = BaseLine(x="key", y="val")
-        bl.min_value = self.dashboard._data[bl.x].min()
-        bl.max_value = self.dashboard._data[bl.x].max()
+        bl.chart_type = "non_aggregate_line"
+        bl.min_value = self.dashboard._cuxfilter_df.data[bl.x].min()
+        bl.max_value = self.dashboard._cuxfilter_df.data[bl.x].max()
         bl.stride = 1
-        if bl.data_points > self.dashboard._data[bl.x].shape[0]:
-            bl.data_points = self.dashboard._data[bl.x].shape[0]
+        if bl.data_points > self.dashboard._cuxfilter_df.data[bl.x].shape[0]:
+            bl.data_points = self.dashboard._cuxfilter_df.data[bl.x].shape[0]
         bl.add_range_slider_filter(self.dashboard)
         self.dashboard.add_charts([bl])
         bl.filter_widget.value = range
         # test the following function behavior
         bl.compute_query_dict(self.dashboard._query_str_dict)
 
-        assert self.dashboard._query_str_dict["key_line"] == query
+        assert (
+            self.dashboard._query_str_dict["key_non_aggregate_line"] == query
+        )
 
     @pytest.mark.parametrize(
         "event, result", [(None, None), (ButtonClick, "func_Called")]

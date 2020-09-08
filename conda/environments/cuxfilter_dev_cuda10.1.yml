@@ -12,14 +12,20 @@ dependencies:
 - dask>=2.12.0
 - distributed>=2.12.0
 - dask-cuda=0.15*
+<<<<<<< HEAD
 - dask-cudf=0.14
 - datashader>=0.10.*
+=======
+- dask-cudf=0.15*
+- datashader>=0.11.1
+- numba>=0.51.2
+>>>>>>> origin/branch-0.15
 - geopandas>=0.6.*
 - pyproj>=2.4.*
 - libwebp
 - pandoc=<2.0.0
-- panel=0.6.*
-- bokeh=1.*
+- bokeh>=2.1.1
+- panel
 - cudatoolkit=10.1
 - nodejs
 - recommonmark
@@ -33,8 +39,9 @@ dependencies:
 - ipython
 - pyppeteer
 - jupyterlab
-- black
-- flake8
+- flake8=3.8.3
+- black=19.10
+- pydeck>=0.3.*
 - pip
 - pip:
   - sphinx-markdown-tables

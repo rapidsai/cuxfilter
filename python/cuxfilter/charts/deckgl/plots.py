@@ -1,11 +1,12 @@
 from ..core.aggregate import BaseChoropleth
-from .bindings import PolygonDeckGL
+from .bindings import PanelDeck
 
 import pandas as pd
 import numpy as np
 from typing import Type
-from bokeh.models import ColumnDataSource, LinearColorMapper
+from bokeh.models import ColumnDataSource
 import bokeh
+from PIL import ImageColor
 
 
 class Choropleth(BaseChoropleth):
@@ -15,13 +16,13 @@ class Choropleth(BaseChoropleth):
     reset_event = None
     coordinates = "coordinates"
     source: Type[ColumnDataSource]
-
+    source_df: Type[pd.DataFrame]
+    rgba_columns: Type[list] = ["__r__", "__g__", "__b__", "__a__"]
     layer_spec = {
         "opacity": 1,
         "getLineWidth": 10,
-        "getPolygon": "@@=coordinates",
-        "getElevation": "",
-        "getFillColor": "@@=__color__",
+        "getPolygon": "coordinates",
+        "getFillColor": "[__r__, __g__, __b__, __a__]",
         "stroked": True,
         "filled": True,
         "extruded": True,
@@ -48,17 +49,44 @@ class Choropleth(BaseChoropleth):
         "controller": True,
     }
 
+    def compute_colors(self):
+        if self.geo_color_palette is None:
+            self.geo_color_palette = bokeh.palettes.Purples9
+
+        self.source_df = self.source.to_df()
+        BREAKS = np.linspace(
+            self.source_df[self.color_column].min(),
+            self.source_df[self.color_column].max(),
+            len(self.geo_color_palette),
+        )
+
+        nan_color = list(ImageColor.getrgb(self.nan_color)) + [50]
+        x = self.source_df[self.color_column]
+        inds = pd.cut(x, BREAKS, labels=False, include_lowest=True)
+        colors = [
+            nan_color
+            if np.isnan(i)
+            else list(ImageColor.getrgb(self.geo_color_palette[int(i)]))
+            + [255]
+            for i in inds
+        ]
+        self.source_df[self.rgba_columns] = pd.DataFrame(colors)
+
     def format_source_data(self, source_dict, patch_update=False):
         """
         format source
 
         Parameters:
         -----------
-        source_dict: {'X': [], 'Y': []}
+        source_dict: {
+            self.x: [], self.color_column: [],
+            self.elevation_column: []  # optional
+        }
 
         ColumnDataSource: {
-            'X': np.array(list),
-            'Y': np.array(list)
+            self.x: np.array(list),
+            self.color_column: np.array(list),
+            self.elevation_column: np.array(list) # optional
         }
         """
         res_df = pd.DataFrame(source_dict)
@@ -79,7 +107,7 @@ class Choropleth(BaseChoropleth):
                 self.source = ColumnDataSource(result_dict)
             else:
                 self.source.stream(result_dict)
-
+            self.compute_colors()
         else:
             result_df = res_df.merge(self.geo_mapper, on=self.x, how="left")
             result_df["index"] = result_df.index
@@ -96,6 +124,8 @@ class Choropleth(BaseChoropleth):
                 ]
 
             self.source.patch(result_dict)
+            self.compute_colors()
+            self.chart.data = self.source_df
 
     def get_mean(self, x):
         return (x[0] + x[1]) / 2
@@ -104,29 +134,14 @@ class Choropleth(BaseChoropleth):
         """
         generate chart
         """
-        if self.geo_color_palette is None:
-            mapper = LinearColorMapper(
-                palette=bokeh.palettes.Purples9,
-                nan_color=self.nan_color,
-                low=np.nanmin(self.source.data[self.color_column]),
-                high=np.nanmax(self.source.data[self.color_column]),
-                name=self.color_column,
-            )
-        else:
-            mapper = LinearColorMapper(
-                palette=self.geo_color_palette,
-                nan_color=self.nan_color,
-                low=np.nanmin(self.source.data[self.color_column]),
-                high=np.nanmax(self.source.data[self.color_column]),
-                name=self.color_column,
-            )
+
         if "opacity" in self.library_specific_params:
             self.layer_spec["opacity"] = self.library_specific_params[
                 "opacity"
             ]
 
         if self.elevation_column is not None:
-            self.layer_spec["getElevation"] = "@@={}*{}".format(
+            self.layer_spec["getElevation"] = "{}*{}".format(
                 self.elevation_column, self.elevation_factor
             )
 
@@ -141,15 +156,17 @@ class Choropleth(BaseChoropleth):
             self.map_style
         )
 
-        self.chart = PolygonDeckGL(
+        self.deck_spec["layers"] = [self.layer_spec]
+
+        self.chart = PanelDeck(
             x=self.x,
-            layer_spec=self.layer_spec,
-            deck_spec=self.deck_spec,
-            color_mapper=mapper,
-            data_source=self.source,
+            data=self.source_df,
+            spec=self.deck_spec,
+            colors=self.source_df[self.rgba_columns],
             width=self.width,
             height=self.height,
-            tooltip=self.tooltip,
+            default_color=list(ImageColor.getrgb(self.nan_color)) + [50],
+            tooltip_include_cols=self.tooltip_include_cols,
         )
 
     def update_dimensions(self, width=None, height=None):
@@ -160,16 +177,6 @@ class Choropleth(BaseChoropleth):
             self.chart.width = width
         if height is not None:
             self.chart.height = height
-
-    # def apply_mappers(self):
-    #     """
-    #     apply dict mappers to x and y axes if provided
-    #     ---
-    #     """
-    #     if self.x_label_map is not None:
-    #         self.chart.xaxis.major_label_overrides = self.x_label_map
-    #     if self.y_label_map is not None:
-    #         self.chart.yaxis.major_label_overrides = self.y_label_map
 
     def reload_chart(self, data, patch_update=True):
         """
@@ -197,6 +204,8 @@ class Choropleth(BaseChoropleth):
 
             patch_dict = {column: [(slice(data.size), data)]}
             self.source.patch(patch_dict)
+            self.compute_colors()
+            self.chart.data = self.source_df
 
     def map_indices_to_values(self, indices: list):
         """
@@ -213,20 +222,14 @@ class Choropleth(BaseChoropleth):
         get list of selected indices
         ---
         """
-        return self.map_indices_to_values(self.source.selected.indices)
+        return self.chart.selected_points()
 
     def add_selection_event(self, callback):
         """
         add selection event
         ---
         """
-
-        def temp_callback(attr, old, new):
-            old = self.map_indices_to_values(old)
-            new = self.map_indices_to_values(new)
-            callback(old, new)
-
-        self.source.selected.on_change("indices", temp_callback)
+        self.chart.callback = callback
 
     def apply_theme(self, properties_dict):
         """
@@ -235,11 +238,7 @@ class Choropleth(BaseChoropleth):
 
         """
         if self.geo_color_palette is None:
-            mapper = LinearColorMapper(
-                palette=properties_dict["chart_color"]["color_palette"],
-                nan_color=self.nan_color,
-                low=np.nanmin(self.source.data[self.color_column]),
-                high=np.nanmax(self.source.data[self.color_column]),
-                name=self.color_column,
-            )
-            self.chart.color_mapper = mapper
+            self.geo_color_palette = properties_dict["chart_color"][
+                "color_palette"
+            ]
+            self.compute_colors()

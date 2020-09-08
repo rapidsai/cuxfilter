@@ -1,21 +1,49 @@
 from ..core.non_aggregate import (
-    BaseScatterGeo,
     BaseScatter,
     BaseLine,
     BaseStackedLine,
+    BaseGraph,
 )
-from .custom_extensions import InteractiveImage
+from .custom_extensions import (
+    InteractiveImage,
+    CustomInspectTool,
+    calc_connected_edges,
+)
+from distutils.version import LooseVersion
 
-import datashader as cds
+import datashader as ds
 from datashader import transfer_functions as tf
 from datashader.colors import Hot
 import dask_cudf
 import dask.dataframe as dd
 import numpy as np
+import cupy as cp
+import pandas as pd
+import bokeh
+import cudf
 from bokeh import events
 from bokeh.plotting import figure
-from bokeh.models import BoxSelectTool
+from bokeh.models import (
+    BoxSelectTool,
+    ColorBar,
+    LinearColorMapper,
+    LogColorMapper,
+    BasicTicker,
+    FixedTicker,
+)
 from bokeh.tile_providers import get_provider
+from PIL import Image
+import requests
+from io import BytesIO
+
+ds_version = LooseVersion(ds.__version__)
+
+_color_mapper = {"linear": LinearColorMapper, "log": LogColorMapper}
+
+
+def load_image(url):
+    response = requests.get(url)
+    return Image.open(BytesIO(response.content))
 
 
 def _rect_vertical_mask(px):
@@ -42,11 +70,77 @@ def _rect_horizontal_mask(px):
     return np.concatenate((x_bool, zero_bool), axis=0)
 
 
-cds.transfer_functions._mask_lookup["rect_vertical"] = _rect_vertical_mask
-cds.transfer_functions._mask_lookup["rect_horizontal"] = _rect_horizontal_mask
+def _compute_datashader_assets(
+    data, x, aggregate_col, aggregate_fn, color_palette
+):
+    aggregator = None
+    cmap = {"cmap": color_palette}
+
+    if isinstance(data[x].dtype, cudf.core.dtypes.CategoricalDtype):
+        if ds_version >= "0.11":
+            aggregator = ds.by(x, getattr(ds, aggregate_fn)(aggregate_col),)
+        else:
+            print("only count_cat supported by datashader <=0.10")
+            aggregator = ds.count_cat(x)
+        cmap = {
+            "color_key": {
+                k: v
+                for k, v in zip(list(data[x].cat.categories), color_palette,)
+            }
+        }
+    else:
+        if aggregate_fn:
+            aggregator = getattr(ds, aggregate_fn)(aggregate_col)
+    return aggregator, cmap
 
 
-class ScatterGeo(BaseScatterGeo):
+def _get_provider(tile_provider):
+    if tile_provider is None:
+        return None
+    elif type(tile_provider) == str:
+        return get_provider(tile_provider)
+    elif isinstance(tile_provider, bokeh.models.tiles.WMTSTileSource):
+        return tile_provider
+    return None
+
+
+def _get_legend_title(aggregate_fn, aggregate_col):
+    if aggregate_fn == "count":
+        return aggregate_fn
+    else:
+        return aggregate_fn + " " + aggregate_col
+
+
+def _generate_legend(
+    pixel_shade_type,
+    color_palette,
+    legend_title,
+    constant_limit,
+    color_bar=None,
+    update=False,
+):
+    mapper = _color_mapper[pixel_shade_type](
+        palette=color_palette, low=constant_limit[0], high=constant_limit[1]
+    )
+    if update and color_bar:
+        color_bar.color_mapper = mapper
+        return color_bar
+
+    color_bar = ColorBar(
+        color_mapper=mapper,
+        location=(0, 0),
+        ticker=BasicTicker(desired_num_ticks=len(color_palette)),
+        title=legend_title,
+        background_fill_alpha=0,
+    )
+    return color_bar
+
+
+ds.transfer_functions._mask_lookup["rect_vertical"] = _rect_vertical_mask
+ds.transfer_functions._mask_lookup["rect_horizontal"] = _rect_horizontal_mask
+
+
+class Scatter(BaseScatter):
     """
         Description:
     """
@@ -55,6 +149,9 @@ class ScatterGeo(BaseScatterGeo):
     data_y_axis = "y"
     data_x_axis = "x"
     no_colors_set = False
+    constant_limit = None
+    color_bar = None
+    legend_added = False
 
     def format_source_data(self, data):
         """
@@ -72,6 +169,26 @@ class ScatterGeo(BaseScatterGeo):
         """
         self.source = data
 
+    def show_legend(self):
+        return self.legend and (
+            self.pixel_shade_type in list(_color_mapper.keys())
+        )
+
+    def render_legend(self):
+        if self.show_legend():
+            update = self.color_bar is not None
+            self.color_bar = _generate_legend(
+                self.pixel_shade_type,
+                self.color_palette,
+                _get_legend_title(self.aggregate_fn, self.aggregate_col),
+                self.constant_limit,
+                color_bar=self.color_bar,
+                update=update,
+            )
+            if (update and self.legend_added) is False:
+                self.chart.add_layout(self.color_bar, self.legend_position)
+                self.legend_added = True
+
     def generate_InteractiveImage_callback(self):
         """
         Description:
@@ -85,18 +202,32 @@ class ScatterGeo(BaseScatterGeo):
         """
 
         def viewInteractiveImage(x_range, y_range, w, h, data_source):
-            cvs = cds.Canvas(
+            cvs = ds.Canvas(
                 plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
             )
-            agg = cvs.points(
+            aggregator, cmap = _compute_datashader_assets(
                 data_source,
                 self.x,
-                self.y,
-                getattr(cds, self.aggregate_fn)(self.aggregate_col),
+                self.aggregate_col,
+                self.aggregate_fn,
+                self.color_palette,
             )
-            img = tf.shade(
-                agg, cmap=self.color_palette, how=self.pixel_shade_type
-            )
+
+            agg = cvs.points(data_source, self.x, self.y, aggregator,)
+
+            if self.constant_limit is None or self.aggregate_fn == "count":
+                self.constant_limit = [
+                    float(cp.nanmin(agg.data)),
+                    float(cp.nanmax(agg.data)),
+                ]
+                self.render_legend()
+
+            span = {"span": self.constant_limit}
+            if self.pixel_shade_type == "eq_hist":
+                span = {}
+
+            img = tf.shade(agg, how=self.pixel_shade_type, **cmap, **span)
+
             if self.pixel_spread == "dynspread":
                 return tf.dynspread(
                     img,
@@ -126,12 +257,9 @@ class ScatterGeo(BaseScatterGeo):
             self.no_colors_set = True
             self.color_palette = Hot
 
-        if type(self.tile_provider) == str:
-            self.tile_provider = get_provider(self.tile_provider)
-
         if len(self.title) == 0:
             self.title = (
-                "Geo Scatter plot for "
+                "Scatter plot for "
                 + self.aggregate_col
                 + " "
                 + self.aggregate_fn
@@ -150,8 +278,14 @@ class ScatterGeo(BaseScatterGeo):
         )
 
         self.chart.add_tools(BoxSelectTool())
-        self.chart.add_tile(self.tile_provider)
-        self.chart.axis.visible = False
+
+        self.tile_provider = _get_provider(self.tile_provider)
+        if self.tile_provider is not None:
+            self.chart.add_tile(self.tile_provider)
+            self.chart.axis.visible = False
+        # reset legend and color_bar
+        self.legend_added = False
+        self.color_bar = None
 
         self.chart.xgrid.grid_line_color = None
         self.chart.ygrid.grid_line_color = None
@@ -162,6 +296,9 @@ class ScatterGeo(BaseScatterGeo):
             data_source=self.source,
             timeout=self.timeout,
         )
+
+        if self.legend_added is False:
+            self.render_legend()
 
     def update_dimensions(self, width=None, height=None):
         """
@@ -179,7 +316,7 @@ class ScatterGeo(BaseScatterGeo):
         if height is not None:
             self.chart.plot_height = height
 
-    def reload_chart(self, data, update_source=False):
+    def reload_chart(self, data=None, patch_update=False):
         """
         Description:
 
@@ -191,8 +328,10 @@ class ScatterGeo(BaseScatterGeo):
         Ouput:
         """
         if data is not None:
+            if len(data) == 0:
+                data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.interactive_image.update_chart(data_source=data)
-            if update_source:
+            if patch_update:
                 self.format_source_data(data)
 
     def add_selection_geometry_event(self, callback):
@@ -218,6 +357,7 @@ class ScatterGeo(BaseScatterGeo):
         """
         apply thematic changes to the chart based on the input
         properties dictionary.
+
         """
         if self.no_colors_set:
             self.color_palette = properties_dict["chart_color"][
@@ -240,6 +380,14 @@ class ScatterGeo(BaseScatterGeo):
         self.chart.title.text_font_size = properties_dict["title"][
             "text_font_size"
         ]
+
+        if self.show_legend():
+            self.color_bar.major_label_text_color = properties_dict["title"][
+                "text_color"
+            ]
+            self.color_bar.title_text_color = properties_dict["title"][
+                "text_color"
+            ]
 
         # background, border, padding
         self.chart.background_fill_color = properties_dict[
@@ -291,17 +439,143 @@ class ScatterGeo(BaseScatterGeo):
         ]
 
 
-class Scatter(BaseScatter):
+class Graph(BaseGraph):
     """
         Description:
     """
 
     reset_event = events.Reset
-    data_y_axis = "y"
-    data_x_axis = "x"
+    data_y_axis = "node_y"
+    data_x_axis = "node_x"
     no_colors_set = False
+    image = None
+    constant_limit_nodes = None
+    constant_limit_edges = None
+    color_bar = None
+    legend_added = False
 
-    def format_source_data(self, data):
+    def compute_colors(self):
+        if self.node_color_palette is None:
+            self.node_color_palette = bokeh.palettes.Purples9
+
+        BREAKS = np.linspace(
+            self.nodes[self.node_aggregate_col].min(),
+            self.nodes[self.node_aggregate_col].max(),
+            len(self.node_color_palette),
+        )
+
+        x = self.source.data[self.node_aggregate_col]
+        inds = pd.cut(x, BREAKS, labels=False, include_lowest=True)
+        colors = [self.node_color_palette[i] for i in inds]
+        self.source.data[self.node_aggregate_col] = colors
+
+    def show_legend(self):
+        """
+        return if legend=True and pixel_shade_type is ['linear', 'log']
+        """
+        return self.legend and (
+            self.node_pixel_shade_type in list(_color_mapper.keys())
+        )
+
+    def render_legend(self):
+        """
+        render legend
+        """
+        if self.show_legend():
+            update = self.color_bar is not None
+            self.color_bar = _generate_legend(
+                self.node_pixel_shade_type,
+                self.node_color_palette,
+                _get_legend_title(
+                    self.node_aggregate_fn, self.node_aggregate_col
+                ),
+                self.constant_limit_nodes,
+                color_bar=self.color_bar,
+                update=update,
+            )
+            if (update and self.legend_added) is False:
+                self.chart.add_layout(self.color_bar, self.legend_position)
+                self.legend_added = True
+
+    def nodes_plot(self, canvas, nodes, name=None):
+        """
+        plot nodes(scatter)
+        """
+        aggregator, cmap = _compute_datashader_assets(
+            nodes,
+            self.node_id,
+            self.node_aggregate_col,
+            self.node_aggregate_fn,
+            self.node_color_palette,
+        )
+
+        agg = canvas.points(
+            nodes.sort_index(), self.node_x, self.node_y, aggregator
+        )
+
+        if (
+            self.constant_limit_nodes is None
+            or self.node_aggregate_fn == "count"
+        ):
+            self.constant_limit_nodes = [
+                float(cp.nanmin(agg.data)),
+                float(cp.nanmax(agg.data)),
+            ]
+            self.render_legend()
+
+        span = {"span": self.constant_limit_nodes}
+        if self.node_pixel_shade_type == "eq_hist":
+            span = {}
+
+        return getattr(tf, self.node_pixel_spread)(
+            tf.shade(
+                agg, how=self.node_pixel_shade_type, name=name, **cmap, **span
+            ),
+            threshold=self.node_pixel_density,
+            max_px=self.node_point_size,
+            shape=self.node_point_shape,
+        )
+
+    def edges_plot(self, canvas, nodes, name=None):
+        """
+        plot edges(lines)
+        """
+        aggregator, cmap = _compute_datashader_assets(
+            self.connected_edges,
+            self.node_x,
+            self.edge_aggregate_col,
+            self.edge_aggregate_fn,
+            self.edge_color_palette,
+        )
+
+        agg = canvas.line(
+            self.connected_edges, self.node_x, self.node_y, aggregator
+        )
+
+        if (
+            self.constant_limit_edges is None
+            or self.edge_aggregate_fn == "count"
+        ):
+            self.constant_limit_edges = [
+                float(cp.nanmin(agg.data)),
+                float(cp.nanmax(agg.data)),
+            ]
+
+        span = {"span": self.constant_limit_nodes}
+
+        return getattr(tf, self.node_pixel_spread)(
+            tf.shade(
+                agg,
+                name=name,
+                how="linear",
+                alpha=255 - 255 * self.edge_transparency,
+                **cmap,
+                **span,
+            ),
+            max_px=1,
+        )
+
+    def format_source_data(self, dataframe):
         """
         Description:
             format source
@@ -315,7 +589,26 @@ class Scatter(BaseScatter):
 
         Ouput:
         """
-        self.source = data
+        if isinstance(dataframe, cudf.core.DataFrame):
+            self.nodes = dataframe
+        else:
+            self.nodes = dataframe.data
+            self.edges = dataframe.edges
+
+        if self.edges is not None:
+            # update connected_edges value for datashaded edges
+            self.connected_edges = calc_connected_edges(
+                self.nodes,
+                self.edges,
+                self.node_x,
+                self.node_y,
+                self.node_id,
+                self.edge_source,
+                self.edge_target,
+                self.edge_aggregate_col,
+                self.edge_render_type,
+                self.curve_params,
+            )
 
     def generate_InteractiveImage_callback(self):
         """
@@ -329,30 +622,35 @@ class Scatter(BaseScatter):
         Ouput:
         """
 
-        def viewInteractiveImage(x_range, y_range, w, h, data_source):
-            cvs = cds.Canvas(
+        def viewInteractiveImage(
+            x_range,
+            y_range,
+            w,
+            h,
+            data_source=self.nodes,
+            nodes_plot=self.nodes_plot,
+            edges_plot=self.edges_plot,
+            chart=self.chart,
+        ):
+            cvs = ds.Canvas(
                 plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
             )
-            agg = cvs.points(
-                data_source,
-                self.x,
-                self.y,
-                getattr(cds, self.aggregate_fn)(self.aggregate_col),
-            )
-            img = tf.shade(
-                agg, cmap=self.color_palette, how=self.pixel_shade_type
-            )
-            if self.pixel_spread == "dynspread":
-                return tf.dynspread(
-                    img,
-                    threshold=self.pixel_density,
-                    max_px=self.point_size,
-                    shape=self.point_shape,
-                )
+            plot = None
+            if self.source is not None:
+                self.source.data = {
+                    self.node_x: [],
+                    self.node_y: [],
+                    self.node_aggregate_col: [],
+                    self.node_aggregate_col + "_color": [],
+                }
+            np = nodes_plot(cvs, data_source)
+            if self.display_edges._active:
+                ep = edges_plot(cvs, data_source)
+                plot = tf.stack(ep, np, how="over")
             else:
-                return tf.spread(
-                    img, px=self.point_size, shape=self.point_shape
-                )
+                plot = np
+
+            return plot
 
         return viewInteractiveImage
 
@@ -367,18 +665,20 @@ class Scatter(BaseScatter):
 
         Ouput:
         """
-        if self.color_palette is None:
+        if self.node_color_palette is None:
             self.no_colors_set = True
-            self.color_palette = Hot
+            self.node_color_palette = Hot
 
         if len(self.title) == 0:
-            self.title = (
-                "Scatter plot for "
-                + self.aggregate_col
-                + " "
-                + self.aggregate_fn
-            )
-
+            self.title = "Graph"
+        self.x_range = (
+            self.x_range[0] - self.node_point_size,
+            self.x_range[1] + self.node_point_size,
+        )
+        self.y_range = (
+            self.y_range[0] - self.node_point_size,
+            self.y_range[1] + self.node_point_size,
+        )
         self.chart = figure(
             title=self.title,
             toolbar_location="right",
@@ -391,9 +691,54 @@ class Scatter(BaseScatter):
             height=self.height,
         )
 
+        self.tile_provider = _get_provider(self.tile_provider)
+        if self.tile_provider is not None:
+            self.chart.add_tile(self.tile_provider)
+            self.chart.axis.visible = False
+        # reset legend and color_bar
+        self.legend_added = False
+        self.color_bar = None
+        # loading icon from a url
+        impath = (
+            "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
+            + "branch-0.15/python/cuxfilter/charts/datashader/icons/graph.png"
+        )
+
+        self.inspect_neighbors = CustomInspectTool(
+            icon=load_image(impath),
+            _active=True,
+            tool_name="Inspect Neighboring Edges",
+        )
+        # loading icon from a url
+        impath = (
+            "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
+            + "branch-0.15/python/cuxfilter/charts/datashader/icons/XPan.png"
+        )
+        self.display_edges = CustomInspectTool(
+            icon=load_image(impath), _active=True, tool_name="Display Edges"
+        )
+
+        def cb(attr, old, new):
+            if new:
+                self.connected_edges = calc_connected_edges(
+                    self.interactive_image.kwargs["data_source"],
+                    self.edges,
+                    self.node_x,
+                    self.node_y,
+                    self.node_id,
+                    self.edge_source,
+                    self.edge_target,
+                    self.edge_aggregate_col,
+                    self.edge_render_type,
+                    self.curve_params,
+                )
+            self.interactive_image.update_chart()
+
+        self.display_edges.on_change("_active", cb)
+
         self.chart.add_tools(BoxSelectTool())
-        # self.chart.add_tile(self.tile_provider)
-        # self.chart.axis.visible = False
+        self.chart.add_tools(self.inspect_neighbors)
+        self.chart.add_tools(self.display_edges)
 
         self.chart.xgrid.grid_line_color = None
         self.chart.ygrid.grid_line_color = None
@@ -401,9 +746,12 @@ class Scatter(BaseScatter):
         self.interactive_image = InteractiveImage(
             self.chart,
             self.generate_InteractiveImage_callback(),
-            data_source=self.source,
+            data_source=self.nodes,
             timeout=self.timeout,
         )
+
+        if self.legend_added is False:
+            self.render_legend()
 
     def update_dimensions(self, width=None, height=None):
         """
@@ -421,7 +769,7 @@ class Scatter(BaseScatter):
         if height is not None:
             self.chart.plot_height = height
 
-    def reload_chart(self, data, update_source=False):
+    def reload_chart(self, nodes, edges=None, patch_update=False):
         """
         Description:
 
@@ -432,10 +780,26 @@ class Scatter(BaseScatter):
 
         Ouput:
         """
-        if data is not None:
-            self.interactive_image.update_chart(data_source=data)
-            if update_source:
-                self.format_source_data(data)
+        if nodes is not None:
+            if len(nodes) == 0:
+                nodes = cudf.DataFrame({k: cp.nan for k in self.nodes.columns})
+
+            # update connected_edges value for datashaded edges
+            # if display edge toggle is active
+            if self.display_edges._active and patch_update is False:
+                self.connected_edges = calc_connected_edges(
+                    nodes,
+                    self.edges if edges is None else edges,
+                    self.node_x,
+                    self.node_y,
+                    self.node_id,
+                    self.edge_source,
+                    self.edge_target,
+                    self.edge_aggregate_col,
+                    self.edge_render_type,
+                    self.curve_params,
+                )
+            self.interactive_image.update_chart(data_source=nodes)
 
     def add_selection_geometry_event(self, callback):
         """
@@ -460,10 +824,9 @@ class Scatter(BaseScatter):
         """
         apply thematic changes to the chart based on the input
         properties dictionary.
-
         """
         if self.no_colors_set:
-            self.color_palette = properties_dict["chart_color"][
+            self.node_color_palette = properties_dict["chart_color"][
                 "color_palette"
             ]
             self.interactive_image.update_chart()
@@ -483,6 +846,13 @@ class Scatter(BaseScatter):
         self.chart.title.text_font_size = properties_dict["title"][
             "text_font_size"
         ]
+        if self.show_legend():
+            self.color_bar.major_label_text_color = properties_dict["title"][
+                "text_color"
+            ]
+            self.color_bar.title_text_color = properties_dict["title"][
+                "text_color"
+            ]
 
         # background, border, padding
         self.chart.background_fill_color = properties_dict[
@@ -591,7 +961,7 @@ class Line(BaseLine):
         """
 
         def viewInteractiveImage(x_range, y_range, w, h, data_source):
-            cvs = cds.Canvas(
+            cvs = ds.Canvas(
                 plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
             )
             agg = cvs.line(source=data_source, x=self.x, y=self.y)
@@ -664,7 +1034,7 @@ class Line(BaseLine):
         if height is not None:
             self.chart.plot_height = height
 
-    def reload_chart(self, data, update_source=False):
+    def reload_chart(self, data, patch_update=False):
         """
         Description:
 
@@ -676,8 +1046,10 @@ class Line(BaseLine):
         Ouput:
         """
         if data is not None:
+            if len(data) == 0:
+                data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.interactive_image.update_chart(data_source=data)
-            if update_source:
+            if patch_update:
                 self.format_source_data(data)
 
     def add_selection_geometry_event(self, callback):
@@ -785,6 +1157,7 @@ class StackedLines(BaseStackedLine):
     data_x_axis = "x"
     use_data_tiles = False
     no_colors_set = False
+    color_bar = None
 
     def calculate_source(self, data):
         """
@@ -844,7 +1217,7 @@ class StackedLines(BaseStackedLine):
         """
 
         def viewInteractiveImage(x_range, y_range, w, h, data_source):
-            cvs = cds.Canvas(
+            cvs = ds.Canvas(
                 plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
             )
             aggs = dict(
@@ -891,8 +1264,24 @@ class StackedLines(BaseStackedLine):
         )
 
         self.chart.add_tools(BoxSelectTool(dimensions="width"))
-        # self.chart.add_tile(self.tile_provider)
-        # self.chart.axis.visible = False
+
+        if self.legend:
+            mapper = LinearColorMapper(
+                palette=self.colors, low=1, high=len(self.y)
+            )
+            self.color_bar = ColorBar(
+                color_mapper=mapper,
+                location=(0, 0),
+                ticker=FixedTicker(ticks=list(range(1, len(self.y) + 1))),
+                major_label_overrides=dict(
+                    zip(list(range(1, len(self.y) + 1)), self.y)
+                ),
+                major_label_text_baseline="top",
+                major_label_text_align="left",
+                major_tick_in=0,
+                major_tick_out=0,
+            )
+            self.chart.add_layout(self.color_bar, self.legend_position)
 
         self.chart.xgrid.grid_line_color = None
         self.chart.ygrid.grid_line_color = None
@@ -920,7 +1309,7 @@ class StackedLines(BaseStackedLine):
         if height is not None:
             self.chart.plot_height = height
 
-    def reload_chart(self, data, update_source=False):
+    def reload_chart(self, data, patch_update=False):
         """
         Description:
 
@@ -932,8 +1321,10 @@ class StackedLines(BaseStackedLine):
         Ouput:
         """
         if data is not None:
+            if len(data) == 0:
+                data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.interactive_image.update_chart(data_source=data)
-            if update_source:
+            if patch_update:
                 self.format_source_data(data)
 
     def add_selection_geometry_event(self, callback):
@@ -982,6 +1373,13 @@ class StackedLines(BaseStackedLine):
         self.chart.title.text_font_size = properties_dict["title"][
             "text_font_size"
         ]
+        if self.legend:
+            self.color_bar.major_label_text_color = properties_dict["title"][
+                "text_color"
+            ]
+            self.color_bar.title_text_color = properties_dict["title"][
+                "text_color"
+            ]
 
         # background, border, padding
         self.chart.background_fill_color = properties_dict[

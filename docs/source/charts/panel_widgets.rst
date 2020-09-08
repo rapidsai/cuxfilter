@@ -8,6 +8,14 @@ Range slider
 
 .. automethod:: panel_widgets.range_slider
 
+
+.. jupyter-execute::
+    :hide-code:
+
+    import panel as pn
+    pn.extension()
+
+
 Example
 ~~~~~~~
 .. jupyter-execute::

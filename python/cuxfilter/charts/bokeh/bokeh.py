@@ -61,7 +61,7 @@ def bar(
     -------
     A bokeh chart object of type vbar
     """
-    return plots.Bar(
+    plot = plots.Bar(
         x,
         y,
         data_points,
@@ -75,6 +75,8 @@ def bar(
         autoscaling,
         **library_specific_params,
     )
+    plot.chart_type = "bar"
+    return plot
 
 
 def line(
@@ -138,7 +140,7 @@ def line(
     -------
     A bokeh chart object of type line
     """
-    return plots.Line(
+    plot = plots.Line(
         x,
         y,
         data_points,
@@ -152,3 +154,5 @@ def line(
         autoscaling,
         **library_specific_params,
     )
+    plot.chart_type = "line"
+    return plot

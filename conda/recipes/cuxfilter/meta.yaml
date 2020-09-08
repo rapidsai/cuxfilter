@@ -2,19 +2,19 @@
 
 {% set version = environ.get('GIT_DESCRIBE_TAG', '0.0.0.dev').lstrip('v') + environ.get('VERSION_SUFFIX', '') %}
 {% set minor_version =  version.split('.')[0] + '.' + version.split('.')[1] %}
-{% set git_revision_count=environ.get('GIT_DESCRIBE_NUMBER', 0) %}
 {% set py_version=environ.get('CONDA_PY', 36) %}
+{% set cuda_version='.'.join(environ.get('CUDA_VERSION', '10.1').split('.')[:2]) %}
 
 package:
   name: cuxfilter
   version: {{ version }}
 
 source:
-  path: ../../..
+  git_url: ../../..
 
 build:
-  number: {{ git_revision_count }}
-  string: py{{ py_version }}_{{ git_revision_count }}
+  number: {{ GIT_DESCRIBE_NUMBER }}
+  string: py{{ py_version }}_{{ GIT_DESCRIBE_HASH }}_{{ GIT_DESCRIBE_NUMBER }}
   script_env:
     - VERSION_SUFFIX
 
@@ -27,18 +27,22 @@ requirements:
     - cudf {{ minor_version }}
     - dask-cudf {{ minor_version }}
     - dask-cuda {{ minor_version }}
-    - datashader >=0.10.*
+    - datashader >=0.11.1
+    - numba >=0.51.2
     - cupy  >=6*
-    - panel 0.6.*
-    - bokeh =1.*
+    - panel >=0.9.*
+    - bokeh >=2.1.1
     - pyproj  >=2.4.*
     - geopandas >=0.6.*
     - nodejs
     - libwebp
     - pyppeteer
     - jupyter-server-proxy
+    - pydeck >=0.3.*
 
 test:
+  requires:
+    - cudatoolkit {{ cuda_version }}.*
   commands:
     - python -c "import cuxfilter"
 

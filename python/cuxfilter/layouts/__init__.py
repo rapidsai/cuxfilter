@@ -14,5 +14,3 @@ from .layouts import (
     Layout11 as double_feature_quad_base,
     Layout12 as three_by_three,
 )
-
-# from .layout_2 import Layout2 as layout_2

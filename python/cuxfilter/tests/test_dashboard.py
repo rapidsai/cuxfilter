@@ -16,7 +16,7 @@ class TestDashBoard:
     dashboard = cux_df.dashboard(charts=[], title="test_title")
 
     def test_variables(self):
-        assert self.dashboard._data.equals(self.df)
+        assert self.dashboard._cuxfilter_df.data.equals(self.df)
         assert self.dashboard.title == "test_title"
         assert (
             self.dashboard._dashboard.__class__
@@ -97,7 +97,6 @@ class TestDashBoard:
         bac = bokeh.bar("key")
         bac.chart_type = "chart_1"
         dashboard.add_charts([bac])
-        print(bac.filter_widget.value)
         bac.filter_widget.value = (0, 3)
         dashboard._active_view = active_view
 

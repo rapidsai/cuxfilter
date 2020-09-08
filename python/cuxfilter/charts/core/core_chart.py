@@ -29,7 +29,10 @@ class BaseChart:
 
     @property
     def name(self):
-        return self.x + "_" + self.chart_type
+        if self.chart_type is not None:
+            return self.x + "_" + self.chart_type
+        else:
+            return self.x + "_"
 
     @property
     def stride(self):

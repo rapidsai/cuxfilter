@@ -21,14 +21,12 @@ class TestViewDataFrame:
     def test_variables(self):
         vd = ViewDataFrame()
 
-        vd.chart_type == "view_dataframe"
         vd.columns is None
         vd._width == 400
         vd._height == 400
         vd.use_data_tiles is False
         vd.source is None
         vd.chart is None
-        vd.name == "view_dataframe"
 
     def test_initiate_chart(self):
         vd = ViewDataFrame()

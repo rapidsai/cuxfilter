@@ -1,14 +1,41 @@
-# cuXfilter 0.14.0 (03 Jun 2020)
+# cuxfilter 0.15.0 (Date TBD)
+
+## New Features
+- PR #164 Added new Graph api, supports (nodes[cuDF], edges[cuDF]) input
+- PR #168 Added legends to non_aggregate charts
+
+## Improvements
+- PR #158 Add docs build script
+- PR #159 Layouts Refactor
+- PR #160 Install dependencies via meta packages
+- PR #162 Dashboard and templates cleanup and tests
+- PR #163 Updated Bokeh version to 2.1.1, added pydeck support
+- PR #168 Replaced interactive datashader callback throttling to debouncing
+- PR #169 Added Node-Inspect Neighbor widget to graph charts
+Added edge-curving
+- PR #173 Updates to installation docs
+- PR #180 Added documentation for deploying as a multi-user dashboard
+
+## Bug Fixes
+- PR #161 fixed layouts bugs
+- PR #171 pydeck 0.4.1 fixes and geo_mapper optimizations
+- PR #180 Datashader version pin fixing issues with cuDF 0.14+
+- PR #186 syntax fixes to avoid CI failure
+
+# cuxfilter 0.14.0 (03 Jun 2020)
 
 ## New Features
 - PR #136 Local gpuCI build script
 - PR #148 Added dask_cudf support to all charts
+
 ## Improvements
 - PR #129 optimizations to grouby query, using boolean masks
 - PR #135 implemented stateless non-aggregate querying
 - PR #148 made groupby pre-computations consistent, made dashboard querying stateless
 - PR #151 implmented autoscaling true/false for bar, line charts
 add_chart now dynamically updates a running dashboard in real-time(page-refresh required)
+- PR #155 Add git commit to conda package
+
 ## Bug Fixes
 - PR #127 fixed logic for calculating datatiles for 2d and 3d choropleth charts
 - PR #128, #130 Bug fixes and test updates
@@ -17,8 +44,9 @@ add_chart now dynamically updates a running dashboard in real-time(page-refresh 
 - PR #133 Added Nodejs dependency in build files
 - PR #148 logic fixes to datatile compute and using vectorized operations instead of numba kernels for datatile compute
 - PR #151 docs and minor bug fixes, also fixed dashboard server notebook issues
+- PR #165 Fix issue with incorrect docker image being used in local build script
 
-# cuXfilter 0.13.0 (31 March 2020)
+# cuxfilter 0.13.0 (31 March 2020)
 
 ## New Features
 
@@ -34,7 +62,7 @@ add_chart now dynamically updates a running dashboard in real-time(page-refresh 
 - PR #112 - updated bokeh dependecy to be 1.* instead of >1
 - PR #122 Critical bug fix - resolves rendering issue related to deckgl charts
 
-# cuXfilter 0.12.0 (4 Feb 2020)
+# cuxfilter 0.12.0 (4 Feb 2020)
 
 ## New Features
 

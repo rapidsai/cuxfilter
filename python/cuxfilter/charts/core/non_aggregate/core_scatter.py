@@ -5,16 +5,11 @@ from .core_non_aggregate import BaseNonAggregate
 
 class BaseScatter(BaseNonAggregate):
     """
-        No datatiles support in scatter plot charts
+        .. note::
+            Non-aggregate charts do not support Datatiles
 
-        If dataset size is greater than a few thousand points,
-        scatter geos can crash the browser tabs, and is only recommended
-        with datashader plugin, in which case an image is
-        rendered instead of points on canvas
     """
 
-    chart_type: str = "scatter"
-    stride = float
     reset_event = None
     x_range: Tuple = None
     y_range: Tuple = None
@@ -37,8 +32,11 @@ class BaseScatter(BaseNonAggregate):
         pixel_spread="dynspread",
         width=800,
         height=400,
+        tile_provider=None,
         title="",
-        timeout=1,
+        timeout=100,
+        legend=True,
+        legend_position="center",
         **library_specific_params,
     ):
         """
@@ -84,6 +82,7 @@ class BaseScatter(BaseNonAggregate):
         self.aggregate_fn = aggregate_fn
         self.width = width
         self.height = height
+        self.tile_provider = tile_provider
         self.point_shape = point_shape
         self.point_size = point_size
         self.title = title
@@ -91,4 +90,6 @@ class BaseScatter(BaseNonAggregate):
         self.pixel_shade_type = pixel_shade_type
         self.pixel_density = pixel_density
         self.pixel_spread = pixel_spread
+        self.legend = legend
+        self.legend_position = legend_position
         self.library_specific_params = library_specific_params

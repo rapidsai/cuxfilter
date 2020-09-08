@@ -6,7 +6,9 @@ from typing import Type
 from ...charts.core.core_chart import BaseChart
 
 
-def calc_value_counts(a_gpu, stride, min_value, data_points):
+def calc_value_counts(
+    a_gpu, stride, min_value, data_points, custom_binning=False
+):
     """
     description:
         main function to calculate histograms
@@ -16,9 +18,8 @@ def calc_value_counts(a_gpu, stride, min_value, data_points):
     output:
         frequencies(ndarray), bin_edge_values(ndarray)
     """
-    custom_binning = False
     if type(a_gpu) == dask_cudf.core.Series:
-        if stride is None or a_gpu.dtype == "bool":
+        if not custom_binning:
             val_count = a_gpu.value_counts()
         else:
             val_count = (
@@ -27,10 +28,9 @@ def calc_value_counts(a_gpu, stride, min_value, data_points):
                 .astype(a_gpu.dtype)
                 .value_counts()
             )
-            custom_binning = True
         val_count = val_count.compute().sort_index()
     else:
-        if stride is None or a_gpu.dtype == "bool":
+        if not custom_binning:
             val_count = a_gpu.value_counts().sort_index()
         else:
             val_count = (
@@ -40,13 +40,8 @@ def calc_value_counts(a_gpu, stride, min_value, data_points):
                 .value_counts()
                 .sort_index()
             )
-            custom_binning = True
 
-    return (
-        (val_count.index.to_array(), val_count.to_array()),
-        len(val_count),
-        custom_binning,
-    )
+    return ((val_count.index.to_array(), val_count.to_array()), len(val_count))
 
 
 def calc_groupby(chart: Type[BaseChart], data, agg=None):
