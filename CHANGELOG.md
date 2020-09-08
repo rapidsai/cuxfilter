@@ -5,6 +5,7 @@
 ## Improvements
 
 ## Bug Fixes
+- PR #189 fix bad auto-merge in #187
 
 # cuXfilter 0.15.0 (Date TBD)
 
