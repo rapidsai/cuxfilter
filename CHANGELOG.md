@@ -6,7 +6,7 @@
 
 ## Bug Fixes
 
-# cuXfilter 0.15.0 (Date TBD)
+# cuXfilter 0.15.0 (08 Sep 2020)
 
 ## New Features
 - PR #164 Added new Graph api, supports (nodes[cuDF], edges[cuDF]) input
