@@ -12,7 +12,7 @@
 #
 import os
 import sys
-import cuxfilter
+
 sys.path.insert(0, os.path.abspath('...'))
 
 
@@ -44,10 +44,9 @@ extensions = ["sphinx.ext.intersphinx",
     "sphinx_markdown_tables",
     "IPython.sphinxext.ipython_console_highlighting",
     "IPython.sphinxext.ipython_directive",
-    "bokeh.sphinxext.bokeh_plot",
     "nbsphinx",
     "recommonmark",
-    "jupyter_sphinx.execute"]
+    "jupyter_sphinx"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -85,10 +84,8 @@ html_static_path = ['../_static']
 
 htmlhelp_basename = "cuxfilterdoc"
 
+# cuxfilter.load_notebook_assets()
+
 
 def setup(app):
     app.add_css_file('custom.css')
-    app.add_css_file('https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.0/mapbox-gl.css')
-    app.add_js_file('https://unpkg.com/deck.gl@latest/dist.min.js')
-    app.add_js_file('https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.0/mapbox-gl.js')
-    app.add_js_file('https://unpkg.com/@deck.gl/json@8.1.0/dist.min.js')
