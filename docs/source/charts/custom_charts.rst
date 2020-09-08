@@ -8,6 +8,13 @@ Table View Chart
 
 .. automethod:: view_dataframe
 
+.. jupyter-execute::
+    :hide-code:
+
+    import panel as pn
+    pn.extension()
+
+
 Example
 ~~~~~~~
 .. jupyter-execute::

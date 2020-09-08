@@ -1,4 +1,3 @@
-import numpy as np
 import cupy as cp
 import cudf
 from numba import cuda
@@ -116,9 +115,9 @@ def compute_curves(nodes, control_points, result, steps):
         v2_y = nodes[i, 3]
 
         bezier(v1_x, v2_x, control_points[i, 0], steps, result[i, 0])
-        result[i, 0, -1] = np.nan
+        result[i, 0, -1] = cp.nan
         bezier(v1_y, v2_y, control_points[i, 1], steps, result[i, 1])
-        result[i, 1, -1] = np.nan
+        result[i, 1, -1] = cp.nan
         if nodes.shape[1] == 5:
             add_aggregate_col(nodes[i, 4], steps, result[i, 2])
 
@@ -179,13 +178,20 @@ def curved_connect_edges(
     fin_df_ = bundled_edges.apply_rows(
         control_point_compute_kernel,
         incols=connected_edge_columns[:4] + ["count", "_index"],
-        outcols=dict(ctrl_point_x=np.float32, ctrl_point_y=np.float32),
+        outcols=dict(ctrl_point_x=cp.float32, ctrl_point_y=cp.float32),
         kwargs=curve_params,
     )
 
-    shape = (fin_df_.shape[0], len(connected_edge_columns) - 2, 101)
+    shape = (
+        fin_df_.shape[0],
+        len(connected_edge_columns) - 2,
+        curve_total_steps + 1,
+    )
     result = cp.zeros(shape=shape, dtype=cp.float32)
     steps = cp.linspace(0, 1, curve_total_steps)
+
+    # Make sure no control points are added for rows with source==destination
+    fin_df_ = fin_df_.query(edge_source + "!=" + edge_target)
     compute_curves[cuda_args(fin_df_.shape[0])](
         fin_df_[connected_edge_columns].to_gpu_matrix(),
         fin_df_[["ctrl_point_x", "ctrl_point_y"]].to_gpu_matrix(),
@@ -200,11 +206,11 @@ def curved_connect_edges(
                 "y": result[:, 1].flatten(),
                 connected_edge_columns[-1]: result[:, 2].flatten(),
             }
-        ).fillna(np.nan)
+        ).fillna(cp.nan)
     else:
         return cudf.DataFrame(
             {"x": result[:, 0].flatten(), "y": result[:, 1].flatten()}
-        ).fillna(np.nan)
+        ).fillna(cp.nan)
 
 
 @cuda.jit
@@ -214,14 +220,14 @@ def connect_edges(edges, result):
     for i in range(start, edges.shape[0], stride):
         result[i, 0, 0] = edges[i, 0]
         result[i, 0, 1] = edges[i, 2]
-        result[i, 0, 2] = np.nan
+        result[i, 0, 2] = cp.nan
         result[i, 1, 0] = edges[i, 1]
         result[i, 1, 1] = edges[i, 3]
-        result[i, 1, 2] = np.nan
+        result[i, 1, 2] = cp.nan
         if edges.shape[1] == 5:
             result[i, 2, 0] = edges[i, 4]
             result[i, 2, 1] = edges[i, 4]
-            result[i, 2, 2] = np.nan
+            result[i, 2, 2] = cp.nan
 
 
 def directly_connect_edges(edges):
@@ -246,11 +252,11 @@ def directly_connect_edges(edges):
                 "y": result[:, 1].flatten(),
                 edges.columns[-1]: result[:, 2].flatten(),
             }
-        ).fillna(np.nan)
+        ).fillna(cp.nan)
     else:
         return cudf.DataFrame(
             {"x": result[:, 0].flatten(), "y": result[:, 1].flatten()}
-        ).fillna(np.nan)
+        ).fillna(cp.nan)
 
 
 def calc_connected_edges(
@@ -291,24 +297,18 @@ def calc_connected_edges(
         edges_columns.remove(None)
         connected_edge_columns.remove(None)
 
-    connected_edges_df = (
-        edges.merge(nodes, left_on=edge_source, right_on=node_id)[
-            edges_columns
-        ]
-        .reset_index(drop=True)
-        .drop_duplicates()
-    )
+    nodes = nodes[[node_id, node_x, node_y]].drop_duplicates()
 
-    connected_edges_df = (
-        connected_edges_df.merge(
-            nodes,
-            left_on=edge_target,
-            right_on=node_id,
-            suffixes=("_src", "_dst"),
-        )
-        .reset_index(drop=True)
-        .drop_duplicates()
-    )
+    connected_edges_df = edges.merge(
+        nodes, left_on=edge_source, right_on=node_id
+    )[edges_columns].reset_index(drop=True)
+
+    connected_edges_df = connected_edges_df.merge(
+        nodes,
+        left_on=edge_target,
+        right_on=node_id,
+        suffixes=("_src", "_dst"),
+    ).reset_index(drop=True)
 
     if connected_edges_df.shape[0] > 0:
         if edge_render_type == "direct":
