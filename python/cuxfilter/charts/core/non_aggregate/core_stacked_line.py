@@ -136,7 +136,9 @@ class BaseStackedLine(BaseChart):
 
         """
 
-        def selection_callback(xmin, xmax, ymin, ymax):
+        def selection_callback(event):
+            xmin, xmax = event.geometry["x0"], event.geometry["x1"]
+            ymin, ymax = event.geometry["y0"], event.geometry["y1"]
             if dashboard_cls._active_view != self.name:
                 # reset previous active view and
                 # set current chart as active view
