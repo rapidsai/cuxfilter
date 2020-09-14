@@ -1,6 +1,7 @@
 # cuXfilter 0.16.0 (Date TBD)
 
 ## New Features
+- PR #177 Add support for lasso selections
 
 ## Improvements
 - PR #191 Update doc build script for CI
