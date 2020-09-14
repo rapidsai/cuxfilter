@@ -107,6 +107,7 @@ class TestCoreGraph:
 
         class evt:
             geometry = dict(x0=1, x1=3, y0=0, y1=1, type="rect")
+
         t = bg.get_selection_geometry_callback(dashboard)
         t(evt)
         assert self.result.equals(result)
@@ -138,7 +139,9 @@ class TestCoreGraph:
         t = bg.get_selection_geometry_callback(dashboard)
         with mock.patch("cuspatial.point_in_polygon") as pip:
 
-            pip.return_value = cudf.DataFrame({"selection": [True, False, True, False]}) 
+            pip.return_value = cudf.DataFrame(
+                {"selection": [True, False, True, False]}
+            )
             t(evt)
             assert pip.called
 

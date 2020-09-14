@@ -130,7 +130,9 @@ class TestCoreNonAggregateChart:
         t = bnac.get_selection_geometry_callback(dashboard)
         with mock.patch("cuspatial.point_in_polygon") as pip:
 
-            pip.return_value = cudf.DataFrame({"selection": [True, False, True]}) 
+            pip.return_value = cudf.DataFrame(
+                {"selection": [True, False, True]}
+            )
             t(evt)
             assert pip.called
 

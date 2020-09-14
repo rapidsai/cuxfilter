@@ -90,8 +90,10 @@ class TestBaseStackedLine:
         bsl = BaseStackedLine("key", ["val"])
         bsl.chart_type = "stacked_lines"
         self.dashboard._active_view = bsl.name
+
         class evt:
             geometry = dict(x0=1, x1=2, y0=3, y1=4, type="rect")
+
         t = bsl.get_selection_geometry_callback(self.dashboard)
         t(evt)
 
