@@ -114,9 +114,7 @@ class TestCoreNonAggregateChart:
         bnac = BaseNonAggregate()
         bnac.x = "a"
         bnac.y = "b"
-        bnac.source = dict(a=[], b=[], s=[])
         bnac.chart_type = "temp"
-        self.result = None
 
         def t_function(data, patch_update=False):
             self.result = data
@@ -125,8 +123,6 @@ class TestCoreNonAggregateChart:
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
-        dashboard._active_view = bnac.name
-
         class evt:
             geometry = dict(x=[1, 1, 2], y=[1, 2, 1], type="poly")
             final = True
@@ -134,10 +130,7 @@ class TestCoreNonAggregateChart:
         t = bnac.get_selection_geometry_callback(dashboard)
         with mock.patch("cuspatial.point_in_polygon") as pip:
 
-            class _indices:
-                selection = "s"
-
-            pip.return_value = _indices
+            pip.return_value = cudf.DataFrame({"selection": [True, False, True]}) 
             t(evt)
             assert pip.called
 

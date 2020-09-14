@@ -86,12 +86,14 @@ class TestBaseStackedLine:
             type(bsl.get_selection_geometry_callback(self.dashboard))
         )
 
-    def test_selection_callback(self):
+    def test_box_selection_callback(self):
         bsl = BaseStackedLine("key", ["val"])
         bsl.chart_type = "stacked_lines"
         self.dashboard._active_view = bsl.name
+        class evt:
+            geometry = dict(x0=1, x1=2, y0=3, y1=4, type="rect")
         t = bsl.get_selection_geometry_callback(self.dashboard)
-        t(xmin=1, xmax=2, ymin=3, ymax=4)
+        t(evt)
 
         assert (
             self.dashboard._query_str_dict["key_stacked_lines"]
