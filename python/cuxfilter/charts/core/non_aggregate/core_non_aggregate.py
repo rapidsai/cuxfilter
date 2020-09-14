@@ -87,12 +87,12 @@ class BaseNonAggregate(BaseChart):
             indices = cuspatial.point_in_polygon(
                 self.source[self.x],
                 self.source[self.y],
-                cudf.Series([0], index=['selection']),
+                cudf.Series([0], index=["selection"]),
                 [0],
-                xs, 
-                ys
+                xs,
+                ys,
             )
-            temp_data = self.source[indices.selection] 
+            temp_data = self.source[indices.selection]
 
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(

@@ -128,13 +128,15 @@ class TestCoreNonAggregateChart:
         dashboard._active_view = bnac.name
 
         class evt:
-            geometry = dict(x=[1,1,2], y=[1,2,1], type="poly")
+            geometry = dict(x=[1, 1, 2], y=[1, 2, 1], type="poly")
             final = True
 
         t = bnac.get_selection_geometry_callback(dashboard)
         with mock.patch("cuspatial.point_in_polygon") as pip:
+
             class _indices:
                 selection = "s"
+
             pip.return_value = _indices
             t(evt)
             assert pip.called

@@ -217,12 +217,12 @@ class BaseGraph(BaseChart):
             indices = cuspatial.point_in_polygon(
                 self.nodes[self.node_x],
                 self.nodes[self.node_y],
-                cudf.Series([0], index=['selection']),
+                cudf.Series([0], index=["selection"]),
                 [0],
-                xs, 
-                ys
+                xs,
+                ys,
             )
-            temp_data = self.source[indices.selection] 
+            temp_data = self.source[indices.selection]
             node_ids = temp_data[self.node_id]
 
             nodes, edges = self.query_graph(node_ids, self.nodes, self.edges)
