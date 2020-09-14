@@ -734,6 +734,7 @@ class Graph(BaseGraph):
         self.display_edges.on_change("_active", cb)
 
         self.chart.add_tools(BoxSelectTool())
+        self.chart.add_tools(LassoSelectTool())
         self.chart.add_tools(self.inspect_neighbors)
         self.chart.add_tools(self.display_edges)
 
