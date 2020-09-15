@@ -1,4 +1,4 @@
-# name: cudf_dev10.0
+# name: cudf_dev11.0
 channels:
 - rapidsai
 - rapidsai-nightly
@@ -7,6 +7,7 @@ channels:
 - anaconda
 dependencies:
 - cupy>=6*
+- cuspatial>=0.15
 - python>=3.6,<3.8
 - cudf=0.16
 - dask>=2.12.0
@@ -21,10 +22,11 @@ dependencies:
 - pandoc=<2.0.0
 - bokeh>=2.1.1
 - panel
-- cudatoolkit=10.0
+- cudatoolkit=11.0
 - nodejs
 - recommonmark
 - pytest
+- mock
 - sphinx
 - sphinx_rtd_theme
 - jupyter_sphinx
