@@ -333,8 +333,6 @@ class Scatter(BaseScatter):
             if len(data) == 0:
                 data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.interactive_image.update_chart(data_source=data)
-            if patch_update:
-                self.format_source_data(data)
 
     def add_selection_geometry_event(self, callback):
         """
@@ -1042,8 +1040,6 @@ class Line(BaseLine):
             if len(data) == 0:
                 data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.interactive_image.update_chart(data_source=data)
-            if patch_update:
-                self.format_source_data(data)
 
     def add_selection_geometry_event(self, callback):
         """
@@ -1312,8 +1308,6 @@ class StackedLines(BaseStackedLine):
             if len(data) == 0:
                 data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.interactive_image.update_chart(data_source=data)
-            if patch_update:
-                self.format_source_data(data)
 
     def add_selection_geometry_event(self, callback):
         """
