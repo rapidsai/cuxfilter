@@ -181,11 +181,8 @@ class BaseGraph(BaseChart):
         self.format_source_data(cuxfilter_df)
 
     def query_graph(self, node_ids, nodes, edges):
-        inspect_type = cudf.logical_and
-        if self.inspect_neighbors._active:
-            inspect_type = cudf.logical_or
         edges_ = edges.loc[
-            inspect_type(
+            cudf.logical_or(
                 edges[self.edge_source].isin(node_ids),
                 edges[self.edge_target].isin(node_ids),
             ).values
@@ -223,17 +220,22 @@ class BaseGraph(BaseChart):
                 xs,
                 ys,
             )
-            temp_data = self.source[indices.selection]
-            node_ids = temp_data[self.node_id]
+            nodes = self.source[indices.selection]
 
-            nodes, edges = self.query_graph(node_ids, self.nodes, self.edges)
+            if self.inspect_neighbors._active:
+                node_ids = nodes[self.node_id]
+                nodes, edges = self.query_graph(
+                    node_ids, self.nodes, self.edges
+                )
+            else:
+                edges = None
 
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])
 
             # reload graph chart separately as it has an extra edges argument
-            self.reload_chart(nodes=nodes, edges=edges, patch_update=False)
-            del temp_data, nodes, edges
+            self.reload_chart(nodes=nodes, edges=edges)
+            del nodes, edges
 
         def box_callback(xmin, xmax, ymin, ymax):
             self.x_range = (xmin, xmax)
@@ -254,19 +256,22 @@ class BaseGraph(BaseChart):
             )
 
             dashboard_cls._query_str_dict[self.name] = query
-            temp_data = dashboard_cls._query(
-                dashboard_cls._generate_query_str()
-            )
-            node_ids = temp_data[self.node_id]
+            nodes = dashboard_cls._query(dashboard_cls._generate_query_str())
 
-            nodes, edges = self.query_graph(node_ids, self.nodes, self.edges)
+            if self.inspect_neighbors._active:
+                node_ids = nodes[self.node_id]
+                nodes, edges = self.query_graph(
+                    node_ids, self.nodes, self.edges
+                )
+            else:
+                edges = None
 
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])
 
             # reload graph chart separately as it has an extra edges argument
-            self.reload_chart(nodes=nodes, edges=edges, patch_update=False)
-            del temp_data, nodes, edges
+            self.reload_chart(nodes=nodes, edges=edges)
+            del nodes, edges
 
         def selection_callback(event):
             if dashboard_cls._active_view != self.name:
@@ -356,9 +361,7 @@ class BaseGraph(BaseChart):
             nodes = dashboard_cls._query(dashboard_cls._generate_query_str())
             dashboard_cls._reload_charts(nodes)
             # reload graph chart separately as it has an extra edges argument
-            self.reload_chart(
-                nodes=nodes, edges=self.edges, patch_update=False
-            )
+            self.reload_chart(nodes=nodes)
             del nodes
 
         # add callback to reset chart button
@@ -385,7 +388,7 @@ class BaseGraph(BaseChart):
         )
         if len(query) > 0:
             final_query += " and " + query
-        self.reload_chart(self.nodes.query(final_query), patch_update=False)
+        self.reload_chart(self.nodes.query(final_query))
 
     def query_chart_by_indices(
         self,
@@ -412,23 +415,19 @@ class BaseGraph(BaseChart):
         if len(new_indices) == 0:
             # case: all selected indices were reset
             # reset the chart
-            self.reload_chart(self.nodes, patch_update=False)
+            self.reload_chart(self.nodes)
         elif len(new_indices) == 1:
             final_query = active_chart.x + "==" + str(float(new_indices[0]))
             if len(query) > 0:
                 final_query += " and " + query
             # just a single index
-            self.reload_chart(
-                self.nodes.query(final_query), patch_update=False
-            )
+            self.reload_chart(self.nodes.query(final_query))
         else:
             new_indices_str = ",".join(map(str, new_indices))
             final_query = active_chart.x + " in (" + new_indices_str + ")"
             if len(query) > 0:
                 final_query += " and " + query
-            self.reload_chart(
-                self.nodes.query(final_query), patch_update=False
-            )
+            self.reload_chart(self.nodes.query(final_query))
 
     def add_selection_geometry_event(self, callback):
         """

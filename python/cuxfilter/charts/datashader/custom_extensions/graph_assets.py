@@ -310,7 +310,8 @@ def calc_connected_edges(
         suffixes=("_src", "_dst"),
     ).reset_index(drop=True)
 
-    if connected_edges_df.shape[0] > 0:
+    if connected_edges_df.shape[0] > 1:
+        # shape=1 when the dataset has src == dst edges
         if edge_render_type == "direct":
             result = directly_connect_edges(
                 connected_edges_df[connected_edge_columns]

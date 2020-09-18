@@ -782,7 +782,7 @@ class Graph(BaseGraph):
 
             # update connected_edges value for datashaded edges
             # if display edge toggle is active
-            if self.display_edges._active and patch_update is False:
+            if self.display_edges._active:
                 self.connected_edges = calc_connected_edges(
                     nodes,
                     self.edges if edges is None else edges,
@@ -795,6 +795,7 @@ class Graph(BaseGraph):
                     self.edge_render_type,
                     self.curve_params,
                 )
+
             self.interactive_image.update_chart(data_source=nodes)
 
     def add_selection_geometry_event(self, callback):
