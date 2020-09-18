@@ -2,12 +2,14 @@
 
 ## New Features
 - PR #177 Add support for lasso selections
+- PR #192 Added drop_duplicates for view_dataframe chart type
 
 ## Improvements
 - PR #191 Update doc build script for CI
 
 ## Bug Fixes
 - PR #190 fix conflicts related to auto-merge with branch-0.15
+- PR #192 fixes issues with non_aggregate charts having permanent inplace querying
 
 # cuXfilter 0.15.0 (08 Sep 2020)
 
