@@ -221,14 +221,13 @@ class BaseGraph(BaseChart):
                 ys,
             )
             nodes = self.source[indices.selection]
+            edges = None
 
             if self.inspect_neighbors._active:
                 node_ids = nodes[self.node_id]
                 nodes, edges = self.query_graph(
                     node_ids, self.nodes, self.edges
                 )
-            else:
-                edges = None
 
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])
@@ -256,15 +255,15 @@ class BaseGraph(BaseChart):
             )
 
             dashboard_cls._query_str_dict[self.name] = query
+
             nodes = dashboard_cls._query(dashboard_cls._generate_query_str())
+            edges = None
 
             if self.inspect_neighbors._active:
                 node_ids = nodes[self.node_id]
                 nodes, edges = self.query_graph(
                     node_ids, self.nodes, self.edges
                 )
-            else:
-                edges = None
 
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])
