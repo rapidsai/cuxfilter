@@ -6,6 +6,7 @@
 
 ## Improvements
 - PR #191 Update doc build script for CI
+- PR #192 Optimize graph querying logic
 
 ## Bug Fixes
 - PR #190 fix conflicts related to auto-merge with branch-0.15
