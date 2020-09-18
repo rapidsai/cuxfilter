@@ -238,11 +238,9 @@ class TestCoreGraph:
         bg.nodes = df
 
         self.result = None
-        self.patch_update = None
 
-        def t_func(data, patch_update):
+        def t_func(data):
             self.result = data
-            self.patch_update = patch_update
 
         # creating a dummy reload chart fn as its not implemented in core
         # non aggregate chart class
@@ -253,7 +251,6 @@ class TestCoreGraph:
         )
 
         assert self.result.to_string() == "   a  b\n1  2  4\n2  3  5"
-        assert self.patch_update is False
 
     @pytest.mark.parametrize(
         "new_indices, result",
@@ -278,11 +275,9 @@ class TestCoreGraph:
         bg.nodes = df
 
         self.result = None
-        self.patch_update = None
 
-        def t_func(data, patch_update):
+        def t_func(data):
             self.result = data
-            self.patch_update = patch_update
 
         # creating a dummy reload chart fn as its not implemented in core
         # non aggregate chart class
@@ -296,4 +291,3 @@ class TestCoreGraph:
         )
 
         assert self.result.to_string() == result
-        assert self.patch_update is False

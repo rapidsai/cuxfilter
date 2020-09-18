@@ -3,7 +3,11 @@ from .core_view_dataframe import ViewDataFrame
 
 
 def view_dataframe(
-    columns=None, width=400, height=400, force_computation=False
+    columns=None,
+    drop_duplicates=False,
+    width=400,
+    height=400,
+    force_computation=False,
 ):
     """
 
@@ -12,6 +16,9 @@ def view_dataframe(
 
     columns: list, default None
         display subset of columns, and all columns if None
+
+    drop_duplicates: bool, default False
+        display only unique rows if True
 
     width: int,  default 400
 

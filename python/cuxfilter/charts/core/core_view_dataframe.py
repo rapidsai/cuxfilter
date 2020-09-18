@@ -33,14 +33,21 @@ class ViewDataFrame:
     chart = None
     source = None
     use_data_tiles = False
+    drop_duplicates = False
     _initialized = False
 
     def __init__(
-        self, columns=None, width=400, height=400, force_computation=False
+        self,
+        columns=None,
+        drop_duplicates=False,
+        width=400,
+        height=400,
+        force_computation=False,
     ):
         self.columns = columns
         self._width = width
         self._height = height
+        self.drop_duplicates = drop_duplicates
         self.force_computation = force_computation
 
     @property
@@ -87,6 +94,11 @@ class ViewDataFrame:
         else:
             self.generate_chart(dashboard_cls._cuxfilter_df.data)
 
+    def _format_data(self, data):
+        if self.drop_duplicates:
+            return data.drop_duplicates()
+        return data
+
     def generate_chart(self, data):
         if self.columns is None:
             self.columns = list(data.columns)
@@ -97,8 +109,9 @@ class ViewDataFrame:
             "font-size": "0.5vw",
             "overflow-x": "auto",
         }
-
-        html_pane = pn.pane.HTML(data[self.columns], style=style)
+        html_pane = pn.pane.HTML(
+            self._format_data(data[self.columns]), style=style
+        )
         self.chart = pn.Column(html_pane, css_classes=["panel-df"])
         self.chart.sizing_mode = "scale_both"
 
@@ -130,11 +143,15 @@ class ViewDataFrame:
     def reload_chart(self, data, patch_update: bool):
         if isinstance(data, dask_cudf.core.DataFrame):
             if self.force_computation:
-                self.chart[0].object = data[self.columns].compute()
+                self.chart[0].object = self._format_data(
+                    data[self.columns].compute()
+                )
             else:
-                self.chart[0].object = data[self.columns].head(1000)
+                self.chart[0].object = self._format_data(
+                    data[self.columns].head(1000)
+                )
         else:
-            self.chart[0].object = data[self.columns]
+            self.chart[0].object = self._format_data(data[self.columns])
 
     def update_dimensions(self, width=None, height=None):
         """
@@ -194,20 +211,17 @@ class ViewDataFrame:
         if len(new_indices) == 0:
             # case: all selected indices were reset
             # reset the chart
-            self.reload_chart(data, False)
+            final_query = query
         elif len(new_indices) == 1:
             final_query = active_chart.x + "==" + str(float(new_indices[0]))
             if len(query) > 0:
                 final_query += " and " + query
-            # just a single index
-            self.reload_chart(
-                data.query(final_query), False,
-            )
         else:
             new_indices_str = ",".join(map(str, new_indices))
             final_query = active_chart.x + " in (" + new_indices_str + ")"
             if len(query) > 0:
                 final_query += " and " + query
-            self.reload_chart(
-                data.query(final_query), False,
-            )
+
+        self.reload_chart(
+            data.query(final_query) if len(final_query) > 0 else data, False
+        )
