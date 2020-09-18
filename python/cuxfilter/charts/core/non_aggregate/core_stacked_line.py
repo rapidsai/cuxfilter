@@ -276,23 +276,23 @@ class BaseStackedLine(BaseChart):
         if len(new_indices) == 0:
             # case: all selected indices were reset
             # reset the chart
-            self.reload_chart(self.source, False)
+            final_query = query
         elif len(new_indices) == 1:
             final_query = active_chart.x + "==" + str(float(new_indices[0]))
             if len(query) > 0:
                 final_query += " and " + query
-            # just a single index
-            self.reload_chart(
-                self.source.query(final_query), False,
-            )
         else:
             new_indices_str = ",".join(map(str, new_indices))
             final_query = active_chart.x + " in (" + new_indices_str + ")"
             if len(query) > 0:
                 final_query += " and " + query
-            self.reload_chart(
-                self.source.query(final_query), False,
-            )
+
+        self.reload_chart(
+            self.source.query(final_query)
+            if len(final_query) > 0
+            else self.source,
+            False,
+        )
 
     def add_selection_geometry_event(self, callback):
         """
