@@ -15,6 +15,9 @@ class TestViewDataFrame:
     df = cudf.DataFrame(
         {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
     )
+    df_duplicates = cudf.DataFrame(
+        {"key": [0, 1, 1, 1, 4], "val": [10, 11, 11, 11, 14]}
+    )
     cux_df = cuxfilter.DataFrame.from_dataframe(df)
     dashboard = cux_df.dashboard(charts=[], title="test_title")
 
@@ -27,6 +30,7 @@ class TestViewDataFrame:
         vd.use_data_tiles is False
         vd.source is None
         vd.chart is None
+        vd.drop_duplicates is False
 
     def test_initiate_chart(self):
         vd = ViewDataFrame()
@@ -56,12 +60,20 @@ class TestViewDataFrame:
 
         assert str(vd.view()) == str(chart_view(_chart, width=vd.width))
 
-    def test_reload_chart(self):
+    @pytest.mark.parametrize("drop_duplicates", [True, False])
+    def test_reload_chart(self, drop_duplicates):
         vd = ViewDataFrame()
+        vd.drop_duplicates = drop_duplicates
         vd.initiate_chart(self.dashboard)
-        vd.reload_chart(self.df, patch_update=False)
 
-        assert vd.chart[0].object.equals(self.df)
+        vd.reload_chart(self.df_duplicates, patch_update=False)
+
+        if drop_duplicates:
+            assert vd.chart[0].object.equals(
+                self.df_duplicates.drop_duplicates()
+            )
+        else:
+            assert vd.chart[0].object.equals(self.df_duplicates)
 
     @pytest.mark.parametrize(
         "width, height, result1, result2",
