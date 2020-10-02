@@ -34,11 +34,17 @@ def _get_host(url):
     return parsed_url.netloc
 
 
-def _create_dashboard_url(notebook_url: str, port: int, environment: str):
+def _create_dashboard_url(notebook_url: str, port: int, service_proxy=None):
     service_url_path = ""
     notebook_url = f"http://{notebook_url}"
 
-    if environment == "jupyterhub":
+    if service_proxy == "jupyterhub":
+        if "JUPYTERHUB_SERVICE_PREFIX" not in os.environ:
+            raise EnvironmentError(
+                "JUPYTERHUB_SERVICE_PREFIX environment variable "
+                + "not set, service_proxy=jupyterhub will only work "
+                + "in a jupyterhub environment"
+            )
         service_url_path = os.environ["JUPYTERHUB_SERVICE_PREFIX"]
 
     proxy_url_path = "proxy/%d/" % port
@@ -49,10 +55,7 @@ def _create_dashboard_url(notebook_url: str, port: int, environment: str):
 
 
 def _create_app(
-    panel_obj,
-    notebook_url=DEFAULT_NOTEBOOK_URL,
-    port=0,
-    environment: str = "jupyter-notebook",
+    panel_obj, notebook_url=DEFAULT_NOTEBOOK_URL, port=0, service_proxy=None,
 ):
     """
     Displays a bokeh server app inline in the notebook.
@@ -63,7 +66,7 @@ def _create_app(
     port: int (optional, default=0)
         Allows specifying a specific port
     """
-    url = _create_dashboard_url(notebook_url, port, environment)
+    url = _create_dashboard_url(notebook_url, port, service_proxy)
 
     server_id = uuid.uuid4().hex
     server = get_server(
@@ -425,7 +428,7 @@ class DashBoard:
         self,
         notebook_url=DEFAULT_NOTEBOOK_URL,
         port: int = 0,
-        environment: str = "jupyter-notebook",
+        service_proxy=None,
     ):
         """
         Run the dashboard with a bokeh backend server within the notebook.
@@ -440,8 +443,8 @@ class DashBoard:
             Default is random open port. Recommended to set this value if
             running jupyter remotely and only few ports are exposed.
 
-        environment: str, optional, default jupyter-notebook,
-            options: jupyter-notebook, jupyterlab, jupyterhub
+        service_proxy: str, optional, default None,
+            available options: jupyterhub
 
         Examples
         --------
@@ -478,7 +481,7 @@ class DashBoard:
             ),
             notebook_url=self._notebook_url,
             port=port,
-            environment=environment,
+            service_proxy=service_proxy,
         )
         self._current_server_type = "app"
 
@@ -487,7 +490,7 @@ class DashBoard:
         notebook_url=DEFAULT_NOTEBOOK_URL,
         port=0,
         threaded=False,
-        environment="jupyter-notebook",
+        service_proxy=None,
         **kwargs,
     ):
         """
@@ -501,8 +504,8 @@ class DashBoard:
         port: int,
             optional- Has to be an open port
 
-        environment: str, optional, default jupyter-notebook,
-            options: jupyter-notebook, jupyterlab, jupyterhub
+        service_proxy: str, optional, default None,
+            available options: jupyterhub
 
         Examples
         --------
@@ -534,7 +537,7 @@ class DashBoard:
             port = get_open_port()
 
         dashboard_url = _create_dashboard_url(
-            self._notebook_url, port, environment
+            self._notebook_url, port, service_proxy
         )
         print("Dashboard running at port " + str(port))
 
