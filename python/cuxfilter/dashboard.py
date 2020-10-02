@@ -81,7 +81,6 @@ def _create_app(
         {HTML_MIME: script, EXEC_MIME: ""},
         metadata={EXEC_MIME: {"server_id": server_id}},
     )
-    print(server_id)
     return server
 
 
