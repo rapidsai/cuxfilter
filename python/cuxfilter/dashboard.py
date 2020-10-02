@@ -2,9 +2,10 @@ from typing import Dict, Type
 import bokeh.embed.util as u
 import panel as pn
 import uuid
-from panel.io.server import _origin_url, get_server
+from panel.io.server import get_server
 from bokeh.embed import server_document
-import re
+import os
+import urllib
 
 from .charts.core.core_chart import BaseChart
 from .datatile import DataTile
@@ -23,16 +24,39 @@ _server_info = (
 EXEC_MIME = "application/vnd.holoviews_exec.v0+json"
 HTML_MIME = "text/html"
 
-DEFAULT_NOTEBOOK_URL = "localhost:8888"
-
-_URL_PAT = re.compile(r"https?://(www\.)?")
+DEFAULT_NOTEBOOK_URL = "http://localhost:8888"
 
 
-def _create_dashboard_url(notebook_url: str, port: int):
-    return f"http://{notebook_url}/proxy/{port}/"
+def _get_host(url):
+    parsed_url = urllib.parse.urlparse(url)
+    if parsed_url.scheme not in ["http", "https"]:
+        raise ValueError("url should contain protocol(http or https)")
+    return parsed_url.netloc
 
 
-def _create_app(panel_obj, notebook_url=None, port=0):
+def _create_dashboard_url(notebook_url: str, port: int, service_proxy=None):
+    service_url_path = ""
+    notebook_url = f"http://{notebook_url}"
+
+    if service_proxy == "jupyterhub":
+        if "JUPYTERHUB_SERVICE_PREFIX" not in os.environ:
+            raise EnvironmentError(
+                "JUPYTERHUB_SERVICE_PREFIX environment variable "
+                + "not set, service_proxy=jupyterhub will only work "
+                + "in a jupyterhub environment"
+            )
+        service_url_path = os.environ["JUPYTERHUB_SERVICE_PREFIX"]
+
+    proxy_url_path = "proxy/%d/" % port
+
+    user_url = urllib.parse.urljoin(notebook_url, service_url_path)
+    full_url = urllib.parse.urljoin(user_url, proxy_url_path)
+    return full_url
+
+
+def _create_app(
+    panel_obj, notebook_url=DEFAULT_NOTEBOOK_URL, port=0, service_proxy=None,
+):
     """
     Displays a bokeh server app inline in the notebook.
     Arguments
@@ -42,19 +66,17 @@ def _create_app(panel_obj, notebook_url=None, port=0):
     port: int (optional, default=0)
         Allows specifying a specific port
     """
-    notebook_url = notebook_url or DEFAULT_NOTEBOOK_URL
+    url = _create_dashboard_url(notebook_url, port, service_proxy)
 
-    if callable(notebook_url):
-        origin = notebook_url(None)
-    else:
-        notebook_url = _URL_PAT.sub("", notebook_url).strip().strip("/")
-        origin = _origin_url(notebook_url)
     server_id = uuid.uuid4().hex
     server = get_server(
-        panel_obj, port, origin, start=True, show=False, server_id=server_id
+        panel_obj,
+        port,
+        notebook_url,
+        start=True,
+        show=False,
+        server_id=server_id,
     )
-
-    url = _create_dashboard_url(notebook_url, port)
 
     script = server_document(url, resources=None)
 
@@ -402,7 +424,12 @@ class DashBoard:
 
         display(Image("temp.png"))
 
-    def app(self, notebook_url=DEFAULT_NOTEBOOK_URL, port: int = 0):
+    def app(
+        self,
+        notebook_url=DEFAULT_NOTEBOOK_URL,
+        port: int = 0,
+        service_proxy=None,
+    ):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
@@ -415,6 +442,9 @@ class DashBoard:
             Port number bokeh uses for it's two communication protocol.
             Default is random open port. Recommended to set this value if
             running jupyter remotely and only few ports are exposed.
+
+        service_proxy: str, optional, default None,
+            available options: jupyterhub
 
         Examples
         --------
@@ -441,13 +471,17 @@ class DashBoard:
                 self.stop()
             self._reinit_all_charts()
 
-        self._notebook_url = notebook_url
+        self._notebook_url = _get_host(notebook_url)
+        if port == 0:
+            port = get_open_port()
+
         self.server = _create_app(
             self._dashboard.generate_dashboard(
                 self.title, self._charts, self._theme
             ),
             notebook_url=self._notebook_url,
             port=port,
+            service_proxy=service_proxy,
         )
         self._current_server_type = "app"
 
@@ -456,17 +490,22 @@ class DashBoard:
         notebook_url=DEFAULT_NOTEBOOK_URL,
         port=0,
         threaded=False,
+        service_proxy=None,
         **kwargs,
     ):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
         ----------
-        url: str, optional
+        notebook_url: str, optional, default localhost:8888
             - URL where you want to run the dashboard as a web-app,
             including the port number.
             - Can use localhost instead of ip if running locally.
-            - Has to be an open port.
+        port: int,
+            optional- Has to be an open port
+
+        service_proxy: str, optional, default None,
+            available options: jupyterhub
 
         Examples
         --------
@@ -493,12 +532,13 @@ class DashBoard:
                 self.stop()
             self._reinit_all_charts()
 
-        notebook_url = _URL_PAT.sub("", notebook_url).strip().strip("/")
-        self._notebook_url = notebook_url
+        self._notebook_url = _get_host(notebook_url)
         if port == 0:
             port = get_open_port()
 
-        dashboard_url = _create_dashboard_url(self._notebook_url, port)
+        dashboard_url = _create_dashboard_url(
+            self._notebook_url, port, service_proxy
+        )
         print("Dashboard running at port " + str(port))
 
         try:

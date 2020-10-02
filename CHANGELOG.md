@@ -11,6 +11,7 @@
 ## New Features
 - PR #177 Add support for lasso selections
 - PR #192 Added drop_duplicates for view_dataframe chart type
+- PR #194 Added jupyterhub support
 
 ## Improvements
 - PR #191 Update doc build script for CI
