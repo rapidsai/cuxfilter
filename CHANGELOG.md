@@ -21,6 +21,7 @@
 ## Bug Fixes
 - PR #190 fix conflicts related to auto-merge with branch-0.15
 - PR #192 fixes issues with non_aggregate charts having permanent inplace querying, and query_by_indices
+- PR #196 fixes issue with static http scheme applied for dashboard url, now picking scheme from base_url
 
 # cuXfilter 0.15.0 (08 Sep 2020)
 
