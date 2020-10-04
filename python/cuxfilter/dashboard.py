@@ -31,12 +31,12 @@ def _get_host(url):
     parsed_url = urllib.parse.urlparse(url)
     if parsed_url.scheme not in ["http", "https"]:
         raise ValueError("url should contain protocol(http or https)")
-    return parsed_url.netloc
+    return parsed_url
 
 
 def _create_dashboard_url(notebook_url: str, port: int, service_proxy=None):
     service_url_path = ""
-    notebook_url = f"http://{notebook_url}"
+    notebook_url = f"{notebook_url.scheme}://{notebook_url.netloc}"
 
     if service_proxy == "jupyterhub":
         if "JUPYTERHUB_SERVICE_PREFIX" not in os.environ:
@@ -66,19 +66,19 @@ def _create_app(
     port: int (optional, default=0)
         Allows specifying a specific port
     """
-    url = _create_dashboard_url(notebook_url, port, service_proxy)
+    dashboard_url = _create_dashboard_url(notebook_url, port, service_proxy)
 
     server_id = uuid.uuid4().hex
     server = get_server(
         panel_obj,
         port,
-        notebook_url,
+        notebook_url.netloc,
         start=True,
         show=False,
         server_id=server_id,
     )
 
-    script = server_document(url, resources=None)
+    script = server_document(dashboard_url, resources=None)
 
     publish_display_data(
         {HTML_MIME: script, EXEC_MIME: ""},
@@ -544,7 +544,7 @@ class DashBoard:
         try:
             self.server = self._get_server(
                 port=port,
-                websocket_origin=self._notebook_url,
+                websocket_origin=self._notebook_url.netloc,
                 show=False,
                 start=True,
                 threaded=threaded,
@@ -554,7 +554,7 @@ class DashBoard:
             self.server.stop()
             self.server = self._get_server(
                 port=port,
-                websocket_origin=self._notebook_url,
+                websocket_origin=self._notebook_url.netloc,
                 show=False,
                 start=True,
                 threaded=threaded,
