@@ -56,7 +56,7 @@ logger "Check GPU usage..."
 nvidia-smi
 
 logger "Activate conda env..."
-source activate gdf
+source activate rapids
 conda install "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
                "cugraph=$MINOR_VERSION.*" \
                "cuspatial=$MINOR_VERSION.*" \
@@ -86,6 +86,10 @@ $WORKSPACE/build.sh clean cuxfilter
 # TEST - Run pytest 
 ################################################################################
 
+set +e -Eo pipefail
+EXITCODE=0
+trap "EXITCODE=1" ERR
+
 if hasArg --skip-tests; then
     logger "Skipping Tests..."
 else
@@ -99,3 +103,5 @@ else
     ${WORKSPACE}/ci/gpu/test-notebooks.sh 2>&1 | tee nbtest.log
     python ${WORKSPACE}/ci/utils/nbtestlog2junitxml.py nbtest.log
 fi
+
+return ${EXITCODE}
