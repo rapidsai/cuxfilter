@@ -15,6 +15,7 @@
 - PR #192 fixes issues with non_aggregate charts having permanent inplace querying, and query_by_indices
 - PR #196 fixes issue with static http scheme applied for dashboard url, now picking scheme from base_url
 - PR #198 Fix notebook error handling in gpuCI
+- PR #199 fix doc build issue
 
 
 # cuXfilter 0.15.0 (08 Sep 2020)
