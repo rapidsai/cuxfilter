@@ -1,4 +1,4 @@
-from ..core.aggregate import BaseBar, BaseLine
+from ..core.aggregate import BaseAggregateChart
 
 import numpy as np
 from bokeh import events
@@ -6,7 +6,7 @@ from bokeh.plotting import figure
 from bokeh.models import ColumnDataSource
 
 
-class Bar(BaseBar):
+class Bar(BaseAggregateChart):
     """
         Description:
     """
@@ -226,7 +226,7 @@ class Bar(BaseBar):
         ]
 
 
-class Line(BaseLine):
+class Line(BaseAggregateChart):
     """
         Description:
     """
