@@ -121,6 +121,7 @@ class DashBoard:
     _charts: Dict[str, Type[BaseChart]]
     _data_tiles: Dict[str, Type[DataTile]]
     _query_str_dict: Dict[str, str]
+    _query_local_variables_dict = {}
     _active_view: str = ""
     _dashboard = None
     _theme = None
@@ -236,13 +237,16 @@ class DashBoard:
             self._charts[chart].initiate_chart(self)
             self._charts[chart]._initialized = True
 
-    def _query(self, query_str):
+    def _query(self, query_str, local_dict=None):
         """
         Query the cudf.DataFrame, inplace or create a copy based on the
         value of inplace.
         """
+        local_dict = local_dict or self._query_local_variables_dict
         if len(query_str) > 0:
-            return self._cuxfilter_df.data.query(query_str)
+            return self._cuxfilter_df.data.query(
+                query_str, local_dict=local_dict
+            )
         else:
             return self._cuxfilter_df.data
 
@@ -314,7 +318,7 @@ class DashBoard:
             return self._cuxfilter_df.data
         else:
             self._charts[self._active_view].compute_query_dict(
-                self._query_str_dict
+                self._query_str_dict, self._query_local_variables_dict
             )
 
             if len(self._generate_query_str()) > 0:
@@ -613,7 +617,7 @@ class DashBoard:
                         chart,
                         dtype="pandas",
                         cumsum=cumsum,
-                    ).calc_data_tile(self._cuxfilter_df.data.copy(), query)
+                    ).calc_data_tile(self._query(query))
 
         self._charts[self._active_view].datatile_loaded_state = True
 
@@ -640,6 +644,7 @@ class DashBoard:
                         self._generate_query_str(
                             self._charts[self._active_view]
                         ),
+                        self._query_local_variables_dict,
                     )
                 elif not chart.use_data_tiles:
                     chart.query_chart_by_range(
@@ -649,6 +654,7 @@ class DashBoard:
                         self._generate_query_str(
                             self._charts[self._active_view]
                         ),
+                        self._query_local_variables_dict,
                     )
                 else:
                     chart.query_chart_by_range(
@@ -704,7 +710,7 @@ class DashBoard:
             return -1
 
         self._charts[self._active_view].compute_query_dict(
-            self._query_str_dict
+            self._query_str_dict, self._query_local_variables_dict
         )
 
         # resetting the loaded state
