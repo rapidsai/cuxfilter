@@ -240,7 +240,7 @@ class BaseChoropleth(BaseChart):
 
         return selection_callback
 
-    def compute_query_dict(self, query_str_dict):
+    def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """
         Description:
 
@@ -255,10 +255,14 @@ class BaseChoropleth(BaseChart):
         if len(list_of_indices) == 0 or list_of_indices == [""]:
             query_str_dict.pop(self.name, None)
         elif len(list_of_indices) == 1:
-            query_str_dict[self.name] = self.x + "==" + str(list_of_indices[0])
+            query_str_dict[self.name] = "{}=={}".format(
+                self.x, list_of_indices[0]
+            )
         else:
             indices_string = ",".join(map(str, list_of_indices))
-            query_str_dict[self.name] = self.x + " in (" + indices_string + ")"
+            query_str_dict[self.name] = "{} in ({})".format(
+                self.x, indices_string
+            )
 
     def add_events(self, dashboard_cls):
         """

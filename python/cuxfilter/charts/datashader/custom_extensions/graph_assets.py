@@ -3,6 +3,9 @@ import cudf
 from numba import cuda
 from math import sqrt, ceil
 
+from ...constants import CUDF_DATETIME_TYPES
+from ....assets import datetime as dt
+
 
 def cuda_args(shape):
     """
@@ -268,6 +271,8 @@ def calc_connected_edges(
     edge_source,
     edge_target,
     edge_aggregate_col,
+    node_x_dtype,
+    node_y_dtype,
     edge_render_type="direct",
     curve_params=None,
 ):
@@ -298,6 +303,9 @@ def calc_connected_edges(
         connected_edge_columns.remove(None)
 
     nodes = nodes[[node_id, node_x, node_y]].drop_duplicates()
+
+    nodes[node_x] = dt.to_int64_if_datetime(nodes[node_x], node_x_dtype)
+    nodes[node_y] = dt.to_int64_if_datetime(nodes[node_y], node_y_dtype)
 
     connected_edges_df = edges.merge(
         nodes, left_on=edge_source, right_on=node_id

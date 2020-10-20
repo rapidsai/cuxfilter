@@ -1,26 +1,20 @@
 import panel as pn
 import dask_cudf
 import numpy as np
-import pandas as pd
-from bokeh.models import DatetimeTickFormatter
 
 from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby, calc_value_counts
 from ....layouts import chart_view
-from ...constants import DATATILE_ACTIVE_COLOR
-
-
-def _datetime_to_np64(dates):
-    dates = pd.to_datetime(dates)
-    return [np.datetime64(i) for i in dates]
+from ...constants import DATATILE_ACTIVE_COLOR, CUDF_DATETIME_TYPES
+from ....assets import datetime as dt
 
 
 class BaseAggregateChart(BaseChart):
     reset_event = None
     _datatile_loaded_state: bool = False
     filter_widget = None
-    x_dtype = None
-    tick_formatter = None
+    x_axis_tick_formatter = None
+    y_axis_tick_formatter = None
     use_data_tiles = True
     custom_binning = False
 
@@ -51,6 +45,7 @@ class BaseAggregateChart(BaseChart):
         title="",
         autoscaling=True,
         x_axis_tick_formatter=None,
+        y_axis_tick_formatter=None,
         **library_specific_params,
     ):
         """
@@ -71,6 +66,8 @@ class BaseAggregateChart(BaseChart):
             autoscaling
             x_label_map
             y_label_map
+            x_axis_tick_formatter
+            y_axis_tick_formatter
             **library_specific_params
         -------------------------------------------
 
@@ -92,6 +89,7 @@ class BaseAggregateChart(BaseChart):
             self.title = title
         self.autoscaling = autoscaling
         self.x_axis_tick_formatter = x_axis_tick_formatter
+        self.y_axis_tick_formatter = y_axis_tick_formatter
         self.library_specific_params = library_specific_params
 
     def _compute_array_all_bins(
@@ -121,13 +119,17 @@ class BaseAggregateChart(BaseChart):
             self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
 
     def compute_stride(self):
+        self.stride_type = dt.transform_stride_type(
+            self.stride_type, self.x_dtype
+        )
+
         if self.stride_type == int and self.max_value < 1:
             self.stride_type = float
 
         if self.stride is None and self.data_points is not None:
             if self.stride_type == int:
                 self.stride = self.stride_type(
-                    round((self.max_value - self.min_value)/self.data_points)
+                    round((self.max_value - self.min_value) / self.data_points)
                 )
             else:
                 self.stride = self.stride_type(
@@ -162,11 +164,11 @@ class BaseAggregateChart(BaseChart):
             ):
                 self.y_label_map = dict_map
         else:
-            if self.x_dtype == "<M8[ns]":
-                self.stride_type = np.timedelta64
-
             self.compute_min_max(dashboard_cls)
-            self.compute_stride()
+            if self.x_dtype != "object":
+                self.compute_stride()
+            else:
+                self.use_data_tiles = False
 
         if self.stride is None:
             # No stride for bins specified, in this we case,
@@ -179,7 +181,7 @@ class BaseAggregateChart(BaseChart):
         self.generate_chart()
         self.apply_mappers()
 
-        if self.add_interaction:
+        if self.add_interaction and self.x_dtype != "object":
             self.add_range_slider_filter(dashboard_cls)
         self.add_events(dashboard_cls)
 
@@ -220,7 +222,7 @@ class BaseAggregateChart(BaseChart):
             if self.data_points is None:
                 self.data_points = len(df[0])
 
-        if self.stride is None:
+        if self.stride is None and self.x_dtype != "object":
             self.compute_stride()
 
         if self.custom_binning:
@@ -237,10 +239,6 @@ class BaseAggregateChart(BaseChart):
             "X": df[0],
             "Y": df[1],
         }
-
-        if self.x_dtype == "<M8[ns]":
-            if self.x_axis_tick_formatter is None:
-                self.x_axis_tick_formatter = DatetimeTickFormatter()
 
         if patch_update and len(dict_temp["X"]) < len(
             self.source.data[self.data_x_axis]
@@ -274,7 +272,7 @@ class BaseAggregateChart(BaseChart):
 
         Ouput:
         """
-        if self.x_dtype == "<M8[ns]":
+        if self.x_dtype in CUDF_DATETIME_TYPES:
             self.filter_widget = pn.widgets.DateRangeSlider(
                 start=self.min_value,
                 end=self.max_value,
@@ -296,9 +294,7 @@ class BaseAggregateChart(BaseChart):
             if dashboard_cls._active_view != self.name:
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles()
-            query_tuple = event.new
-            if self.x_dtype == "<M8[ns]":
-                query_tuple = (_datetime_to_np64(query_tuple))
+            query_tuple = dt.to_dt64_if_datetime(event.new, self.x_dtype)
             dashboard_cls._query_datatiles_by_range(query_tuple)
 
         # add callback to filter_Widget on value change
@@ -324,15 +320,15 @@ class BaseAggregateChart(BaseChart):
         ):
             min_temp, max_temp = self.filter_widget.value
             query = "@{} <= {} <= @{}".format(
-                self.x+"_min", self.x, self.x+"_max"
+                self.x + "_min", self.x, self.x + "_max"
             )
             query_str_dict[self.name] = query
-            query_local_variables_dict[self.x+"_min"] = min_temp
-            query_local_variables_dict[self.x+"_max"] = max_temp
+            query_local_variables_dict[self.x + "_min"] = min_temp
+            query_local_variables_dict[self.x + "_max"] = max_temp
         else:
             query_str_dict.pop(self.name, None)
-            query_local_variables_dict.pop(self.x+"_min", None)
-            query_local_variables_dict.pop(self.x+"_max", None)
+            query_local_variables_dict.pop(self.x + "_min", None)
+            query_local_variables_dict.pop(self.x + "_max", None)
 
     def add_events(self, dashboard_cls):
         """
@@ -361,10 +357,11 @@ class BaseAggregateChart(BaseChart):
         """
 
         def reset_callback(event):
-            self.filter_widget.value = (
-                self.filter_widget.start,
-                self.filter_widget.end,
-            )
+            if self.add_interaction and self.x_dtype != "object":
+                self.filter_widget.value = (
+                    self.filter_widget.start,
+                    self.filter_widget.end,
+                )
 
         # add callback to reset chart button
         self.add_event(self.reset_event, reset_callback)

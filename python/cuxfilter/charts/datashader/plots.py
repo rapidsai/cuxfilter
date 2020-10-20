@@ -9,8 +9,9 @@ from .custom_extensions import (
     CustomInspectTool,
     calc_connected_edges,
 )
-from distutils.version import LooseVersion
+from ...assets import datetime as dt
 
+from distutils.version import LooseVersion
 import datashader as ds
 from datashader import transfer_functions as tf
 from datashader.colors import Hot
@@ -202,19 +203,27 @@ class Scatter(BaseScatter):
         Ouput:
         """
 
-        def viewInteractiveImage(x_range, y_range, w, h, data_source):
+        def viewInteractiveImage(
+            x_range, y_range, w, h, data_source, **kwargs
+        ):
+            dd = data_source[[self.x, self.y, self.aggregate_col]]
+            dd[self.x] = dt.to_int64_if_datetime(dd[self.x], self.x_dtype)
+            dd[self.y] = dt.to_int64_if_datetime(dd[self.y], self.y_dtype)
+
+            x_range = dt.to_int64_if_datetime(x_range, self.x_dtype)
+            y_range = dt.to_int64_if_datetime(y_range, self.y_dtype)
+
             cvs = ds.Canvas(
                 plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
             )
             aggregator, cmap = _compute_datashader_assets(
-                data_source,
+                dd,
                 self.x,
                 self.aggregate_col,
                 self.aggregate_fn,
                 self.color_palette,
             )
-
-            agg = cvs.points(data_source, self.x, self.y, aggregator,)
+            agg = cvs.points(dd, self.x, self.y, aggregator,)
 
             if self.constant_limit is None or self.aggregate_fn == "count":
                 self.constant_limit = [
@@ -297,6 +306,8 @@ class Scatter(BaseScatter):
             self.generate_InteractiveImage_callback(),
             data_source=self.source,
             timeout=self.timeout,
+            x_dtype=self.x_dtype,
+            y_dtype=self.y_dtype,
         )
 
         if self.legend_added is False:
@@ -601,6 +612,8 @@ class Graph(BaseGraph):
                 self.edge_source,
                 self.edge_target,
                 self.edge_aggregate_col,
+                self.x_dtype,
+                self.y_dtype,
                 self.edge_render_type,
                 self.curve_params,
             )
@@ -626,7 +639,21 @@ class Graph(BaseGraph):
             nodes_plot=self.nodes_plot,
             edges_plot=self.edges_plot,
             chart=self.chart,
+            **kwargs,
         ):
+            dd = data_source[
+                [self.node_x, self.node_y, self.node_aggregate_col]
+            ]
+            dd[self.node_x] = dt.to_int64_if_datetime(
+                dd[self.node_x], self.x_dtype
+            )
+            dd[self.node_y] = dt.to_int64_if_datetime(
+                dd[self.node_y], self.y_dtype
+            )
+
+            x_range = dt.to_int64_if_datetime(x_range, self.x_dtype)
+            y_range = dt.to_int64_if_datetime(y_range, self.y_dtype)
+
             cvs = ds.Canvas(
                 plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
             )
@@ -638,9 +665,9 @@ class Graph(BaseGraph):
                     self.node_aggregate_col: [],
                     self.node_aggregate_col + "_color": [],
                 }
-            np = nodes_plot(cvs, data_source)
+            np = nodes_plot(cvs, dd)
             if self.display_edges._active:
-                ep = edges_plot(cvs, data_source)
+                ep = edges_plot(cvs, dd)
                 plot = tf.stack(ep, np, how="over")
             else:
                 plot = np
@@ -724,6 +751,8 @@ class Graph(BaseGraph):
                     self.edge_source,
                     self.edge_target,
                     self.edge_aggregate_col,
+                    self.x_dtype,
+                    self.y_dtype,
                     self.edge_render_type,
                     self.curve_params,
                 )
@@ -744,6 +773,8 @@ class Graph(BaseGraph):
             self.generate_InteractiveImage_callback(),
             data_source=self.nodes,
             timeout=self.timeout,
+            x_dtype=self.x_dtype,
+            y_dtype=self.y_dtype,
         )
 
         if self.legend_added is False:
@@ -792,6 +823,8 @@ class Graph(BaseGraph):
                     self.edge_source,
                     self.edge_target,
                     self.edge_aggregate_col,
+                    self.x_dtype,
+                    self.y_dtype,
                     self.edge_render_type,
                     self.curve_params,
                 )
@@ -934,8 +967,10 @@ class Line(BaseLine):
         Ouput:
         """
         self.source = data
+
         self.x_range = (self.source[self.x].min(), self.source[self.x].max())
         self.y_range = (self.source[self.y].min(), self.source[self.y].max())
+
         if isinstance(data, dask_cudf.core.DataFrame):
             self.x_range = dd.compute(*self.x_range)
             self.y_range = dd.compute(*self.y_range)
@@ -952,11 +987,22 @@ class Line(BaseLine):
         Ouput:
         """
 
-        def viewInteractiveImage(x_range, y_range, w, h, data_source):
+        def viewInteractiveImage(
+            x_range, y_range, w, h, data_source, **kwargs
+        ):
+            dd = data_source[[self.x, self.y]]
+            dd[self.x] = dt.to_int64_if_datetime(dd[self.x], self.x_dtype)
+            dd[self.y] = dt.to_int64_if_datetime(dd[self.y], self.y_dtype)
+
+            x_range = dt.to_int64_if_datetime(x_range, self.x_dtype)
+            y_range = dt.to_int64_if_datetime(y_range, self.y_dtype)
+
             cvs = ds.Canvas(
                 plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
             )
-            agg = cvs.line(source=data_source, x=self.x, y=self.y)
+
+            agg = cvs.line(source=dd, x=self.x, y=self.y)
+
             img = tf.shade(
                 agg, cmap=["white", self.color], how=self.pixel_shade_type
             )
@@ -997,9 +1043,11 @@ class Line(BaseLine):
         )
 
         self.chart.add_tools(BoxSelectTool())
-        # self.chart.add_tile(self.tile_provider)
-        # self.chart.axis.visible = False
-
+        self.chart.axis.visible = False
+        if self.x_axis_tick_formatter:
+            self.chart.xaxis.formatter = self.x_axis_tick_formatter
+        if self.y_axis_tick_formatter:
+            self.chart.yaxis.formatter = self.y_axis_tick_formatter
         self.chart.xgrid.grid_line_color = None
         self.chart.ygrid.grid_line_color = None
 
@@ -1008,6 +1056,8 @@ class Line(BaseLine):
             self.generate_InteractiveImage_callback(),
             data_source=self.source,
             timeout=self.timeout,
+            x_dtype=self.x_dtype,
+            y_dtype=self.y_dtype,
         )
 
     def update_dimensions(self, width=None, height=None):
@@ -1201,13 +1251,21 @@ class StackedLines(BaseStackedLine):
         Ouput:
         """
 
-        def viewInteractiveImage(x_range, y_range, w, h, data_source):
+        def viewInteractiveImage(
+            x_range, y_range, w, h, data_source, **kwargs
+        ):
+            dd = data_source[[self.x] + self.y]
+            dd[self.x] = dt.to_int64_if_datetime(dd[self.x], self.x_dtype)
+            for _y in self.y:
+                dd[_y] = dt.to_int64_if_datetime(dd[_y], self.y_dtype)
+
+            x_range = dt.to_int64_if_datetime(x_range, self.x_dtype)
+            y_range = dt.to_int64_if_datetime(y_range, self.y_dtype)
+
             cvs = ds.Canvas(
                 plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
             )
-            aggs = dict(
-                (_y, cvs.line(data_source, x=self.x, y=_y)) for _y in self.y
-            )
+            aggs = dict((_y, cvs.line(dd, x=self.x, y=_y)) for _y in self.y)
             imgs = [
                 tf.shade(aggs[_y], cmap=["white", color])
                 for _y, color in zip(self.y, self.colors)
@@ -1238,8 +1296,8 @@ class StackedLines(BaseStackedLine):
         self.chart = figure(
             title=self.title,
             toolbar_location="right",
-            tools="pan, xwheel_zoom, reset",
-            active_scroll="xwheel_zoom",
+            tools="pan, wheel_zoom, reset",
+            active_scroll="wheel_zoom",
             active_drag="pan",
             x_range=self.x_range,
             y_range=self.y_range,
@@ -1271,11 +1329,18 @@ class StackedLines(BaseStackedLine):
         self.chart.xgrid.grid_line_color = None
         self.chart.ygrid.grid_line_color = None
 
+        if self.x_axis_tick_formatter:
+            self.chart.xaxis.formatter = self.x_axis_tick_formatter
+        if self.y_axis_tick_formatter:
+            self.chart.yaxis.formatter = self.y_axis_tick_formatter
+
         self.interactive_image = InteractiveImage(
             self.chart,
             self.generate_InteractiveImage_callback(),
             data_source=self.source,
             timeout=self.timeout,
+            x_dtype=self.x_dtype,
+            y_dtype=self.y_dtype,
         )
 
     def update_dimensions(self, width=None, height=None):

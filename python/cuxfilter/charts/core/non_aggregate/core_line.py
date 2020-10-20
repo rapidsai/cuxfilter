@@ -3,18 +3,21 @@ import dask_cudf
 
 from .core_non_aggregate import BaseNonAggregate
 from ....layouts import chart_view
+from ...constants import CUDF_DATETIME_TYPES
+from ....assets import datetime as dt
 
 
 class BaseLine(BaseNonAggregate):
     stride = 0.0
     reset_event = None
     filter_widget = None
+    x_axis_tick_formatter = None
     no_color_set = False
 
     def __init__(
         self,
         x,
-        y=None,
+        y,
         data_points=100,
         add_interaction=True,
         pixel_shade_type="linear",
@@ -25,6 +28,8 @@ class BaseLine(BaseNonAggregate):
         height=400,
         title="",
         timeout=100,
+        x_axis_tick_formatter=None,
+        y_axis_tick_formatter=None,
         **library_specific_params,
     ):
         """
@@ -47,6 +52,8 @@ class BaseLine(BaseNonAggregate):
             height
             title
             timeout
+            x_axis_tick_formatter
+            y_axis_tick_formatter
             **library_specific_params
         -------------------------------------------
 
@@ -68,9 +75,41 @@ class BaseLine(BaseNonAggregate):
         self.pixel_shade_type = pixel_shade_type
         self.title = title
         self.timeout = timeout
+        self.x_axis_tick_formatter = x_axis_tick_formatter
+        self.y_axis_tick_formatter = y_axis_tick_formatter
         self.library_specific_params = library_specific_params
         self.width = width
         self.height = height
+
+    def compute_min_max(self, dashboard_cls):
+        if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
+            self.min_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].min().compute()
+            )
+            self.max_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].max().compute()
+            )
+        else:
+            self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
+            self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
+
+    def compute_stride(self):
+        self.stride_type = dt.transform_stride_type(
+            self.stride_type, self.x_dtype
+        )
+
+        if self.stride_type == int and self.max_value < 1:
+            self.stride_type = float
+
+        if self.stride is None and self.data_points is not None:
+            if self.stride_type == int:
+                self.stride = self.stride_type(
+                    round((self.max_value - self.min_value) / self.data_points)
+                )
+            else:
+                self.stride = self.stride_type(
+                    (self.max_value - self.min_value) / self.data_points
+                )
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -84,31 +123,25 @@ class BaseLine(BaseNonAggregate):
         Ouput:
 
         """
-        if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
-            self.min_value = (
-                dashboard_cls._cuxfilter_df.data[self.x].min().compute()
-            )
-            self.max_value = (
-                dashboard_cls._cuxfilter_df.data[self.x].max().compute()
-            )
-        else:
-            self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
-            self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
+        self.x_dtype = dashboard_cls._cuxfilter_df.data[self.x].dtype
+        self.y_dtype = dashboard_cls._cuxfilter_df.data[self.y].dtype
 
         if self.data_points > len(dashboard_cls._cuxfilter_df.data):
             self.data_points = len(dashboard_cls._cuxfilter_df.data)
 
-        if self.stride is None:
-            if self.max_value < 1 and self.stride_type == int:
-                self.stride_type = float
-            if self.stride_type == int:
-                self.stride = int(
-                    round((self.max_value - self.min_value) / self.data_points)
-                )
-            else:
-                self.stride = float(
-                    (self.max_value - self.min_value) / self.data_points
-                )
+        if self.x_dtype == "bool":
+            self.min_value = 0
+            self.max_value = 1
+            self.stride = 1
+            # set axis labels:
+            dict_map = {0: "False", 1: "True"}
+            if len(self.x_label_map) == 0:
+                self.x_label_map = dict_map
+            if len(self.y_label_map) == 0:
+                self.y_label_map = dict_map
+        else:
+            self.compute_min_max(dashboard_cls)
+            self.compute_stride()
 
         self.calculate_source(dashboard_cls._cuxfilter_df.data)
         self.generate_chart()
@@ -134,33 +167,37 @@ class BaseLine(BaseNonAggregate):
 
         Ouput:
         """
-        if self.stride is None:
-            self.stride = self.stride_type(
-                (self.max_value - self.min_value) / self.data_points
+        if self.x_dtype in CUDF_DATETIME_TYPES:
+            self.filter_widget = pn.widgets.DateRangeSlider(
+                start=self.min_value,
+                end=self.max_value,
+                value=(self.min_value, self.max_value),
+                **{"width": self.width},
+                sizing_mode="scale_width",
             )
-
-        self.filter_widget = pn.widgets.RangeSlider(
-            start=self.min_value,
-            end=self.max_value,
-            value=(self.min_value, self.max_value),
-            step=self.stride,
-            **{"width": self.width},
-            sizing_mode="scale_width",
-        )
+        else:
+            self.filter_widget = pn.widgets.RangeSlider(
+                start=self.min_value,
+                end=self.max_value,
+                value=(self.min_value, self.max_value),
+                step=self.stride,
+                **{"width": self.width},
+                sizing_mode="scale_width",
+            )
 
         def filter_widget_callback(event):
             if dashboard_cls._active_view != self.name:
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles()
-
-            dashboard_cls._query_datatiles_by_range(event.new)
+            query_tuple = dt.to_dt64_if_datetime(event.new)
+            dashboard_cls._query_datatiles_by_range(query_tuple)
 
         # add callback to filter_Widget on value change
         self.filter_widget.param.watch(
             filter_widget_callback, ["value"], onlychanged=False
         )
 
-    def compute_query_dict(self, query_str_dict):
+    def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """
         Description:
 
@@ -176,11 +213,16 @@ class BaseLine(BaseNonAggregate):
             self.filter_widget.end,
         ):
             min_temp, max_temp = self.filter_widget.value
-            query_str_dict[self.name] = (
-                str(min_temp) + "<=" + str(self.x) + "<=" + str(max_temp)
+            query = "@{} <= {} <= @{}".format(
+                self.x + "_min", self.x, self.x + "_max"
             )
+            query_str_dict[self.name] = query
+            query_local_variables_dict[self.x + "_min"] = min_temp
+            query_local_variables_dict[self.x + "_max"] = max_temp
         else:
             query_str_dict.pop(self.name, None)
+            query_local_variables_dict.pop(self.x + "_min", None)
+            query_local_variables_dict.pop(self.x + "_max", None)
 
     def add_events(self, dashboard_cls):
         """

@@ -53,6 +53,11 @@ class Bar(BaseAggregateChart):
         """
         self.chart = figure(
             title=self.title,
+            x_range=(
+                self.source.data[self.data_x_axis]
+                if self.x_dtype == "object"
+                else None
+            ),
             tools="pan, wheel_zoom, reset",
             active_scroll="wheel_zoom",
             active_drag="pan",
@@ -75,8 +80,13 @@ class Bar(BaseAggregateChart):
                 **self.library_specific_params,
             )
         self.chart.xaxis.axis_label = self.x
+        if self.x_axis_tick_formatter:
+            self.chart.xaxis.formatter = self.x_axis_tick_formatter
+        if self.y_axis_tick_formatter:
+            self.chart.yaxis.formatter = self.y_axis_tick_formatter
         if self.autoscaling is False:
             self.chart.y_range.end = self.source.data[self.data_y_axis].max()
+
         if self.y != self.x:
             self.chart.yaxis.axis_label = self.y
         else:
@@ -277,6 +287,10 @@ class Line(BaseAggregateChart):
             active_scroll="wheel_zoom",
             active_drag="pan",
         )
+        if self.x_axis_tick_formatter:
+            self.chart.xaxis.formatter = self.x_axis_tick_formatter
+        if self.y_axis_tick_formatter:
+            self.chart.yaxis.formatter = self.y_axis_tick_formatter
         if self.autoscaling is False:
             self.chart.y_range.end = self.source.data[self.data_y_axis].max()
 

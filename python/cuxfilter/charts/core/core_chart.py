@@ -8,6 +8,8 @@ class BaseChart:
     chart_type: str = None
     x: str = None
     y: str = None
+    x_dtype: str = None
+    y_dtype: str = None
     aggregate_fn: str = "count"
     color: str = None
     _height: int = 0

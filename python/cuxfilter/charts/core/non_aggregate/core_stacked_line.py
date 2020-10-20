@@ -2,6 +2,7 @@ from typing import Tuple
 
 from ..core_chart import BaseChart
 from ....layouts import chart_view
+from ....assets import datetime as dt
 
 
 class BaseStackedLine(BaseChart):
@@ -36,6 +37,8 @@ class BaseStackedLine(BaseChart):
         timeout=100,
         legend=True,
         legend_position="center",
+        x_axis_tick_formatter=None,
+        y_axis_tick_formatter=None,
         **library_specific_params,
     ):
         """
@@ -56,6 +59,8 @@ class BaseStackedLine(BaseChart):
             timeout
             legend
             legend_position
+            x_axis_tick_formatter
+            y_axis_tick_formatter
             **library_specific_params
         -------------------------------------------
 
@@ -79,6 +84,8 @@ class BaseStackedLine(BaseChart):
         self.timeout = timeout
         self.legend = legend
         self.legend_position = legend_position
+        self.x_axis_tick_formatter = x_axis_tick_formatter
+        self.y_axis_tick_formatter = y_axis_tick_formatter
         self.library_specific_params = library_specific_params
         self.width = width
         self.height = height
@@ -92,6 +99,13 @@ class BaseStackedLine(BaseChart):
         data: cudf DataFrame
         -------------------------------------------
         """
+        self.x_dtype = dashboard_cls._cuxfilter_df.data[self.x].dtype
+        self.y_dtype = dashboard_cls._cuxfilter_df.data[self.y[0]].dtype
+
+        for _y in self.y:
+            if self.y_dtype != dashboard_cls._cuxfilter_df.data[_y].dtype:
+                raise TypeError("All y columns should be of same type")
+
         if self.x_range is None:
             self.x_range = (
                 dashboard_cls._cuxfilter_df.data[self.x].min(),
@@ -126,7 +140,8 @@ class BaseStackedLine(BaseChart):
 
     def get_selection_geometry_callback(self, dashboard_cls):
         """
-        Description: generate callback for choropleth selection evetn
+        Description: generate callback for stacked line
+            selection event (only along x-axis)
         -------------------------------------------
         Input:
 
@@ -137,8 +152,9 @@ class BaseStackedLine(BaseChart):
         """
 
         def selection_callback(event):
-            xmin, xmax = event.geometry["x0"], event.geometry["x1"]
-            ymin, ymax = event.geometry["y0"], event.geometry["y1"]
+            xmin, xmax = dt.to_dt64_if_datetime(
+                (event.geometry["x0"], event.geometry["x1"]), self.x_dtype
+            )
             if dashboard_cls._active_view != self.name:
                 # reset previous active view and
                 # set current chart as active view
@@ -146,12 +162,19 @@ class BaseStackedLine(BaseChart):
                 self.source = dashboard_cls._cuxfilter_df.data
 
             self.x_range = (xmin, xmax)
-            self.y_range = (ymin, ymax)
 
-            query = str(xmin) + "<=" + self.x + " <= " + str(xmax)
+            query = "@{}<={}<=@{}".format(
+                self.x + "_min", self.x, self.x + "_max"
+            )
+            local_dict = {
+                self.x + "_min": xmin,
+                self.x + "_max": xmax,
+            }
             dashboard_cls._query_str_dict[self.name] = query
+            dashboard_cls._query_local_variables_dict.update(local_dict)
+
             temp_data = dashboard_cls._query(
-                dashboard_cls._query_str_dict[self.name]
+                dashboard_cls._query_str_dict[self.name], local_dict
             )
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(data=temp_data, ignore_cols=[])
@@ -160,7 +183,7 @@ class BaseStackedLine(BaseChart):
 
         return selection_callback
 
-    def compute_query_dict(self, query_str_dict):
+    def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """
         Description:
 
@@ -172,15 +195,15 @@ class BaseStackedLine(BaseChart):
         Ouput:
         """
         if self.x_range is not None and self.y_range is not None:
-            query_str_dict[self.name] = (
-                str(self.x_range[0])
-                + "<="
-                + self.x
-                + " <= "
-                + str(self.x_range[1])
+            query_str_dict[self.name] = "{} in [@{}]]".format(
+                self.node_x, "range_" + self.node_x,
+            )
+            query_local_variables_dict["range_" + self.node_x] = ",".join(
+                map(str, self.x_range)
             )
         else:
             query_str_dict.pop(self.name, None)
+            query_local_variables_dict.pop("range_" + self.node_x, None)
 
     def add_events(self, dashboard_cls):
         """
@@ -227,7 +250,12 @@ class BaseStackedLine(BaseChart):
         self.add_event(self.reset_event, reset_callback)
 
     def query_chart_by_range(
-        self, active_chart: BaseChart, query_tuple, datatile=None, query=""
+        self,
+        active_chart: BaseChart,
+        query_tuple,
+        datatile=None,
+        query="",
+        local_dict={},
     ):
         """
         Description:
@@ -242,13 +270,11 @@ class BaseStackedLine(BaseChart):
         Ouput:
         """
         min_val, max_val = query_tuple
-        final_query = (
-            str(min_val) + "<=" + active_chart.x + "<=" + str(max_val)
-        )
+        final_query = "@min_val<=" + active_chart.x + "<=@max_val"
         if len(query) > 0:
             final_query += " and " + query
         self.reload_chart(
-            self.source.query(final_query), False,
+            self.source.query(final_query, local_dict), False,
         )
 
     def query_chart_by_indices(
