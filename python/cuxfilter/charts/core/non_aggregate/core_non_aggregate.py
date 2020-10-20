@@ -147,10 +147,10 @@ class BaseNonAggregate(BaseChart):
                 self.source = dashboard_cls._cuxfilter_df.data
 
             if event.geometry["type"] == "rect":
-                xmin, xmax = dt.to_dt64_if_datetime(
+                xmin, xmax = dt.to_dt_if_datetime(
                     [event.geometry["x0"], event.geometry["x1"]], self.x_dtype
                 )
-                ymin, ymax = dt.to_dt64_if_datetime(
+                ymin, ymax = dt.to_dt_if_datetime(
                     [event.geometry["y0"], event.geometry["y1"]], self.y_dtype
                 )
                 box_callback(xmin, xmax, ymin, ymax)

@@ -152,7 +152,7 @@ class BaseStackedLine(BaseChart):
         """
 
         def selection_callback(event):
-            xmin, xmax = dt.to_dt64_if_datetime(
+            xmin, xmax = dt.to_dt_if_datetime(
                 (event.geometry["x0"], event.geometry["x1"]), self.x_dtype
             )
             if dashboard_cls._active_view != self.name:

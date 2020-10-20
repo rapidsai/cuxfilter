@@ -189,7 +189,7 @@ class BaseLine(BaseNonAggregate):
             if dashboard_cls._active_view != self.name:
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles()
-            query_tuple = dt.to_dt64_if_datetime(event.new)
+            query_tuple = dt.to_np_dt64_if_datetime(event.new)
             dashboard_cls._query_datatiles_by_range(query_tuple)
 
         # add callback to filter_Widget on value change

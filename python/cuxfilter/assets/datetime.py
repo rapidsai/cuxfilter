@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import cudf
 import math
 
@@ -11,31 +12,65 @@ dt = {
     CUDF_DATETIME_TYPES[3]: 18,
 }
 
+dt_unit = {
+    9: 's',
+    12: 'ms',
+    15: 'us',
+    18: 'ns'
+}
+
 
 def get_dt_unit_factor(date, _type):
     _pow = dt[str(_type)] - int(math.log10(date))
     return math.pow(10, _pow)
 
 
-def to_dt64_if_datetime(dates, _type):
+def to_dt_if_datetime(dates, _type):
     """
-    convert to datetime if _type in CUDF_DATETIME_TYPES
+    Description:
+        convert to datetime.datetime if _type in CUDF_DATETIME_TYPES
+
+    -------------------------------------------
+    Input:
+        dates = list or tuple of integer timestamps objects
+        _type = dtype
+    -------------------------------------------
+
+    Ouput:
+        list of datetime.datetime objects
     """
     if _type in CUDF_DATETIME_TYPES:
-        if (
-            type(dates) in [list, tuple]
-            and type(dates[0]) not in CUDF_DATETIME_TYPES
-        ):
+        if type(dates) in [list, tuple]:
             # compute date seconds factor
-            dt_s_factor = get_dt_unit_factor(int(dates[0]), _type)
-            return (np.array(dates) * dt_s_factor).astype(_type)
-        elif (
-            type(dates) == cudf.Series
-            and dates.dtype not in CUDF_DATETIME_TYPES
-        ):
-            # compute date seconds factor
-            dt_s_factor = get_dt_unit_factor(dates.iloc[0], _type)
-            return (dates * dt_s_factor).astype(_type)
+            if type(dates[0]) in [int, float]:
+                dates = pd.to_datetime(
+                    dates, unit=dt_unit[int(math.log10(dates[0]))]
+                )
+            else:
+                dates = pd.to_datetime(dates)
+
+            return dates.to_pydatetime()
+    return dates
+
+
+def to_np_dt64_if_datetime(dates, _type):
+    """
+    Description:
+        convert to np.datetime64 if _type in CUDF_DATETIME_TYPES
+
+    -------------------------------------------
+    Input:
+        dates = list or tuple of datetime.datetime objects
+        _type = dtype
+    -------------------------------------------
+
+    Ouput:
+        list of np.datetime64 objects
+
+    """
+    if _type in CUDF_DATETIME_TYPES:
+        dates = pd.to_datetime(dates)
+        return [date.to_datetime64() for date in dates]
 
     return dates
 
