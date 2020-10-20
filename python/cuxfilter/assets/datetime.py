@@ -1,4 +1,5 @@
 import numpy as np
+import cupy as cp
 import pandas as pd
 import cudf
 import math
@@ -75,6 +76,12 @@ def to_np_dt64_if_datetime(dates, _type):
     return dates
 
 
+def check_series_for_nan(ser_):
+    if ser_.dtype == 'float64':
+        return ser_[~cp.isnan(ser_)].shape[0] > 0
+    return True
+
+
 def to_int64_if_datetime(dates, _type):
     """
     col: cudf.Series | list | tuple
@@ -83,11 +90,15 @@ def to_int64_if_datetime(dates, _type):
     if _type in CUDF_DATETIME_TYPES:
         if type(dates) in [list, tuple]:
             # compute date seconds factor
-            dt_s_factor = get_dt_unit_factor(int(dates[0]), _type)
+            dt_s_factor = get_dt_unit_factor(dates[0], _type)
             return (np.array(dates).astype("int64")) * dt_s_factor
-        elif type(dates) == cudf.Series:
+        elif(
+            type(dates) == cudf.Series and check_series_for_nan(dates)
+        ):
             # compute date seconds factor
-            dt_s_factor = get_dt_unit_factor(int(dates.iloc[0]), _type)
+            dt_s_factor = get_dt_unit_factor(
+                dates.iloc[0], _type
+            )
             return (dates.astype("int64")) * dt_s_factor
     return dates
 
