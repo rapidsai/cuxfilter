@@ -3,7 +3,6 @@ import cudf
 from numba import cuda
 from math import sqrt, ceil
 
-from ...constants import CUDF_DATETIME_TYPES
 from ....assets import datetime as dt
 
 
