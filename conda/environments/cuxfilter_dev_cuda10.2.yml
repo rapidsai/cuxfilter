@@ -8,12 +8,13 @@ channels:
 - anaconda
 dependencies:
 - cupy>=6*
+- cuspatial>=0.15
 - python>=3.6,<3.8
-- cudf=0.15
+- cudf=0.16
 - dask>=2.12.0
 - distributed>=2.12.0
-- dask-cuda=0.15*
-- dask-cudf=0.15
+- dask-cuda=0.16
+- dask-cudf=0.16
 - datashader>=0.11.1
 - numba>=0.51.2
 - geopandas>=0.6.*
@@ -26,6 +27,7 @@ dependencies:
 - nodejs
 - recommonmark
 - pytest
+- mock
 - sphinx
 - sphinx_rtd_theme
 - jupyter_sphinx

@@ -1,5 +1,6 @@
 import pytest
 import cudf
+import mock
 
 from cuxfilter.charts.core.non_aggregate.core_graph import BaseGraph
 from cuxfilter.dashboard import DashBoard
@@ -81,7 +82,7 @@ class TestCoreGraph:
             ),
         ],
     )
-    def test_selection_callback(self, inspect_neighbors, result):
+    def test_box_selection_callback(self, inspect_neighbors, result):
         nodes = cudf.DataFrame(
             {"vertex": [0, 1, 2, 3], "x": [0, 1, 1, 2], "y": [0, 1, 2, 0]}
         )
@@ -104,9 +105,45 @@ class TestCoreGraph:
 
         dashboard._active_view = bg.name
 
+        class evt:
+            geometry = dict(x0=1, x1=3, y0=0, y1=1, type="rect")
+
         t = bg.get_selection_geometry_callback(dashboard)
-        t(xmin=1, xmax=3, ymin=0, ymax=1)
+        t(evt)
         assert self.result.equals(result)
+
+    def test_lasso_election_callback(self):
+        nodes = cudf.DataFrame(
+            {"vertex": [0, 1, 2, 3], "x": [0, 1, 1, 2], "y": [0, 1, 2, 0]}
+        )
+        edges = cudf.DataFrame(
+            {"source": [1, 1, 1, 1], "target": [0, 1, 2, 3]}
+        )
+        dashboard = DashBoard(dataframe=DataFrame.load_graph((nodes, edges)))
+
+        bg = BaseGraph()
+        bg.chart_type = "temp"
+        bg.nodes = nodes
+        bg.edges = edges
+        bg.inspect_neighbors = CustomInspectTool(_active=False)
+
+        def t_function(nodes, edges=None, patch_update=False):
+            pass
+
+        bg.reload_chart = t_function
+
+        class evt:
+            geometry = dict(x=[1, 1, 2], y=[1, 2, 1], type="poly")
+            final = True
+
+        t = bg.get_selection_geometry_callback(dashboard)
+        with mock.patch("cuspatial.point_in_polygon") as pip:
+
+            pip.return_value = cudf.DataFrame(
+                {"selection": [True, False, True, False]}
+            )
+            t(evt)
+            assert pip.called
 
     @pytest.mark.parametrize(
         "x_range, y_range, query",
@@ -201,11 +238,9 @@ class TestCoreGraph:
         bg.nodes = df
 
         self.result = None
-        self.patch_update = None
 
-        def t_func(data, patch_update):
+        def t_func(data):
             self.result = data
-            self.patch_update = patch_update
 
         # creating a dummy reload chart fn as its not implemented in core
         # non aggregate chart class
@@ -216,7 +251,6 @@ class TestCoreGraph:
         )
 
         assert self.result.to_string() == "   a  b\n1  2  4\n2  3  5"
-        assert self.patch_update is False
 
     @pytest.mark.parametrize(
         "new_indices, result",
@@ -241,11 +275,9 @@ class TestCoreGraph:
         bg.nodes = df
 
         self.result = None
-        self.patch_update = None
 
-        def t_func(data, patch_update):
+        def t_func(data):
             self.result = data
-            self.patch_update = patch_update
 
         # creating a dummy reload chart fn as its not implemented in core
         # non aggregate chart class
@@ -259,4 +291,3 @@ class TestCoreGraph:
         )
 
         assert self.result.to_string() == result
-        assert self.patch_update is False

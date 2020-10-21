@@ -1,4 +1,24 @@
-# cuxfilter 0.15.0 (Date TBD)
+# cuXfilter 0.16.0 (21 Oct 2020)
+
+## New Features
+- PR #177 Add support for lasso selections
+- PR #192 Added drop_duplicates for view_dataframe chart type
+- PR #194 Added jupyterhub support
+
+## Improvements
+- PR #191 Update doc build script for CI
+- PR #192 Optimize graph querying logic
+- PR #193 Update ci/local/README.md
+
+## Bug Fixes
+- PR #190 fix conflicts related to auto-merge with branch-0.15
+- PR #192 fixes issues with non_aggregate charts having permanent inplace querying, and query_by_indices
+- PR #196 fixes issue with static http scheme applied for dashboard url, now picking scheme from base_url
+- PR #198 Fix notebook error handling in gpuCI
+- PR #199, #202 fix doc build issues
+
+
+# cuXfilter 0.15.0 (08 Sep 2020)
 
 ## New Features
 - PR #164 Added new Graph api, supports (nodes[cuDF], edges[cuDF]) input

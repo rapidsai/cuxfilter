@@ -136,7 +136,9 @@ class BaseStackedLine(BaseChart):
 
         """
 
-        def selection_callback(xmin, xmax, ymin, ymax):
+        def selection_callback(event):
+            xmin, xmax = event.geometry["x0"], event.geometry["x1"]
+            ymin, ymax = event.geometry["y0"], event.geometry["y1"]
             if dashboard_cls._active_view != self.name:
                 # reset previous active view and
                 # set current chart as active view
@@ -274,23 +276,23 @@ class BaseStackedLine(BaseChart):
         if len(new_indices) == 0:
             # case: all selected indices were reset
             # reset the chart
-            self.reload_chart(self.source, False)
+            final_query = query
         elif len(new_indices) == 1:
             final_query = active_chart.x + "==" + str(float(new_indices[0]))
             if len(query) > 0:
                 final_query += " and " + query
-            # just a single index
-            self.reload_chart(
-                self.source.query(final_query), False,
-            )
         else:
             new_indices_str = ",".join(map(str, new_indices))
             final_query = active_chart.x + " in (" + new_indices_str + ")"
             if len(query) > 0:
                 final_query += " and " + query
-            self.reload_chart(
-                self.source.query(final_query), False,
-            )
+
+        self.reload_chart(
+            self.source.query(final_query)
+            if len(final_query) > 0
+            else self.source,
+            False,
+        )
 
     def add_selection_geometry_event(self, callback):
         """

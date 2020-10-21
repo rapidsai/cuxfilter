@@ -26,6 +26,7 @@ from bokeh.plotting import figure
 from bokeh.models import (
     BoxSelectTool,
     ColorBar,
+    LassoSelectTool,
     LinearColorMapper,
     LogColorMapper,
     BasicTicker,
@@ -278,6 +279,7 @@ class Scatter(BaseScatter):
         )
 
         self.chart.add_tools(BoxSelectTool())
+        self.chart.add_tools(LassoSelectTool())
 
         self.tile_provider = _get_provider(self.tile_provider)
         if self.tile_provider is not None:
@@ -331,8 +333,6 @@ class Scatter(BaseScatter):
             if len(data) == 0:
                 data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.interactive_image.update_chart(data_source=data)
-            if patch_update:
-                self.format_source_data(data)
 
     def add_selection_geometry_event(self, callback):
         """
@@ -346,12 +346,7 @@ class Scatter(BaseScatter):
         Ouput:
         """
 
-        def temp_callback(event):
-            xmin, xmax = event.geometry["x0"], event.geometry["x1"]
-            ymin, ymax = event.geometry["y0"], event.geometry["y1"]
-            callback(xmin, xmax, ymin, ymax)
-
-        self.chart.on_event(events.SelectionGeometry, temp_callback)
+        self.chart.on_event(events.SelectionGeometry, callback)
 
     def apply_theme(self, properties_dict):
         """
@@ -737,6 +732,7 @@ class Graph(BaseGraph):
         self.display_edges.on_change("_active", cb)
 
         self.chart.add_tools(BoxSelectTool())
+        self.chart.add_tools(LassoSelectTool())
         self.chart.add_tools(self.inspect_neighbors)
         self.chart.add_tools(self.display_edges)
 
@@ -786,7 +782,7 @@ class Graph(BaseGraph):
 
             # update connected_edges value for datashaded edges
             # if display edge toggle is active
-            if self.display_edges._active and patch_update is False:
+            if self.display_edges._active:
                 self.connected_edges = calc_connected_edges(
                     nodes,
                     self.edges if edges is None else edges,
@@ -799,6 +795,7 @@ class Graph(BaseGraph):
                     self.edge_render_type,
                     self.curve_params,
                 )
+
             self.interactive_image.update_chart(data_source=nodes)
 
     def add_selection_geometry_event(self, callback):
@@ -813,12 +810,7 @@ class Graph(BaseGraph):
         Ouput:
         """
 
-        def temp_callback(event):
-            xmin, xmax = event.geometry["x0"], event.geometry["x1"]
-            ymin, ymax = event.geometry["y0"], event.geometry["y1"]
-            callback(xmin, xmax, ymin, ymax)
-
-        self.chart.on_event(events.SelectionGeometry, temp_callback)
+        self.chart.on_event(events.SelectionGeometry, callback)
 
     def apply_theme(self, properties_dict):
         """
@@ -1049,8 +1041,6 @@ class Line(BaseLine):
             if len(data) == 0:
                 data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.interactive_image.update_chart(data_source=data)
-            if patch_update:
-                self.format_source_data(data)
 
     def add_selection_geometry_event(self, callback):
         """
@@ -1064,12 +1054,7 @@ class Line(BaseLine):
         Ouput:
         """
 
-        def temp_callback(event):
-            xmin, xmax = event.geometry["x0"], event.geometry["x1"]
-            ymin, ymax = event.geometry["y0"], event.geometry["y1"]
-            callback(xmin, xmax, ymin, ymax)
-
-        self.chart.on_event(events.SelectionGeometry, temp_callback)
+        self.chart.on_event(events.SelectionGeometry, callback)
 
     def apply_theme(self, properties_dict):
         """
@@ -1324,8 +1309,6 @@ class StackedLines(BaseStackedLine):
             if len(data) == 0:
                 data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.interactive_image.update_chart(data_source=data)
-            if patch_update:
-                self.format_source_data(data)
 
     def add_selection_geometry_event(self, callback):
         """
@@ -1339,12 +1322,7 @@ class StackedLines(BaseStackedLine):
         Ouput:
         """
 
-        def temp_callback(event):
-            xmin, xmax = event.geometry["x0"], event.geometry["x1"]
-            ymin, ymax = event.geometry["y0"], event.geometry["y1"]
-            callback(xmin, xmax, ymin, ymax)
-
-        self.chart.on_event(events.SelectionGeometry, temp_callback)
+        self.chart.on_event(events.SelectionGeometry, callback)
 
     def apply_theme(self, properties_dict):
         """
