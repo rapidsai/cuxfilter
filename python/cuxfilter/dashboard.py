@@ -323,13 +323,11 @@ class DashBoard:
 
             if len(self._generate_query_str()) > 0:
                 print("final query", self._generate_query_str())
-                # return self._backup_data.query(self._generate_query_str())
-                return self._cuxfilter_df.data.query(
+                return self._query(
                     self._generate_query_str()
                 )
             else:
                 print("no querying done, returning original dataframe")
-                # return self._backup_data
                 return self._cuxfilter_df.data
 
     def __str__(self):
@@ -617,7 +615,7 @@ class DashBoard:
                         chart,
                         dtype="pandas",
                         cumsum=cumsum,
-                    ).calc_data_tile(self._query(query))
+                    ).calc_data_tile(self._query(query).copy())
 
         self._charts[self._active_view].datatile_loaded_state = True
 
