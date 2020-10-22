@@ -180,7 +180,10 @@ class BaseStackedLine(BaseChart):
                 temp_local_dict,
             )
             # reload all charts with new queried data (cudf.DataFrame only)
-            dashboard_cls._reload_charts(data=temp_data, ignore_cols=[])
+            dashboard_cls._reload_charts(
+                data=temp_data, ignore_cols=[self.name]
+            )
+            self.reload_chart(temp_data, False)
             # self.reload_chart(temp_data, False)
             del temp_data
 
