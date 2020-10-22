@@ -87,37 +87,52 @@ class TestBaseStackedLine:
         )
 
     def test_box_selection_callback(self):
-        bsl = BaseStackedLine("key", ["val"])
-        bsl.chart_type = "stacked_lines"
-        self.dashboard._active_view = bsl.name
-
-        class evt:
-            geometry = dict(x0=1, x1=2, y0=3, y1=4, type="rect")
-
-        t = bsl.get_selection_geometry_callback(self.dashboard)
-        t(evt)
-
-        assert (
-            self.dashboard._query_str_dict["key_stacked_lines"]
-            == "1<=key <= 2"
-        )
-
-    @pytest.mark.parametrize(
-        "x_range, y_range, query",
-        [((1, 2), (3, 4), "1<=a <= 2"), ((0, 2), (3, 5), "0<=a <= 2")],
-    )
-    def test_compute_query_dict(self, x_range, y_range, query):
         bsl = BaseStackedLine("a", ["b"])
         bsl.chart_type = "stacked_lines"
-        bsl.x_range = x_range
-        bsl.y_range = y_range
+        self.result = None
+
+        def t_function(data, patch_update=False):
+            self.result = data
+
+        bsl.reload_chart = t_function
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = cuxfilter.dashboard.DashBoard(
             dataframe=cuxfilter.DataFrame.from_dataframe(df)
         )
-        bsl.compute_query_dict(dashboard._query_str_dict)
+        dashboard._active_view = bsl.name
 
-        assert dashboard._query_str_dict["a_stacked_lines"] == query
+        class evt:
+            geometry = dict(x0=1, x1=2, y0=3, y1=4, type="rect")
+
+        t = bsl.get_selection_geometry_callback(dashboard)
+        t(evt)
+        self.result.equals(df.query("1<=a<=2"))
+
+    @pytest.mark.parametrize(
+        "x_range, y_range, query, local_dict",
+        [
+            ((1, 2), (3, 4), "@x_min<=x<=@x_max", {"x_min": 1, "x_max": 2},),
+            ((0, 2), (3, 5), "@x_min<=x<=@x_max", {"x_min": 0, "x_max": 2},),
+        ],
+    )
+    def test_compute_query_dict(self, x_range, y_range, query, local_dict):
+        bsl = BaseStackedLine("x", ["y"])
+        bsl.chart_type = "stacked_lines"
+        bsl.x_range = x_range
+        bsl.y_range = y_range
+        df = cudf.DataFrame({"x": [1, 2, 2], "y": [3, 4, 5]})
+        dashboard = cuxfilter.dashboard.DashBoard(
+            dataframe=cuxfilter.DataFrame.from_dataframe(df)
+        )
+        bsl.compute_query_dict(
+            dashboard._query_str_dict, dashboard._query_local_variables_dict
+        )
+
+        assert dashboard._query_str_dict["x_stacked_lines"] == query
+        for key in local_dict:
+            assert (
+                dashboard._query_local_variables_dict[key] == local_dict[key]
+            )
 
     @pytest.mark.parametrize(
         "add_interaction, reset_event, event_1, event_2",

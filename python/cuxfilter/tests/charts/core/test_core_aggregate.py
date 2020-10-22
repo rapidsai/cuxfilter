@@ -95,17 +95,37 @@ class TestBaseAggregateChart:
         assert bb.filter_widget.value == (0, 4)
 
     @pytest.mark.parametrize(
-        "range, query", [((3, 4), "3<=key<=4"), ((0, 0), "0<=key<=0")]
+        "range, query, local_dict",
+        [
+            (
+                (3, 4),
+                "@key_min <= key <= @key_max",
+                {"key_min": 3, "key_max": 4},
+            ),
+            (
+                (0, 0),
+                "@key_min <= key <= @key_max",
+                {"key_min": 0, "key_max": 0},
+            ),
+        ],
     )
-    def test_compute_query_dict(self, range, query):
+    def test_compute_query_dict(self, range, query, local_dict):
         bb = BaseAggregateChart(x="key")
         bb.chart_type = "bar"
         self.dashboard.add_charts([bb])
         bb.filter_widget.value = range
         # test the following function behavior
-        bb.compute_query_dict(self.dashboard._query_str_dict)
+        bb.compute_query_dict(
+            self.dashboard._query_str_dict,
+            self.dashboard._query_local_variables_dict,
+        )
 
         assert self.dashboard._query_str_dict["key_bar"] == query
+        for key in local_dict:
+            assert (
+                self.dashboard._query_local_variables_dict[key]
+                == local_dict[key]
+            )
 
     @pytest.mark.parametrize(
         "event, result", [(None, None), (ButtonClick, "func_Called")]

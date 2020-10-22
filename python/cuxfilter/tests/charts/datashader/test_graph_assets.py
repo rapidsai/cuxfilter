@@ -52,5 +52,7 @@ class TestGraphAssets:
             "target",
             edge_aggregate_col=edge_aggregate_col,
             edge_render_type=edge_render_type,
+            node_x_dtype=np.float32,
+            node_y_dtype=np.float32,
         )
         assert res.to_pandas().equals(result.to_pandas())
