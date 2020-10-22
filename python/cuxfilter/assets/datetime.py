@@ -1,6 +1,7 @@
 import numpy as np
 import cupy as cp
 import pandas as pd
+import datetime
 import cudf
 import math
 
@@ -22,8 +23,19 @@ dt_unit = {
 
 
 def get_dt_unit_factor(date, _type):
+    if type(date) == datetime.datetime:
+        date = date.timestamp()
     _pow = dt[str(_type)] - int(math.log10(date))
     return math.pow(10, _pow)
+
+
+def to_datetime(dates):
+    unit = {}
+    if type(dates[0]) != datetime.datetime:
+        unit["unit"] = dt_unit[
+            int(math.log10(dates[0]))
+        ]
+    return pd.to_datetime(dates, **unit)
 
 
 def to_dt_if_datetime(dates, _type):
@@ -40,17 +52,10 @@ def to_dt_if_datetime(dates, _type):
     Ouput:
         list of datetime.datetime objects
     """
-    if _type in CUDF_DATETIME_TYPES:
-        if type(dates) in [list, tuple]:
-            # compute date seconds factor
-            if type(dates[0]) in [int, float]:
-                dates = pd.to_datetime(
-                    dates, unit=dt_unit[int(math.log10(dates[0]))]
-                )
-            else:
-                dates = pd.to_datetime(dates)
-
-            return dates.to_pydatetime()
+    if _type in CUDF_DATETIME_TYPES and type(dates) in [list, tuple]:
+        return type(dates)(
+            to_datetime(dates).to_pydatetime()
+        )
     return dates
 
 
@@ -69,9 +74,11 @@ def to_np_dt64_if_datetime(dates, _type):
         list of np.datetime64 objects
 
     """
-    if _type in CUDF_DATETIME_TYPES:
-        dates = pd.to_datetime(dates)
-        return [date.to_datetime64() for date in dates]
+    if _type in CUDF_DATETIME_TYPES and type(dates) in [list, tuple]:
+        dates = to_datetime(dates)
+        return type(dates)(
+            [date.to_datetime64() for date in dates]
+        )
 
     return dates
 
