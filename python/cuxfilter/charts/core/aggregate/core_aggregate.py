@@ -1,11 +1,14 @@
 import panel as pn
 import dask_cudf
 import numpy as np
+from bokeh.models import DatetimeTickFormatter
 
 from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby, calc_value_counts
 from ....layouts import chart_view
-from ...constants import DATATILE_ACTIVE_COLOR, CUDF_DATETIME_TYPES
+from ...constants import (
+    DATATILE_ACTIVE_COLOR, DATATILE_INACTIVE_COLOR, CUDF_DATETIME_TYPES
+)
 from ....assets import datetime as dt
 
 
@@ -17,6 +20,7 @@ class BaseAggregateChart(BaseChart):
     y_axis_tick_formatter = None
     use_data_tiles = True
     custom_binning = False
+    datatile_active_color = DATATILE_ACTIVE_COLOR
 
     @property
     def datatile_loaded_state(self):
@@ -27,9 +31,9 @@ class BaseAggregateChart(BaseChart):
         self._datatile_loaded_state = state
         if self.add_interaction:
             if state:
-                self.filter_widget.bar_color = DATATILE_ACTIVE_COLOR
+                self.filter_widget.bar_color = self.datatile_active_color
             else:
-                self.filter_widget.bar_color = "#d3d9e2"
+                self.filter_widget.bar_color = DATATILE_INACTIVE_COLOR
 
     def __init__(
         self,
@@ -101,10 +105,10 @@ class BaseAggregateChart(BaseChart):
         update_data_x: updated_data_x, np.array()
         update_data_y: updated_data_x, np.array()
         """
-        result_array = np.zeros(shape=(int(source_x.max()),))
-        # -1 for 0-based indexing
-        np.put(result_array, update_data_x.astype(int) - 1, update_data_y)
-        return result_array[source_x.astype(int) - 1]
+        result_array = np.zeros(shape=source_x.shape)
+        indices = [np.where(x_ == source_x)[0][0] for x_ in update_data_x]
+        np.put(result_array, indices, update_data_y)
+        return result_array
 
     def compute_min_max(self, dashboard_cls):
         if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
@@ -165,6 +169,8 @@ class BaseAggregateChart(BaseChart):
                 self.y_label_map = dict_map
         else:
             self.compute_min_max(dashboard_cls)
+            if self.x_dtype in CUDF_DATETIME_TYPES:
+                self.x_axis_tick_formatter = DatetimeTickFormatter()
             if self.x_dtype != "object":
                 self.compute_stride()
             else:
@@ -295,7 +301,6 @@ class BaseAggregateChart(BaseChart):
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles()
             query_tuple = dt.to_np_dt64_if_datetime(event.new, self.x_dtype)
-            print(query_tuple)
             dashboard_cls._query_datatiles_by_range(query_tuple)
 
         # add callback to filter_Widget on value change
