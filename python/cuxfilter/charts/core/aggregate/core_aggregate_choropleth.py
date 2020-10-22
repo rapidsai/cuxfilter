@@ -166,13 +166,17 @@ class BaseChoropleth(BaseChart):
         update_data_x: updated_data_x, np.array()
         update_data_y: updated_data_x, np.array()
         """
+        result_array = np.zeros(shape=source_x.shape)
+        indices = [np.where(x_ == source_x)[0][0] for x_ in update_data_x]
+        np.put(result_array, indices, update_data_y)
+        return result_array
 
-        result_array = np.zeros(
-            shape=(int(max(source_x.max(), update_data_x.max())),)
-        )
-        # -1 for 0-based indexing, making sure indexes are type int
-        np.put(result_array, (update_data_x - 1).astype(int), update_data_y)
-        return result_array[source_x.astype(int) - 1]
+        # result_array = np.zeros(
+        #     shape=(int(max(source_x.max(), update_data_x.max())),)
+        # )
+        # # -1 for 0-based indexing, making sure indexes are type int
+        # np.put(result_array, (update_data_x - 1).astype(int), update_data_y)
+        # return result_array[source_x.astype(int) - 1]
 
     def calculate_source(self, data, patch_update=False):
         """
