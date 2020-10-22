@@ -283,6 +283,11 @@ class Line(BaseAggregateChart):
         """
         self.chart = figure(
             title=self.title,
+            x_range=(
+                self.source.data[self.data_x_axis]
+                if self.x_dtype == "object"
+                else None
+            ),
             tools="pan, wheel_zoom, reset",
             active_scroll="wheel_zoom",
             active_drag="pan",
