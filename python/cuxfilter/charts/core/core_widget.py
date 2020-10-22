@@ -21,6 +21,7 @@ class BaseWidget:
     params = None
     min_value: float = 0.0
     max_value: float = 0.0
+    x_dtype = None
     label_map: Dict[str, str] = None
     use_data_tiles = False
     _initialized = False

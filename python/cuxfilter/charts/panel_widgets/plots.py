@@ -1,5 +1,10 @@
 from ..core import BaseWidget
 from ..core.aggregate import BaseDataSizeIndicator
+from ..constants import (
+    CUDF_DATETIME_TYPES,
+    DATATILE_ACTIVE_COLOR, DATATILE_INACTIVE_COLOR
+)
+from ...assets import datetime as dt
 
 import panel as pn
 import dask_cudf
@@ -7,7 +12,7 @@ import dask_cudf
 
 class RangeSlider(BaseWidget):
     _datatile_loaded_state: bool = False
-    datatile_active_color = "#8ab4f7"
+    datatile_active_color = DATATILE_ACTIVE_COLOR
 
     @property
     def datatile_loaded_state(self):
@@ -19,7 +24,14 @@ class RangeSlider(BaseWidget):
         if state:
             self.chart.bar_color = self.datatile_active_color
         else:
-            self.chart.bar_color = "#d3d9e2"
+            self.chart.bar_color = DATATILE_INACTIVE_COLOR
+
+    def compute_stride(self):
+        if self.stride_type == int and self.max_value < 1:
+            self.stride_type = float
+
+        if self.stride is None:
+            self.chart.step
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -36,9 +48,6 @@ class RangeSlider(BaseWidget):
             self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
             self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
 
-        if self.max_value < 1 and self.stride_type == int:
-            self.stride_type = float
-
         self.generate_widget()
         self.add_events(dashboard_cls)
 
@@ -46,24 +55,17 @@ class RangeSlider(BaseWidget):
         """
         generate widget range slider
         """
-        if self.stride is None:
-            self.chart = pn.widgets.RangeSlider(
-                name=self.x,
-                start=self.min_value,
-                end=self.max_value,
-                value=(self.min_value, self.max_value),
-                **self.params,
-            )
-            self.stride = self.chart.step
-        else:
-            self.chart = pn.widgets.RangeSlider(
-                name=self.x,
-                start=self.min_value,
-                end=self.max_value,
-                value=(self.min_value, self.max_value),
-                step=self.stride,
-                **self.params,
-            )
+        if self.stride:
+            self.params["step"] = self.stride
+
+        self.chart = pn.widgets.RangeSlider(
+            name=self.x,
+            start=self.min_value,
+            end=self.max_value,
+            value=(self.min_value, self.max_value),
+            **self.params,
+        )
+        self.compute_stride()
 
     def apply_theme(self, properties_dict):
         """
@@ -86,13 +88,12 @@ class RangeSlider(BaseWidget):
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles()
 
-            dashboard_cls._query_datatiles_by_range(event.new)
+            query_tuple = dt.to_np_dt64_if_datetime(event.new, self.x_dtype)
+            dashboard_cls._query_datatiles_by_range(query_tuple)
 
-        # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
-        # self.add_reset_event(dashboard_cls)
 
-    def compute_query_dict(self, query_str_dict):
+    def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """
         compute query value
 
@@ -104,21 +105,21 @@ class RangeSlider(BaseWidget):
         """
         if self.chart.value != (self.chart.start, self.chart.end):
             min_temp, max_temp = self.chart.value
-            query_str_dict[self.name] = (
-                str(self.stride_type(round(min_temp, 4)))
-                + "<="
-                + str(self.x)
-                + "<="
-                + str(self.stride_type(round(max_temp, 4)))
+            query = "@{} <= {} <= @{}".format(
+                self.x + "_min", self.x, self.x + "_max"
             )
+            query_str_dict[self.name] = query
+            query_local_variables_dict[self.x + "_min"] = min_temp
+            query_local_variables_dict[self.x + "_max"] = max_temp
         else:
             query_str_dict.pop(self.name, None)
+            query_local_variables_dict.pop(self.x + "_min", None)
+            query_local_variables_dict.pop(self.x + "_max", None)
 
 
-class IntSlider(BaseWidget):
+class DateRangeSlider(BaseWidget):
     _datatile_loaded_state: bool = False
-    value = None
-    datatile_active_color = "#8ab4f7"
+    datatile_active_color = DATATILE_ACTIVE_COLOR
 
     @property
     def datatile_loaded_state(self):
@@ -130,7 +131,127 @@ class IntSlider(BaseWidget):
         if state:
             self.chart.bar_color = self.datatile_active_color
         else:
-            self.chart.bar_color = "#d3d9e2"
+            self.chart.bar_color = DATATILE_INACTIVE_COLOR
+
+    def compute_stride(self):
+        self.stride = self.stride_type(
+            (self.max_value - self.min_value) / self.data_points
+        )
+
+    def initiate_chart(self, dashboard_cls):
+        """
+        initiate chart on dashboard creation
+        """
+        self.x_dtype = dashboard_cls._cuxfilter_df.data[self.x].dtype
+        if self.x_dtype not in CUDF_DATETIME_TYPES:
+            raise TypeError(
+                "DateRangeSlider: x-column type must be one of " +
+                str(CUDF_DATETIME_TYPES)
+            )
+        if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
+            self.min_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].min().compute()
+            )
+            self.max_value = (
+                dashboard_cls._cuxfilter_df.data[self.x].max().compute()
+            )
+            if self.data_points is None:
+                self.data_points = len(
+                    dashboard_cls._cuxfilter_df.data[self.x]
+                    .value_counts()
+                    .compute()
+                )
+        else:
+            self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
+            self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
+            if self.data_points is None:
+                self.data_points = len(
+                    dashboard_cls._cuxfilter_df.data[self.x]
+                    .value_counts()
+                )
+        self.compute_stride()
+        self.generate_widget()
+        self.add_events(dashboard_cls)
+
+    def generate_widget(self):
+        """
+        generate widget range slider
+        """
+        self.chart = pn.widgets.DateRangeSlider(
+            name=self.x,
+            start=self.min_value,
+            end=self.max_value,
+            value=(self.min_value, self.max_value),
+            width=self.width,
+            sizing_mode="scale_width",
+            **self.params
+        )
+
+    def apply_theme(self, properties_dict):
+        """
+        apply thematic changes to the chart based on the input
+        properties dictionary.
+
+        """
+        # interactive slider
+        self.datatile_active_color = properties_dict["widgets"][
+            "datatile_active_color"
+        ]
+
+    def add_events(self, dashboard_cls):
+        """
+        add events
+        """
+        def widget_callback(event):
+            if dashboard_cls._active_view != self.name:
+                dashboard_cls._reset_current_view(new_active_view=self)
+                dashboard_cls._calc_data_tiles()
+            query_tuple = dt.to_np_dt64_if_datetime(event.new, self.x_dtype)
+            dashboard_cls._query_datatiles_by_range(query_tuple)
+
+        # add callback to filter_Widget on value change
+        self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
+
+    def compute_query_dict(self, query_str_dict, query_local_variables_dict):
+        """
+        compute query value
+
+        Parameters:
+        -----------
+
+        query_dict:
+            reference to dashboard.__cls__.query_dict
+        """
+        if self.chart.value != (self.chart.start, self.chart.end):
+            min_temp, max_temp = self.chart.value
+            query = "@{} <= {} <= @{}".format(
+                self.x + "_min", self.x, self.x + "_max"
+            )
+            query_str_dict[self.name] = query
+            query_local_variables_dict[self.x + "_min"] = min_temp
+            query_local_variables_dict[self.x + "_max"] = max_temp
+        else:
+            query_str_dict.pop(self.name, None)
+            query_local_variables_dict.pop(self.x + "_min", None)
+            query_local_variables_dict.pop(self.x + "_max", None)
+
+
+class IntSlider(BaseWidget):
+    _datatile_loaded_state: bool = False
+    value = None
+    datatile_active_color = DATATILE_ACTIVE_COLOR
+
+    @property
+    def datatile_loaded_state(self):
+        return self._datatile_loaded_state
+
+    @datatile_loaded_state.setter
+    def datatile_loaded_state(self, state: bool):
+        self._datatile_loaded_state = state
+        if state:
+            self.chart.bar_color = self.datatile_active_color
+        else:
+            self.chart.bar_color = DATATILE_INACTIVE_COLOR
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -202,14 +323,14 @@ class IntSlider(BaseWidget):
         def widget_callback(event):
             if dashboard_cls._active_view != self.name:
                 dashboard_cls._reset_current_view(new_active_view=self)
-                dashboard_cls._calc_data_tiles(cumsum=False)
+                dashboard_cls._calc_data_tiles()
             dashboard_cls._query_datatiles_by_indices([], [event.new])
 
         # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
         # self.add_reset_event(dashboard_cls)
 
-    def compute_query_dict(self, query_str_dict):
+    def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """
         compute query value
 
@@ -220,17 +341,20 @@ class IntSlider(BaseWidget):
             reference to dashboard.__cls__.query_dict
         """
         if len(str(self.chart.value)) > 0:
-            query_str_dict[self.name] = (
-                str(self.x) + "==" + str(self.chart.value)
+            query = "{} == @{}".format(
+                self.x, self.x + "_value"
             )
+            query_str_dict[self.name] = query
+            query_local_variables_dict[self.x + "_value"] = self.chart.value
         else:
             query_str_dict.pop(self.name, None)
+            query_local_variables_dict.pop(self.x + "_value", None)
 
 
 class FloatSlider(BaseWidget):
     _datatile_loaded_state: bool = False
     value = None
-    datatile_active_color = "#8ab4f7"
+    datatile_active_color = DATATILE_ACTIVE_COLOR
 
     @property
     def datatile_loaded_state(self):
@@ -242,7 +366,7 @@ class FloatSlider(BaseWidget):
         if state:
             self.chart.bar_color = self.datatile_active_color
         else:
-            self.chart.bar_color = "#d3d9e2"
+            self.chart.bar_color = DATATILE_INACTIVE_COLOR
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -317,7 +441,7 @@ class FloatSlider(BaseWidget):
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
         # self.add_reset_event(dashboard_cls)
 
-    def compute_query_dict(self, query_str_dict):
+    def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """
         compute query value
 
@@ -328,11 +452,14 @@ class FloatSlider(BaseWidget):
             reference to dashboard.__cls__.query_dict
         """
         if len(str(self.chart.value)) > 0:
-            query_str_dict[self.name] = (
-                str(self.x) + "==" + str(self.chart.value)
+            query = "{} == @{}".format(
+                self.x, self.x + "_value"
             )
+            query_str_dict[self.name] = query
+            query_local_variables_dict[self.x + "_value"] = self.chart.value
         else:
             query_str_dict.pop(self.name, None)
+            query_local_variables_dict.pop(self.x + "_value", None)
 
 
 class DropDown(BaseWidget):
@@ -433,7 +560,7 @@ class DropDown(BaseWidget):
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
         # self.add_reset_event(dashboard_cls)
 
-    def compute_query_dict(self, query_str_dict):
+    def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """
         compute query value
 
@@ -444,11 +571,14 @@ class DropDown(BaseWidget):
             reference to dashboard.__cls__.query_dict
         """
         if len(str(self.chart.value)) > 0:
-            query_str_dict[self.name] = (
-                str(self.x) + "==" + str(self.chart.value)
+            query = "{} == @{}".format(
+                self.x, self.x + "_value"
             )
+            query_str_dict[self.name] = query
+            query_local_variables_dict[self.x + "_value"] = self.chart.value
         else:
             query_str_dict.pop(self.name, None)
+            query_local_variables_dict.pop(self.x + "_value", None)
 
 
 class MultiSelect(BaseWidget):
@@ -554,7 +684,7 @@ class MultiSelect(BaseWidget):
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
         # self.add_reset_event(dashboard_cls)
 
-    def compute_query_dict(self, query_str_dict):
+    def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """
         compute query value
 
@@ -567,12 +697,14 @@ class MultiSelect(BaseWidget):
         if len(self.chart.value) == 0 or self.chart.value == [""]:
             query_str_dict.pop(self.name, None)
         elif len(self.chart.value) == 1:
-            query_str_dict[self.name] = (
-                self.x + "==" + str(self.chart.value[0])
+            query_str_dict[self.name] = "{}=={}".format(
+                self.x, self.chart.value[0]
             )
         else:
             indices_string = ",".join(map(str, self.chart.value))
-            query_str_dict[self.name] = self.x + " in (" + indices_string + ")"
+            query_str_dict[self.name] = "{} in ({})".format(
+                self.x, indices_string
+            )
 
 
 class DataSizeIndicator(BaseDataSizeIndicator):
