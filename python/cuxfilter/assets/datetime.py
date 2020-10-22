@@ -14,12 +14,7 @@ dt = {
     CUDF_DATETIME_TYPES[3]: 18,
 }
 
-dt_unit = {
-    9: 's',
-    12: 'ms',
-    15: 'us',
-    18: 'ns'
-}
+dt_unit = {9: "s", 12: "ms", 15: "us", 18: "ns"}
 
 
 def get_dt_unit_factor(date, _type):
@@ -32,9 +27,7 @@ def get_dt_unit_factor(date, _type):
 def to_datetime(dates):
     unit = {}
     if type(dates[0]) != datetime.datetime:
-        unit["unit"] = dt_unit[
-            int(math.log10(dates[0]))
-        ]
+        unit["unit"] = dt_unit[int(math.log10(dates[0]))]
     return pd.to_datetime(dates, **unit)
 
 
@@ -53,9 +46,7 @@ def to_dt_if_datetime(dates, _type):
         list of datetime.datetime objects
     """
     if _type in CUDF_DATETIME_TYPES and type(dates) in [list, tuple]:
-        return type(dates)(
-            to_datetime(dates).to_pydatetime()
-        )
+        return type(dates)(to_datetime(dates).to_pydatetime())
     return dates
 
 
@@ -76,15 +67,13 @@ def to_np_dt64_if_datetime(dates, _type):
     """
     if _type in CUDF_DATETIME_TYPES and type(dates) in [list, tuple]:
         dates = to_datetime(dates)
-        return type(dates)(
-            [date.to_datetime64() for date in dates]
-        )
+        return type(dates)([date.to_datetime64() for date in dates])
 
     return dates
 
 
 def check_series_for_nan(ser_):
-    if ser_.dtype == 'float64':
+    if ser_.dtype == "float64":
         return ser_[~cp.isnan(ser_)].shape[0] > 0
     return True
 
@@ -99,13 +88,9 @@ def to_int64_if_datetime(dates, _type):
             # compute date seconds factor
             dt_s_factor = get_dt_unit_factor(dates[0], _type)
             return (np.array(dates).astype("int64")) * dt_s_factor
-        elif(
-            type(dates) == cudf.Series and check_series_for_nan(dates)
-        ):
+        elif type(dates) == cudf.Series and check_series_for_nan(dates):
             # compute date seconds factor
-            dt_s_factor = get_dt_unit_factor(
-                dates.iloc[0], _type
-            )
+            dt_s_factor = get_dt_unit_factor(dates.iloc[0], _type)
             return (dates.astype("int64")) * dt_s_factor
     return dates
 

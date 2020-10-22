@@ -7,7 +7,9 @@ from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby, calc_value_counts
 from ....layouts import chart_view
 from ...constants import (
-    DATATILE_ACTIVE_COLOR, DATATILE_INACTIVE_COLOR, CUDF_DATETIME_TYPES
+    DATATILE_ACTIVE_COLOR,
+    DATATILE_INACTIVE_COLOR,
+    CUDF_DATETIME_TYPES,
 )
 from ....assets import datetime as dt
 

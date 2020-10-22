@@ -2,7 +2,8 @@ from ..core import BaseWidget
 from ..core.aggregate import BaseDataSizeIndicator
 from ..constants import (
     CUDF_DATETIME_TYPES,
-    DATATILE_ACTIVE_COLOR, DATATILE_INACTIVE_COLOR
+    DATATILE_ACTIVE_COLOR,
+    DATATILE_INACTIVE_COLOR,
 )
 from ...assets import datetime as dt
 
@@ -145,8 +146,8 @@ class DateRangeSlider(BaseWidget):
         self.x_dtype = dashboard_cls._cuxfilter_df.data[self.x].dtype
         if self.x_dtype not in CUDF_DATETIME_TYPES:
             raise TypeError(
-                "DateRangeSlider: x-column type must be one of " +
-                str(CUDF_DATETIME_TYPES)
+                "DateRangeSlider: x-column type must be one of "
+                + str(CUDF_DATETIME_TYPES)
             )
         if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
             self.min_value = (
@@ -166,8 +167,7 @@ class DateRangeSlider(BaseWidget):
             self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
             if self.data_points is None:
                 self.data_points = len(
-                    dashboard_cls._cuxfilter_df.data[self.x]
-                    .value_counts()
+                    dashboard_cls._cuxfilter_df.data[self.x].value_counts()
                 )
         self.compute_stride()
         self.generate_widget()
@@ -184,7 +184,7 @@ class DateRangeSlider(BaseWidget):
             value=(self.min_value, self.max_value),
             width=self.width,
             sizing_mode="scale_width",
-            **self.params
+            **self.params,
         )
 
     def apply_theme(self, properties_dict):
@@ -202,6 +202,7 @@ class DateRangeSlider(BaseWidget):
         """
         add events
         """
+
         def widget_callback(event):
             if dashboard_cls._active_view != self.name:
                 dashboard_cls._reset_current_view(new_active_view=self)
@@ -341,9 +342,7 @@ class IntSlider(BaseWidget):
             reference to dashboard.__cls__.query_dict
         """
         if len(str(self.chart.value)) > 0:
-            query = "{} == @{}".format(
-                self.x, self.x + "_value"
-            )
+            query = "{} == @{}".format(self.x, self.x + "_value")
             query_str_dict[self.name] = query
             query_local_variables_dict[self.x + "_value"] = self.chart.value
         else:
@@ -452,9 +451,7 @@ class FloatSlider(BaseWidget):
             reference to dashboard.__cls__.query_dict
         """
         if len(str(self.chart.value)) > 0:
-            query = "{} == @{}".format(
-                self.x, self.x + "_value"
-            )
+            query = "{} == @{}".format(self.x, self.x + "_value")
             query_str_dict[self.name] = query
             query_local_variables_dict[self.x + "_value"] = self.chart.value
         else:
@@ -571,9 +568,7 @@ class DropDown(BaseWidget):
             reference to dashboard.__cls__.query_dict
         """
         if len(str(self.chart.value)) > 0:
-            query = "{} == @{}".format(
-                self.x, self.x + "_value"
-            )
+            query = "{} == @{}".format(self.x, self.x + "_value")
             query_str_dict[self.name] = query
             query_local_variables_dict[self.x + "_value"] = self.chart.value
         else:

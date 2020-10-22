@@ -55,11 +55,7 @@ def range_slider(
 
 
 def date_range_slider(
-    x,
-    width=400,
-    height=20,
-    data_points=None,
-    **params,
+    x, width=400, height=20, data_points=None, **params,
 ):
     """
 
@@ -87,8 +83,13 @@ def date_range_slider(
 
     """
     plot = DateRangeSlider(
-        x, width, height, data_points, step_size=None,
-        step_size_type=CUDF_TIMEDELTA_TYPE, **params
+        x,
+        width,
+        height,
+        data_points,
+        step_size=None,
+        step_size_type=CUDF_TIMEDELTA_TYPE,
+        **params,
     )
     plot.chart_type = "widget_date_range_slider"
     return plot
