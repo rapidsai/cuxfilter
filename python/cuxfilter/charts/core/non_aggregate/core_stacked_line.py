@@ -166,15 +166,18 @@ class BaseStackedLine(BaseChart):
             query = "@{}<={}<=@{}".format(
                 self.x + "_min", self.x, self.x + "_max"
             )
-            local_dict = {
-                self.x + "_min": xmin,
-                self.x + "_max": xmax,
+            temp_str_dict = {
+                **dashboard_cls._query_str_dict,
+                **{self.name: query},
             }
-            dashboard_cls._query_str_dict[self.name] = query
-            dashboard_cls._query_local_variables_dict.update(local_dict)
+            temp_local_dict = {
+                **dashboard_cls._query_local_variables_dict,
+                **{self.x + "_min": xmin, self.x + "_max": xmax},
+            }
 
             temp_data = dashboard_cls._query(
-                dashboard_cls._query_str_dict[self.name], local_dict
+                dashboard_cls._generate_query_str(temp_str_dict),
+                temp_local_dict,
             )
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(data=temp_data, ignore_cols=[])
@@ -195,15 +198,18 @@ class BaseStackedLine(BaseChart):
         Ouput:
         """
         if self.x_range is not None and self.y_range is not None:
-            query_str_dict[self.name] = "{} in [@{}]]".format(
-                self.node_x, "range_" + self.node_x,
+            query_str_dict[self.name] = "@{}<={}<=@{}".format(
+                self.x + "_min", self.x, self.x + "_max",
             )
-            query_local_variables_dict["range_" + self.node_x] = ",".join(
-                map(str, self.x_range)
-            )
+            temp_local_dict = {
+                self.x + "_min": self.x_range[0],
+                self.x + "_max": self.x_range[1],
+            }
+            query_local_variables_dict.update(temp_local_dict)
         else:
             query_str_dict.pop(self.name, None)
-            query_local_variables_dict.pop("range_" + self.node_x, None)
+            for key in [self.x + "_min", self.x + "_max"]:
+                query_local_variables_dict.pop(key, None)
 
     def add_events(self, dashboard_cls):
         """

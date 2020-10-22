@@ -213,16 +213,18 @@ class BaseLine(BaseNonAggregate):
             self.filter_widget.end,
         ):
             min_temp, max_temp = self.filter_widget.value
-            query = "@{} <= {} <= @{}".format(
+            query_str_dict[self.name] = "@{} <= {} <= @{}".format(
                 self.x + "_min", self.x, self.x + "_max"
             )
-            query_str_dict[self.name] = query
-            query_local_variables_dict[self.x + "_min"] = min_temp
-            query_local_variables_dict[self.x + "_max"] = max_temp
+            temp_local_dict = {
+                self.x + "_min": min_temp,
+                self.x + "_max": max_temp,
+            }
+            query_local_variables_dict.update(temp_local_dict)
         else:
             query_str_dict.pop(self.name, None)
-            query_local_variables_dict.pop(self.x + "_min", None)
-            query_local_variables_dict.pop(self.x + "_max", None)
+            for key in [self.x + "_min", self.x + "_max"]:
+                query_local_variables_dict.pop(key, None)
 
     def add_events(self, dashboard_cls):
         """

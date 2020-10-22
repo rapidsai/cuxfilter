@@ -118,17 +118,23 @@ class BaseNonAggregate(BaseChart):
                 self.y,
                 self.y + "_max",
             )
-            local_dict = {
-                self.x + "_min": xmin,
-                self.x + "_max": xmax,
-                self.y + "_min": ymin,
-                self.y + "_max": ymax,
+            temp_str_dict = {
+                **dashboard_cls._query_str_dict,
+                **{self.name: query},
+            }
+            temp_local_dict = {
+                **dashboard_cls._query_local_variables_dict,
+                **{
+                    self.x + "_min": xmin,
+                    self.x + "_max": xmax,
+                    self.y + "_min": ymin,
+                    self.y + "_max": ymax,
+                },
             }
 
-            dashboard_cls._query_str_dict[self.name] = query
-            dashboard_cls._query_local_variables_dict.update(local_dict)
             temp_data = dashboard_cls._query(
-                dashboard_cls._generate_query_str(), local_dict
+                dashboard_cls._generate_query_str(temp_str_dict),
+                temp_local_dict,
             )
 
             # reload all charts with new queried data (cudf.DataFrame only)
@@ -175,19 +181,30 @@ class BaseNonAggregate(BaseChart):
         Ouput:
         """
         if self.x_range is not None and self.y_range is not None:
-            query_str_dict[self.name] = "{} in [@{}] and {} in [@{}]".format(
-                self.x, "range_" + self.x, self.y, "range_" + self.x
+            query_str_dict[self.name] = "@{}<={}<=@{} and @{}<={}<=@{}".format(
+                self.x + "_min",
+                self.x,
+                self.x + "_max",
+                self.y + "_min",
+                self.y,
+                self.y + "_max",
             )
-            query_local_variables_dict["range_" + self.x] = ",".join(
-                map(str, self.x_range)
-            )
-            query_local_variables_dict["range_" + self.x] = ",".join(
-                map(str, self.y_range)
-            )
+            temp_local_dict = {
+                self.x + "_min": self.x_range[0],
+                self.x + "_max": self.x_range[1],
+                self.y + "_min": self.y_range[0],
+                self.y + "_max": self.y_range[1],
+            }
+            query_local_variables_dict.update(temp_local_dict)
         else:
             query_str_dict.pop(self.name, None)
-            query_local_variables_dict.pop("range_" + self.x, None)
-            query_local_variables_dict.pop("range_" + self.y, None)
+            for key in [
+                self.x + "_min",
+                self.x + "_max",
+                self.y + "_min",
+                self.y + "_max",
+            ]:
+                query_local_variables_dict.pop(key, None)
 
     def add_events(self, dashboard_cls):
         """

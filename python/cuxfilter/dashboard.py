@@ -250,25 +250,25 @@ class DashBoard:
         else:
             return self._cuxfilter_df.data
 
-    def _generate_query_str(self, ignore_chart=""):
+    def _generate_query_str(self, query_dict=None, ignore_chart=""):
         """
         Generate query string based on current crossfiltered state of
         the dashboard.
         """
         popped_value = None
-
+        query_dict = query_dict or self._query_str_dict
         if (
             type(ignore_chart) != str
             and len(ignore_chart.name) > 0
-            and ignore_chart.name in self._query_str_dict
+            and ignore_chart.name in query_dict
         ):
-            popped_value = self._query_str_dict.pop(ignore_chart.name, None)
+            popped_value = query_dict.pop(ignore_chart.name, None)
 
-        return_query_str = " and ".join(list(self._query_str_dict.values()))
+        return_query_str = " and ".join(list(query_dict.values()))
 
         # adding the popped value to the query_str_dict again
         if popped_value is not None:
-            self._query_str_dict[ignore_chart.name] = popped_value
+            query_dict[ignore_chart.name] = popped_value
 
         return return_query_str
 
@@ -323,9 +323,7 @@ class DashBoard:
 
             if len(self._generate_query_str()) > 0:
                 print("final query", self._generate_query_str())
-                return self._query(
-                    self._generate_query_str()
-                )
+                return self._query(self._generate_query_str())
             else:
                 print("no querying done, returning original dataframe")
                 return self._cuxfilter_df.data
@@ -603,7 +601,9 @@ class DashBoard:
 
         # NO DATATILES for scatter types, as they are essentially all
         # points in the dataset
-        query = self._generate_query_str(self._charts[self._active_view])
+        query = self._generate_query_str(
+            ignore_chart=self._charts[self._active_view]
+        )
 
         if "scatter" not in self._active_view:
             for chart in list(self._charts.values()):
@@ -650,7 +650,7 @@ class DashBoard:
                         query_tuple,
                         self._data_tiles[chart.name],
                         self._generate_query_str(
-                            self._charts[self._active_view]
+                            ignore_chart=self._charts[self._active_view]
                         ),
                         self._query_local_variables_dict,
                     )
@@ -678,7 +678,7 @@ class DashBoard:
                         new_indices,
                         self._cuxfilter_df.data,
                         self._generate_query_str(
-                            self._charts[self._active_view]
+                            ignore_chart=self._charts[self._active_view]
                         ),
                     )
                 elif not chart.use_data_tiles:
@@ -688,7 +688,7 @@ class DashBoard:
                         new_indices,
                         self._data_tiles[chart.name],
                         self._generate_query_str(
-                            self._charts[self._active_view]
+                            ignore_chart=self._charts[self._active_view]
                         ),
                     )
                 else:

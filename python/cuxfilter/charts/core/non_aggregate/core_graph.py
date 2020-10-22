@@ -260,18 +260,24 @@ class BaseGraph(BaseChart):
                 self.node_y,
                 self.node_y + "_max",
             )
-            local_dict = {
-                self.node_x + "_min": xmin,
-                self.node_x + "_max": xmax,
-                self.node_y + "_min": ymin,
-                self.node_y + "_max": ymax,
+            temp_str_dict = {
+                **dashboard_cls._query_str_dict,
+                **{self.name: query},
             }
-            dashboard_cls._query_str_dict[self.name] = query
-            dashboard_cls._query_local_variables_dict.update(local_dict)
-
+            temp_local_dict = {
+                **dashboard_cls._query_local_variables_dict,
+                **{
+                    self.node_x + "_min": xmin,
+                    self.node_x + "_max": xmax,
+                    self.node_y + "_min": ymin,
+                    self.node_y + "_max": ymax,
+                },
+            }
             nodes = dashboard_cls._query(
-                dashboard_cls._generate_query_str(), local_dict
+                dashboard_cls._generate_query_str(temp_str_dict),
+                temp_local_dict,
             )
+
             edges = None
 
             if self.inspect_neighbors._active:
@@ -323,22 +329,30 @@ class BaseGraph(BaseChart):
         Ouput:
         """
         if self.x_range is not None and self.y_range is not None:
-            query_str_dict[self.name] = "{} in [@{}] and {} in [@{}]".format(
+            query_str_dict[self.name] = "@{}<={}<=@{} and @{}<={}<=@{}".format(
+                self.node_x + "_min",
                 self.node_x,
-                "range_" + self.node_x,
+                self.node_x + "_max",
+                self.node_y + "_min",
                 self.node_y,
-                "range_" + self.node_y,
+                self.node_y + "_max",
             )
-            query_local_variables_dict["range_" + self.node_x] = ",".join(
-                map(str, self.x_range)
-            )
-            query_local_variables_dict["range_" + self.node_y] = ",".join(
-                map(str, self.y_range)
-            )
+            temp_local_dict = {
+                self.node_x + "_min": self.x_range[0],
+                self.node_x + "_max": self.x_range[1],
+                self.node_y + "_min": self.y_range[0],
+                self.node_y + "_max": self.y_range[1],
+            }
+            query_local_variables_dict.update(temp_local_dict)
         else:
             query_str_dict.pop(self.name, None)
-            query_local_variables_dict.pop("range_" + self.node_x, None)
-            query_local_variables_dict.pop("range_" + self.node_y, None)
+            for key in [
+                self.node_x + "_min",
+                self.node_x + "_max",
+                self.node_y + "_min",
+                self.node_y + "_max",
+            ]:
+                query_local_variables_dict.pop(key, None)
 
     def add_events(self, dashboard_cls):
         """
