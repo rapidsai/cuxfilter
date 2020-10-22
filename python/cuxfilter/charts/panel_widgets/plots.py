@@ -32,7 +32,7 @@ class RangeSlider(BaseWidget):
             self.stride_type = float
 
         if self.stride is None:
-            self.chart.step
+            self.stride = self.chart.step
 
     def initiate_chart(self, dashboard_cls):
         """
