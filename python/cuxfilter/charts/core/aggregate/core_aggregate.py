@@ -82,7 +82,7 @@ class BaseAggregateChart(BaseChart):
         """
         self.x = x
         self.y = y
-        self.stride = step_size
+        self.input_stride = step_size
         self.stride_type = step_size_type
         self.data_points = data_points
         self.add_interaction = add_interaction
@@ -178,11 +178,12 @@ class BaseAggregateChart(BaseChart):
             else:
                 self.use_data_tiles = False
 
-        if self.stride is None:
+        if self.input_stride is None:
             # No stride for bins specified, in this we case,
             # we compute cudf.Series.value_counts() for histogram
             self.custom_binning = False
         else:
+            self.stride = self.input_stride
             self.custom_binning = True
 
         self.calculate_source(dashboard_cls._cuxfilter_df.data)
