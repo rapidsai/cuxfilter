@@ -1,9 +1,9 @@
 # cuXfilter 0.17.0 (Date TBD)
 
 ## New Features
-
+- PR #208 Adds support for new dtype - datetime for all chart types except choropleths, Added new chart widget type - DateRangeSlider
 ## Improvements
-
+- PR #208 refactor - merged BaseLine and BaseBar to BaseAggregate
 ## Bug Fixes
 
 # cuXfilter 0.16.0 (Date TBD)
