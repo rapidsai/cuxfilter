@@ -17,17 +17,36 @@ dt = {
 dt_unit = {9: "s", 12: "ms", 15: "us", 18: "ns"}
 
 
+def date_to_int(date):
+    if type(date) == np.datetime64:
+        date = date.astype("int64")
+    return date
+
+
 def get_dt_unit_factor(date, _type):
     if type(date) == datetime.datetime:
         date = date.timestamp()
-    _pow = dt[str(_type)] - int(math.log10(date))
+
+    _pow = dt[str(_type)] - int(math.log10(date_to_int(date)))
     return math.pow(10, _pow)
 
 
 def to_datetime(dates):
+    """
+    Description:
+        Convert dates to pd.to_datetime while also figuring out
+        date_type unit
+    -------------------------------------------
+    Input:
+        dates = list or tuple of dates
+    -------------------------------------------
+    Output:
+        pd.to_datetime object
+    """
     unit = {}
-    if type(dates[0]) != datetime.datetime:
-        unit["unit"] = dt_unit[int(math.log10(dates[0]))]
+    test_date = dates[0] if type(dates) in [list, tuple, pd.Series] else dates
+    if type(test_date) != datetime.datetime:
+        unit["unit"] = dt_unit[int(math.log10(date_to_int(test_date)))]
     return pd.to_datetime(dates, **unit)
 
 
@@ -68,7 +87,6 @@ def to_np_dt64_if_datetime(dates, _type):
     if _type in CUDF_DATETIME_TYPES and type(dates) in [list, tuple]:
         dates = to_datetime(dates)
         return type(dates)([date.to_datetime64() for date in dates])
-
     return dates
 
 
@@ -80,8 +98,12 @@ def check_series_for_nan(ser_):
 
 def to_int64_if_datetime(dates, _type):
     """
-    col: cudf.Series | list | tuple
-    _type: cudf.dtype
+    Description:
+        convert to int64 for input to datashader based plots
+    -------------------------------------------
+    Input:
+        col: cudf.Series | list | tuple
+        _type: cudf.dtype
     """
     if _type in CUDF_DATETIME_TYPES:
         if type(dates) in [list, tuple]:
