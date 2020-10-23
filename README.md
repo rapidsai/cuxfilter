@@ -215,7 +215,7 @@ Currently supported layout templates and example code can be found on the [layou
 | ------------- | ------------- |
 | bokeh  | bar, line  |
 | datashader  | scatter, scatter_geo, line, stacked_lines, heatmap, graph |
-| panel_widgets  | range_slider, float_slider, int_slider, drop_down, multi_select  |
+| panel_widgets  | range_slider, date_range_slider, float_slider, int_slider, drop_down, multi_select  |
 | custom    | view_dataframe |
 | pydeck    | choropleth(3d and 2d)   |
 
@@ -230,4 +230,3 @@ For more details, check out the [contributing guide](./CONTRIBUTING.md).
 
 ## Future Work
 cuxfilter development is in early stages and on going. See what we are planning next on the [projects page](https://github.com/rapidsai/cuxfilter/projects).
-
