@@ -5,6 +5,7 @@
 ## Improvements
 
 ## Bug Fixes
+- PR #209 fix groupby issues - remove legacy parameter method
 
 # cuXfilter 0.16.0 (Date TBD)
 
