@@ -5,6 +5,7 @@
 ## Improvements
 
 ## Bug Fixes
+- PR #209 remove deprecated cudf methods- `to_gpu_matrix`, `add_column` and groupby parameter `method`
 
 # cuXfilter 0.16.0 (Date TBD)
 

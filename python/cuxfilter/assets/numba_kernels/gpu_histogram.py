@@ -113,7 +113,5 @@ def aggregated_column_unique(chart: Type[BaseChart], data):
     """
 
     temp_df = cudf.DataFrame()
-    temp_df.add_column(
-        chart.x, (data[chart.x] / chart.stride) - chart.min_value
-    )
+    temp_df[chart.x] = (data[chart.x] / chart.stride) - chart.min_value
     return temp_df[chart.x].unique().to_pandas().tolist()
