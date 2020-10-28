@@ -23,11 +23,11 @@ def date_to_int(date):
     return date
 
 
-def get_dt_unit_factor(date, _type):
+def get_dt_unit_factor(date, typ):
     if type(date) == datetime.datetime:
         date = date.timestamp()
 
-    _pow = dt[str(_type)] - int(math.log10(date_to_int(date)))
+    _pow = dt[str(typ)] - int(math.log10(date_to_int(date)))
     return math.pow(10, _pow)
 
 
@@ -50,74 +50,73 @@ def to_datetime(dates):
     return pd.to_datetime(dates, **unit)
 
 
-def to_dt_if_datetime(dates, _type):
+def to_dt_if_datetime(dates, typ):
     """
     Description:
-        convert to datetime.datetime if _type in CUDF_DATETIME_TYPES
+        convert to datetime.datetime if typ in CUDF_DATETIME_TYPES
 
     -------------------------------------------
     Input:
         dates = list or tuple of integer timestamps objects
-        _type = dtype
+        typ = dtype
     -------------------------------------------
 
     Ouput:
-        list of datetime.datetime objects
+        list or tuple of datetime.datetime objects
     """
-    if _type in CUDF_DATETIME_TYPES and type(dates) in [list, tuple]:
+    if typ in CUDF_DATETIME_TYPES and type(dates) in [list, tuple]:
         return type(dates)(to_datetime(dates).to_pydatetime())
     return dates
 
 
-def to_np_dt64_if_datetime(dates, _type):
+def to_np_dt64_if_datetime(dates, typ):
     """
     Description:
-        convert to np.datetime64 if _type in CUDF_DATETIME_TYPES
+        convert to np.datetime64 if typ in CUDF_DATETIME_TYPES
 
     -------------------------------------------
     Input:
         dates = list or tuple of datetime.datetime objects
-        _type = dtype
+        typ = dtype
     -------------------------------------------
 
     Ouput:
-        list of np.datetime64 objects
-
+        list or tuple of np.datetime64 objects
     """
-    if _type in CUDF_DATETIME_TYPES and type(dates) in [list, tuple]:
+    if typ in CUDF_DATETIME_TYPES and type(dates) in [list, tuple]:
         dates = to_datetime(dates)
-        return type(dates)([date.to_datetime64() for date in dates])
+        return type(dates)(date.to_datetime64() for date in dates)
     return dates
 
 
-def check_series_for_nan(ser_):
-    if ser_.dtype == "float64":
-        return ser_[~cp.isnan(ser_)].shape[0] > 0
+def check_series_for_nan(series):
+    if series.dtype == "float64":
+        return series[~cp.isnan(series)].shape[0] > 0
     return True
 
 
-def to_int64_if_datetime(dates, _type):
+def to_int64_if_datetime(dates, typ):
     """
     Description:
         convert to int64 for input to datashader based plots
     -------------------------------------------
     Input:
         col: cudf.Series | list | tuple
-        _type: cudf.dtype
+        typ: cudf.dtype
     """
-    if _type in CUDF_DATETIME_TYPES:
+    if typ in CUDF_DATETIME_TYPES:
         if type(dates) in [list, tuple]:
             # compute date seconds factor
-            dt_s_factor = get_dt_unit_factor(dates[0], _type)
+            dt_s_factor = get_dt_unit_factor(dates[0], typ)
             return (np.array(dates).astype("int64")) * dt_s_factor
         elif type(dates) == cudf.Series and check_series_for_nan(dates):
             # compute date seconds factor
-            dt_s_factor = get_dt_unit_factor(dates.iloc[0], _type)
+            dt_s_factor = get_dt_unit_factor(dates.iloc[0], typ)
             return (dates.astype("int64")) * dt_s_factor
     return dates
 
 
-def transform_stride_type(stride_type, _type):
-    if _type in CUDF_DATETIME_TYPES:
+def transform_stride_type(stride_type, typ):
+    if typ in CUDF_DATETIME_TYPES:
         return CUDF_TIMEDELTA_TYPE
     return stride_type
