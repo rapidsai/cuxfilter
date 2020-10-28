@@ -1,8 +1,9 @@
+import cudf
+import dask_cudf
 from typing import Tuple
 
 from ..core_chart import BaseChart
 from ....layouts import chart_view
-from ....assets import datetime as dt
 
 
 class BaseStackedLine(BaseChart):
@@ -21,6 +22,16 @@ class BaseStackedLine(BaseChart):
     use_data_tiles = False
     y: list = []
     colors: list = []
+
+    @property
+    def y_dtype(self):
+        """
+        overwriting the y_dtype property from BaseChart for stackedLines where
+        self.y is a list of columns
+        """
+        if isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
+            return self.source[self.y[0]].dtype
+        return None
 
     def __init__(
         self,
@@ -99,9 +110,6 @@ class BaseStackedLine(BaseChart):
         data: cudf DataFrame
         -------------------------------------------
         """
-        self.x_dtype = dashboard_cls._cuxfilter_df.data[self.x].dtype
-        self.y_dtype = dashboard_cls._cuxfilter_df.data[self.y[0]].dtype
-
         for _y in self.y:
             if self.y_dtype != dashboard_cls._cuxfilter_df.data[_y].dtype:
                 raise TypeError("All y columns should be of same type")
@@ -152,8 +160,8 @@ class BaseStackedLine(BaseChart):
         """
 
         def selection_callback(event):
-            xmin, xmax = dt.to_dt_if_datetime(
-                (event.geometry["x0"], event.geometry["x1"]), self.x_dtype
+            xmin, xmax = self._xaxis_dt_transform(
+                (event.geometry["x0"], event.geometry["x1"])
             )
             if dashboard_cls._active_view != self.name:
                 # reset previous active view and

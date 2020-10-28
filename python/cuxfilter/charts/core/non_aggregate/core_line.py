@@ -4,7 +4,6 @@ import dask_cudf
 from .core_non_aggregate import BaseNonAggregate
 from ....layouts import chart_view
 from ...constants import CUDF_DATETIME_TYPES
-from ....assets import datetime as dt
 
 
 class BaseLine(BaseNonAggregate):
@@ -94,9 +93,7 @@ class BaseLine(BaseNonAggregate):
             self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
 
     def compute_stride(self):
-        self.stride_type = dt.transform_stride_type(
-            self.stride_type, self.x_dtype
-        )
+        self.stride_type = self._xaxis_stride_type_transform(self.stride_type)
 
         if self.stride_type == int and self.max_value < 1:
             self.stride_type = float
@@ -123,8 +120,7 @@ class BaseLine(BaseNonAggregate):
         Ouput:
 
         """
-        self.x_dtype = dashboard_cls._cuxfilter_df.data[self.x].dtype
-        self.y_dtype = dashboard_cls._cuxfilter_df.data[self.y].dtype
+        self.calculate_source(dashboard_cls._cuxfilter_df.data)
 
         if self.data_points > len(dashboard_cls._cuxfilter_df.data):
             self.data_points = len(dashboard_cls._cuxfilter_df.data)
@@ -143,7 +139,6 @@ class BaseLine(BaseNonAggregate):
             self.compute_min_max(dashboard_cls)
             self.compute_stride()
 
-        self.calculate_source(dashboard_cls._cuxfilter_df.data)
         self.generate_chart()
         self.apply_mappers()
 
@@ -189,7 +184,7 @@ class BaseLine(BaseNonAggregate):
             if dashboard_cls._active_view != self.name:
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles()
-            query_tuple = dt.to_np_dt64_if_datetime(event.new, self.x_dtype)
+            query_tuple = self._xaxis_np_dt64_transform(event.new)
             dashboard_cls._query_datatiles_by_range(query_tuple)
 
         # add callback to filter_Widget on value change

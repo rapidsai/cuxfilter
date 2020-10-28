@@ -7,7 +7,6 @@ import dask.dataframe as dd
 from ..core_chart import BaseChart
 from ....layouts import chart_view
 from ...constants import CUXF_DEFAULT_COLOR_PALETTE
-from ....assets import datetime as dt
 
 
 class BaseGraph(BaseChart):
@@ -137,6 +136,18 @@ class BaseGraph(BaseChart):
         self.y_axis_tick_formatter = y_axis_tick_formatter
         self.library_specific_params = library_specific_params
 
+    @property
+    def x_dtype(self):
+        if isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
+            return self.nodes[self.node_x].dtype
+        return None
+
+    @property
+    def y_dtype(self):
+        if isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
+            return self.nodes[self.node_y].dtype
+        return None
+
     def initiate_chart(self, dashboard_cls):
         """
         Description:
@@ -149,8 +160,7 @@ class BaseGraph(BaseChart):
         Ouput:
 
         """
-        self.x_dtype = dashboard_cls._cuxfilter_df.data[self.node_x].dtype
-        self.y_dtype = dashboard_cls._cuxfilter_df.data[self.node_y].dtype
+        self.source = dashboard_cls._cuxfilter_df.data
 
         if dashboard_cls._cuxfilter_df.edges is None:
             raise ValueError("Edges dataframe not provided")
@@ -212,21 +222,14 @@ class BaseGraph(BaseChart):
     def get_selection_geometry_callback(self, dashboard_cls):
         """
         Description: generate callback for map selection event
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-
         """
 
         def lasso_callback(xs, ys):
             # convert datetime to int64 since, point_in_polygon does not
             # support datetime
             indices = cuspatial.point_in_polygon(
-                dt.to_int64_if_datetime(self.nodes[self.node_x], self.x_dtype),
-                dt.to_int64_if_datetime(self.nodes[self.node_y], self.y_dtype),
+                self._to_xaxis_type(self.nodes[self.node_x]),
+                self._to_yaxis_type(self.nodes[self.node_y]),
                 cudf.Series([0], index=["selection"]),
                 [0],
                 xs,
@@ -301,18 +304,18 @@ class BaseGraph(BaseChart):
                 self.source = dashboard_cls._cuxfilter_df.data
 
             if event.geometry["type"] == "rect":
-                xmin, xmax = dt.to_dt_if_datetime(
-                    [event.geometry["x0"], event.geometry["x1"]], self.x_dtype
+                xmin, xmax = self._xaxis_dt_transform(
+                    (event.geometry["x0"], event.geometry["x1"])
                 )
-                ymin, ymax = dt.to_dt_if_datetime(
-                    [event.geometry["y0"], event.geometry["y1"]], self.y_dtype
+                ymin, ymax = self._yaxis_dt_transform(
+                    (event.geometry["y0"], event.geometry["y1"])
                 )
                 box_callback(xmin, xmax, ymin, ymax)
             elif event.geometry["type"] == "poly" and event.final:
                 # convert datetime to int64 since, point_in_polygon does not
                 # support datetime
-                xs = dt.to_int64_if_datetime(event.geometry["x"], self.x_dtype)
-                ys = dt.to_int64_if_datetime(event.geometry["y"], self.y_dtype)
+                xs = self._to_xaxis_type(event.geometry["x"])
+                ys = self._to_yaxis_type(event.geometry["y"])
                 lasso_callback(xs, ys)
 
         return selection_callback

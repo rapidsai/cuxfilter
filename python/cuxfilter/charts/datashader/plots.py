@@ -9,7 +9,6 @@ from .custom_extensions import (
     CustomInspectTool,
     calc_connected_edges,
 )
-from ...assets import datetime as dt
 
 from distutils.version import LooseVersion
 import datashader as ds
@@ -207,11 +206,11 @@ class Scatter(BaseScatter):
             x_range, y_range, w, h, data_source, **kwargs
         ):
             dd = data_source[[self.x, self.y, self.aggregate_col]]
-            dd[self.x] = dt.to_int64_if_datetime(dd[self.x], self.x_dtype)
-            dd[self.y] = dt.to_int64_if_datetime(dd[self.y], self.y_dtype)
+            dd[self.x] = self._to_xaxis_type(dd[self.x])
+            dd[self.y] = self._to_yaxis_type(dd[self.y])
 
-            x_range = dt.to_int64_if_datetime(x_range, self.x_dtype)
-            y_range = dt.to_int64_if_datetime(y_range, self.y_dtype)
+            x_range = self._to_xaxis_type(x_range)
+            y_range = self._to_yaxis_type(y_range)
 
             cvs = ds.Canvas(
                 plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
@@ -644,15 +643,11 @@ class Graph(BaseGraph):
             dd = data_source[
                 [self.node_x, self.node_y, self.node_aggregate_col]
             ]
-            dd[self.node_x] = dt.to_int64_if_datetime(
-                dd[self.node_x], self.x_dtype
-            )
-            dd[self.node_y] = dt.to_int64_if_datetime(
-                dd[self.node_y], self.y_dtype
-            )
+            dd[self.node_x] = self._to_xaxis_type(dd[self.node_x])
+            dd[self.node_y] = self._to_yaxis_type(dd[self.node_y])
 
-            x_range = dt.to_int64_if_datetime(x_range, self.x_dtype)
-            y_range = dt.to_int64_if_datetime(y_range, self.y_dtype)
+            x_range = self._to_xaxis_type(x_range)
+            y_range = self._to_yaxis_type(y_range)
 
             cvs = ds.Canvas(
                 plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
@@ -991,11 +986,11 @@ class Line(BaseLine):
             x_range, y_range, w, h, data_source, **kwargs
         ):
             dd = data_source[[self.x, self.y]]
-            dd[self.x] = dt.to_int64_if_datetime(dd[self.x], self.x_dtype)
-            dd[self.y] = dt.to_int64_if_datetime(dd[self.y], self.y_dtype)
+            dd[self.x] = self._to_xaxis_type(dd[self.x])
+            dd[self.y] = self._to_yaxis_type(dd[self.y])
 
-            x_range = dt.to_int64_if_datetime(x_range, self.x_dtype)
-            y_range = dt.to_int64_if_datetime(y_range, self.y_dtype)
+            x_range = self._to_xaxis_type(x_range)
+            y_range = self._to_yaxis_type(y_range)
 
             cvs = ds.Canvas(
                 plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
@@ -1255,12 +1250,12 @@ class StackedLines(BaseStackedLine):
             x_range, y_range, w, h, data_source, **kwargs
         ):
             dd = data_source[[self.x] + self.y]
-            dd[self.x] = dt.to_int64_if_datetime(dd[self.x], self.x_dtype)
+            dd[self.x] = self._to_xaxis_type(dd[self.x])
             for _y in self.y:
-                dd[_y] = dt.to_int64_if_datetime(dd[_y], self.y_dtype)
+                dd[_y] = self._to_yaxis_type(dd[_y])
 
-            x_range = dt.to_int64_if_datetime(x_range, self.x_dtype)
-            y_range = dt.to_int64_if_datetime(y_range, self.y_dtype)
+            x_range = self._to_xaxis_type(x_range)
+            y_range = self._to_yaxis_type(y_range)
 
             cvs = ds.Canvas(
                 plot_width=w, plot_height=h, x_range=x_range, y_range=y_range

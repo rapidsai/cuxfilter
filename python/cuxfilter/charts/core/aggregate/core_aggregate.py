@@ -11,7 +11,6 @@ from ...constants import (
     DATATILE_INACTIVE_COLOR,
     CUDF_DATETIME_TYPES,
 )
-from ....assets import datetime as dt
 
 
 class BaseAggregateChart(BaseChart):
@@ -125,9 +124,7 @@ class BaseAggregateChart(BaseChart):
             self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
 
     def compute_stride(self):
-        self.stride_type = dt.transform_stride_type(
-            self.stride_type, self.x_dtype
-        )
+        self.stride_type = self._xaxis_stride_type_transform(self.stride_type)
 
         if self.stride_type == int and self.max_value < 1:
             self.stride_type = float
@@ -154,7 +151,7 @@ class BaseAggregateChart(BaseChart):
         Ouput:
 
         """
-        self.x_dtype = dashboard_cls._cuxfilter_df.data[self.x].dtype
+        self.source = dashboard_cls._cuxfilter_df.data
         if self.x_dtype == "bool":
             self.min_value = 0
             self.max_value = 1
@@ -303,7 +300,7 @@ class BaseAggregateChart(BaseChart):
             if dashboard_cls._active_view != self.name:
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles()
-            query_tuple = dt.to_np_dt64_if_datetime(event.new, self.x_dtype)
+            query_tuple = self._xaxis_np_dt64_transform(event.new)
             dashboard_cls._query_datatiles_by_range(query_tuple)
 
         # add callback to filter_Widget on value change
