@@ -87,10 +87,7 @@ class BaseAggregateChart(BaseChart):
         self.aggregate_fn = aggregate_fn
         self.height = height
         self.width = width
-        if len(title) == 0:
-            self.title = self.x
-        else:
-            self.title = title
+        self.title = title if title else self.x
         self.autoscaling = autoscaling
         self.x_axis_tick_formatter = x_axis_tick_formatter
         self.y_axis_tick_formatter = y_axis_tick_formatter
