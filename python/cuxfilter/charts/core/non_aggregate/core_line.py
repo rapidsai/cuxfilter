@@ -2,7 +2,7 @@ import panel as pn
 
 from .core_non_aggregate import BaseNonAggregate
 from ....layouts import chart_view
-from ...constants import CUDF_DATETIME_TYPES
+from ...constants import BOOL_MAP, CUDF_DATETIME_TYPES
 
 
 class BaseLine(BaseNonAggregate):
@@ -119,11 +119,10 @@ class BaseLine(BaseNonAggregate):
             self.max_value = 1
             self.stride = 1
             # set axis labels:
-            dict_map = {0: "False", 1: "True"}
             if len(self.x_label_map) == 0:
-                self.x_label_map = dict_map
+                self.x_label_map = BOOL_MAP
             if len(self.y_label_map) == 0:
-                self.y_label_map = dict_map
+                self.y_label_map = BOOL_MAP
         else:
             self.compute_min_max(dashboard_cls)
             self.compute_stride()

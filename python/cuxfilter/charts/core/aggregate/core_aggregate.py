@@ -6,9 +6,10 @@ from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby, calc_value_counts
 from ....layouts import chart_view
 from ...constants import (
+    BOOL_MAP,
+    CUDF_DATETIME_TYPES,
     DATATILE_ACTIVE_COLOR,
     DATATILE_INACTIVE_COLOR,
-    CUDF_DATETIME_TYPES,
 )
 
 
@@ -143,15 +144,14 @@ class BaseAggregateChart(BaseChart):
             self.max_value = 1
             self.stride = 1
             # set axis labels:
-            dict_map = {0: "False", 1: "True"}
             if len(self.x_label_map) == 0:
-                self.x_label_map = dict_map
+                self.x_label_map = BOOL_MAP
             if (
                 self.y != self.x
                 and self.y is not None
                 and len(self.y_label_map) == 0
             ):
-                self.y_label_map = dict_map
+                self.y_label_map = BOOL_MAP
         else:
             self.compute_min_max(dashboard_cls)
             if self.x_dtype in CUDF_DATETIME_TYPES:
