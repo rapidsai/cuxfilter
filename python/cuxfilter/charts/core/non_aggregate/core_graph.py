@@ -398,7 +398,12 @@ class BaseGraph(BaseChart):
         self.add_event(self.reset_event, reset_callback)
 
     def query_chart_by_range(
-        self, active_chart: BaseChart, query_tuple, datatile=None, query=""
+        self,
+        active_chart: BaseChart,
+        query_tuple,
+        datatile=None,
+        query="",
+        local_dict={},
     ):
         """
         Description:
@@ -413,10 +418,10 @@ class BaseGraph(BaseChart):
         Ouput:
         """
         min_val, max_val = query_tuple
-        final_query = "@min_val<=" + active_chart.x + "<=@max_val"
+        final_query = f"@min_val<={active_chart.x}<=@max_val"
         if len(query) > 0:
-            final_query += " and " + query
-        self.reload_chart(self.nodes.query(final_query))
+            final_query += f" and {query}"
+        self.reload_chart(self.nodes.query(final_query, local_dict),)
 
     def query_chart_by_indices(
         self,
@@ -425,6 +430,7 @@ class BaseGraph(BaseChart):
         new_indices,
         datatile=None,
         query="",
+        local_dict={},
     ):
         """
         Description:
@@ -445,17 +451,17 @@ class BaseGraph(BaseChart):
             # reset the chart
             final_query = query
         elif len(new_indices) == 1:
-            final_query = active_chart.x + "==" + str(float(new_indices[0]))
+            final_query = f"{active_chart.x}=={str(float(new_indices[0]))}"
             if len(query) > 0:
-                final_query += " and " + query
+                final_query += f" and {query}"
         else:
             new_indices_str = ",".join(map(str, new_indices))
-            final_query = active_chart.x + " in (" + new_indices_str + ")"
+            final_query = f"{active_chart.x} in ({new_indices_str})"
             if len(query) > 0:
-                final_query += " and " + query
+                final_query += f" and {query}"
 
         self.reload_chart(
-            self.nodes.query(final_query)
+            self.nodes.query(final_query, local_dict)
             if len(final_query) > 0
             else self.nodes
         )

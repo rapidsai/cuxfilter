@@ -273,6 +273,7 @@ class BaseNonAggregate(BaseChart):
         new_indices,
         datatile=None,
         query="",
+        local_dict={},
     ):
         """
         Description:
@@ -293,17 +294,17 @@ class BaseNonAggregate(BaseChart):
             # reset the chart
             final_query = query
         elif len(new_indices) == 1:
-            final_query = active_chart.x + "==" + str(float(new_indices[0]))
+            final_query = f"{active_chart.x}=={str(float(new_indices[0]))}"
             if len(query) > 0:
-                final_query += " and " + query
+                final_query += f" and {query}"
         else:
             new_indices_str = ",".join(map(str, new_indices))
-            final_query = active_chart.x + " in (" + new_indices_str + ")"
+            final_query = f"{active_chart.x} in ({new_indices_str})"
             if len(query) > 0:
-                final_query += " and " + query
+                final_query += f" and {query}"
 
         self.reload_chart(
-            self.source.query(final_query)
+            self.source.query(final_query, local_dict)
             if len(final_query) > 0
             else self.source,
             False,

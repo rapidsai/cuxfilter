@@ -682,6 +682,7 @@ class DashBoard:
                         self._generate_query_str(
                             ignore_chart=self._charts[self._active_view]
                         ),
+                        self._query_local_variables_dict,
                     )
                 elif not chart.use_data_tiles:
                     chart.query_chart_by_indices(
@@ -692,6 +693,7 @@ class DashBoard:
                         self._generate_query_str(
                             ignore_chart=self._charts[self._active_view]
                         ),
+                        self._query_local_variables_dict,
                     )
                 else:
                     chart.query_chart_by_indices(
