@@ -98,7 +98,7 @@ def _compute_datashader_assets(
 def _get_provider(tile_provider):
     if tile_provider is None:
         return None
-    elif type(tile_provider) == str:
+    elif isinstance(tile_provider, str):
         return get_provider(tile_provider)
     elif isinstance(tile_provider, bokeh.models.tiles.WMTSTileSource):
         return tile_provider

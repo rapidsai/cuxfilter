@@ -588,7 +588,7 @@ def stacked_lines(
     A cudashader stacked_lines plot.
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
-    if type(y) is not list or len(y) == 0:
+    if not isinstance(y, list) or len(y) == 0:
         raise ValueError("y must be a list of atleast one column name")
     plot = plots.StackedLines(
         x,
