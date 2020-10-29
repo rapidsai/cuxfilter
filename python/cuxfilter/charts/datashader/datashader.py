@@ -104,6 +104,8 @@ def scatter(
     A cudashader scatter plot.
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
+    if isinstance(color_palette, tuple):
+        color_palette = list(color_palette)
     plot = plots.Scatter(
         x,
         y,
@@ -277,6 +279,10 @@ def graph(
     A cudashader graph plot.
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
+    if isinstance(node_color_palette, tuple):
+        node_color_palette = list(node_color_palette)
+    if isinstance(edge_color_palette, tuple):
+        edge_color_palette = list(edge_color_palette)
     plot = plots.Graph(
         node_x,
         node_y,
@@ -406,6 +412,8 @@ def heatmap(
     A cudashader heatmap (scatter object).
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
+    if isinstance(color_palette, tuple):
+        color_palette = list(color_palette)
     plot = plots.Scatter(
         x,
         y,
