@@ -86,7 +86,7 @@ def calc_data_tile_for_size(
     else:
         groupby_result = (
             df[[col_1 + "_mod"]]
-            .groupby(col_1 + "_mod", method="hash", as_index=True)
+            .groupby(col_1 + "_mod", as_index=True)
             .agg({col_1 + "_mod": "count"})
         )
 
@@ -180,9 +180,7 @@ def calc_data_tile(
             groupby_results.append(temp_df)
         else:
             groupby_results.append(
-                df.groupby(
-                    check_list, method="hash", sort=False, as_index=False
-                ).agg(agg)
+                df.groupby(check_list, sort=False, as_index=False).agg(agg)
             )
 
     del df
