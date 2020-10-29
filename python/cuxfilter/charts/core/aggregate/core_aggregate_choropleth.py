@@ -1,7 +1,6 @@
 from typing import Dict
 import os
 import numpy as np
-import dask_cudf
 
 from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby
@@ -129,16 +128,9 @@ class BaseChoropleth(BaseChart):
         Ouput:
 
         """
-        if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
-            self.min_value = (
-                dashboard_cls._cuxfilter_df.data[self.x].min().compute()
-            )
-            self.max_value = (
-                dashboard_cls._cuxfilter_df.data[self.x].max().compute()
-            )
-        else:
-            self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
-            self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
+        self.min_value, self.max_value = self._get_min_max(
+            dashboard_cls._cuxfilter_df.data, self.x
+        )
 
         self.geo_mapper, x_range, y_range = geo_json_mapper(
             self.geoJSONSource,
@@ -170,13 +162,6 @@ class BaseChoropleth(BaseChart):
         indices = [np.where(x_ == source_x)[0][0] for x_ in update_data_x]
         np.put(result_array, indices, update_data_y)
         return result_array
-
-        # result_array = np.zeros(
-        #     shape=(int(max(source_x.max(), update_data_x.max())),)
-        # )
-        # # -1 for 0-based indexing, making sure indexes are type int
-        # np.put(result_array, (update_data_x - 1).astype(int), update_data_y)
-        # return result_array[source_x.astype(int) - 1]
 
     def calculate_source(self, data, patch_update=False):
         """
@@ -259,14 +244,10 @@ class BaseChoropleth(BaseChart):
         if len(list_of_indices) == 0 or list_of_indices == [""]:
             query_str_dict.pop(self.name, None)
         elif len(list_of_indices) == 1:
-            query_str_dict[self.name] = "{}=={}".format(
-                self.x, list_of_indices[0]
-            )
+            query_str_dict[self.name] = f"{self.x}=={list_of_indices[0]}"
         else:
             indices_string = ",".join(map(str, list_of_indices))
-            query_str_dict[self.name] = "{} in ({})".format(
-                self.x, indices_string
-            )
+            query_str_dict[self.name] = f"{self.x} in ({indices_string})"
 
     def add_events(self, dashboard_cls):
         """

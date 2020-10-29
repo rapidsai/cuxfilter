@@ -1,5 +1,4 @@
 import panel as pn
-import dask_cudf
 
 from .core_non_aggregate import BaseNonAggregate
 from ....layouts import chart_view
@@ -81,16 +80,9 @@ class BaseLine(BaseNonAggregate):
         self.height = height
 
     def compute_min_max(self, dashboard_cls):
-        if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
-            self.min_value = (
-                dashboard_cls._cuxfilter_df.data[self.x].min().compute()
-            )
-            self.max_value = (
-                dashboard_cls._cuxfilter_df.data[self.x].max().compute()
-            )
-        else:
-            self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
-            self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
+        self.min_value, self.max_value = self._get_min_max(
+            dashboard_cls._cuxfilter_df.data, self.x
+        )
 
     def compute_stride(self):
         self.stride_type = self._xaxis_stride_type_transform(self.stride_type)
@@ -99,14 +91,11 @@ class BaseLine(BaseNonAggregate):
             self.stride_type = float
 
         if self.stride is None and self.data_points is not None:
-            if self.stride_type == int:
-                self.stride = self.stride_type(
-                    round((self.max_value - self.min_value) / self.data_points)
-                )
-            else:
-                self.stride = self.stride_type(
-                    (self.max_value - self.min_value) / self.data_points
-                )
+            raw_stride = (self.max_value - self.min_value) / self.data_points
+            stride = (
+                round(raw_stride) if self.stride_type == int else raw_stride
+            )
+            self.stride = self.stride_type(stride)
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -208,9 +197,9 @@ class BaseLine(BaseNonAggregate):
             self.filter_widget.end,
         ):
             min_temp, max_temp = self.filter_widget.value
-            query_str_dict[self.name] = "@{} <= {} <= @{}".format(
-                self.x + "_min", self.x, self.x + "_max"
-            )
+            query_str_dict[
+                self.name
+            ] = f"@{self.x}_min <= {self.x} <= @{self.x}_max"
             temp_local_dict = {
                 self.x + "_min": min_temp,
                 self.x + "_max": max_temp,

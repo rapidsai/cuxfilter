@@ -203,6 +203,11 @@ class BaseChart:
         """
         return dt.transform_stride_type(stride_type, self.y_dtype)
 
+    def _get_min_max(self, df, col_name):
+        if isinstance(df, dask_cudf.core.DataFrame):
+            return (df[col_name].min().compute(), df[col_name].max().compute())
+        return (df[col_name].min(), df[col_name].max())
+
     def view(self):
         return self.chart
 

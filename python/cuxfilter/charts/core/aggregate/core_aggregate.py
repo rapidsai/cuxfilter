@@ -1,5 +1,4 @@
 import panel as pn
-import dask_cudf
 import numpy as np
 from bokeh.models import DatetimeTickFormatter
 
@@ -112,16 +111,9 @@ class BaseAggregateChart(BaseChart):
         return result_array
 
     def compute_min_max(self, dashboard_cls):
-        if type(dashboard_cls._cuxfilter_df.data) == dask_cudf.core.DataFrame:
-            self.min_value = (
-                dashboard_cls._cuxfilter_df.data[self.x].min().compute()
-            )
-            self.max_value = (
-                dashboard_cls._cuxfilter_df.data[self.x].max().compute()
-            )
-        else:
-            self.min_value = dashboard_cls._cuxfilter_df.data[self.x].min()
-            self.max_value = dashboard_cls._cuxfilter_df.data[self.x].max()
+        self.min_value, self.max_value = self._get_min_max(
+            dashboard_cls._cuxfilter_df.data, self.x
+        )
 
     def compute_stride(self):
         self.stride_type = self._xaxis_stride_type_transform(self.stride_type)
@@ -130,14 +122,11 @@ class BaseAggregateChart(BaseChart):
             self.stride_type = float
 
         if self.stride is None and self.data_points is not None:
-            if self.stride_type == int:
-                self.stride = self.stride_type(
-                    round((self.max_value - self.min_value) / self.data_points)
-                )
-            else:
-                self.stride = self.stride_type(
-                    (self.max_value - self.min_value) / self.data_points
-                )
+            raw_stride = (self.max_value - self.min_value) / self.data_points
+            stride = (
+                round(raw_stride) if self.stride_type == int else raw_stride
+            )
+            self.stride = self.stride_type(stride)
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -325,9 +314,7 @@ class BaseAggregateChart(BaseChart):
             self.filter_widget.end,
         ):
             min_temp, max_temp = self.filter_widget.value
-            query = "@{} <= {} <= @{}".format(
-                self.x + "_min", self.x, self.x + "_max"
-            )
+            query = f"@{self.x}_min <= {self.x} <= @{self.x}_max"
             query_str_dict[self.name] = query
             query_local_variables_dict[self.x + "_min"] = min_temp
             query_local_variables_dict[self.x + "_max"] = max_temp
