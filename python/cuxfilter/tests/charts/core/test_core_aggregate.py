@@ -91,7 +91,7 @@ class TestBaseAggregateChart:
         bb = BaseAggregateChart(x="key")
         bb.chart_type = "bar"
         self.dashboard.add_charts([bb])
-        assert type(bb.filter_widget) == pn.widgets.RangeSlider
+        assert isinstance(bb.filter_widget, pn.widgets.RangeSlider)
         assert bb.filter_widget.value == (0, 4)
 
     @pytest.mark.parametrize(

@@ -1,4 +1,4 @@
-from typing import Dict, Type
+from typing import Dict, Type, Union
 import bokeh.embed.util as u
 import panel as pn
 import uuid
@@ -7,7 +7,7 @@ from bokeh.embed import server_document
 import os
 import urllib
 
-from .charts.core.core_chart import BaseChart
+from .charts.core import BaseChart, BaseWidget, ViewDataFrame
 from .datatile import DataTile
 from .layouts import single_feature
 from .charts.panel_widgets import data_size_indicator
@@ -25,6 +25,8 @@ EXEC_MIME = "application/vnd.holoviews_exec.v0+json"
 HTML_MIME = "text/html"
 
 DEFAULT_NOTEBOOK_URL = "http://localhost:8888"
+
+CUXF_BASE_CHARTS = (BaseChart, BaseWidget, ViewDataFrame)
 
 
 def _get_host(url):
@@ -118,7 +120,7 @@ class DashBoard:
         [0] Bokeh(Figure)`
     """
 
-    _charts: Dict[str, Type[BaseChart]]
+    _charts: Dict[str, Union[CUXF_BASE_CHARTS]]
     _data_tiles: Dict[str, Type[DataTile]]
     _query_str_dict: Dict[str, str]
     _query_local_variables_dict = {}
@@ -258,7 +260,7 @@ class DashBoard:
         popped_value = None
         query_dict = query_dict or self._query_str_dict
         if (
-            type(ignore_chart) != str
+            isinstance(ignore_chart, CUXF_BASE_CHARTS)
             and len(ignore_chart.name) > 0
             and ignore_chart.name in query_dict
         ):
@@ -699,7 +701,7 @@ class DashBoard:
                         self._data_tiles[chart.name],
                     )
 
-    def _reset_current_view(self, new_active_view: BaseChart):
+    def _reset_current_view(self, new_active_view: CUXF_BASE_CHARTS):
         """
         Reset current view and assign new view as the active view.
         """
@@ -724,7 +726,9 @@ class DashBoard:
         ):
             self._charts[self._active_view].reload_chart(
                 data=self._query(
-                    self._generate_query_str(ignore_chart=self._active_view)
+                    self._generate_query_str(
+                        ignore_chart=self._charts[self._active_view]
+                    )
                 ),
                 patch_update=True,
             )

@@ -120,9 +120,8 @@ def test_calc_cumsum_data_tile():
     ],
 )
 def test_format_result(result, return_format_str, return_format):
-    assert (
-        type(gpu_datatile.format_result(result, return_format_str))
-        == return_format
+    assert isinstance(
+        gpu_datatile.format_result(result, return_format_str), return_format
     )
 
 

@@ -60,7 +60,7 @@ class TestNonAggregateBaseLine:
         bl.compute_stride()
         bl.add_range_slider_filter(self.dashboard)
 
-        assert type(bl.filter_widget) == pn.widgets.RangeSlider
+        assert isinstance(bl.filter_widget, pn.widgets.RangeSlider)
         assert bl.filter_widget.value == (0, 4)
 
     @pytest.mark.parametrize(

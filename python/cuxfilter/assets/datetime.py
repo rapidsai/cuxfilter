@@ -18,13 +18,13 @@ dt_unit = {9: "s", 12: "ms", 15: "us", 18: "ns"}
 
 
 def date_to_int(date):
-    if type(date) == np.datetime64:
+    if isinstance(date, np.datetime64):
         date = date.astype("int64")
     return date
 
 
 def get_dt_unit_factor(date, typ):
-    if type(date) == datetime.datetime:
+    if isinstance(date, datetime.datetime):
         date = date.timestamp()
 
     _pow = dt[str(typ)] - int(math.log10(date_to_int(date)))
@@ -44,8 +44,10 @@ def to_datetime(dates):
         pd.to_datetime object
     """
     unit = {}
-    test_date = dates[0] if type(dates) in [list, tuple, pd.Series] else dates
-    if type(test_date) != datetime.datetime:
+    test_date = (
+        dates[0] if isinstance(dates, (list, tuple, pd.Series)) else dates
+    )
+    if not isinstance(test_date, datetime.datetime):
         unit["unit"] = dt_unit[int(math.log10(date_to_int(test_date)))]
     return pd.to_datetime(dates, **unit)
 
@@ -64,7 +66,7 @@ def to_dt_if_datetime(dates, typ):
     Ouput:
         list or tuple of datetime.datetime objects
     """
-    if typ in CUDF_DATETIME_TYPES and type(dates) in [list, tuple]:
+    if typ in CUDF_DATETIME_TYPES and isinstance(dates, (list, tuple)):
         return type(dates)(to_datetime(dates).to_pydatetime())
     return dates
 
@@ -83,14 +85,18 @@ def to_np_dt64_if_datetime(dates, typ):
     Ouput:
         list or tuple of np.datetime64 objects
     """
-    if typ in CUDF_DATETIME_TYPES and type(dates) in [list, tuple]:
+    if typ in CUDF_DATETIME_TYPES and isinstance(dates, (list, tuple)):
         dates = to_datetime(dates)
         return type(dates)(date.to_datetime64() for date in dates)
     return dates
 
 
 def check_series_for_nan(series):
-    if series.dtype == "float64":
+    """
+    Description:
+        return True if length of series without NaN is greater than 0
+    """
+    if series.dtype in [float, int]:
         return series[~cp.isnan(series)].shape[0] > 0
     return True
 
@@ -105,11 +111,11 @@ def to_int64_if_datetime(dates, typ):
         typ: cudf.dtype
     """
     if typ in CUDF_DATETIME_TYPES:
-        if type(dates) in [list, tuple]:
+        if isinstance(dates, (list, tuple)):
             # compute date seconds factor
             dt_s_factor = get_dt_unit_factor(dates[0], typ)
             return (np.array(dates).astype("int64")) * dt_s_factor
-        elif type(dates) == cudf.Series and check_series_for_nan(dates):
+        elif isinstance(dates, cudf.Series) and check_series_for_nan(dates):
             # compute date seconds factor
             dt_s_factor = get_dt_unit_factor(dates.iloc[0], typ)
             return (dates.astype("int64")) * dt_s_factor

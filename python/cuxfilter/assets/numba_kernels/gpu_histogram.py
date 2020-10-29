@@ -18,7 +18,7 @@ def calc_value_counts(
     output:
         frequencies(ndarray), bin_edge_values(ndarray)
     """
-    if type(a_gpu) == dask_cudf.core.Series:
+    if isinstance(a_gpu, dask_cudf.core.Series):
         if not custom_binning:
             val_count = a_gpu.value_counts()
         else:
@@ -58,7 +58,7 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
 
     if agg is None:
         temp_df[chart.y] = data.dropna(subset=[chart.x])[chart.y]
-        if type(temp_df) == dask_cudf.core.DataFrame:
+        if isinstance(temp_df, dask_cudf.core.DataFrame):
             groupby_res = getattr(
                 temp_df.groupby(by=[chart.x]), chart.aggregate_fn
             )()
@@ -72,7 +72,7 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
     else:
         for key, agg_fn in agg.items():
             temp_df[key] = data[key]
-        if type(data) == dask_cudf.core.DataFrame:
+        if isinstance(data, dask_cudf.core.DataFrame):
             groupby_res = None
             for key, agg_fn in agg.items():
                 groupby_res_temp = getattr(
