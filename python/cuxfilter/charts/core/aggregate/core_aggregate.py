@@ -272,7 +272,7 @@ class BaseAggregateChart(BaseChart):
                 start=self.min_value,
                 end=self.max_value,
                 value=(self.min_value, self.max_value),
-                **{"width": self.width},
+                width=self.width,
                 sizing_mode="scale_width",
             )
         else:
@@ -281,7 +281,7 @@ class BaseAggregateChart(BaseChart):
                 end=self.max_value,
                 value=(self.min_value, self.max_value),
                 step=self.stride,
-                **{"width": self.width},
+                width=self.width,
                 sizing_mode="scale_width",
             )
 
