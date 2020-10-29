@@ -75,7 +75,7 @@ def date_range_slider(
 
     data_points: int,  default None
 
-    step_size: np.timedelta64, defautl np.timedelta64(days=1)
+    step_size: np.timedelta64, default np.timedelta64(days=1)
 
     **params:
         additional arguments to be passed to the function. See bokeh
