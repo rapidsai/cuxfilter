@@ -641,7 +641,12 @@ class Graph(BaseGraph):
             **kwargs,
         ):
             dd = data_source[
-                [self.node_x, self.node_y, self.node_aggregate_col]
+                [
+                    self.node_id,
+                    self.node_x,
+                    self.node_y,
+                    self.node_aggregate_col,
+                ]
             ]
             dd[self.node_x] = self._to_xaxis_type(dd[self.node_x])
             dd[self.node_y] = self._to_yaxis_type(dd[self.node_y])
