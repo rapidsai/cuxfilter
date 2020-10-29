@@ -107,13 +107,9 @@ class BaseNonAggregate(BaseChart):
             self.x_range = (xmin, xmax)
             self.y_range = (ymin, ymax)
 
-            query = "@{}<={}<=@{} and @{}<={}<=@{}".format(
-                self.x + "_min",
-                self.x,
-                self.x + "_max",
-                self.y + "_min",
-                self.y,
-                self.y + "_max",
+            query = (
+                f"@{self.x}_min<={self.x}<=@{self.x}_max"
+                + f" and @{self.y}_min<={self.y}<=@{self.y}_max"
             )
             temp_str_dict = {
                 **dashboard_cls._query_str_dict,
@@ -178,13 +174,9 @@ class BaseNonAggregate(BaseChart):
         Ouput:
         """
         if self.x_range is not None and self.y_range is not None:
-            query_str_dict[self.name] = "@{}<={}<=@{} and @{}<={}<=@{}".format(
-                self.x + "_min",
-                self.x,
-                self.x + "_max",
-                self.y + "_min",
-                self.y,
-                self.y + "_max",
+            query_str_dict[self.name] = (
+                f"@{self.x}_min<={self.x}<=@{self.x}_max"
+                + f" and @{self.y}_min<={self.y}<=@{self.y}_max"
             )
             temp_local_dict = {
                 self.x + "_min": self.x_range[0],

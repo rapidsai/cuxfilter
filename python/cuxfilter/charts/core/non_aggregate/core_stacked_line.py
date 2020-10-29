@@ -79,7 +79,7 @@ class BaseStackedLine(BaseChart):
 
         """
         self.x = x
-        if type(y) != list:
+        if not isinstance(y, list):
             raise TypeError("y must be a list of column names")
         if len(y) == 0:
             raise ValueError("y must not be empty")
@@ -87,7 +87,7 @@ class BaseStackedLine(BaseChart):
         self.data_points = data_points
         self.add_interaction = add_interaction
         self.stride = step_size
-        if type(colors) != list:
+        if not isinstance(colors, list):
             raise TypeError("colors must be a list of colors")
         self.colors = colors
         self.stride_type = step_size_type
@@ -171,9 +171,7 @@ class BaseStackedLine(BaseChart):
 
             self.x_range = (xmin, xmax)
 
-            query = "@{}<={}<=@{}".format(
-                self.x + "_min", self.x, self.x + "_max"
-            )
+            query = f"@{self.x}_min<={self.x}<=@{self.x}_max"
             temp_str_dict = {
                 **dashboard_cls._query_str_dict,
                 **{self.name: query},
@@ -209,9 +207,9 @@ class BaseStackedLine(BaseChart):
         Ouput:
         """
         if self.x_range is not None and self.y_range is not None:
-            query_str_dict[self.name] = "@{}<={}<=@{}".format(
-                self.x + "_min", self.x, self.x + "_max",
-            )
+            query_str_dict[
+                self.name
+            ] = f"@{self.x}_min<={self.x}<=@{self.x}_max"
             temp_local_dict = {
                 self.x + "_min": self.x_range[0],
                 self.x + "_max": self.x_range[1],

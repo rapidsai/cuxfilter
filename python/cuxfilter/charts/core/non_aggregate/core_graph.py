@@ -255,13 +255,9 @@ class BaseGraph(BaseChart):
             self.x_range = (xmin, xmax)
             self.y_range = (ymin, ymax)
 
-            query = "@{}<={}<=@{} and @{}<={}<=@{}".format(
-                self.node_x + "_min",
-                self.node_x,
-                self.node_x + "_max",
-                self.node_y + "_min",
-                self.node_y,
-                self.node_y + "_max",
+            query = (
+                f"@{self.node_x}_min<={self.node_x}<=@{self.node_x}_max"
+                + f" and @{self.node_y}_min<={self.node_y}<=@{self.node_y}_max"
             )
             temp_str_dict = {
                 **dashboard_cls._query_str_dict,
@@ -332,13 +328,9 @@ class BaseGraph(BaseChart):
         Ouput:
         """
         if self.x_range is not None and self.y_range is not None:
-            query_str_dict[self.name] = "@{}<={}<=@{} and @{}<={}<=@{}".format(
-                self.node_x + "_min",
-                self.node_x,
-                self.node_x + "_max",
-                self.node_y + "_min",
-                self.node_y,
-                self.node_y + "_max",
+            query_str_dict[self.name] = (
+                f"@{self.node_x}_min<={self.node_x}<=@{self.node_x}_max"
+                + f" and @{self.node_y}_min<={self.node_y}<=@{self.node_y}_max"
             )
             temp_local_dict = {
                 self.node_x + "_min": self.x_range[0],

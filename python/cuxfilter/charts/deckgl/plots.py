@@ -141,9 +141,9 @@ class Choropleth(BaseChoropleth):
             ]
 
         if self.elevation_column is not None:
-            self.layer_spec["getElevation"] = "{}*{}".format(
-                self.elevation_column, self.elevation_factor
-            )
+            self.layer_spec[
+                "getElevation"
+            ] = f"{self.elevation_column}*{self.elevation_factor}"
 
         self.deck_spec["initialViewState"]["latitude"] = self.get_mean(
             self.library_specific_params["y_range"]
@@ -152,9 +152,9 @@ class Choropleth(BaseChoropleth):
             self.library_specific_params["x_range"]
         )
         self.deck_spec["mapboxApiAccessToken"] = self.mapbox_api_key
-        self.deck_spec["mapStyle"] = "mapbox://styles/mapbox/{}-v9".format(
-            self.map_style
-        )
+        self.deck_spec[
+            "mapStyle"
+        ] = f"mapbox://styles/mapbox/{self.map_style}-v9"
 
         self.deck_spec["layers"] = [self.layer_spec]
 
