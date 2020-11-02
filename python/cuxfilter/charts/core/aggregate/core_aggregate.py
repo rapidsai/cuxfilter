@@ -11,6 +11,7 @@ from ...constants import (
     DATATILE_ACTIVE_COLOR,
     DATATILE_INACTIVE_COLOR,
 )
+from ....assets.cudf_utils import get_min_max
 
 
 class BaseAggregateChart(BaseChart):
@@ -109,7 +110,7 @@ class BaseAggregateChart(BaseChart):
         return result_array
 
     def compute_min_max(self, dashboard_cls):
-        self.min_value, self.max_value = self._get_min_max(
+        self.min_value, self.max_value = get_min_max(
             dashboard_cls._cuxfilter_df.data, self.x
         )
 

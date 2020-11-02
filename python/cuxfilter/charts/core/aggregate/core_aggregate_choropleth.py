@@ -5,6 +5,7 @@ import numpy as np
 from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby
 from ....assets import geo_json_mapper
+from ....assets.cudf_utils import get_min_max
 from ...constants import CUXF_NAN_COLOR
 
 np.seterr(divide="ignore", invalid="ignore")
@@ -128,7 +129,7 @@ class BaseChoropleth(BaseChart):
         Ouput:
 
         """
-        self.min_value, self.max_value = self._get_min_max(
+        self.min_value, self.max_value = get_min_max(
             dashboard_cls._cuxfilter_df.data, self.x
         )
 

@@ -61,11 +61,6 @@ class BaseWidget:
         # self.x_dtype is a computed read-only property
         return dt.to_np_dt64_if_datetime(dates, self.x_dtype)
 
-    def _get_min_max(self, df, col_name):
-        if isinstance(df, dask_cudf.core.DataFrame):
-            return (df[col_name].min().compute(), df[col_name].max().compute())
-        return (df[col_name].min(), df[col_name].max())
-
     def __init__(
         self,
         x,

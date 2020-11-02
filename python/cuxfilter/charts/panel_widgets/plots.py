@@ -5,7 +5,7 @@ from ..constants import (
     DATATILE_ACTIVE_COLOR,
     DATATILE_INACTIVE_COLOR,
 )
-
+from ....assets.cudf_utils import get_min_max
 import panel as pn
 import dask_cudf
 
@@ -37,7 +37,7 @@ class RangeSlider(BaseWidget):
         """
         initiate chart on dashboard creation
         """
-        self.min_value, self.max_value = self._get_min_max(
+        self.min_value, self.max_value = get_min_max(
             dashboard_cls._cuxfilter_df.data, self.x
         )
 
@@ -139,7 +139,7 @@ class DateRangeSlider(BaseWidget):
                 "DateRangeSlider: x-column type must be one of "
                 + str(CUDF_DATETIME_TYPES)
             )
-        self.min_value, self.max_value = self._get_min_max(
+        self.min_value, self.max_value = get_min_max(
             dashboard_cls._cuxfilter_df.data, self.x
         )
         if self.data_points is None:
@@ -237,12 +237,9 @@ class IntSlider(BaseWidget):
         """
         initiate chart on dashboard creation
         """
-        self.min_value, self.max_value = (
-            int(i)
-            for i in self._get_min_max(
-                dashboard_cls._cuxfilter_df.data, self.x
-            )
-        )
+        min, max = get_min_max(dashboard_cls._cuxfilter_df.data, self.x)
+        self.min_value = int(min)
+        self.max_value = int(max)
 
         self.generate_widget()
         self.add_events(dashboard_cls)
@@ -342,7 +339,7 @@ class FloatSlider(BaseWidget):
         """
         initiate chart on dashboard creation
         """
-        self.min_value, self.max_value = self._get_min_max(
+        self.min_value, self.max_value = get_min_max(
             dashboard_cls._cuxfilter_df.data, self.x
         )
         self.generate_widget()
@@ -430,7 +427,7 @@ class DropDown(BaseWidget):
         """
         initiate chart on dashboard creation
         """
-        self.min_value, self.max_value = self._get_min_max(
+        self.min_value, self.max_value = get_min_max(
             dashboard_cls._cuxfilter_df.data, self.x
         )
 
@@ -540,7 +537,7 @@ class MultiSelect(BaseWidget):
         """
         initiate chart on dashboard creation
         """
-        self.min_value, self.max_value = self._get_min_max(
+        self.min_value, self.max_value = get_min_max(
             dashboard_cls._cuxfilter_df.data, self.x
         )
 
