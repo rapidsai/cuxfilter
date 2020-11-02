@@ -1,54 +1,171 @@
 import pytest
+import cudf
+from bokeh.events import ButtonClick
+from bokeh.models import ColumnDataSource
+import panel as pn
 import pandas as pd
 import numpy as np
 
-from bokeh.models import ColumnDataSource
 from cuxfilter.charts.core.aggregate.core_aggregate import BaseAggregateChart
+import cuxfilter
+from cuxfilter.layouts import chart_view
 
 
-class TestCoreAggregateChart:
+class TestBaseAggregateChart:
+
+    df = cudf.DataFrame(
+        {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
+    )
+    cux_df = cuxfilter.DataFrame.from_dataframe(df)
+    dashboard = cux_df.dashboard(charts=[], title="test_title")
+
     def test_variables(self):
-        bac = BaseAggregateChart()
+        bb = BaseAggregateChart(x="test_x")
 
-        # BaseChart variables
-        assert bac.chart_type is None
-        assert bac.x is None
-        assert bac.y is None
-        assert bac.aggregate_fn == "count"
-        assert bac.color is None
-        assert bac.height == 0
-        assert bac.width == 0
-        assert bac.add_interaction is True
-        assert bac.chart is None
-        assert bac.source is None
-        assert bac.source_backup is None
-        assert bac.data_points == 0
-        assert bac._library_specific_params == {}
-        assert bac._stride is None
-        assert bac.stride_type == int
-        assert bac.min_value == 0.0
-        assert bac.max_value == 0.0
-        assert bac.x_label_map == {}
-        assert bac.y_label_map == {}
+        assert bb.chart_type is None
+        assert bb.reset_event is None
+        assert bb._datatile_loaded_state is False
+        assert bb.filter_widget is None
+        assert bb.use_data_tiles is True
+        assert bb.x == "test_x"
+        assert bb.y is None
+        assert bb.data_points is None
+        assert bb.add_interaction is True
+        assert bb.aggregate_fn == "count"
+        assert bb.width == 400
+        assert bb.height == 400
+        assert bb.stride is None
+        assert bb.stride_type == int
+        assert bb.library_specific_params == {}
 
-        bac.x = "test_x"
-        bac.chart_type = "test_chart_type"
+    def test_initiate_chart(self):
+        bb = BaseAggregateChart(x="key")
+        bb.initiate_chart(self.dashboard)
 
-        assert bac.name == "test_x_test_chart_type"
+        assert bb.min_value == 0.0
+        assert bb.max_value == 4.0
+        assert bb.data_points == 5
+        assert bb.stride == 1
+        assert bb.stride_type == int
 
-        # BaseAggregateChart variables
-        assert bac.use_data_tiles is True
+    @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
+    def test_view(self, chart, _chart):
+        bnac = BaseAggregateChart(x="test_x")
+        bnac.chart = chart
+        bnac.width = 400
+
+        assert str(bnac.view()) == str(chart_view(_chart, width=bnac.width))
+
+    @pytest.mark.parametrize(
+        "bb, result",
+        [
+            (
+                BaseAggregateChart(x="key", y="val"),
+                {
+                    "X": [0.0, 1.0, 2.0, 3.0, 4.0],
+                    "Y": [10.0, 11.0, 12.0, 13.0, 14.0],
+                },
+            ),
+            (
+                BaseAggregateChart(x="key"),
+                {
+                    "X": [0.0, 1.0, 2.0, 3.0, 4.0],
+                    "Y": [1.0, 1.0, 1.0, 1.0, 1.0],
+                },
+            ),
+        ],
+    )
+    def test_calculate_source(self, bb, result):
+        bb.initiate_chart(self.dashboard)
+        self.result = None
+
+        def func1(dict_temp, patch_update=False):
+            self.result = dict_temp
+
+        bb.format_source_data = func1
+        bb.calculate_source(self.df)
+        assert all(result["X"] == self.result["X"])
+        assert all(result["Y"] == self.result["Y"])
+
+    def test_add_range_slider_filter(self):
+        bb = BaseAggregateChart(x="key")
+        bb.chart_type = "bar"
+        self.dashboard.add_charts([bb])
+        assert isinstance(bb.filter_widget, pn.widgets.RangeSlider)
+        assert bb.filter_widget.value == (0, 4)
+
+    @pytest.mark.parametrize(
+        "range, query, local_dict",
+        [
+            (
+                (3, 4),
+                "@key_min <= key <= @key_max",
+                {"key_min": 3, "key_max": 4},
+            ),
+            (
+                (0, 0),
+                "@key_min <= key <= @key_max",
+                {"key_min": 0, "key_max": 0},
+            ),
+        ],
+    )
+    def test_compute_query_dict(self, range, query, local_dict):
+        bb = BaseAggregateChart(x="key")
+        bb.chart_type = "bar"
+        self.dashboard.add_charts([bb])
+        bb.filter_widget.value = range
+        # test the following function behavior
+        bb.compute_query_dict(
+            self.dashboard._query_str_dict,
+            self.dashboard._query_local_variables_dict,
+        )
+
+        assert self.dashboard._query_str_dict["key_bar"] == query
+        for key in local_dict:
+            assert (
+                self.dashboard._query_local_variables_dict[key]
+                == local_dict[key]
+            )
+
+    @pytest.mark.parametrize(
+        "event, result", [(None, None), (ButtonClick, "func_Called")]
+    )
+    def test_add_events(self, event, result):
+        bb = BaseAggregateChart(x="key")
+        self.result = None
+
+        def test_func(cls):
+            self.result = "func_Called"
+
+        bb.add_reset_event = test_func
+        bb.reset_event = event
+        # test the following function behavior
+        bb.add_events(self.dashboard)
+
+        assert self.result == result
+
+    def test_add_reset_event(self):
+        bb = BaseAggregateChart(x="key")
+        self.result = None
+
+        def test_func(event, callback):
+            self.result = callback
+
+        bb.add_event = test_func
+        # test the following function behavior
+        bb.add_reset_event(self.dashboard)
+        assert self.result.__name__ == "reset_callback"
 
     @pytest.mark.parametrize(
         "stride, _stride", [(1, 1), (None, None), (0.01, 0.01)]
     )
     def test_stride(self, stride, _stride):
-        bac = BaseAggregateChart()
+        bac = BaseAggregateChart(x="test_x")
         bac.stride = stride
         assert bac._stride == _stride
 
     def test_label_mappers(self):
-        bac = BaseAggregateChart()
+        bac = BaseAggregateChart(x="test_x")
         library_specific_params = {
             "x_label_map": {"a": 1, "b": 2},
             "y_label_map": {"a": 1, "b": 2},
@@ -57,12 +174,6 @@ class TestCoreAggregateChart:
 
         assert bac.x_label_map == {"a": 1, "b": 2}
         assert bac.y_label_map == {"a": 1, "b": 2}
-
-    @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
-    def test_view(self, chart, _chart):
-        bac = BaseAggregateChart()
-        bac.chart = chart
-        assert bac.view() == _chart
 
     @pytest.mark.parametrize(
         "query_tuple, result",
@@ -73,7 +184,7 @@ class TestCoreAggregateChart:
         ],
     )
     def test_query_chart_by_range(self, query_tuple, result):
-        active_chart = BaseAggregateChart()
+        active_chart = BaseAggregateChart(x="test_x")
 
         active_chart.stride = 1
         active_chart.min_value = 10.0
@@ -133,8 +244,8 @@ class TestCoreAggregateChart:
     def test_query_chart_by_indices(
         self, old_indices, new_indices, prev_result, result
     ):
-        active_chart = BaseAggregateChart()
-        passive_chart = BaseAggregateChart()
+        active_chart = BaseAggregateChart(x="test_x")
+        passive_chart = BaseAggregateChart(x="test_x")
 
         active_chart.stride = 1
         active_chart.min_value = 0.0

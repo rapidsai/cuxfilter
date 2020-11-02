@@ -84,16 +84,17 @@ class BaseNonAggregate(BaseChart):
         """
 
         def lasso_callback(xs, ys):
+            # convert datetime to int64 since, point_in_polygon does not
+            # support datetime
             indices = cuspatial.point_in_polygon(
-                self.source[self.x],
-                self.source[self.y],
+                self._to_xaxis_type(self.source[self.x]),
+                self._to_yaxis_type(self.source[self.y]),
                 cudf.Series([0], index=["selection"]),
                 [0],
                 xs,
                 ys,
             )
             temp_data = self.source[indices.selection]
-
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(
                 data=temp_data, ignore_cols=[self.name]
@@ -107,22 +108,26 @@ class BaseNonAggregate(BaseChart):
             self.y_range = (ymin, ymax)
 
             query = (
-                str(xmin)
-                + "<="
-                + self.x
-                + " <= "
-                + str(xmax)
-                + " and "
-                + str(ymin)
-                + "<="
-                + self.y
-                + " <= "
-                + str(ymax)
+                f"@{self.x}_min<={self.x}<=@{self.x}_max"
+                + f" and @{self.y}_min<={self.y}<=@{self.y}_max"
             )
+            temp_str_dict = {
+                **dashboard_cls._query_str_dict,
+                **{self.name: query},
+            }
+            temp_local_dict = {
+                **dashboard_cls._query_local_variables_dict,
+                **{
+                    self.x + "_min": xmin,
+                    self.x + "_max": xmax,
+                    self.y + "_min": ymin,
+                    self.y + "_max": ymax,
+                },
+            }
 
-            dashboard_cls._query_str_dict[self.name] = query
             temp_data = dashboard_cls._query(
-                dashboard_cls._generate_query_str()
+                dashboard_cls._generate_query_str(temp_str_dict),
+                temp_local_dict,
             )
 
             # reload all charts with new queried data (cudf.DataFrame only)
@@ -133,6 +138,7 @@ class BaseNonAggregate(BaseChart):
             del temp_data
 
         def selection_callback(event):
+            self.test_event = event
             if dashboard_cls._active_view != self.name:
                 # reset previous active view and
                 # set current chart as active view
@@ -140,17 +146,23 @@ class BaseNonAggregate(BaseChart):
                 self.source = dashboard_cls._cuxfilter_df.data
 
             if event.geometry["type"] == "rect":
-                xmin, xmax = event.geometry["x0"], event.geometry["x1"]
-                ymin, ymax = event.geometry["y0"], event.geometry["y1"]
+                xmin, xmax = self._xaxis_dt_transform(
+                    (event.geometry["x0"], event.geometry["x1"])
+                )
+                ymin, ymax = self._yaxis_dt_transform(
+                    (event.geometry["y0"], event.geometry["y1"])
+                )
                 box_callback(xmin, xmax, ymin, ymax)
             elif event.geometry["type"] == "poly" and event.final:
-                xs = event.geometry["x"]
-                ys = event.geometry["y"]
+                # convert datetime to int64 since, point_in_polygon does not
+                # support datetime
+                xs = self._to_xaxis_type(event.geometry["x"])
+                ys = self._to_yaxis_type(event.geometry["y"])
                 lasso_callback(xs, ys)
 
         return selection_callback
 
-    def compute_query_dict(self, query_str_dict):
+    def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """
         Description:
 
@@ -163,20 +175,25 @@ class BaseNonAggregate(BaseChart):
         """
         if self.x_range is not None and self.y_range is not None:
             query_str_dict[self.name] = (
-                str(self.x_range[0])
-                + "<="
-                + self.x
-                + " <= "
-                + str(self.x_range[1])
-                + " and "
-                + str(self.y_range[0])
-                + "<="
-                + self.y
-                + " <= "
-                + str(self.y_range[1])
+                f"@{self.x}_min<={self.x}<=@{self.x}_max"
+                + f" and @{self.y}_min<={self.y}<=@{self.y}_max"
             )
+            temp_local_dict = {
+                self.x + "_min": self.x_range[0],
+                self.x + "_max": self.x_range[1],
+                self.y + "_min": self.y_range[0],
+                self.y + "_max": self.y_range[1],
+            }
+            query_local_variables_dict.update(temp_local_dict)
         else:
             query_str_dict.pop(self.name, None)
+            for key in [
+                self.x + "_min",
+                self.x + "_max",
+                self.y + "_min",
+                self.y + "_max",
+            ]:
+                query_local_variables_dict.pop(key, None)
 
     def add_events(self, dashboard_cls):
         """
@@ -222,7 +239,12 @@ class BaseNonAggregate(BaseChart):
         self.add_event(self.reset_event, reset_callback)
 
     def query_chart_by_range(
-        self, active_chart: BaseChart, query_tuple, datatile=None, query=""
+        self,
+        active_chart: BaseChart,
+        query_tuple,
+        datatile=None,
+        query="",
+        local_dict={},
     ):
         """
         Description:
@@ -237,13 +259,11 @@ class BaseNonAggregate(BaseChart):
         Ouput:
         """
         min_val, max_val = query_tuple
-        final_query = (
-            str(min_val) + "<=" + active_chart.x + "<=" + str(max_val)
-        )
+        final_query = "@min_val<=" + active_chart.x + "<=@max_val"
         if len(query) > 0:
             final_query += " and " + query
         self.reload_chart(
-            self.source.query(final_query), False,
+            self.source.query(final_query, local_dict), False,
         )
 
     def query_chart_by_indices(
@@ -253,6 +273,7 @@ class BaseNonAggregate(BaseChart):
         new_indices,
         datatile=None,
         query="",
+        local_dict={},
     ):
         """
         Description:
@@ -273,17 +294,17 @@ class BaseNonAggregate(BaseChart):
             # reset the chart
             final_query = query
         elif len(new_indices) == 1:
-            final_query = active_chart.x + "==" + str(float(new_indices[0]))
+            final_query = f"{active_chart.x}=={str(float(new_indices[0]))}"
             if len(query) > 0:
-                final_query += " and " + query
+                final_query += f" and {query}"
         else:
             new_indices_str = ",".join(map(str, new_indices))
-            final_query = active_chart.x + " in (" + new_indices_str + ")"
+            final_query = f"{active_chart.x} in ({new_indices_str})"
             if len(query) > 0:
-                final_query += " and " + query
+                final_query += f" and {query}"
 
         self.reload_chart(
-            self.source.query(final_query)
+            self.source.query(final_query, local_dict)
             if len(final_query) > 0
             else self.source,
             False,

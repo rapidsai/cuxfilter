@@ -1,3 +1,5 @@
+import cudf
+import dask_cudf
 from typing import Tuple
 
 from ..core_chart import BaseChart
@@ -21,6 +23,16 @@ class BaseStackedLine(BaseChart):
     y: list = []
     colors: list = []
 
+    @property
+    def y_dtype(self):
+        """
+        overwriting the y_dtype property from BaseChart for stackedLines where
+        self.y is a list of columns
+        """
+        if isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
+            return self.source[self.y[0]].dtype
+        return None
+
     def __init__(
         self,
         x,
@@ -36,6 +48,8 @@ class BaseStackedLine(BaseChart):
         timeout=100,
         legend=True,
         legend_position="center",
+        x_axis_tick_formatter=None,
+        y_axis_tick_formatter=None,
         **library_specific_params,
     ):
         """
@@ -56,6 +70,8 @@ class BaseStackedLine(BaseChart):
             timeout
             legend
             legend_position
+            x_axis_tick_formatter
+            y_axis_tick_formatter
             **library_specific_params
         -------------------------------------------
 
@@ -63,7 +79,7 @@ class BaseStackedLine(BaseChart):
 
         """
         self.x = x
-        if type(y) != list:
+        if not isinstance(y, list):
             raise TypeError("y must be a list of column names")
         if len(y) == 0:
             raise ValueError("y must not be empty")
@@ -71,7 +87,7 @@ class BaseStackedLine(BaseChart):
         self.data_points = data_points
         self.add_interaction = add_interaction
         self.stride = step_size
-        if type(colors) != list:
+        if not isinstance(colors, list):
             raise TypeError("colors must be a list of colors")
         self.colors = colors
         self.stride_type = step_size_type
@@ -79,6 +95,8 @@ class BaseStackedLine(BaseChart):
         self.timeout = timeout
         self.legend = legend
         self.legend_position = legend_position
+        self.x_axis_tick_formatter = x_axis_tick_formatter
+        self.y_axis_tick_formatter = y_axis_tick_formatter
         self.library_specific_params = library_specific_params
         self.width = width
         self.height = height
@@ -92,6 +110,10 @@ class BaseStackedLine(BaseChart):
         data: cudf DataFrame
         -------------------------------------------
         """
+        for _y in self.y:
+            if self.y_dtype != dashboard_cls._cuxfilter_df.data[_y].dtype:
+                raise TypeError("All y columns should be of same type")
+
         if self.x_range is None:
             self.x_range = (
                 dashboard_cls._cuxfilter_df.data[self.x].min(),
@@ -126,7 +148,8 @@ class BaseStackedLine(BaseChart):
 
     def get_selection_geometry_callback(self, dashboard_cls):
         """
-        Description: generate callback for choropleth selection evetn
+        Description: generate callback for stacked line
+            selection event (only along x-axis)
         -------------------------------------------
         Input:
 
@@ -137,8 +160,9 @@ class BaseStackedLine(BaseChart):
         """
 
         def selection_callback(event):
-            xmin, xmax = event.geometry["x0"], event.geometry["x1"]
-            ymin, ymax = event.geometry["y0"], event.geometry["y1"]
+            xmin, xmax = self._xaxis_dt_transform(
+                (event.geometry["x0"], event.geometry["x1"])
+            )
             if dashboard_cls._active_view != self.name:
                 # reset previous active view and
                 # set current chart as active view
@@ -146,21 +170,32 @@ class BaseStackedLine(BaseChart):
                 self.source = dashboard_cls._cuxfilter_df.data
 
             self.x_range = (xmin, xmax)
-            self.y_range = (ymin, ymax)
 
-            query = str(xmin) + "<=" + self.x + " <= " + str(xmax)
-            dashboard_cls._query_str_dict[self.name] = query
+            query = f"@{self.x}_min<={self.x}<=@{self.x}_max"
+            temp_str_dict = {
+                **dashboard_cls._query_str_dict,
+                **{self.name: query},
+            }
+            temp_local_dict = {
+                **dashboard_cls._query_local_variables_dict,
+                **{self.x + "_min": xmin, self.x + "_max": xmax},
+            }
+
             temp_data = dashboard_cls._query(
-                dashboard_cls._query_str_dict[self.name]
+                dashboard_cls._generate_query_str(temp_str_dict),
+                temp_local_dict,
             )
             # reload all charts with new queried data (cudf.DataFrame only)
-            dashboard_cls._reload_charts(data=temp_data, ignore_cols=[])
+            dashboard_cls._reload_charts(
+                data=temp_data, ignore_cols=[self.name]
+            )
+            self.reload_chart(temp_data, False)
             # self.reload_chart(temp_data, False)
             del temp_data
 
         return selection_callback
 
-    def compute_query_dict(self, query_str_dict):
+    def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """
         Description:
 
@@ -172,15 +207,18 @@ class BaseStackedLine(BaseChart):
         Ouput:
         """
         if self.x_range is not None and self.y_range is not None:
-            query_str_dict[self.name] = (
-                str(self.x_range[0])
-                + "<="
-                + self.x
-                + " <= "
-                + str(self.x_range[1])
-            )
+            query_str_dict[
+                self.name
+            ] = f"@{self.x}_min<={self.x}<=@{self.x}_max"
+            temp_local_dict = {
+                self.x + "_min": self.x_range[0],
+                self.x + "_max": self.x_range[1],
+            }
+            query_local_variables_dict.update(temp_local_dict)
         else:
             query_str_dict.pop(self.name, None)
+            for key in [self.x + "_min", self.x + "_max"]:
+                query_local_variables_dict.pop(key, None)
 
     def add_events(self, dashboard_cls):
         """
@@ -227,7 +265,12 @@ class BaseStackedLine(BaseChart):
         self.add_event(self.reset_event, reset_callback)
 
     def query_chart_by_range(
-        self, active_chart: BaseChart, query_tuple, datatile=None, query=""
+        self,
+        active_chart: BaseChart,
+        query_tuple,
+        datatile=None,
+        query="",
+        local_dict={},
     ):
         """
         Description:
@@ -242,13 +285,11 @@ class BaseStackedLine(BaseChart):
         Ouput:
         """
         min_val, max_val = query_tuple
-        final_query = (
-            str(min_val) + "<=" + active_chart.x + "<=" + str(max_val)
-        )
+        final_query = f"@min_val<={active_chart.x}<=@max_val"
         if len(query) > 0:
-            final_query += " and " + query
+            final_query += f" and {query}"
         self.reload_chart(
-            self.source.query(final_query), False,
+            self.source.query(final_query, local_dict), False,
         )
 
     def query_chart_by_indices(
@@ -258,6 +299,7 @@ class BaseStackedLine(BaseChart):
         new_indices,
         datatile=None,
         query="",
+        local_dict={},
     ):
         """
         Description:
@@ -278,17 +320,17 @@ class BaseStackedLine(BaseChart):
             # reset the chart
             final_query = query
         elif len(new_indices) == 1:
-            final_query = active_chart.x + "==" + str(float(new_indices[0]))
+            final_query = f"{active_chart.x}=={str(float(new_indices[0]))}"
             if len(query) > 0:
-                final_query += " and " + query
+                final_query += f" and {query}"
         else:
             new_indices_str = ",".join(map(str, new_indices))
-            final_query = active_chart.x + " in (" + new_indices_str + ")"
+            final_query = f"{active_chart.x} in ({new_indices_str})"
             if len(query) > 0:
-                final_query += " and " + query
+                final_query += f" and {query}"
 
         self.reload_chart(
-            self.source.query(final_query)
+            self.source.query(final_query, local_dict)
             if len(final_query) > 0
             else self.source,
             False,

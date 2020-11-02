@@ -232,6 +232,12 @@ class TestDashBoard:
         dashboard._reset_current_view(new_active_view=bac1)
 
         assert dashboard._active_view == bac1.name
-        assert dashboard._query_str_dict == {"key_line": "1<=key<=2"}
+        assert dashboard._query_str_dict == {
+            "key_line": "@key_min <= key <= @key_max"
+        }
+        assert dashboard._query_local_variables_dict == {
+            "key_min": 1,
+            "key_max": 2,
+        }
         assert dashboard._charts[bac.name].datatile_loaded_state is False
         assert bac1.name not in dashboard._query_str_dict

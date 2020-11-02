@@ -52,6 +52,8 @@ class BaseGraph(BaseChart):
         timeout=100,
         legend=True,
         legend_position="center",
+        x_axis_tick_formatter=None,
+        y_axis_tick_formatter=None,
         **library_specific_params,
     ):
         """
@@ -88,6 +90,8 @@ class BaseGraph(BaseChart):
             timeout
             legend
             legend_position
+            x_axis_tick_formatter
+            y_axis_tick_formatter
             **library_specific_params
         -------------------------------------------
 
@@ -128,7 +132,21 @@ class BaseGraph(BaseChart):
         self.timeout = timeout
         self.legend = legend
         self.legend_position = legend_position
+        self.x_axis_tick_formatter = x_axis_tick_formatter
+        self.y_axis_tick_formatter = y_axis_tick_formatter
         self.library_specific_params = library_specific_params
+
+    @property
+    def x_dtype(self):
+        if isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
+            return self.nodes[self.node_x].dtype
+        return None
+
+    @property
+    def y_dtype(self):
+        if isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
+            return self.nodes[self.node_y].dtype
+        return None
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -142,6 +160,8 @@ class BaseGraph(BaseChart):
         Ouput:
 
         """
+        self.source = dashboard_cls._cuxfilter_df.data
+
         if dashboard_cls._cuxfilter_df.edges is None:
             raise ValueError("Edges dataframe not provided")
         if self.x_range is None:
@@ -202,19 +222,14 @@ class BaseGraph(BaseChart):
     def get_selection_geometry_callback(self, dashboard_cls):
         """
         Description: generate callback for map selection event
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-
         """
 
         def lasso_callback(xs, ys):
+            # convert datetime to int64 since, point_in_polygon does not
+            # support datetime
             indices = cuspatial.point_in_polygon(
-                self.nodes[self.node_x],
-                self.nodes[self.node_y],
+                self._to_xaxis_type(self.nodes[self.node_x]),
+                self._to_yaxis_type(self.nodes[self.node_y]),
                 cudf.Series([0], index=["selection"]),
                 [0],
                 xs,
@@ -241,22 +256,27 @@ class BaseGraph(BaseChart):
             self.y_range = (ymin, ymax)
 
             query = (
-                str(xmin)
-                + "<="
-                + self.node_x
-                + " <= "
-                + str(xmax)
-                + " and "
-                + str(ymin)
-                + "<="
-                + self.node_y
-                + " <= "
-                + str(ymax)
+                f"@{self.node_x}_min<={self.node_x}<=@{self.node_x}_max"
+                + f" and @{self.node_y}_min<={self.node_y}<=@{self.node_y}_max"
+            )
+            temp_str_dict = {
+                **dashboard_cls._query_str_dict,
+                **{self.name: query},
+            }
+            temp_local_dict = {
+                **dashboard_cls._query_local_variables_dict,
+                **{
+                    self.node_x + "_min": xmin,
+                    self.node_x + "_max": xmax,
+                    self.node_y + "_min": ymin,
+                    self.node_y + "_max": ymax,
+                },
+            }
+            nodes = dashboard_cls._query(
+                dashboard_cls._generate_query_str(temp_str_dict),
+                temp_local_dict,
             )
 
-            dashboard_cls._query_str_dict[self.name] = query
-
-            nodes = dashboard_cls._query(dashboard_cls._generate_query_str())
             edges = None
 
             if self.inspect_neighbors._active:
@@ -280,17 +300,23 @@ class BaseGraph(BaseChart):
                 self.source = dashboard_cls._cuxfilter_df.data
 
             if event.geometry["type"] == "rect":
-                xmin, xmax = event.geometry["x0"], event.geometry["x1"]
-                ymin, ymax = event.geometry["y0"], event.geometry["y1"]
+                xmin, xmax = self._xaxis_dt_transform(
+                    (event.geometry["x0"], event.geometry["x1"])
+                )
+                ymin, ymax = self._yaxis_dt_transform(
+                    (event.geometry["y0"], event.geometry["y1"])
+                )
                 box_callback(xmin, xmax, ymin, ymax)
             elif event.geometry["type"] == "poly" and event.final:
-                xs = event.geometry["x"]
-                ys = event.geometry["y"]
+                # convert datetime to int64 since, point_in_polygon does not
+                # support datetime
+                xs = self._to_xaxis_type(event.geometry["x"])
+                ys = self._to_yaxis_type(event.geometry["y"])
                 lasso_callback(xs, ys)
 
         return selection_callback
 
-    def compute_query_dict(self, query_str_dict):
+    def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """
         Description:
 
@@ -303,20 +329,25 @@ class BaseGraph(BaseChart):
         """
         if self.x_range is not None and self.y_range is not None:
             query_str_dict[self.name] = (
-                str(self.x_range[0])
-                + "<="
-                + self.node_x
-                + " <= "
-                + str(self.x_range[1])
-                + " and "
-                + str(self.y_range[0])
-                + "<="
-                + self.node_y
-                + " <= "
-                + str(self.y_range[1])
+                f"@{self.node_x}_min<={self.node_x}<=@{self.node_x}_max"
+                + f" and @{self.node_y}_min<={self.node_y}<=@{self.node_y}_max"
             )
+            temp_local_dict = {
+                self.node_x + "_min": self.x_range[0],
+                self.node_x + "_max": self.x_range[1],
+                self.node_y + "_min": self.y_range[0],
+                self.node_y + "_max": self.y_range[1],
+            }
+            query_local_variables_dict.update(temp_local_dict)
         else:
             query_str_dict.pop(self.name, None)
+            for key in [
+                self.node_x + "_min",
+                self.node_x + "_max",
+                self.node_y + "_min",
+                self.node_y + "_max",
+            ]:
+                query_local_variables_dict.pop(key, None)
 
     def add_events(self, dashboard_cls):
         """
@@ -367,7 +398,12 @@ class BaseGraph(BaseChart):
         self.add_event(self.reset_event, reset_callback)
 
     def query_chart_by_range(
-        self, active_chart: BaseChart, query_tuple, datatile=None, query=""
+        self,
+        active_chart: BaseChart,
+        query_tuple,
+        datatile=None,
+        query="",
+        local_dict={},
     ):
         """
         Description:
@@ -382,12 +418,10 @@ class BaseGraph(BaseChart):
         Ouput:
         """
         min_val, max_val = query_tuple
-        final_query = (
-            str(min_val) + "<=" + active_chart.x + "<=" + str(max_val)
-        )
+        final_query = f"@min_val<={active_chart.x}<=@max_val"
         if len(query) > 0:
-            final_query += " and " + query
-        self.reload_chart(self.nodes.query(final_query))
+            final_query += f" and {query}"
+        self.reload_chart(self.nodes.query(final_query, local_dict),)
 
     def query_chart_by_indices(
         self,
@@ -396,6 +430,7 @@ class BaseGraph(BaseChart):
         new_indices,
         datatile=None,
         query="",
+        local_dict={},
     ):
         """
         Description:
@@ -416,17 +451,17 @@ class BaseGraph(BaseChart):
             # reset the chart
             final_query = query
         elif len(new_indices) == 1:
-            final_query = active_chart.x + "==" + str(float(new_indices[0]))
+            final_query = f"{active_chart.x}=={str(float(new_indices[0]))}"
             if len(query) > 0:
-                final_query += " and " + query
+                final_query += f" and {query}"
         else:
             new_indices_str = ",".join(map(str, new_indices))
-            final_query = active_chart.x + " in (" + new_indices_str + ")"
+            final_query = f"{active_chart.x} in ({new_indices_str})"
             if len(query) > 0:
-                final_query += " and " + query
+                final_query += f" and {query}"
 
         self.reload_chart(
-            self.nodes.query(final_query)
+            self.nodes.query(final_query, local_dict)
             if len(final_query) > 0
             else self.nodes
         )

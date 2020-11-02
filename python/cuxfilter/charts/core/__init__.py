@@ -1,3 +1,4 @@
+from .core_chart import BaseChart
 from .core_widget import BaseWidget
 from .core_view_dataframe import ViewDataFrame
 
