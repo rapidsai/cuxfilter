@@ -5,7 +5,7 @@ from ..constants import (
     DATATILE_ACTIVE_COLOR,
     DATATILE_INACTIVE_COLOR,
 )
-from ....assets.cudf_utils import get_min_max
+from ...assets.cudf_utils import get_min_max
 import panel as pn
 import dask_cudf
 
