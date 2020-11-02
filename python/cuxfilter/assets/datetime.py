@@ -96,7 +96,7 @@ def check_series_for_nan(series):
     Description:
         return True if length of series without NaN is greater than 0
     """
-    if series.dtype in [float, int]:
+    if series.dtype == float:
         return series[~cp.isnan(series)].shape[0] > 0
     return True
 
