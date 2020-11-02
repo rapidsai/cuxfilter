@@ -91,13 +91,13 @@ def to_np_dt64_if_datetime(dates, typ):
     return dates
 
 
-def check_series_for_nan(series):
+def check_not_all_nans(series):
     """
     Description:
         return True if length of series without NaN is greater than 0
     """
-    if series.dtype == float:
-        return series[~cp.isnan(series)].shape[0] > 0
+    if series.dtype not in CUDF_DATETIME_TYPES:
+        return not all(cp.isnan(series))
     return True
 
 
@@ -115,7 +115,7 @@ def to_int64_if_datetime(dates, typ):
             # compute date seconds factor
             dt_s_factor = get_dt_unit_factor(dates[0], typ)
             return (np.array(dates).astype("int64")) * dt_s_factor
-        elif isinstance(dates, cudf.Series) and check_series_for_nan(dates):
+        elif isinstance(dates, cudf.Series) and check_not_all_nans(dates):
             # compute date seconds factor
             dt_s_factor = get_dt_unit_factor(dates.iloc[0], typ)
             return (dates.astype("int64")) * dt_s_factor
