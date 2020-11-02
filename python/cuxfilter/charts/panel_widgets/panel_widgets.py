@@ -36,6 +36,8 @@ def range_slider(
     height: int,  default 20
 
     data_points: int,  default None
+        when None, it means no custom number of bins are provided and
+        data_points will default to df[self.x].nunique()
 
     step_size: int,  default 1
 
@@ -74,6 +76,8 @@ def date_range_slider(
     height: int,  default 20
 
     data_points: int,  default None
+        when None, it means no custom number of bins are provided and
+        data_points will default to df[self.x].nunique()
 
     step_size: np.timedelta64, default np.timedelta64(days=1)
 
@@ -115,6 +119,8 @@ def int_slider(
     height: int,  default 40
 
     data_points: int,  default None
+        when None, it means no custom number of bins are provided and
+        data_points will default to df[self.x].nunique()
 
     step_size: int,  default 1
 
@@ -151,6 +157,8 @@ def float_slider(
     height: int,  default 40
 
     data_points: int,  default None
+        when None, it means no custom number of bins are provided and
+        data_points will default to df[self.x].nunique()
 
     step_size: float,  default float((max - min)/datapoints)
 
