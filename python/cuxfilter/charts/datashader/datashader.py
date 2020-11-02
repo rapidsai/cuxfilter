@@ -40,8 +40,8 @@ def scatter(
 
     add_interaction: {True, False},  default True
 
-    color_palette: bokeh.palettes or list of hex_color_codes, or list of
-                   color names,  default CUXF_DEFAULT_COLOR_PALETTE(Virisdis10)
+    color_palette: bokeh.palettes or list/tuple of hex_color_codes,
+        or list/tuple of color names, default bokeh.palettes.Virisdis10
 
     aggregate_col: str, default None
         column from the gpu dataframe on which the aggregate_fn will be run on,
@@ -104,8 +104,6 @@ def scatter(
     A cudashader scatter plot.
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
-    if isinstance(color_palette, tuple):
-        color_palette = list(color_palette)
     plot = plots.Scatter(
         x,
         y,
@@ -206,11 +204,11 @@ def graph(
     node_aggregate_fn={'count', 'mean', 'max', 'min'},  default 'count'
     edge_aggregate_fn={'count', 'mean', 'max', 'min'},  default 'count'
 
-    node_color_palette=bokeh.palettes or list of hex_color_codes, or list of
-                   color names,  default CUXF_DEFAULT_COLOR_PALETTE(viridis10)
+    node_color_palette=bokeh.palettes or list/tuple of hex_color_codes,
+        or list/tuple of color names, default bokeh.palettes.Virisdis10
 
-    edge_color_palette=bokeh.palettes or list of hex_color_codes, or list of
-                   color names,  default ["#000000"]
+    edge_color_palette=bokeh.palettes or list/tuple of hex_color_codes,
+        or list/tuple of color names, default ["#000000"]
 
     node_point_size: int, default 8
         Point size in the scatter plot.
@@ -279,10 +277,6 @@ def graph(
     A cudashader graph plot.
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
-    if isinstance(node_color_palette, tuple):
-        node_color_palette = list(node_color_palette)
-    if isinstance(edge_color_palette, tuple):
-        edge_color_palette = list(edge_color_palette)
     plot = plots.Graph(
         node_x,
         node_y,
@@ -358,8 +352,8 @@ def heatmap(
 
     add_interaction: {True, False},  default True
 
-    color_palette: bokeh.palettes or list of hex_color_codes, or
-        list of color names,default CUXF_DEFAULT_COLOR_PALETTE(viridis10)
+    color_palette: bokeh.palettes or list/tuple of hex_color_codes,
+        or list/tuple of color names, default bokeh.palettes.Virisdis10
 
     aggregate_col: str, default None
         column from the gpu dataframe on which the aggregate_fn will be run on,
@@ -412,8 +406,6 @@ def heatmap(
     A cudashader heatmap (scatter object).
     Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
     """
-    if isinstance(color_palette, tuple):
-        color_palette = list(color_palette)
     plot = plots.Scatter(
         x,
         y,
