@@ -62,6 +62,7 @@ conda install "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
                "cuspatial=$MINOR_VERSION.*" \
                "dask-cudf=$MINOR_VERSION.*" "dask-cuda=$MINOR_VERSION.*" \
                "numba>=0.51.2" \
+               "panel<=0.9.7" \
                "rapids-build-env=$MINOR_VERSION.*" \
                "rapids-notebook-env=$MINOR_VERSION.*"
 
