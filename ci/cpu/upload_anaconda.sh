@@ -4,7 +4,7 @@
 
 set -e
 
-export CUXFILTER_FILE=`conda build conda/recipes/cuxfilter --python=$PYTHON --output`
+export CUXFILTER_FILE=`gpuci_conda_retry build conda/recipes/cuxfilter --python=$PYTHON --output`
 
 CUDA_REL=${CUDA_VERSION%.*}
 

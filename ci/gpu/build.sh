@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (c) 2018, NVIDIA CORPORATION.
+# COPYRIGHT (c) 2020, NVIDIA CORPORATION.
 ##############################################
 # cuXfilter GPU build and test script for CI #
 ##############################################
@@ -8,7 +8,7 @@ NUMARGS=$#
 ARGS=$*
 
 # Logger function for build status output
-function logger() {
+function gpuci_logger() {
   echo -e "\n>>>> $@\n"
 }
 
@@ -18,8 +18,8 @@ function hasArg {
 }
 
 # Set path and build parallel level
-export PATH=/conda/bin:/usr/local/cuda/bin:$PATH
-export PARALLEL_LEVEL=4
+export PATH=/opt/conda/bin:/usr/local/cuda/bin:$PATH
+export PARALLEL_LEVEL=-4
 export CUDA_REL=${CUDA_VERSION%.*}
 
 # Set home to the job's workspace
@@ -36,27 +36,28 @@ export LIBCUDF_KERNEL_CACHE_PATH="$HOME/.jitify-cache"
 
 function remove_libcudf_kernel_cache_dir {
     EXITCODE=$?
-    logger "removing kernel cache dir: $LIBCUDF_KERNEL_CACHE_PATH"
-    rm -rf "$LIBCUDF_KERNEL_CACHE_PATH" || logger "could not rm -rf $LIBCUDF_KERNEL_CACHE_PATH"
+    gpuci_logger "removing kernel cache dir: $LIBCUDF_KERNEL_CACHE_PATH"
+    rm -rf "$LIBCUDF_KERNEL_CACHE_PATH" || gpuci_logger "could not rm -rf $LIBCUDF_KERNEL_CACHE_PATH"
     exit $EXITCODE
 }
 
 trap remove_libcudf_kernel_cache_dir EXIT
 
-mkdir -p "$LIBCUDF_KERNEL_CACHE_PATH" || logger "could not mkdir -p $LIBCUDF_KERNEL_CACHE_PATH"
+mkdir -p "$LIBCUDF_KERNEL_CACHE_PATH" || gpuci_logger "could not mkdir -p $LIBCUDF_KERNEL_CACHE_PATH"
 
 ################################################################################
 # SETUP - Check environment
 ################################################################################
 
-logger "Check environment..."
+gpuci_logger "Check environment"
 env
 
-logger "Check GPU usage..."
+gpuci_logger "Check GPU usage"
 nvidia-smi
 
-logger "Activate conda env..."
-source activate rapids
+gpuci_logger "Activate conda env"
+. /opt/conda/etc/profile.d/conda.sh
+conda activate rapids
 conda install "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
                "cugraph=$MINOR_VERSION.*" \
                "cuspatial=$MINOR_VERSION.*" \
@@ -69,17 +70,19 @@ conda install "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
 # conda remove -f rapids-build-env rapids-notebook-env
 # conda install "your-pkg=1.0.0"
 
-logger "Check versions..."
+gpuci_logger "Check versions"
 python --version
 $CC --version
 $CXX --version
-conda list
+conda info
+conda config --show-sources
+conda list --show-channel-urls
 
 ################################################################################
 # BUILD - Build cuxfilter from source
 ################################################################################
 
-logger "Build cuxfilter..."
+gpuci_logger "Build cuxfilter"
 $WORKSPACE/build.sh clean cuxfilter
 
 ################################################################################
@@ -91,13 +94,13 @@ EXITCODE=0
 trap "EXITCODE=1" ERR
 
 if hasArg --skip-tests; then
-    logger "Skipping Tests..."
+    gpuci_logger "Skipping Tests"
 else
-    logger "Check GPU usage..."
+    gpuci_logger "Check GPU usage"
     nvidia-smi
 
     cd $WORKSPACE/python/cuxfilter/tests
-    logger "Python py.test for cuxfilter..."
+    gpuci_logger "Python py.test for cuxfilter"
     py.test --cache-clear --junitxml=${WORKSPACE}/junit-cuxfilter.xml -v
 
     ${WORKSPACE}/ci/gpu/test-notebooks.sh 2>&1 | tee nbtest.log

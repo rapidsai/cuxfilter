@@ -1,4 +1,4 @@
 set -e
 
 echo "Building cuxfilter"
-conda build conda/recipes/cuxfilter --python=$PYTHON
+gpuci_conda_retry build conda/recipes/cuxfilter --python=$PYTHON
