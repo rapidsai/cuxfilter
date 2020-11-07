@@ -41,7 +41,7 @@ class BaseChoropleth(BaseChart):
         geoJSONProperty=None,
         geo_color_palette=None,
         mapbox_api_key=os.getenv("MAPBOX_API_KEY"),
-        map_style="dark",
+        map_style=None,
         tooltip=True,
         tooltip_include_cols=[],
         nan_color=CUXF_NAN_COLOR,

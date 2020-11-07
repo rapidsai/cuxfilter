@@ -71,7 +71,6 @@ class PanelDeck(param.Parameterized):
             "PolygonLayer", data=self.data, **self.spec["layers"][0]
         )
         self._tooltip = {"html": self.get_tooltip_html()}
-
         self._deck = pdk.Deck(
             mapbox_key=self.spec["mapboxApiAccessToken"],
             views=[
@@ -86,6 +85,8 @@ class PanelDeck(param.Parameterized):
             initial_view_state=self._view_state,
             tooltip=self._tooltip,
         )
+        if self.spec["map_style"]:
+            self._deck.map_style = self.spec["map_style"]
         self.pane = pn.pane.DeckGL(
             self._deck,
             sizing_mode=self.sizing_mode,

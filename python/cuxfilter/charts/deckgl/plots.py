@@ -39,7 +39,7 @@ class Choropleth(BaseChoropleth):
 
     deck_spec = {
         "mapboxApiAccessToken": "",
-        "mapStyle": "",
+        "map_style": "",
         "initialViewState": {
             "latitude": 38.212288,
             "longitude": -107.101581,
@@ -152,9 +152,7 @@ class Choropleth(BaseChoropleth):
             self.library_specific_params["x_range"]
         )
         self.deck_spec["mapboxApiAccessToken"] = self.mapbox_api_key
-        self.deck_spec[
-            "mapStyle"
-        ] = f"mapbox://styles/mapbox/{self.map_style}-v9"
+        self.deck_spec["map_style"] = self.map_style
 
         self.deck_spec["layers"] = [self.layer_spec]
 
@@ -242,3 +240,8 @@ class Choropleth(BaseChoropleth):
                 "color_palette"
             ]
             self.compute_colors()
+        if self.map_style is None:
+            bg_color = properties_dict["map_style"]
+            self.chart._deck.map_style = (
+                f"mapbox://styles/mapbox/{bg_color}-v9"
+            )

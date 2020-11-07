@@ -18,7 +18,7 @@ def choropleth(
     geoJSONProperty=None,
     geo_color_palette=None,
     mapbox_api_key=os.getenv("MAPBOX_API_KEY"),
-    map_style="dark",
+    map_style=None,
     tooltip=True,
     tooltip_include_cols=[],
     nan_color=CUXF_NAN_COLOR,
@@ -75,8 +75,9 @@ def choropleth(
 
     mapbox_api_key: str, default os.getenv('MAPBOX_API_KEY')
 
-    map_style: {'dark', 'light'}, default 'dark'
-        map background type
+    map_style: str, default 'mapbox://styles/mapbox/dark-v9'
+        URI for Mapbox basemap style.
+        See Mapbox's `gallery <https://www.mapbox.com/gallery/>`_ for examples
 
     tooltip: {True, False},  default True
 
