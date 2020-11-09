@@ -37,6 +37,12 @@ class BaseAggregateChart(BaseChart):
             else:
                 self.filter_widget.bar_color = DATATILE_INACTIVE_COLOR
 
+    @property
+    def custom_binning(self):
+        return (
+            self._stride is not None or self._data_points is not None
+        )
+
     def __init__(
         self,
         x,
@@ -82,11 +88,9 @@ class BaseAggregateChart(BaseChart):
         """
         self.x = x
         self.y = y
-        if step_size or data_points:
-            self.custom_binning = True
-        self.stride = step_size
+        self._stride = step_size
+        self._data_points = data_points
         self.stride_type = step_size_type
-        self.data_points = data_points
         self.add_interaction = add_interaction
         self.aggregate_fn = aggregate_fn
         self.height = height
@@ -142,6 +146,11 @@ class BaseAggregateChart(BaseChart):
 
         """
         self.source = dashboard_cls._cuxfilter_df.data
+        # reset data_point to input _data_points
+        self.data_points = self._data_points
+        # reset stride to input _stride
+        self.stride = self._stride
+
         if self.x_dtype == "bool":
             self.min_value = 0
             self.max_value = 1
