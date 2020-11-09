@@ -41,9 +41,7 @@ class BaseAggregateChart(BaseChart):
 
     @property
     def custom_binning(self):
-        return (
-            self._stride is not None or self._data_points is not None
-        )
+        return self._stride is not None or self._data_points is not None
 
     def __init__(
         self,
