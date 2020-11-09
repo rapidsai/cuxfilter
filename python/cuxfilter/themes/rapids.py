@@ -148,5 +148,5 @@ class Theme:
             "background_color": "#8735fb",
             "datatile_active_color": "#5742f5",
         },
-        "map_style": "dark",
+        "map_style": "mapbox://styles/mapbox/dark-v9",
     }

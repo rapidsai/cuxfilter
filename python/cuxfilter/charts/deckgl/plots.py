@@ -241,7 +241,4 @@ class Choropleth(BaseChoropleth):
             ]
             self.compute_colors()
         if self.map_style is None:
-            bg_color = properties_dict["map_style"]
-            self.chart._deck.map_style = (
-                f"mapbox://styles/mapbox/{bg_color}-v9"
-            )
+            self.chart._deck.map_style = properties_dict["map_style"]
