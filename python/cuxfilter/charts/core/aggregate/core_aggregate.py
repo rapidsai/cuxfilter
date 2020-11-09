@@ -23,6 +23,8 @@ class BaseAggregateChart(BaseChart):
     use_data_tiles = True
     custom_binning = False
     datatile_active_color = DATATILE_ACTIVE_COLOR
+    stride = None
+    data_points = None
 
     @property
     def datatile_loaded_state(self):
@@ -36,6 +38,10 @@ class BaseAggregateChart(BaseChart):
                 self.filter_widget.bar_color = self.datatile_active_color
             else:
                 self.filter_widget.bar_color = DATATILE_INACTIVE_COLOR
+
+    @property
+    def custom_binning(self):
+        return self._stride is not None or self._data_points is not None
 
     def __init__(
         self,
@@ -82,9 +88,9 @@ class BaseAggregateChart(BaseChart):
         """
         self.x = x
         self.y = y
-        self.input_stride = step_size
+        self._stride = step_size
+        self._data_points = data_points
         self.stride_type = step_size_type
-        self.data_points = data_points
         self.add_interaction = add_interaction
         self.aggregate_fn = aggregate_fn
         self.height = height
@@ -140,6 +146,11 @@ class BaseAggregateChart(BaseChart):
 
         """
         self.source = dashboard_cls._cuxfilter_df.data
+        # reset data_point to input _data_points
+        self.data_points = self._data_points
+        # reset stride to input _stride
+        self.stride = self._stride
+
         if self.x_dtype == "bool":
             self.min_value = 0
             self.max_value = 1
@@ -161,14 +172,6 @@ class BaseAggregateChart(BaseChart):
                 self.compute_stride()
             else:
                 self.use_data_tiles = False
-
-        if self.input_stride is None:
-            # No stride for bins specified, in this we case,
-            # we compute cudf.Series.value_counts() for histogram
-            self.custom_binning = False
-        else:
-            self.stride = self.input_stride
-            self.custom_binning = True
 
         self.calculate_source(dashboard_cls._cuxfilter_df.data)
         self.generate_chart()

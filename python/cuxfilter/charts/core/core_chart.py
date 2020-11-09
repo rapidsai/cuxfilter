@@ -24,7 +24,7 @@ class BaseChart:
     data_points: int = 0
     filter_widget = None
     _library_specific_params: Dict[str, str] = {}
-    _stride = None
+    stride = None
     stride_type = int
     min_value: float = 0.0
     max_value: float = 0.0
@@ -38,14 +38,6 @@ class BaseChart:
             return self.x + "_" + self.chart_type
         else:
             return self.x + "_"
-
-    @property
-    def stride(self):
-        return self._stride
-
-    @stride.setter
-    def stride(self, value):
-        self._stride = value
 
     @property
     def width(self):

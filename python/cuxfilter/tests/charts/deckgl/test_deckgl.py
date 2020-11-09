@@ -42,7 +42,7 @@ class TestDeckGL:
 
         assert choropleth3d_chart.deck_spec == {
             "mapboxApiAccessToken": None,
-            "mapStyle": "mapbox://styles/mapbox/dark-v9",
+            "map_style": None,
             "initialViewState": {
                 "latitude": 28.400005999999998,
                 "longitude": 0.31556500000000653,
@@ -72,6 +72,11 @@ class TestDeckGL:
                 }
             ],
         }
+
+        assert (
+            choropleth3d_chart.chart._deck.map_style
+            == "mapbox://styles/mapbox/dark-v9"
+        )
 
         assert isinstance(choropleth3d_chart.chart, PanelDeck)
 

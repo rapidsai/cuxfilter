@@ -23,7 +23,7 @@ class TestBaseStackedLine:
         assert bsl.y == ["val"]
         assert bsl.data_points == 100
         assert bsl.add_interaction is True
-        assert bsl._stride is None
+        assert bsl.stride is None
         assert bsl.stride_type == int
         assert bsl.height == 400
         assert bsl.width == 800
