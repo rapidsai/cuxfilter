@@ -156,14 +156,6 @@ class TestBaseAggregateChart:
         bb.add_reset_event(self.dashboard)
         assert self.result.__name__ == "reset_callback"
 
-    @pytest.mark.parametrize(
-        "stride, _stride", [(1, 1), (None, None), (0.01, 0.01)]
-    )
-    def test_stride(self, stride, _stride):
-        bac = BaseAggregateChart(x="test_x")
-        bac.stride = stride
-        assert bac._stride == _stride
-
     def test_label_mappers(self):
         bac = BaseAggregateChart(x="test_x")
         library_specific_params = {

@@ -28,7 +28,7 @@ class TestCoreNonAggregateChart:
         assert bnac.source_backup is None
         assert bnac.data_points == 0
         assert bnac._library_specific_params == {}
-        assert bnac._stride is None
+        assert bnac.stride is None
         assert bnac.stride_type == int
         assert bnac.min_value == 0.0
         assert bnac.max_value == 0.0
@@ -47,14 +47,6 @@ class TestCoreNonAggregateChart:
         assert bnac.x_range is None
         assert bnac.y_range is None
         assert bnac.aggregate_col is None
-
-    @pytest.mark.parametrize(
-        "stride, _stride", [(1, 1), (None, None), (0.01, 0.01)]
-    )
-    def test_stride(self, stride, _stride):
-        bnac = BaseNonAggregate()
-        bnac.stride = stride
-        assert bnac._stride == _stride
 
     def test_label_mappers(self):
         bnac = BaseNonAggregate()

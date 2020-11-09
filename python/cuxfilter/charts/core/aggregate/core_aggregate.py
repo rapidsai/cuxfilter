@@ -23,6 +23,8 @@ class BaseAggregateChart(BaseChart):
     use_data_tiles = True
     custom_binning = False
     datatile_active_color = DATATILE_ACTIVE_COLOR
+    stride = None
+    data_points = None
 
     @property
     def datatile_loaded_state(self):
