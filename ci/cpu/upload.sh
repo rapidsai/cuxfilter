@@ -28,7 +28,7 @@ fi
 ################################################################################
 
 gpuci_logger "Get conda file output locations"
-export CUXFILTER_FILE=`gpuci_conda_retry build conda/recipes/cuxfilter --python=$PYTHON --output`
+export CUXFILTER_FILE=`conda build conda/recipes/cuxfilter --python=$PYTHON --output`
 
 ################################################################################
 # UPLOAD - Conda packages
@@ -43,5 +43,5 @@ if [ "$UPLOAD_CUXFILTER" == "1" ]; then
   test -e ${CUXFILTER_FILE}
   echo "Upload cuXfilter"
   echo ${CUXFILTER_FILE}
-  anaconda -t ${MY_UPLOAD_KEY} upload -u ${CONDA_USERNAME:-rapidsai} ${LABEL_OPTION} --skip-existing ${CUXFILTER_FILE}
+  gpuci_retry anaconda -t ${MY_UPLOAD_KEY} upload -u ${CONDA_USERNAME:-rapidsai} ${LABEL_OPTION} --skip-existing ${CUXFILTER_FILE}
 fi
