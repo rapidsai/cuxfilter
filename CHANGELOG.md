@@ -8,6 +8,7 @@
 - PR #209 remove deprecated cudf methods- `to_gpu_matrix`, `add_column` and groupby parameter `method`
 - PR #212 remove redundant docs folders and files, removed bloated notebooks
 - PR #214 fix map_style in choropleths, and fix custom_binning param issue in core_aggregate charts
+- PR #216 fix dashboard._get_server preventing the dashboard function error for panel>=0.10.0
 
 # cuXfilter 0.16.0 (Date TBD)
 
