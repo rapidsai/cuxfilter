@@ -365,14 +365,14 @@ class DashBoard:
         **kwargs,
     ):
         return get_server(
-            self._dashboard.generate_dashboard(
+            panel=self._dashboard.generate_dashboard(
                 self.title, self._charts, self._theme
             ),
-            port,
-            websocket_origin,
-            loop,
-            show,
-            start,
+            port=port,
+            websocket_origin=websocket_origin,
+            loop=loop,
+            show=show,
+            start=start,
             title=self.title,
             **kwargs,
         )
