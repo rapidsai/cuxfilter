@@ -18,7 +18,7 @@
 - PR #214 fix map_style in choropleths, and fix custom_binning param issue in core_aggregate charts
 - PR #216 fix dashboard._get_server preventing the dashboard function error for panel>=0.10.0
 - PR #217 pin open-ended dependency versions
-# cuXfilter 0.16.0 (Date TBD)
+# cuXfilter 0.16.0 (21 Oct 2020)
 
 ## New Features
 - PR #177 Add support for lasso selections
