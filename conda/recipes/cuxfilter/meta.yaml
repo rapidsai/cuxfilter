@@ -28,18 +28,18 @@ requirements:
     - cuspatial {{ minor_version }}
     - dask-cudf {{ minor_version }}
     - dask-cuda {{ minor_version }}
-    - datashader >=0.11.1
+    - datashader >=0.11.1, <0.12
     - numba >=0.51.2
-    - cupy  >=6*
-    - panel >=0.9.*
-    - bokeh >=2.1.1
-    - pyproj  >=2.4.*
-    - geopandas >=0.6.*
+    - cupy  >7.1.0,<9.0.0a0
+    - panel>=0.9.1, <=0.9.7
+    - bokeh >=2.1.1,<=2.2.3
+    - pyproj >=2.4, <=2.6.1.post1
+    - geopandas >=0.6, <=0.8.1
     - nodejs
     - libwebp
-    - pyppeteer
+    - pyppeteer <=0.2.2
     - jupyter-server-proxy
-    - pydeck >=0.3.*
+    - pydeck >=0.3, <=0.5.0
 
 test:
   requires:

@@ -72,9 +72,9 @@ def _create_app(
 
     server_id = uuid.uuid4().hex
     server = get_server(
-        panel_obj,
-        port,
-        notebook_url.netloc,
+        panel=panel_obj,
+        port=port,
+        websocket_origin=notebook_url.netloc,
         start=True,
         show=False,
         server_id=server_id,
