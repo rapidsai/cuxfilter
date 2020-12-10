@@ -1,4 +1,4 @@
-# cuXfilter 0.17.0 (Date TBD)
+# cuXfilter 0.17.0 (10 Dec 2020)
 
 ## New Features
 - PR #208 Adds support for new dtype - datetime for all chart types except choropleths, Added new chart widget type - DateRangeSlider
