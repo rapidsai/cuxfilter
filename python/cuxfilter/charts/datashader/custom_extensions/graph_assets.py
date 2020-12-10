@@ -3,6 +3,8 @@ import cudf
 from numba import cuda
 from math import sqrt, ceil
 
+from ....assets import datetime as dt
+
 
 def cuda_args(shape):
     """
@@ -193,8 +195,8 @@ def curved_connect_edges(
     # Make sure no control points are added for rows with source==destination
     fin_df_ = fin_df_.query(edge_source + "!=" + edge_target)
     compute_curves[cuda_args(fin_df_.shape[0])](
-        fin_df_[connected_edge_columns].to_gpu_matrix(),
-        fin_df_[["ctrl_point_x", "ctrl_point_y"]].to_gpu_matrix(),
+        fin_df_[connected_edge_columns].as_gpu_matrix(),
+        fin_df_[["ctrl_point_x", "ctrl_point_y"]].as_gpu_matrix(),
         result,
         steps,
     )
@@ -244,7 +246,7 @@ def directly_connect_edges(edges):
     result = cp.zeros(
         shape=(edges.shape[0], edges.shape[1] - 2, 3), dtype=cp.float32
     )
-    connect_edges[cuda_args(edges.shape[0])](edges.to_gpu_matrix(), result)
+    connect_edges[cuda_args(edges.shape[0])](edges.as_gpu_matrix(), result)
     if edges.shape[1] == 5:
         return cudf.DataFrame(
             {
@@ -268,6 +270,8 @@ def calc_connected_edges(
     edge_source,
     edge_target,
     edge_aggregate_col,
+    node_x_dtype,
+    node_y_dtype,
     edge_render_type="direct",
     curve_params=None,
 ):
@@ -298,6 +302,9 @@ def calc_connected_edges(
         connected_edge_columns.remove(None)
 
     nodes = nodes[[node_id, node_x, node_y]].drop_duplicates()
+
+    nodes[node_x] = dt.to_int64_if_datetime(nodes[node_x], node_x_dtype)
+    nodes[node_y] = dt.to_int64_if_datetime(nodes[node_y], node_y_dtype)
 
     connected_edges_df = edges.merge(
         nodes, left_on=edge_source, right_on=node_id

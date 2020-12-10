@@ -1,3 +1,17 @@
+# cuXfilter 0.17.0 (10 Dec 2020)
+
+## New Features
+- PR #208 Adds support for new dtype - datetime for all chart types except choropleths, Added new chart widget type - DateRangeSlider
+## Improvements
+- PR #208 refactor - merged BaseLine and BaseBar to BaseAggregate
+- PR #215 cleand up gpuCI scripts
+## Bug Fixes
+- PR #209 remove deprecated cudf methods- `to_gpu_matrix`, `add_column` and groupby parameter `method`
+- PR #212 remove redundant docs folders and files, removed bloated notebooks
+- PR #214 fix map_style in choropleths, and fix custom_binning param issue in core_aggregate charts
+- PR #216 fix dashboard._get_server preventing the dashboard function error for panel>=0.10.0
+- PR #217 pin open-ended dependency versions
+
 # cuXfilter 0.16.0 (21 Oct 2020)
 
 ## New Features

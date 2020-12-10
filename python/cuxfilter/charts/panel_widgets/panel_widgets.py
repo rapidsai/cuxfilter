@@ -1,18 +1,20 @@
 from .plots import (
     RangeSlider,
+    DateRangeSlider,
     IntSlider,
     FloatSlider,
     DropDown,
     MultiSelect,
     DataSizeIndicator,
 )
+from ..constants import CUDF_TIMEDELTA_TYPE
 
 
 def range_slider(
     x,
     width=400,
     height=20,
-    data_points=100,
+    data_points=None,
     step_size=None,
     step_size_type=int,
     **params,
@@ -33,7 +35,9 @@ def range_slider(
 
     height: int,  default 20
 
-    data_points: int,  default 100
+    data_points: int,  default None
+        when None, it means no custom number of bins are provided and
+        data_points will default to df[self.x].nunique()
 
     step_size: int,  default 1
 
@@ -52,8 +56,51 @@ def range_slider(
     return plot
 
 
+def date_range_slider(
+    x, width=400, height=20, data_points=None, **params,
+):
+    """
+
+    Widget in the navbar of the cuxfilter dashboard.
+
+    Type: Range Slider
+
+    Parameters
+    ----------
+
+    x: str
+        column name from gpu dataframe
+
+    width: int,  default 400
+
+    height: int,  default 20
+
+    data_points: int,  default None
+        when None, it means no custom number of bins are provided and
+        data_points will default to df[self.x].nunique()
+
+    step_size: np.timedelta64, default np.timedelta64(days=1)
+
+    **params:
+        additional arguments to be passed to the function. See bokeh
+        DateRangeSlider documentation for more info
+
+    """
+    plot = DateRangeSlider(
+        x,
+        width,
+        height,
+        data_points,
+        step_size=None,
+        step_size_type=CUDF_TIMEDELTA_TYPE,
+        **params,
+    )
+    plot.chart_type = "widget_date_range_slider"
+    return plot
+
+
 def int_slider(
-    x, width=400, height=40, data_points=100, step_size=1, **params
+    x, width=400, height=40, data_points=None, step_size=1, **params
 ):
     """
 
@@ -71,7 +118,9 @@ def int_slider(
 
     height: int,  default 40
 
-    data_points: int,  default 100
+    data_points: int,  default None
+        when None, it means no custom number of bins are provided and
+        data_points will default to df[self.x].nunique()
 
     step_size: int,  default 1
 
@@ -89,7 +138,7 @@ def int_slider(
 
 
 def float_slider(
-    x, width=400, height=40, data_points=100, step_size=None, **params
+    x, width=400, height=40, data_points=None, step_size=None, **params
 ):
     """
 
@@ -107,7 +156,9 @@ def float_slider(
 
     height: int,  default 40
 
-    data_points: int,  default 100
+    data_points: int,  default None
+        when None, it means no custom number of bins are provided and
+        data_points will default to df[self.x].nunique()
 
     step_size: float,  default float((max - min)/datapoints)
 

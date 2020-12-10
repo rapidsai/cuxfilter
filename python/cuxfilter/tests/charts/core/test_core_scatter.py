@@ -1,6 +1,7 @@
 import pytest
 
 from cuxfilter.charts.core.non_aggregate.core_scatter import BaseScatter
+from cuxfilter.charts import constants
 
 pytest
 
@@ -16,7 +17,7 @@ class TestBaseScatter:
         assert bs.x_range is None
         assert bs.y_range is None
         assert bs.add_interaction is True
-        assert bs.color_palette is None
+        assert bs.color_palette == constants.CUXF_DEFAULT_COLOR_PALETTE
         assert bs.aggregate_col == "test_agg_col"
         assert bs.aggregate_fn == "count"
         assert bs.point_size == 1

@@ -57,31 +57,46 @@ class TestNonAggregateBaseLine:
         bl.max_value = self.dashboard._cuxfilter_df.data[bl.x].max()
         if bl.data_points > self.dashboard._cuxfilter_df.data[bl.x].shape[0]:
             bl.data_points = self.dashboard._cuxfilter_df.data[bl.x].shape[0]
+        bl.compute_stride()
         bl.add_range_slider_filter(self.dashboard)
 
-        assert type(bl.filter_widget) == pn.widgets.RangeSlider
+        assert isinstance(bl.filter_widget, pn.widgets.RangeSlider)
         assert bl.filter_widget.value == (0, 4)
 
     @pytest.mark.parametrize(
-        "range, query", [((3, 4), "3<=key<=4"), ((0, 0), "0<=key<=0")]
+        "range, query, local_dict",
+        [
+            (
+                (3, 4),
+                "@key_min <= key <= @key_max",
+                {"key_min": 3, "key_max": 4},
+            ),
+            (
+                (0, 0),
+                "@key_min <= key <= @key_max",
+                {"key_min": 0, "key_max": 0},
+            ),
+        ],
     )
-    def test_compute_query_dict(self, range, query):
-        bl = BaseLine(x="key", y="val")
-        bl.chart_type = "non_aggregate_line"
-        bl.min_value = self.dashboard._cuxfilter_df.data[bl.x].min()
-        bl.max_value = self.dashboard._cuxfilter_df.data[bl.x].max()
-        bl.stride = 1
-        if bl.data_points > self.dashboard._cuxfilter_df.data[bl.x].shape[0]:
-            bl.data_points = self.dashboard._cuxfilter_df.data[bl.x].shape[0]
-        bl.add_range_slider_filter(self.dashboard)
-        self.dashboard.add_charts([bl])
-        bl.filter_widget.value = range
+    def test_compute_query_dict(self, range, query, local_dict):
+        bb = BaseLine(x="key", y="val")
+        bb.chart_type = "non_aggregate_line"
+        self.dashboard.add_charts([bb])
+        bb.filter_widget.value = range
         # test the following function behavior
-        bl.compute_query_dict(self.dashboard._query_str_dict)
+        bb.compute_query_dict(
+            self.dashboard._query_str_dict,
+            self.dashboard._query_local_variables_dict,
+        )
 
         assert (
             self.dashboard._query_str_dict["key_non_aggregate_line"] == query
         )
+        for key in local_dict:
+            assert (
+                self.dashboard._query_local_variables_dict[key]
+                == local_dict[key]
+            )
 
     @pytest.mark.parametrize(
         "event, result", [(None, None), (ButtonClick, "func_Called")]

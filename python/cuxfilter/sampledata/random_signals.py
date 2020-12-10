@@ -1,20 +1,18 @@
 import pandas as pd
 import numpy as np
 import cudf
+import datetime
 
 # Constants
 np.random.seed(2)
 # Number of points
-n = 10000000
+n = 10000
 # Column names of samples
 cols = list("abcdefg")
 # Start time
-start = 1456297053
-# End time
-end = start + 60 * 60 * 24
+start = datetime.datetime(2010, 10, 1, 0)
 
 # Generate a fake signal
-time = np.linspace(start, end, n)
 signal = np.random.normal(0, 0.3, size=n).cumsum() + 50
 
 
@@ -40,9 +38,7 @@ data["z"] = signal
 locs = np.random.choice(n, 10)
 data["a"][locs] *= 2
 
-# Default plot ranges:
-x_range = (start, end)
-y_range = (1.2 * signal.min(), 1.2 * signal.max())
+data["Time"] = [start + datetime.timedelta(minutes=1) * i for i in range(n)]
+
 # Create a dataframe
-data["Time"] = np.linspace(start, end, n)
 df = cudf.DataFrame.from_pandas(pd.DataFrame(data))

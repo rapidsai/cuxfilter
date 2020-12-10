@@ -19,7 +19,7 @@ class TestBaseChart:
         assert bc.source_backup is None
         assert bc.data_points == 0
         assert bc._library_specific_params == {}
-        assert bc._stride is None
+        assert bc.stride is None
         assert bc.stride_type == int
         assert bc.min_value == 0.0
         assert bc.max_value == 0.0
@@ -30,14 +30,6 @@ class TestBaseChart:
         bc.chart_type = "test_chart_type"
 
         assert bc.name == "test_x_test_chart_type"
-
-    @pytest.mark.parametrize(
-        "stride, _stride", [(1, 1), (None, None), (0.01, 0.01)]
-    )
-    def test_stride(self, stride, _stride):
-        bc = BaseChart()
-        bc.stride = stride
-        assert bc._stride == _stride
 
     def test_set_dimensions(self):
         bc = BaseChart()

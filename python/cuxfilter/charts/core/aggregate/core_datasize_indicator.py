@@ -1,8 +1,8 @@
-from .core_aggregate import BaseAggregateChart
+from ..core_chart import BaseChart
 from ....layouts import chart_view
 
 
-class BaseDataSizeIndicator(BaseAggregateChart):
+class BaseDataSizeIndicator(BaseChart):
     x: str = ""
     use_data_tiles = True
 

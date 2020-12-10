@@ -23,7 +23,9 @@ def bar(
         x-axis column name from the gpu dataframe
     y: str, default None
         y-axis column name from the gpu dataframe
-    data_points: int,  default 100
+    data_points: int,  default None
+        when None, it means no custom number of bins are provided and
+        data_points will default to df[self.x].nunique()
 
     add_interaction: {True, False},  default True
 
@@ -102,7 +104,9 @@ def line(
         x-axis column name from the gpu dataframe
     y: str, default None
         y-axis column name from the gpu dataframe
-    data_points: int,  default 100
+    data_points: int,  default None
+        when None, it means no custom number of bins are provided and
+        data_points will default to df[self.x].nunique()
 
     add_interaction: {True, False},  default True
 

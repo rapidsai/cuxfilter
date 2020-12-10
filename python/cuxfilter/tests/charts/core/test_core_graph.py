@@ -146,13 +146,23 @@ class TestCoreGraph:
             assert pip.called
 
     @pytest.mark.parametrize(
-        "x_range, y_range, query",
+        "x_range, y_range, query, local_dict",
         [
-            ((1, 2), (3, 4), "1<=x <= 2 and 3<=y <= 4"),
-            ((0, 2), (3, 5), "0<=x <= 2 and 3<=y <= 5"),
+            (
+                (1, 2),
+                (3, 4),
+                "@x_min<=x<=@x_max and @y_min<=y<=@y_max",
+                {"x_min": 1, "x_max": 2, "y_min": 3, "y_max": 4},
+            ),
+            (
+                (0, 2),
+                (3, 5),
+                "@x_min<=x<=@x_max and @y_min<=y<=@y_max",
+                {"x_min": 0, "x_max": 2, "y_min": 3, "y_max": 5},
+            ),
         ],
     )
-    def test_compute_query_dict(self, x_range, y_range, query):
+    def test_compute_query_dict(self, x_range, y_range, query, local_dict):
         bg = BaseGraph()
         bg.chart_type = "test"
         bg.x_range = x_range
@@ -161,8 +171,14 @@ class TestCoreGraph:
         df = cudf.DataFrame({"x": [1, 2, 2], "y": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
-        bg.compute_query_dict(dashboard._query_str_dict)
+        bg.compute_query_dict(
+            dashboard._query_str_dict, dashboard._query_local_variables_dict
+        )
         assert dashboard._query_str_dict["x_test"] == query
+        for key in local_dict:
+            assert (
+                dashboard._query_local_variables_dict[key] == local_dict[key]
+            )
 
     @pytest.mark.parametrize(
         "add_interaction, reset_event, event_1, event_2",

@@ -20,9 +20,7 @@ def test_calc_cumsum_data_tile():
     min_s = int(df["val"].max() - df["val"].min()) + 1
     df["val_mod"] = ((df["val"] - df["val"].min()) / 1).round().astype("int32")
     groupby_as_ndarray = cuda.to_device(
-        df.groupby(
-            by=["key", "val_mod"], method="hash", sort=True, as_index=False
-        )
+        df.groupby(by=["key", "val_mod"], sort=True, as_index=False)
         .agg({"val": "count"})
         .to_pandas()
         .values.astype(float)
@@ -120,9 +118,8 @@ def test_calc_cumsum_data_tile():
     ],
 )
 def test_format_result(result, return_format_str, return_format):
-    assert (
-        type(gpu_datatile.format_result(result, return_format_str))
-        == return_format
+    assert isinstance(
+        gpu_datatile.format_result(result, return_format_str), return_format
     )
 
 

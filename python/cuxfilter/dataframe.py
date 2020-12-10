@@ -49,7 +49,7 @@ class DataFrame:
             )
 
         """
-        if type(dataframe_location) == str:
+        if isinstance(dataframe_location, str):
             df = cudf.DataFrame.from_arrow(read_arrow(dataframe_location))
         else:
             df = cudf.DataFrame.from_arrow(dataframe_location)

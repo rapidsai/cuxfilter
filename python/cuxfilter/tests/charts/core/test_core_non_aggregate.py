@@ -28,7 +28,7 @@ class TestCoreNonAggregateChart:
         assert bnac.source_backup is None
         assert bnac.data_points == 0
         assert bnac._library_specific_params == {}
-        assert bnac._stride is None
+        assert bnac.stride is None
         assert bnac.stride_type == int
         assert bnac.min_value == 0.0
         assert bnac.max_value == 0.0
@@ -47,14 +47,6 @@ class TestCoreNonAggregateChart:
         assert bnac.x_range is None
         assert bnac.y_range is None
         assert bnac.aggregate_col is None
-
-    @pytest.mark.parametrize(
-        "stride, _stride", [(1, 1), (None, None), (0.01, 0.01)]
-    )
-    def test_stride(self, stride, _stride):
-        bnac = BaseNonAggregate()
-        bnac.stride = stride
-        assert bnac._stride == _stride
 
     def test_label_mappers(self):
         bnac = BaseNonAggregate()
@@ -87,7 +79,7 @@ class TestCoreNonAggregateChart:
         )
         assert callable(type(bnac.get_selection_geometry_callback(dashboard)))
 
-    def test_box_election_callback(self):
+    def test_box_selection_callback(self):
         bnac = BaseNonAggregate()
         bnac.x = "a"
         bnac.y = "b"
@@ -163,26 +155,42 @@ class TestCoreNonAggregateChart:
         assert self.result.equals(_data)
 
     @pytest.mark.parametrize(
-        "x_range, y_range, query",
+        "x_range, y_range, query, local_dict",
         [
-            ((1, 2), (3, 4), "1<=a <= 2 and 3<=b <= 4"),
-            ((0, 2), (3, 5), "0<=a <= 2 and 3<=b <= 5"),
+            (
+                (1, 2),
+                (3, 4),
+                "@x_min<=x<=@x_max and @y_min<=y<=@y_max",
+                {"x_min": 1, "x_max": 2, "y_min": 3, "y_max": 4},
+            ),
+            (
+                (0, 2),
+                (3, 5),
+                "@x_min<=x<=@x_max and @y_min<=y<=@y_max",
+                {"x_min": 0, "x_max": 2, "y_min": 3, "y_max": 5},
+            ),
         ],
     )
-    def test_compute_query_dict(self, x_range, y_range, query):
+    def test_compute_query_dict(self, x_range, y_range, query, local_dict):
         bnac = BaseNonAggregate()
         bnac.chart_type = "test"
-        bnac.x = "a"
-        bnac.y = "b"
+        bnac.x = "x"
+        bnac.y = "y"
         bnac.x_range = x_range
         bnac.y_range = y_range
 
-        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
+        df = cudf.DataFrame({"x": [1, 2, 2], "y": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
-        bnac.compute_query_dict(dashboard._query_str_dict)
+        bnac.compute_query_dict(
+            dashboard._query_str_dict, dashboard._query_local_variables_dict
+        )
 
-        assert dashboard._query_str_dict["a_test"] == query
+        assert dashboard._query_str_dict["x_test"] == query
+        for key in local_dict:
+            assert (
+                dashboard._query_local_variables_dict[key] == local_dict[key]
+            )
 
     @pytest.mark.parametrize(
         "add_interaction, reset_event, event_1, event_2",

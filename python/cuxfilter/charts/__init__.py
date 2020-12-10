@@ -9,6 +9,7 @@ from .deckgl import choropleth
 from .panel_widgets import (
     range_slider,
     int_slider,
+    date_range_slider,
     float_slider,
     multi_select,
     drop_down,

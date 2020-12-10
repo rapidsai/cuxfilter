@@ -39,7 +39,7 @@ class Choropleth(BaseChoropleth):
 
     deck_spec = {
         "mapboxApiAccessToken": "",
-        "mapStyle": "",
+        "map_style": "",
         "initialViewState": {
             "latitude": 38.212288,
             "longitude": -107.101581,
@@ -141,9 +141,9 @@ class Choropleth(BaseChoropleth):
             ]
 
         if self.elevation_column is not None:
-            self.layer_spec["getElevation"] = "{}*{}".format(
-                self.elevation_column, self.elevation_factor
-            )
+            self.layer_spec[
+                "getElevation"
+            ] = f"{self.elevation_column}*{self.elevation_factor}"
 
         self.deck_spec["initialViewState"]["latitude"] = self.get_mean(
             self.library_specific_params["y_range"]
@@ -152,9 +152,7 @@ class Choropleth(BaseChoropleth):
             self.library_specific_params["x_range"]
         )
         self.deck_spec["mapboxApiAccessToken"] = self.mapbox_api_key
-        self.deck_spec["mapStyle"] = "mapbox://styles/mapbox/{}-v9".format(
-            self.map_style
-        )
+        self.deck_spec["map_style"] = self.map_style
 
         self.deck_spec["layers"] = [self.layer_spec]
 
@@ -242,3 +240,5 @@ class Choropleth(BaseChoropleth):
                 "color_palette"
             ]
             self.compute_colors()
+        if self.map_style is None:
+            self.chart._deck.map_style = properties_dict["map_style"]

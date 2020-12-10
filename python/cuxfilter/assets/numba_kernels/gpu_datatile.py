@@ -79,14 +79,14 @@ def calc_data_tile_for_size(
     df[col_1 + "_mod"] = (
         ((df[col_1] - min_1) / stride_1).round().astype("int32")
     )
-    if type(df) == dask_cudf.core.DataFrame:
+    if isinstance(df, dask_cudf.core.DataFrame):
         groupby_result = getattr(
             df[[col_1 + "_mod", col_1]].groupby(col_1 + "_mod"), "count"
         )().compute()
     else:
         groupby_result = (
             df[[col_1 + "_mod"]]
-            .groupby(col_1 + "_mod", method="hash", as_index=True)
+            .groupby(col_1 + "_mod", as_index=True)
             .agg({col_1 + "_mod": "count"})
         )
 
@@ -172,7 +172,7 @@ def calc_data_tile(
     groupby_results = []
     for i in aggregate_dict[key]:
         agg = {key: i}
-        if type(df) == dask_cudf.core.DataFrame:
+        if isinstance(df, dask_cudf.core.DataFrame):
             temp_df = getattr(
                 df[check_list + [key]].groupby(check_list, sort=False), i
             )()
@@ -180,9 +180,7 @@ def calc_data_tile(
             groupby_results.append(temp_df)
         else:
             groupby_results.append(
-                df.groupby(
-                    check_list, method="hash", sort=False, as_index=False
-                ).agg(agg)
+                df.groupby(check_list, sort=False, as_index=False).agg(agg)
             )
 
     del df

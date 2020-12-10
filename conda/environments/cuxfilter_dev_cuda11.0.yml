@@ -7,20 +7,20 @@ channels:
 - anaconda
 dependencies:
 - cupy>7.1.0,<9.0.0a0
-- cuspatial>=0.15
+- cuspatial=0.17
 - python>=3.6,<3.8
-- cudf=0.16
+- cudf=0.17
 - dask>=2.12.0
 - distributed>=2.12.0
-- dask-cuda=0.16
-- dask-cudf=0.16
-- datashader>=0.11.1, <0.12
+- dask-cuda=0.17
+- dask-cudf=0.17
+- datashader>=0.11.1
 - numba>=0.51.2
 - geopandas>=0.6, <=0.8.1
 - pyproj>=2.4, <=2.6.1.post1
 - libwebp
 - pandoc=<2.0.0
-- bokeh>=2.1.1, <=2.2.3
+- bokeh>=2.1.1,<=2.2.3
 - panel>=0.9.1, <=0.9.7
 - cudatoolkit=11.0
 - nodejs
