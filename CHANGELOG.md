@@ -12,6 +12,7 @@
 - PR #208 Adds support for new dtype - datetime for all chart types except choropleths, Added new chart widget type - DateRangeSlider
 ## Improvements
 - PR #208 refactor - merged BaseLine and BaseBar to BaseAggregate
+- PR #215 cleand up gpuCI scripts
 ## Bug Fixes
 - PR #209 remove deprecated cudf methods- `to_gpu_matrix`, `add_column` and groupby parameter `method`
 - PR #212 remove redundant docs folders and files, removed bloated notebooks
