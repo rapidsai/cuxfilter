@@ -66,6 +66,8 @@ conda install "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
 # https://docs.rapids.ai/maintainers/depmgmt/ 
 # conda remove -f rapids-build-env rapids-notebook-env
 # conda install "your-pkg=1.0.0"
+gpuci_conda_retry remove --force rapids-build-env rapids-notebook-env
+gpuci_conda_retry install "libgcc-ng=9.3.0" "libstdcxx-ng=9.3.0" "libgfortran-ng=9.3.0"
 
 gpuci_logger "Check versions"
 python --version
