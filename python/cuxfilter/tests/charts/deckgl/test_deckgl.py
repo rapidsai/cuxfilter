@@ -93,4 +93,4 @@ class TestDeckGL:
 
         assert choropleth3d_chart.chart.multi_select is False
 
-        assert choropleth3d_chart.chart.sizing_mode == "scale_both"
+        assert choropleth3d_chart.chart.sizing_mode == "stretch_both"

@@ -50,7 +50,7 @@ class TestViewDataFrame:
                 },
             )
         )
-        assert vd.chart.sizing_mode == "scale_both"
+        assert vd.chart.sizing_mode == "stretch_both"
         assert vd.columns == list(self.df.columns)
 
     @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
@@ -58,7 +58,9 @@ class TestViewDataFrame:
         vd = ViewDataFrame()
         vd.chart = chart
 
-        assert str(vd.view()) == str(chart_view(_chart, width=vd.width))
+        assert str(vd.view()) == str(
+            chart_view(_chart, width=vd.width, title="Dataset View")
+        )
 
     @pytest.mark.parametrize("drop_duplicates", [True, False])
     def test_reload_chart(self, drop_duplicates):
