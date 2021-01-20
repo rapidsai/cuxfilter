@@ -24,7 +24,7 @@ NOTEBOOK_DIV = """
 
 
 def bokeh_notebook_div(image):
-    """"
+    """ "
     Generates an HTML div to embed in the notebook.
 
     Parameters
@@ -110,7 +110,10 @@ class InteractiveImage(object):
 
         """
         return CustomJS(
-            args=dict(hidden_chart=self.hidden_chart, __timeout=self.timeout,),
+            args=dict(
+                hidden_chart=self.hidden_chart,
+                __timeout=self.timeout,
+            ),
             code=js_code,
         )
 

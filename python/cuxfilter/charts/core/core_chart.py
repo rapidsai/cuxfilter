@@ -224,8 +224,7 @@ class BaseChart:
         return -1
 
     def format_source_data(self, source_dict, patch_update=False):
-        """
-        """
+        """"""
         # print('function to be overridden by library specific extensions')
         return -1
 
@@ -234,7 +233,6 @@ class BaseChart:
         return []
 
     def apply_mappers(self):
-        """
-        """
+        """"""
         # print('function to be overridden by library specific extensions')
         return -1

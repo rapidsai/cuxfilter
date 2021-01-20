@@ -8,7 +8,7 @@ from bokeh.models import ColumnDataSource
 
 class Bar(BaseAggregateChart):
     """
-        Description:
+    Description:
     """
 
     reset_event = events.Reset
@@ -236,7 +236,7 @@ class Bar(BaseAggregateChart):
 
 class Line(BaseAggregateChart):
     """
-        Description:
+    Description:
     """
 
     reset_event = events.Reset

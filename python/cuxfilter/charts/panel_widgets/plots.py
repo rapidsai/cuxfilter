@@ -639,7 +639,7 @@ class MultiSelect(BaseWidget):
 
 class DataSizeIndicator(BaseDataSizeIndicator):
     """
-        Description:
+    Description:
     """
 
     css = """
