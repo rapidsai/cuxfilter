@@ -188,8 +188,7 @@ class ViewDataFrame:
         if len(query) > 0:
             final_query += " and " + query
         self.reload_chart(
-            data.query(final_query),
-            False,
+            data.query(final_query), False,
         )
 
     def query_chart_by_indices(

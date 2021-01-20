@@ -79,20 +79,14 @@ def _compute_datashader_assets(
 
     if isinstance(data[x].dtype, cudf.core.dtypes.CategoricalDtype):
         if ds_version >= "0.11":
-            aggregator = ds.by(
-                x,
-                getattr(ds, aggregate_fn)(aggregate_col),
-            )
+            aggregator = ds.by(x, getattr(ds, aggregate_fn)(aggregate_col),)
         else:
             print("only count_cat supported by datashader <=0.10")
             aggregator = ds.count_cat(x)
         cmap = {
             "color_key": {
                 k: v
-                for k, v in zip(
-                    list(data[x].cat.categories),
-                    color_palette,
-                )
+                for k, v in zip(list(data[x].cat.categories), color_palette,)
             }
         }
     else:
@@ -228,12 +222,7 @@ class Scatter(BaseScatter):
                 self.aggregate_fn,
                 self.color_palette,
             )
-            agg = cvs.points(
-                dd,
-                self.x,
-                self.y,
-                aggregator,
-            )
+            agg = cvs.points(dd, self.x, self.y, aggregator,)
 
             if self.constant_limit is None or self.aggregate_fn == "count":
                 self.constant_limit = [

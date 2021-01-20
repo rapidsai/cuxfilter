@@ -33,14 +33,8 @@ test_arr3 = [
 @pytest.mark.parametrize(
     "custom_binning, result",
     [
-        (
-            True,
-            np.array([[0, 1, 2, 3, 7, 8], [100, 150, 300, 100, 50, 150]]),
-        ),
-        (
-            False,
-            np.array([test_arr1, test_arr2]),
-        ),
+        (True, np.array([[0, 1, 2, 3, 7, 8], [100, 150, 300, 100, 50, 150]]),),
+        (False, np.array([test_arr1, test_arr2]),),
     ],
 )
 def test_calc_value_counts(custom_binning, result):

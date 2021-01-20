@@ -57,10 +57,7 @@ def _create_dashboard_url(notebook_url: str, port: int, service_proxy=None):
 
 
 def _create_app(
-    panel_obj,
-    notebook_url=DEFAULT_NOTEBOOK_URL,
-    port=0,
-    service_proxy=None,
+    panel_obj, notebook_url=DEFAULT_NOTEBOOK_URL, port=0, service_proxy=None,
 ):
     """
     Displays a bokeh server app inline in the notebook.
