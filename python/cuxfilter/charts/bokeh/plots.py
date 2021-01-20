@@ -280,7 +280,6 @@ class Line(BaseAggregateChart):
         generate chart
         """
         self.chart = figure(
-            # title=self.title,
             x_range=(
                 self.source.data[self.data_x_axis]
                 if self.x_dtype == "object"
