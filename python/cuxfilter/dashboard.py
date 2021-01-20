@@ -9,7 +9,7 @@ import urllib
 
 from .charts.core import BaseChart, BaseWidget, ViewDataFrame
 from .datatile import DataTile
-from .layouts import single_feature
+from .layouts import single_feature, STATIC_DIR
 from .charts.panel_widgets import data_size_indicator
 from .assets import screengrab, get_open_port
 from .themes import light
@@ -72,9 +72,9 @@ def _create_app(
 
     server_id = uuid.uuid4().hex
     server = get_server(
-        panel_obj,
-        port,
-        notebook_url.netloc,
+        panel=panel_obj,
+        port=port,
+        websocket_origin=notebook_url.netloc,
         start=True,
         show=False,
         server_id=server_id,
@@ -130,6 +130,7 @@ class DashBoard:
     _notebook_url = DEFAULT_NOTEBOOK_URL
     # _current_server_type - show(separate tab)/ app(in-notebook)
     _current_server_type = "show"
+    _layout_array = None
     server = None
 
     def __init__(
@@ -141,6 +142,7 @@ class DashBoard:
         title="Dashboard",
         data_size_widget=True,
         warnings=False,
+        layout_array=None
     ):
         self._cuxfilter_df = dataframe
         self._charts = dict()
@@ -161,6 +163,7 @@ class DashBoard:
         self.title = title
         self._dashboard = layout()
         self._theme = theme
+        self._layout_array = layout_array
         # handle dashboard warnings
         if not warnings:
             u.log.disabled = True
@@ -335,7 +338,7 @@ class DashBoard:
 
     def __repr__(self):
         template_obj = self._dashboard.generate_dashboard(
-            self.title, self._charts, self._theme
+            self.title, self._charts, self._theme, self._layout_array
         )
         cls = "#### cuxfilter " + type(self).__name__
         spacer = "\n    "
@@ -364,9 +367,9 @@ class DashBoard:
         start=False,
         **kwargs,
     ):
-        return get_server(
+        server = get_server(
             panel=self._dashboard.generate_dashboard(
-                self.title, self._charts, self._theme
+                self.title, self._charts, self._theme, self._layout_array
             ),
             port=port,
             websocket_origin=websocket_origin,
@@ -374,8 +377,11 @@ class DashBoard:
             show=show,
             start=start,
             title=self.title,
+            static_dirs={'custom-react': STATIC_DIR},
             **kwargs,
         )
+        server_document(websocket_origin, resources=None)
+        return server
 
     async def preview(self):
         """
@@ -479,7 +485,7 @@ class DashBoard:
 
         self.server = _create_app(
             self._dashboard.generate_dashboard(
-                self.title, self._charts, self._theme
+                self.title, self._charts, self._theme, self._layout_array
             ),
             notebook_url=self._notebook_url,
             port=port,
