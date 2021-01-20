@@ -182,7 +182,9 @@ class BaseAggregateChart(BaseChart):
         self.add_events(dashboard_cls)
 
     def view(self):
-        return chart_view(self.chart, self.filter_widget, width=self.width)
+        return chart_view(
+            self.chart, self.filter_widget, width=self.width, title=self.title
+        )
 
     def calculate_source(self, data, patch_update=False):
         """
@@ -225,7 +227,8 @@ class BaseAggregateChart(BaseChart):
             if len(self.x_label_map) == 0:
                 temp_mapper_index = np.array(df[0])
                 temp_mapper_value = np.round(
-                    (temp_mapper_index * self.stride) + self.min_value, 4,
+                    (temp_mapper_index * self.stride) + self.min_value,
+                    4,
                 ).astype("str")
                 temp_mapper_index = temp_mapper_index.astype("str")
                 self.x_label_map = dict(
@@ -554,7 +557,11 @@ class BaseAggregateChart(BaseChart):
         return datatile_result
 
     def query_chart_by_indices_for_minmax(
-        self, active_chart, old_indices, new_indices, datatile,
+        self,
+        active_chart,
+        old_indices,
+        new_indices,
+        datatile,
     ):
         """
         Description:
@@ -638,6 +645,9 @@ class BaseAggregateChart(BaseChart):
             )
         elif self.aggregate_fn in ["min", "max"]:
             datatile_result = self.query_chart_by_indices_for_minmax(
-                active_chart, old_indices, new_indices, datatile,
+                active_chart,
+                old_indices,
+                new_indices,
+                datatile,
             )
         self.reset_chart(datatile_result)

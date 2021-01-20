@@ -17,12 +17,10 @@ class _LayoutBase:
     _num_charts_pat = re.compile("roots.chart")
 
     def generate_dashboard(self, title, charts, theme, layout_array=None):
-        pn.config.sizing_mode = 'stretch_both'
+        pn.config.sizing_mode = "stretch_both"
         self._layout_array = layout_array
         if theme == cuxfilter.themes.dark or theme == cuxfilter.themes.rapids:
-            tmpl = ReactTemplate(
-                title=title, theme=DarkTheme, compact="both"
-            )
+            tmpl = ReactTemplate(title=title, theme=DarkTheme, compact="both")
         else:
             tmpl = ReactTemplate(title=title, compact="both")
 
@@ -51,13 +49,29 @@ class _LayoutBase:
             arr = np.array([arr])
         for i in range(arr.max()):
             if i < len(plots):
-                x0, y0 = np.array(
-                    [np.where(arr == i+1)[0][0], np.where(arr == i+1)[1][0]]
-                ) / np.array(arr.shape) * (6, 12)
-                x1, y1 = np.array(
-                    [np.where(arr == i+1)[0][-1] + 1, np.where(arr == i+1)[1][-1]+1]
-                ) / np.array(arr.shape) * (6, 12)
-                tmpl.main[int(x0):int(x1), int(y0):int(y1)] = plots[i].view()
+                x0, y0 = (
+                    np.array(
+                        [
+                            np.where(arr == i + 1)[0][0],
+                            np.where(arr == i + 1)[1][0],
+                        ]
+                    )
+                    / np.array(arr.shape)
+                    * (6, 12)
+                )
+                x1, y1 = (
+                    np.array(
+                        [
+                            np.where(arr == i + 1)[0][-1] + 1,
+                            np.where(arr == i + 1)[1][-1] + 1,
+                        ]
+                    )
+                    / np.array(arr.shape)
+                    * (6, 12)
+                )
+                tmpl.main[int(x0) : int(x1), int(y0) : int(y1)] = plots[
+                    i
+                ].view()
 
     def _process_plots(self, plots, tmpl):
         raise NotImplementedError()
@@ -160,10 +174,7 @@ class Layout7(_LayoutBase):
         [2  3  4]
         """
         if not self._layout_array:
-            self._layout_array = [
-                [1, 1, 1],
-                [2, 3, 4]
-            ]
+            self._layout_array = [[1, 1, 1], [2, 3, 4]]
         self._process_grid_matrix(plots, tmpl)
 
 
@@ -176,10 +187,7 @@ class Layout8(_LayoutBase):
         [2  3   4  5]
         """
         if not self._layout_array:
-            self._layout_array = [
-                [1, 1, 1, 1],
-                [2, 3, 4, 5]
-            ]
+            self._layout_array = [[1, 1, 1, 1], [2, 3, 4, 5]]
         self._process_grid_matrix(plots, tmpl)
 
 
@@ -193,11 +201,7 @@ class Layout9(_LayoutBase):
         [4  5  6]
         """
         if not self._layout_array:
-            self._layout_array = [
-                [1, 1, 2],
-                [1, 1, 3],
-                [4, 5, 6]
-            ]
+            self._layout_array = [[1, 1, 2], [1, 1, 3], [4, 5, 6]]
         self._process_grid_matrix(plots, tmpl)
 
 
@@ -210,10 +214,7 @@ class Layout10(_LayoutBase):
         [4  5  6]
         """
         if not self._layout_array:
-            self._layout_array = [
-                [1, 2, 3],
-                [4, 5, 6]
-            ]
+            self._layout_array = [[1, 2, 3], [4, 5, 6]]
         self._process_grid_matrix(plots, tmpl)
 
 
@@ -226,10 +227,7 @@ class Layout11(_LayoutBase):
         [3   4   5   6]
         """
         if not self._layout_array:
-            self._layout_array = [
-                [1, 1, 2, 2],
-                [3, 4, 5, 6]
-            ]
+            self._layout_array = [[1, 1, 2, 2], [3, 4, 5, 6]]
         self._process_grid_matrix(plots, tmpl)
 
 
@@ -243,9 +241,5 @@ class Layout12(_LayoutBase):
         [7  8  9]
         """
         if not self._layout_array:
-            self._layout_array = [
-                [1, 2, 3],
-                [4, 5, 6],
-                [7, 8, 9]
-            ]
+            self._layout_array = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
         self._process_grid_matrix(plots, tmpl)

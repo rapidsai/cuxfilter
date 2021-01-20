@@ -10,12 +10,12 @@ from ....layouts import chart_view
 
 class BaseNonAggregate(BaseChart):
     """
-        No datatiles support in non_data_tiles plot charts
+    No datatiles support in non_data_tiles plot charts
 
-        If dataset size is greater than a few thousand points,
-        scatter geos can crash the browser tabs, and is only recommended
-        with datashader plugin, in which case an image is
-        rendered instead of points on canvas
+    If dataset size is greater than a few thousand points,
+    scatter geos can crash the browser tabs, and is only recommended
+    with datashader plugin, in which case an image is
+    rendered instead of points on canvas
     """
 
     reset_event = None
@@ -56,7 +56,7 @@ class BaseNonAggregate(BaseChart):
         self.add_events(dashboard_cls)
 
     def view(self):
-        return chart_view(self.chart, width=self.width)
+        return chart_view(self.chart, width=self.width, title=self.title)
 
     def calculate_source(self, data):
         """
@@ -263,7 +263,8 @@ class BaseNonAggregate(BaseChart):
         if len(query) > 0:
             final_query += " and " + query
         self.reload_chart(
-            self.source.query(final_query, local_dict), False,
+            self.source.query(final_query, local_dict),
+            False,
         )
 
     def query_chart_by_indices(

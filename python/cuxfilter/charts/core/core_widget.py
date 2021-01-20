@@ -43,23 +43,15 @@ class BaseWidget:
             self.stride_type = type(value)
         self._stride = value
 
-    @property
-    def x_dtype(self):
-        if isinstance(self.source, ColumnDataSource):
-            return self.source.data[self.data_x_axis].dtype
-        elif isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
-            return self.source[self.x].dtype
-        return None
-
     def _xaxis_np_dt64_transform(self, dates):
         """
-        Description: convert to datetime64 if self.y_dtype is of type datetime
+        Description: convert to datetime64 if self.x_dtype is of type datetime
         -----------------------------------------------------------------
         Input:
             dates: list | tuple of datetime.datetime objects
         """
         # self.x_dtype is a computed read-only property
-        return dt.to_np_dt64_if_datetime(dates, self.x_dtype)
+        return dt.to_np_dt64_if_datetime(dates, self.stride_type)
 
     def __init__(
         self,
@@ -120,7 +112,7 @@ class BaseWidget:
         return None
 
     def view(self):
-        return chart_view(self.chart, width=self.width)
+        return chart_view(self.chart, width=self.width, title=self.name)
 
     def add_event(self, event, callback):
         self.chart.on_event(event, callback)

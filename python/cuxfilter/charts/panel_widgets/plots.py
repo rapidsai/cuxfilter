@@ -52,7 +52,6 @@ class RangeSlider(BaseWidget):
             self.params["step"] = self.stride
 
         self.chart = pn.widgets.RangeSlider(
-            name=self.x,
             start=self.min_value,
             end=self.max_value,
             value=(self.min_value, self.max_value),
@@ -159,7 +158,6 @@ class DateRangeSlider(BaseWidget):
         generate widget range slider
         """
         self.chart = pn.widgets.DateRangeSlider(
-            name=self.x,
             start=self.min_value,
             end=self.max_value,
             value=(self.min_value, self.max_value),
@@ -252,7 +250,6 @@ class IntSlider(BaseWidget):
             self.value = self.min_value
         if self.stride is None:
             self.chart = pn.widgets.IntSlider(
-                name=self.x,
                 start=self.min_value,
                 end=self.max_value,
                 value=self.value,
@@ -264,7 +261,6 @@ class IntSlider(BaseWidget):
             self.stride = self.chart.step
         else:
             self.chart = pn.widgets.IntSlider(
-                name=self.x,
                 start=self.min_value,
                 end=self.max_value,
                 value=self.value,
@@ -353,7 +349,6 @@ class FloatSlider(BaseWidget):
             self.value = self.min_value
         if self.stride is None:
             self.chart = pn.widgets.FloatSlider(
-                name=self.x,
                 start=self.min_value,
                 end=self.max_value,
                 value=self.value,
@@ -364,7 +359,6 @@ class FloatSlider(BaseWidget):
             self.stride = self.chart.step
         else:
             self.chart = pn.widgets.FloatSlider(
-                name=self.x,
                 start=self.min_value,
                 end=self.max_value,
                 value=self.value,
@@ -472,7 +466,6 @@ class DropDown(BaseWidget):
         generate widget dropdown
         """
         self.chart = pn.widgets.Select(
-            name=self.x,
             options=self.list_of_values,
             value="",
             width=self.width,
@@ -582,7 +575,6 @@ class MultiSelect(BaseWidget):
         generate widget multiselect
         """
         self.chart = pn.widgets.MultiSelect(
-            name=self.x,
             options=self.list_of_values,
             value=[""],
             width=self.width,

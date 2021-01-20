@@ -3,13 +3,18 @@ import param
 import pydeck as pdk
 
 css = """
-.multi-select {
-color: white;
-z-index: 100;
-background-color: #2c2b2b;
-border-radius: 1px;
-width: 100px !important;
-height: 30px;
+.multi-select{
+    color: white;
+    z-index: 100;
+    background: rgba(44,43,43,0.5);
+    border-radius: 1px;
+    width: 120px !important;
+    height: 30px !important;
+}
+.multi-select > .bk {
+    padding: 5px;
+    width: 120px !important;
+    height: 30px !important;
 }
 
 .deck-chart {
@@ -34,7 +39,7 @@ class PanelDeck(param.Parameterized):
     callback = param.Callable()
     spec = param.Dict()
     default_color = param.List([211, 211, 211, 50])
-    sizing_mode = param.String("scale_both")
+    sizing_mode = param.String("stretch_both")
     height = param.Integer(400)
     width = param.Integer(400)
     tooltip_include_cols = param.List(
@@ -151,13 +156,17 @@ class PanelDeck(param.Parameterized):
         """
         view object
         """
-        x = pn.Column(self.param.multi_select, css_classes=["multi-select"])
+        x = pn.Column(
+            self.param.multi_select,
+            sizing_mode=self.sizing_mode,
+            css_classes=["multi-select"],
+        )
 
         return pn.Column(
-            self.click_event,
             x,
+            self.click_event,
             self.pane,
             width=self.width,
             height=self.height,
-            sizing_mode="scale_both",
+            sizing_mode=self.sizing_mode,
         )

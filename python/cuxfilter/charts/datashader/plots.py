@@ -79,14 +79,20 @@ def _compute_datashader_assets(
 
     if isinstance(data[x].dtype, cudf.core.dtypes.CategoricalDtype):
         if ds_version >= "0.11":
-            aggregator = ds.by(x, getattr(ds, aggregate_fn)(aggregate_col),)
+            aggregator = ds.by(
+                x,
+                getattr(ds, aggregate_fn)(aggregate_col),
+            )
         else:
             print("only count_cat supported by datashader <=0.10")
             aggregator = ds.count_cat(x)
         cmap = {
             "color_key": {
                 k: v
-                for k, v in zip(list(data[x].cat.categories), color_palette,)
+                for k, v in zip(
+                    list(data[x].cat.categories),
+                    color_palette,
+                )
             }
         }
     else:
@@ -143,7 +149,7 @@ ds.transfer_functions._mask_lookup["rect_horizontal"] = _rect_horizontal_mask
 
 class Scatter(BaseScatter):
     """
-        Description:
+    Description:
     """
 
     reset_event = events.Reset
@@ -222,7 +228,12 @@ class Scatter(BaseScatter):
                 self.aggregate_fn,
                 self.color_palette,
             )
-            agg = cvs.points(dd, self.x, self.y, aggregator,)
+            agg = cvs.points(
+                dd,
+                self.x,
+                self.y,
+                aggregator,
+            )
 
             if self.constant_limit is None or self.aggregate_fn == "count":
                 self.constant_limit = [
@@ -275,7 +286,6 @@ class Scatter(BaseScatter):
             )
 
         self.chart = figure(
-            title=self.title,
             toolbar_location="right",
             tools="pan, wheel_zoom, reset",
             active_scroll="wheel_zoom",
@@ -446,7 +456,7 @@ class Scatter(BaseScatter):
 
 class Graph(BaseGraph):
     """
-        Description:
+    Description:
     """
 
     reset_event = events.Reset
@@ -702,7 +712,6 @@ class Graph(BaseGraph):
             self.y_range[1] + self.node_point_size,
         )
         self.chart = figure(
-            title=self.title,
             toolbar_location="right",
             tools="pan, wheel_zoom, reset",
             active_scroll="wheel_zoom",
@@ -931,7 +940,7 @@ class Graph(BaseGraph):
 
 class Line(BaseLine):
     """
-        Description:
+    Description:
     """
 
     reset_event = events.Reset
@@ -1031,7 +1040,6 @@ class Line(BaseLine):
                 self.title = "Line plot for (" + self.x + "," + self.y + ")"
 
         self.chart = figure(
-            title=self.title,
             toolbar_location="right",
             tools="pan, wheel_zoom, reset",
             active_scroll="wheel_zoom",
@@ -1184,7 +1192,7 @@ class Line(BaseLine):
 
 class StackedLines(BaseStackedLine):
     """
-        Description:
+    Description:
     """
 
     reset_event = events.Reset
@@ -1294,7 +1302,6 @@ class StackedLines(BaseStackedLine):
             self.title = "Stacked Line plots on x-axis: " + self.x
 
         self.chart = figure(
-            title=self.title,
             toolbar_location="right",
             tools="pan, wheel_zoom, reset",
             active_scroll="wheel_zoom",

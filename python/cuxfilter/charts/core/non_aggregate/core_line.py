@@ -136,7 +136,9 @@ class BaseLine(BaseNonAggregate):
         self.add_events(dashboard_cls)
 
     def view(self):
-        return chart_view(self.chart, self.filter_widget, width=self.width)
+        return chart_view(
+            self.chart, self.filter_widget, width=self.width, title=self.title
+        )
 
     def add_range_slider_filter(self, dashboard_cls):
         """

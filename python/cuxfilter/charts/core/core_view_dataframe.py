@@ -109,11 +109,11 @@ class ViewDataFrame:
             "font-size": "0.5vw",
             "overflow-x": "auto",
         }
-        html_pane = pn.pane.HTML(
-            self._format_data(data[self.columns]), style=style
+        self.chart = pn.pane.HTML(
+            self._format_data(data[self.columns]),
+            style=style,
+            css_classes=["panel-df"],
         )
-        self.chart = pn.Column(html_pane, css_classes=["panel-df"])
-        self.chart.sizing_mode = "scale_both"
 
     def _repr_mimebundle_(self, include=None, exclude=None):
         view = self.view()
@@ -138,7 +138,7 @@ class ViewDataFrame:
         return None
 
     def view(self):
-        return chart_view(self.chart, width=self.width)
+        return chart_view(self.chart, width=self.width, title="Dataset View")
 
     def reload_chart(self, data, patch_update: bool):
         if isinstance(data, dask_cudf.core.DataFrame):
@@ -188,11 +188,18 @@ class ViewDataFrame:
         if len(query) > 0:
             final_query += " and " + query
         self.reload_chart(
-            data.query(final_query), False,
+            data.query(final_query),
+            False,
         )
 
     def query_chart_by_indices(
-        self, active_chart: BaseChart, old_indices, new_indices, data, query=""
+        self,
+        active_chart: BaseChart,
+        old_indices,
+        new_indices,
+        data,
+        query="",
+        local_dict={},
     ):
         """
         Description:
@@ -223,5 +230,8 @@ class ViewDataFrame:
                 final_query += " and " + query
 
         self.reload_chart(
-            data.query(final_query) if len(final_query) > 0 else data, False
+            data.query(final_query, local_dict)
+            if len(final_query) > 0
+            else data,
+            False,
         )

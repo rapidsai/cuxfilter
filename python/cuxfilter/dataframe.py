@@ -162,7 +162,7 @@ class DataFrame:
         title="Dashboard",
         data_size_widget=True,
         warnings=False,
-        layout_array=None
+        layout_array=None,
     ):
         """
         Creates a cuxfilter.DashBoard object
@@ -214,6 +214,12 @@ class DataFrame:
             notebook_assets.load_notebook_assets()
 
         return DashBoard(
-            charts, self, layout, theme, title, data_size_widget, warnings,
-            layout_array
+            charts,
+            self,
+            layout,
+            theme,
+            title,
+            data_size_widget,
+            warnings,
+            layout_array,
         )

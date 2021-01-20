@@ -57,7 +57,10 @@ def _create_dashboard_url(notebook_url: str, port: int, service_proxy=None):
 
 
 def _create_app(
-    panel_obj, notebook_url=DEFAULT_NOTEBOOK_URL, port=0, service_proxy=None,
+    panel_obj,
+    notebook_url=DEFAULT_NOTEBOOK_URL,
+    port=0,
+    service_proxy=None,
 ):
     """
     Displays a bokeh server app inline in the notebook.
@@ -142,7 +145,7 @@ class DashBoard:
         title="Dashboard",
         data_size_widget=True,
         warnings=False,
-        layout_array=None
+        layout_array=None,
     ):
         self._cuxfilter_df = dataframe
         self._charts = dict()
@@ -377,7 +380,7 @@ class DashBoard:
             show=show,
             start=start,
             title=self.title,
-            static_dirs={'custom-react': STATIC_DIR},
+            static_dirs={"custom-react": STATIC_DIR},
             **kwargs,
         )
         server_document(websocket_origin, resources=None)
