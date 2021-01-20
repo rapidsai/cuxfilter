@@ -31,7 +31,7 @@ requirements:
     - datashader >=0.11.1
     - numba >=0.51.2
     - cupy  >=6*
-    - panel >=0.9.*
+    - panel >=0.10.3
     - bokeh >=2.1.1
     - pyproj  >=2.4.*
     - geopandas >=0.6.*
