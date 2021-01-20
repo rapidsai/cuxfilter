@@ -13,7 +13,8 @@ from panel.template.base import BasicTemplate
 from panel.template.theme import DarkTheme, DefaultTheme
 import os
 
-custom_dist_path = "custom-react"
+CUSTOM_DIST_PATH = "custom-react"
+ASSETS_PATH = pathlib.Path(__file__).parent / "assets"
 
 
 class ReactTemplate(BasicTemplate):
@@ -40,9 +41,9 @@ class ReactTemplate(BasicTemplate):
 
     row_height = param.Integer(default=0)
 
-    _css = pathlib.Path(__file__).parent / "assets/react.css"
+    _css = ASSETS_PATH / "react.css"
 
-    _template = pathlib.Path(__file__).parent / "assets/react.html"
+    _template = ASSETS_PATH / "react.html"
 
     _modifiers = {Card: {"children": {"margin": (20, 20)}, "margin": (10, 5)}}
 
@@ -89,12 +90,12 @@ class ReactTemplate(BasicTemplate):
 
         # CSS files
         base_css = os.path.basename(self._css)
-        css_files["base"] = f"{custom_dist_path}/{base_css}"
+        css_files["base"] = f"{CUSTOM_DIST_PATH}/{base_css}"
         if self.theme:
             theme = self.theme.find_theme(type(self))
             if theme and theme.css:
                 basename = os.path.basename(theme.css)
-                css_files["theme"] = f"{custom_dist_path}/{basename}"
+                css_files["theme"] = f"{CUSTOM_DIST_PATH}/{basename}"
         return {"css": css_files, "js": js_files}
 
     def __init__(self, **params):
@@ -132,17 +133,13 @@ class ReactTemplate(BasicTemplate):
 
 class ReactDefaultTheme(DefaultTheme):
 
-    css = param.Filename(
-        default=pathlib.Path(__file__).parent / "assets/default.css"
-    )
+    css = param.Filename(default=ASSETS_PATH / "default.css")
 
     _template = ReactTemplate
 
 
 class ReactDarkTheme(DarkTheme):
 
-    css = param.Filename(
-        default=pathlib.Path(__file__).parent / "assets/custom-dark.css"
-    )
+    css = param.Filename(default=ASSETS_PATH / "custom-dark.css")
 
     _template = ReactTemplate

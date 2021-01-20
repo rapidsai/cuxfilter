@@ -1,7 +1,7 @@
 import re
 import numpy as np
 import panel as pn
-import cuxfilter
+from ..themes import dark, rapids
 from panel.template import DarkTheme
 
 from .custom_react_template import ReactTemplate
@@ -9,6 +9,20 @@ from .custom_react_template import ReactTemplate
 
 def is_widget(obj):
     return "widget" in obj.chart_type or obj.chart_type == "datasize_indicator"
+
+
+def compute_position(arr, i, pos, offset):
+    x, y = (
+        np.array(
+            [
+                np.where(arr == i + 1)[0][pos] + offset,
+                np.where(arr == i + 1)[1][pos] + offset,
+            ]
+        )
+        / np.array(arr.shape)
+        * (6, 12)
+    )
+    return int(x), int(y)
 
 
 class _LayoutBase:
@@ -19,7 +33,7 @@ class _LayoutBase:
     def generate_dashboard(self, title, charts, theme, layout_array=None):
         pn.config.sizing_mode = "stretch_both"
         self._layout_array = layout_array
-        if theme == cuxfilter.themes.dark or theme == cuxfilter.themes.rapids:
+        if theme in [dark, rapids]:
             tmpl = ReactTemplate(title=title, theme=DarkTheme, compact="both")
         else:
             tmpl = ReactTemplate(title=title, compact="both")
@@ -49,29 +63,9 @@ class _LayoutBase:
             arr = np.array([arr])
         for i in range(arr.max()):
             if i < len(plots):
-                x0, y0 = (
-                    np.array(
-                        [
-                            np.where(arr == i + 1)[0][0],
-                            np.where(arr == i + 1)[1][0],
-                        ]
-                    )
-                    / np.array(arr.shape)
-                    * (6, 12)
-                )
-                x1, y1 = (
-                    np.array(
-                        [
-                            np.where(arr == i + 1)[0][-1] + 1,
-                            np.where(arr == i + 1)[1][-1] + 1,
-                        ]
-                    )
-                    / np.array(arr.shape)
-                    * (6, 12)
-                )
-                tmpl.main[int(x0) : int(x1), int(y0) : int(y1)] = plots[
-                    i
-                ].view()
+                x0, y0 = compute_position(arr, i, 0, 0)
+                x1, y1 = compute_position(arr, i, -1, 1)
+                tmpl.main[x0:x1, y0:y1] = plots[i].view()
 
     def _process_plots(self, plots, tmpl):
         raise NotImplementedError()

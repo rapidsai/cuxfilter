@@ -24,7 +24,7 @@ NOTEBOOK_DIV = """
 
 
 def bokeh_notebook_div(image):
-    """ "
+    """
     Generates an HTML div to embed in the notebook.
 
     Parameters
