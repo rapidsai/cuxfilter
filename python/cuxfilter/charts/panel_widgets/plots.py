@@ -6,8 +6,10 @@ from ..constants import (
     DATATILE_INACTIVE_COLOR,
 )
 from ...assets.cudf_utils import get_min_max
-import panel as pn
+from bokeh.models import ColumnDataSource
+import cudf
 import dask_cudf
+import panel as pn
 
 
 class RangeSlider(BaseWidget):
@@ -52,7 +54,6 @@ class RangeSlider(BaseWidget):
             self.params["step"] = self.stride
 
         self.chart = pn.widgets.RangeSlider(
-            name=self.x,
             start=self.min_value,
             end=self.max_value,
             value=(self.min_value, self.max_value),
@@ -116,6 +117,14 @@ class DateRangeSlider(BaseWidget):
     def datatile_loaded_state(self):
         return self._datatile_loaded_state
 
+    @property
+    def x_dtype(self):
+        if isinstance(self.source, ColumnDataSource):
+            return self.source.data[self.data_x_axis].dtype
+        elif isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
+            return self.source[self.x].dtype
+        return None
+
     @datatile_loaded_state.setter
     def datatile_loaded_state(self, state: bool):
         self._datatile_loaded_state = state
@@ -159,7 +168,6 @@ class DateRangeSlider(BaseWidget):
         generate widget range slider
         """
         self.chart = pn.widgets.DateRangeSlider(
-            name=self.x,
             start=self.min_value,
             end=self.max_value,
             value=(self.min_value, self.max_value),
@@ -252,7 +260,6 @@ class IntSlider(BaseWidget):
             self.value = self.min_value
         if self.stride is None:
             self.chart = pn.widgets.IntSlider(
-                name=self.x,
                 start=self.min_value,
                 end=self.max_value,
                 value=self.value,
@@ -264,7 +271,6 @@ class IntSlider(BaseWidget):
             self.stride = self.chart.step
         else:
             self.chart = pn.widgets.IntSlider(
-                name=self.x,
                 start=self.min_value,
                 end=self.max_value,
                 value=self.value,
@@ -353,7 +359,6 @@ class FloatSlider(BaseWidget):
             self.value = self.min_value
         if self.stride is None:
             self.chart = pn.widgets.FloatSlider(
-                name=self.x,
                 start=self.min_value,
                 end=self.max_value,
                 value=self.value,
@@ -364,7 +369,6 @@ class FloatSlider(BaseWidget):
             self.stride = self.chart.step
         else:
             self.chart = pn.widgets.FloatSlider(
-                name=self.x,
                 start=self.min_value,
                 end=self.max_value,
                 value=self.value,
@@ -472,7 +476,6 @@ class DropDown(BaseWidget):
         generate widget dropdown
         """
         self.chart = pn.widgets.Select(
-            name=self.x,
             options=self.list_of_values,
             value="",
             width=self.width,
@@ -582,7 +585,6 @@ class MultiSelect(BaseWidget):
         generate widget multiselect
         """
         self.chart = pn.widgets.MultiSelect(
-            name=self.x,
             options=self.list_of_values,
             value=[""],
             width=self.width,
@@ -647,7 +649,7 @@ class MultiSelect(BaseWidget):
 
 class DataSizeIndicator(BaseDataSizeIndicator):
     """
-        Description:
+    Description:
     """
 
     css = """
@@ -688,7 +690,7 @@ class DataSizeIndicator(BaseDataSizeIndicator):
         generate chart float slider
         """
         self.chart = pn.widgets.FloatSlider(
-            name="Data Points selected",
+            # name="Data Points selected",
             width=self.width,
             start=0,
             end=self.max_value,

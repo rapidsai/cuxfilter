@@ -64,8 +64,11 @@ class TestCoreNonAggregateChart:
         bnac = BaseNonAggregate()
         bnac.chart = chart
         bnac.width = 400
+        bnac.title = "test_title"
 
-        assert str(bnac.view()) == str(chart_view(_chart, width=bnac.width))
+        assert str(bnac.view()) == str(
+            chart_view(_chart, width=bnac.width, title=bnac.title)
+        )
 
     def test_get_selection_geometry_callback(self):
         bnac = BaseNonAggregate()

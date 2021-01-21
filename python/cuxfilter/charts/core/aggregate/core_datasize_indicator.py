@@ -43,7 +43,11 @@ class BaseDataSizeIndicator(BaseChart):
         self.generate_chart()
 
     def view(self):
-        return chart_view(self.chart, css_classes=["non-handle-temp"])
+        return chart_view(
+            self.chart,
+            css_classes=["non-handle-temp"],
+            title="Datapoints Selected",
+        )
 
     def calculate_source(self, data, patch_update=False):
         """

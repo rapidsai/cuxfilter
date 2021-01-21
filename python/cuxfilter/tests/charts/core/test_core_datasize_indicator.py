@@ -44,7 +44,11 @@ class TestBaseDataSizeIndicator:
         bdsi.chart = chart
 
         assert str(bdsi.view()) == str(
-            chart_view(_chart, css_classes=["non-handle-temp"])
+            chart_view(
+                _chart,
+                css_classes=["non-handle-temp"],
+                title="Datapoints Selected",
+            )
         )
 
     def test_calculate_source(self):

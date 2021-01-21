@@ -1,7 +1,7 @@
 # cuXfilter 0.18.0 (Date TBD)
 
 ## New Features
-
+- PR #226 Added support for React-Grid-Templates allowing resizing, dragging and dynamic layout mapping + loading animation on callback execution
 ## Improvements
 
 ## Bug Fixes

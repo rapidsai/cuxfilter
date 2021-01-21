@@ -8,7 +8,7 @@ from bokeh.models import ColumnDataSource
 
 class Bar(BaseAggregateChart):
     """
-        Description:
+    Description:
     """
 
     reset_event = events.Reset
@@ -52,7 +52,6 @@ class Bar(BaseAggregateChart):
         generate chart
         """
         self.chart = figure(
-            title=self.title,
             x_range=(
                 self.source.data[self.data_x_axis]
                 if self.x_dtype == "object"
@@ -79,7 +78,6 @@ class Bar(BaseAggregateChart):
                 color=self.color,
                 **self.library_specific_params,
             )
-        self.chart.xaxis.axis_label = self.x
         if self.x_axis_tick_formatter:
             self.chart.xaxis.formatter = self.x_axis_tick_formatter
         if self.y_axis_tick_formatter:
@@ -238,7 +236,7 @@ class Bar(BaseAggregateChart):
 
 class Line(BaseAggregateChart):
     """
-        Description:
+    Description:
     """
 
     reset_event = events.Reset
@@ -282,7 +280,6 @@ class Line(BaseAggregateChart):
         generate chart
         """
         self.chart = figure(
-            title=self.title,
             x_range=(
                 self.source.data[self.data_x_axis]
                 if self.x_dtype == "object"

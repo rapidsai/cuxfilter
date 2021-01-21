@@ -51,7 +51,7 @@ def get_arrow_stream(record_batch):
 
 def format_result(result_np: np.ndarray, return_format: str):
     """
-        format result as a pandas dataframe
+    format result as a pandas dataframe
     """
     pandas_df = pd.DataFrame(result_np, dtype=np.float64)
 

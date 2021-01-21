@@ -11,8 +11,8 @@ from ...constants import CUXF_DEFAULT_COLOR_PALETTE
 
 class BaseGraph(BaseChart):
     """
-        .. note::
-            Non-aggregate charts do not support Datatiles
+    .. note::
+        Non-aggregate charts do not support Datatiles
 
     """
 
@@ -185,7 +185,7 @@ class BaseGraph(BaseChart):
         self.add_events(dashboard_cls)
 
     def view(self):
-        return chart_view(self.chart, width=self.width)
+        return chart_view(self.chart, width=self.width, title=self.title)
 
     def calculate_source(self, cuxfilter_df):
         """

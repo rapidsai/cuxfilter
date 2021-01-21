@@ -6,8 +6,8 @@ from ...constants import CUXF_DEFAULT_COLOR_PALETTE
 
 class BaseScatter(BaseNonAggregate):
     """
-        .. note::
-            Non-aggregate charts do not support Datatiles
+    .. note::
+        Non-aggregate charts do not support Datatiles
 
     """
 

@@ -143,7 +143,7 @@ ds.transfer_functions._mask_lookup["rect_horizontal"] = _rect_horizontal_mask
 
 class Scatter(BaseScatter):
     """
-        Description:
+    Description:
     """
 
     reset_event = events.Reset
@@ -275,7 +275,6 @@ class Scatter(BaseScatter):
             )
 
         self.chart = figure(
-            title=self.title,
             toolbar_location="right",
             tools="pan, wheel_zoom, reset",
             active_scroll="wheel_zoom",
@@ -446,7 +445,7 @@ class Scatter(BaseScatter):
 
 class Graph(BaseGraph):
     """
-        Description:
+    Description:
     """
 
     reset_event = events.Reset
@@ -702,7 +701,6 @@ class Graph(BaseGraph):
             self.y_range[1] + self.node_point_size,
         )
         self.chart = figure(
-            title=self.title,
             toolbar_location="right",
             tools="pan, wheel_zoom, reset",
             active_scroll="wheel_zoom",
@@ -931,7 +929,7 @@ class Graph(BaseGraph):
 
 class Line(BaseLine):
     """
-        Description:
+    Description:
     """
 
     reset_event = events.Reset
@@ -1031,7 +1029,6 @@ class Line(BaseLine):
                 self.title = "Line plot for (" + self.x + "," + self.y + ")"
 
         self.chart = figure(
-            title=self.title,
             toolbar_location="right",
             tools="pan, wheel_zoom, reset",
             active_scroll="wheel_zoom",
@@ -1184,7 +1181,7 @@ class Line(BaseLine):
 
 class StackedLines(BaseStackedLine):
     """
-        Description:
+    Description:
     """
 
     reset_event = events.Reset
@@ -1294,7 +1291,6 @@ class StackedLines(BaseStackedLine):
             self.title = "Stacked Line plots on x-axis: " + self.x
 
         self.chart = figure(
-            title=self.title,
             toolbar_location="right",
             tools="pan, wheel_zoom, reset",
             active_scroll="wheel_zoom",
