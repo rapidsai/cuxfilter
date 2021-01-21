@@ -53,7 +53,7 @@ class _LayoutBase:
     def _process_widgets(self, widgets_list, tmpl):
         for obj in widgets_list:
             obj.chart.width = 280
-            obj.chart.sizing_mode = "scale_both"
+            obj.chart.sizing_mode = "scale_width"
             tmpl.sidebar.append(obj.view())
         return tmpl
 

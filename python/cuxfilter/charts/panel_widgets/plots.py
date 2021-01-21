@@ -6,8 +6,10 @@ from ..constants import (
     DATATILE_INACTIVE_COLOR,
 )
 from ...assets.cudf_utils import get_min_max
-import panel as pn
+from bokeh.models import ColumnDataSource
+import cudf
 import dask_cudf
+import panel as pn
 
 
 class RangeSlider(BaseWidget):
@@ -114,6 +116,14 @@ class DateRangeSlider(BaseWidget):
     @property
     def datatile_loaded_state(self):
         return self._datatile_loaded_state
+
+    @property
+    def x_dtype(self):
+        if isinstance(self.source, ColumnDataSource):
+            return self.source.data[self.data_x_axis].dtype
+        elif isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
+            return self.source[self.x].dtype
+        return None
 
     @datatile_loaded_state.setter
     def datatile_loaded_state(self, state: bool):
@@ -680,7 +690,7 @@ class DataSizeIndicator(BaseDataSizeIndicator):
         generate chart float slider
         """
         self.chart = pn.widgets.FloatSlider(
-            name="Data Points selected",
+            # name="Data Points selected",
             width=self.width,
             start=0,
             end=self.max_value,
