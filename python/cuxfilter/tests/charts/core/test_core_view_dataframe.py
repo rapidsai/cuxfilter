@@ -38,9 +38,10 @@ class TestViewDataFrame:
 
         vd.initiate_chart(self.dashboard)
 
-        assert str(vd.chart.objects[0]) == str(
+        assert str(vd.chart) == str(
             pn.pane.HTML(
                 self.df,
+                css_classes=["panel-df"],
                 style={
                     "width": "100%",
                     "height": "100%",
@@ -50,7 +51,6 @@ class TestViewDataFrame:
                 },
             )
         )
-        assert vd.chart.sizing_mode == "stretch_both"
         assert vd.columns == list(self.df.columns)
 
     @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
