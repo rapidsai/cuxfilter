@@ -6,20 +6,15 @@ Python:
  - 'python/**'
  - 'notebooks/**'
 
-libcuxfilter:
+cpp:
  - 'cpp/**'
 
 CMake:
  - '**/CMakeLists.txt'
  - '**/cmake/**'
 
-Java:
- - 'java/**'
+ci:
+   - 'ci/**'
 
-Ops:
- - '.github/**'
- - 'ci/**'
- - 'conda/**'
- - '**/Dockerfile'
- - '**/.dockerignore'
- - 'docker/**'
+conda:
+   - 'conda/**'
