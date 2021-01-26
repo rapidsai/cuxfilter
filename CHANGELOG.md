@@ -2,9 +2,13 @@
 
 ## New Features
 - PR #226 Added support for React-Grid-Templates allowing resizing, dragging and dynamic layout mapping + loading animation on callback execution
+- PR #227 Added new datasize indicator (with themes)
+
 ## Improvements
+- PR #227 Added Template+CSS based themes and refactored old apply_themes functions
 
 ## Bug Fixes
+- PR #227 Adds missing css and html template files to the package build and fixed Loading Animation issue for Datashader+Bokeh charts
 
 # cuXfilter 0.17.0 (Date TBD)
 
