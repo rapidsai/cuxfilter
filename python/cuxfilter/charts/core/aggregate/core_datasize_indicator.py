@@ -43,9 +43,10 @@ class BaseDataSizeIndicator(BaseChart):
         self.generate_chart()
 
     def view(self):
+        import panel as pn
+
         return chart_view(
-            self.chart,
-            css_classes=["non-handle-temp"],
+            pn.Column(self.chart, self.progress_bar),
             title="Datapoints Selected",
         )
 
