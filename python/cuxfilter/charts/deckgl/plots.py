@@ -14,6 +14,7 @@ class Choropleth(BaseChoropleth):
     # reset event handling not required, as the default behavior
     # unselects all selected points, and that is already taken care of
     reset_event = None
+    no_colors_set = False
     coordinates = "coordinates"
     source: Type[ColumnDataSource]
     source_df: Type[pd.DataFrame]
@@ -51,6 +52,7 @@ class Choropleth(BaseChoropleth):
 
     def compute_colors(self):
         if self.geo_color_palette is None:
+            self.no_colors_set = True
             self.geo_color_palette = bokeh.palettes.Purples9
 
         self.source_df = self.source.to_df()
@@ -229,16 +231,15 @@ class Choropleth(BaseChoropleth):
         """
         self.chart.callback = callback
 
-    def apply_theme(self, properties_dict):
+    def apply_theme(self, theme):
         """
         apply thematic changes to the chart based on the input
         properties dictionary.
 
         """
-        if self.geo_color_palette is None:
-            self.geo_color_palette = properties_dict["chart_color"][
-                "color_palette"
-            ]
+        if self.no_colors_set:
+            self.geo_color_palette = theme.color_palette
             self.compute_colors()
+            self.chart.colors = self.source_df[self.rgba_columns]
         if self.map_style is None:
-            self.chart._deck.map_style = properties_dict["map_style"]
+            self.chart._deck.map_style = theme.mapbox_style

@@ -23,7 +23,7 @@ class BaseScatter(BaseNonAggregate):
         x_range=None,
         y_range=None,
         add_interaction=True,
-        color_palette=CUXF_DEFAULT_COLOR_PALETTE,
+        color_palette=None,
         aggregate_col=None,
         aggregate_fn="count",
         point_size=1,
@@ -80,7 +80,11 @@ class BaseScatter(BaseNonAggregate):
             self.aggregate_col = self.y
 
         # if tuple, typecasting color_palette to a list
-        self.color_palette = list(color_palette)
+        if color_palette is None:
+            self.no_colors_set = True
+            self.color_palette = CUXF_DEFAULT_COLOR_PALETTE
+        else:
+            self.color_palette = list(color_palette)
         self.aggregate_fn = aggregate_fn
         self.width = width
         self.height = height

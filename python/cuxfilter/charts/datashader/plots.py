@@ -132,7 +132,6 @@ def _generate_legend(
         location=(0, 0),
         ticker=BasicTicker(desired_num_ticks=len(color_palette)),
         title=legend_title,
-        background_fill_alpha=0,
     )
     return color_bar
 
@@ -355,92 +354,16 @@ class Scatter(BaseScatter):
         Ouput:
         """
 
-        self.chart.on_event(events.SelectionGeometry, callback)
+        self.add_event(events.SelectionGeometry, callback)
 
-    def apply_theme(self, properties_dict):
+    def apply_theme(self, theme):
         """
-        apply thematic changes to the chart based on the input
-        properties dictionary.
-
+        apply thematic changes to the chart based on the theme
         """
         if self.no_colors_set:
-            self.color_palette = properties_dict["chart_color"][
-                "color_palette"
-            ]
+            self.color_palette = theme.color_palette
+            self.render_legend()
             self.interactive_image.update_chart()
-        self.chart.xgrid.grid_line_color = properties_dict["geo_charts_grids"][
-            "xgrid"
-        ]
-        self.chart.ygrid.grid_line_color = properties_dict["geo_charts_grids"][
-            "ygrid"
-        ]
-
-        # title
-        self.chart.title.text_color = properties_dict["title"]["text_color"]
-        self.chart.title.text_font = properties_dict["title"]["text_font"]
-        self.chart.title.text_font_style = properties_dict["title"][
-            "text_font_style"
-        ]
-        self.chart.title.text_font_size = properties_dict["title"][
-            "text_font_size"
-        ]
-
-        if self.show_legend():
-            self.color_bar.major_label_text_color = properties_dict["title"][
-                "text_color"
-            ]
-            self.color_bar.title_text_color = properties_dict["title"][
-                "text_color"
-            ]
-
-        # background, border, padding
-        self.chart.background_fill_color = properties_dict[
-            "background_fill_color"
-        ]
-        self.chart.border_fill_color = properties_dict["border_fill_color"]
-        self.chart.min_border = properties_dict["min_border"]
-        self.chart.outline_line_width = properties_dict["outline_line_width"]
-        self.chart.outline_line_alpha = properties_dict["outline_line_alpha"]
-        self.chart.outline_line_color = properties_dict["outline_line_color"]
-
-        # x axis title
-        self.chart.xaxis.major_label_text_color = properties_dict["xaxis"][
-            "major_label_text_color"
-        ]
-        self.chart.xaxis.axis_line_width = properties_dict["xaxis"][
-            "axis_line_width"
-        ]
-        self.chart.xaxis.axis_line_color = properties_dict["xaxis"][
-            "axis_line_color"
-        ]
-
-        # y axis title
-        self.chart.yaxis.major_label_text_color = properties_dict["yaxis"][
-            "major_label_text_color"
-        ]
-        self.chart.yaxis.axis_line_width = properties_dict["yaxis"][
-            "axis_line_width"
-        ]
-        self.chart.yaxis.axis_line_color = properties_dict["yaxis"][
-            "axis_line_color"
-        ]
-
-        # axis ticks
-        self.chart.axis.major_tick_line_color = properties_dict["axis"][
-            "major_tick_line_color"
-        ]
-        self.chart.axis.minor_tick_line_color = properties_dict["axis"][
-            "minor_tick_line_color"
-        ]
-        self.chart.axis.minor_tick_out = properties_dict["axis"][
-            "minor_tick_out"
-        ]
-        self.chart.axis.major_tick_out = properties_dict["axis"][
-            "major_tick_out"
-        ]
-        self.chart.axis.major_tick_in = properties_dict["axis"][
-            "major_tick_in"
-        ]
 
 
 class Graph(BaseGraph):
@@ -841,90 +764,16 @@ class Graph(BaseGraph):
         Ouput:
         """
 
-        self.chart.on_event(events.SelectionGeometry, callback)
+        self.add_event(events.SelectionGeometry, callback)
 
-    def apply_theme(self, properties_dict):
+    def apply_theme(self, theme):
         """
-        apply thematic changes to the chart based on the input
-        properties dictionary.
+        apply thematic changes to the chart based on the theme
         """
         if self.no_colors_set:
-            self.node_color_palette = properties_dict["chart_color"][
-                "color_palette"
-            ]
+            self.node_color_palette = theme.color_palette
+            self.render_legend()
             self.interactive_image.update_chart()
-        self.chart.xgrid.grid_line_color = properties_dict["geo_charts_grids"][
-            "xgrid"
-        ]
-        self.chart.ygrid.grid_line_color = properties_dict["geo_charts_grids"][
-            "ygrid"
-        ]
-
-        # title
-        self.chart.title.text_color = properties_dict["title"]["text_color"]
-        self.chart.title.text_font = properties_dict["title"]["text_font"]
-        self.chart.title.text_font_style = properties_dict["title"][
-            "text_font_style"
-        ]
-        self.chart.title.text_font_size = properties_dict["title"][
-            "text_font_size"
-        ]
-        if self.show_legend():
-            self.color_bar.major_label_text_color = properties_dict["title"][
-                "text_color"
-            ]
-            self.color_bar.title_text_color = properties_dict["title"][
-                "text_color"
-            ]
-
-        # background, border, padding
-        self.chart.background_fill_color = properties_dict[
-            "background_fill_color"
-        ]
-        self.chart.border_fill_color = properties_dict["border_fill_color"]
-        self.chart.min_border = properties_dict["min_border"]
-        self.chart.outline_line_width = properties_dict["outline_line_width"]
-        self.chart.outline_line_alpha = properties_dict["outline_line_alpha"]
-        self.chart.outline_line_color = properties_dict["outline_line_color"]
-
-        # x axis title
-        self.chart.xaxis.major_label_text_color = properties_dict["xaxis"][
-            "major_label_text_color"
-        ]
-        self.chart.xaxis.axis_line_width = properties_dict["xaxis"][
-            "axis_line_width"
-        ]
-        self.chart.xaxis.axis_line_color = properties_dict["xaxis"][
-            "axis_line_color"
-        ]
-
-        # y axis title
-        self.chart.yaxis.major_label_text_color = properties_dict["yaxis"][
-            "major_label_text_color"
-        ]
-        self.chart.yaxis.axis_line_width = properties_dict["yaxis"][
-            "axis_line_width"
-        ]
-        self.chart.yaxis.axis_line_color = properties_dict["yaxis"][
-            "axis_line_color"
-        ]
-
-        # axis ticks
-        self.chart.axis.major_tick_line_color = properties_dict["axis"][
-            "major_tick_line_color"
-        ]
-        self.chart.axis.minor_tick_line_color = properties_dict["axis"][
-            "minor_tick_line_color"
-        ]
-        self.chart.axis.minor_tick_out = properties_dict["axis"][
-            "minor_tick_out"
-        ]
-        self.chart.axis.major_tick_out = properties_dict["axis"][
-            "major_tick_out"
-        ]
-        self.chart.axis.major_tick_in = properties_dict["axis"][
-            "major_tick_in"
-        ]
 
 
 class Line(BaseLine):
@@ -1021,6 +870,7 @@ class Line(BaseLine):
         """
         if self.color is None:
             self.color = "#8735fb"
+            self.no_color_set = True
 
         if len(self.title) == 0:
             if self.x == self.y:
@@ -1040,7 +890,7 @@ class Line(BaseLine):
         )
 
         self.chart.add_tools(BoxSelectTool())
-        self.chart.axis.visible = False
+        self.chart.axis.visible = True
         if self.x_axis_tick_formatter:
             self.chart.xaxis.formatter = self.x_axis_tick_formatter
         if self.y_axis_tick_formatter:
@@ -1101,82 +951,15 @@ class Line(BaseLine):
         Ouput:
         """
 
-        self.chart.on_event(events.SelectionGeometry, callback)
+        self.add_event(events.SelectionGeometry, callback)
 
-    def apply_theme(self, properties_dict):
+    def apply_theme(self, theme):
         """
-        apply thematic changes to the chart based on the input
-        properties dictionary.
-
+        apply thematic changes to the chart based on the theme
         """
-        if self.no_color_set:
-            self.color = properties_dict["chart_color"]["color"]
+        if self.no_colors_set:
+            self.color = theme.chart_color
             self.interactive_image.update_chart()
-        self.chart.xgrid.grid_line_color = properties_dict["geo_charts_grids"][
-            "xgrid"
-        ]
-        self.chart.ygrid.grid_line_color = properties_dict["geo_charts_grids"][
-            "ygrid"
-        ]
-
-        # title
-        self.chart.title.text_color = properties_dict["title"]["text_color"]
-        self.chart.title.text_font = properties_dict["title"]["text_font"]
-        self.chart.title.text_font_style = properties_dict["title"][
-            "text_font_style"
-        ]
-        self.chart.title.text_font_size = properties_dict["title"][
-            "text_font_size"
-        ]
-
-        # background, border, padding
-        self.chart.background_fill_color = properties_dict[
-            "background_fill_color"
-        ]
-        self.chart.border_fill_color = properties_dict["border_fill_color"]
-        self.chart.min_border = properties_dict["min_border"]
-        self.chart.outline_line_width = properties_dict["outline_line_width"]
-        self.chart.outline_line_alpha = properties_dict["outline_line_alpha"]
-        self.chart.outline_line_color = properties_dict["outline_line_color"]
-
-        # x axis title
-        self.chart.xaxis.major_label_text_color = properties_dict["xaxis"][
-            "major_label_text_color"
-        ]
-        self.chart.xaxis.axis_line_width = properties_dict["xaxis"][
-            "axis_line_width"
-        ]
-        self.chart.xaxis.axis_line_color = properties_dict["xaxis"][
-            "axis_line_color"
-        ]
-
-        # y axis title
-        self.chart.yaxis.major_label_text_color = properties_dict["yaxis"][
-            "major_label_text_color"
-        ]
-        self.chart.yaxis.axis_line_width = properties_dict["yaxis"][
-            "axis_line_width"
-        ]
-        self.chart.yaxis.axis_line_color = properties_dict["yaxis"][
-            "axis_line_color"
-        ]
-
-        # axis ticks
-        self.chart.axis.major_tick_line_color = properties_dict["axis"][
-            "major_tick_line_color"
-        ]
-        self.chart.axis.minor_tick_line_color = properties_dict["axis"][
-            "minor_tick_line_color"
-        ]
-        self.chart.axis.minor_tick_out = properties_dict["axis"][
-            "minor_tick_out"
-        ]
-        self.chart.axis.major_tick_out = properties_dict["axis"][
-            "major_tick_out"
-        ]
-        self.chart.axis.major_tick_in = properties_dict["axis"][
-            "major_tick_in"
-        ]
 
 
 class StackedLines(BaseStackedLine):
@@ -1190,6 +973,28 @@ class StackedLines(BaseStackedLine):
     use_data_tiles = False
     no_colors_set = False
     color_bar = None
+    legend_added = False
+
+    def render_legend(self):
+        if self.legend:
+            mapper = LinearColorMapper(
+                palette=self.colors, low=1, high=len(self.y)
+            )
+            self.color_bar = ColorBar(
+                color_mapper=mapper,
+                location=(0, 0),
+                ticker=FixedTicker(ticks=list(range(1, len(self.y) + 1))),
+                major_label_overrides=dict(
+                    zip(list(range(1, len(self.y) + 1)), self.y)
+                ),
+                major_label_text_baseline="top",
+                major_label_text_align="left",
+                major_tick_in=0,
+                major_tick_out=0,
+            )
+            if self.legend_added is False:
+                self.chart.add_layout(self.color_bar, self.legend_position)
+                self.legend_added = True
 
     def calculate_source(self, data):
         """
@@ -1303,24 +1108,9 @@ class StackedLines(BaseStackedLine):
         )
 
         self.chart.add_tools(BoxSelectTool(dimensions="width"))
-
-        if self.legend:
-            mapper = LinearColorMapper(
-                palette=self.colors, low=1, high=len(self.y)
-            )
-            self.color_bar = ColorBar(
-                color_mapper=mapper,
-                location=(0, 0),
-                ticker=FixedTicker(ticks=list(range(1, len(self.y) + 1))),
-                major_label_overrides=dict(
-                    zip(list(range(1, len(self.y) + 1)), self.y)
-                ),
-                major_label_text_baseline="top",
-                major_label_text_align="left",
-                major_tick_in=0,
-                major_tick_out=0,
-            )
-            self.chart.add_layout(self.color_bar, self.legend_position)
+        # reset legend and color_bar
+        self.legend_added = False
+        self.color_bar = None
 
         self.chart.xgrid.grid_line_color = None
         self.chart.ygrid.grid_line_color = None
@@ -1338,6 +1128,9 @@ class StackedLines(BaseStackedLine):
             x_dtype=self.x_dtype,
             y_dtype=self.y_dtype,
         )
+
+        if self.legend_added is False:
+            self.render_legend()
 
     def update_dimensions(self, width=None, height=None):
         """
@@ -1383,88 +1176,14 @@ class StackedLines(BaseStackedLine):
         Ouput:
         """
 
-        self.chart.on_event(events.SelectionGeometry, callback)
+        self.add_event(events.SelectionGeometry, callback)
 
-    def apply_theme(self, properties_dict):
+    def apply_theme(self, theme):
         """
-        apply thematic changes to the chart based on the input
-        properties dictionary.
-
+        apply thematic changes to the chart based on the theme
         """
         if self.no_colors_set:
-            self.colors = [properties_dict["chart_color"]["color"]] * len(
-                self.y
-            )
+            self.colors = [theme.chart_color] * len(self.y)
             self.interactive_image.update_chart()
-        self.chart.xgrid.grid_line_color = properties_dict["geo_charts_grids"][
-            "xgrid"
-        ]
-        self.chart.ygrid.grid_line_color = properties_dict["geo_charts_grids"][
-            "ygrid"
-        ]
-
-        # title
-        self.chart.title.text_color = properties_dict["title"]["text_color"]
-        self.chart.title.text_font = properties_dict["title"]["text_font"]
-        self.chart.title.text_font_style = properties_dict["title"][
-            "text_font_style"
-        ]
-        self.chart.title.text_font_size = properties_dict["title"][
-            "text_font_size"
-        ]
-        if self.legend:
-            self.color_bar.major_label_text_color = properties_dict["title"][
-                "text_color"
-            ]
-            self.color_bar.title_text_color = properties_dict["title"][
-                "text_color"
-            ]
-
-        # background, border, padding
-        self.chart.background_fill_color = properties_dict[
-            "background_fill_color"
-        ]
-        self.chart.border_fill_color = properties_dict["border_fill_color"]
-        self.chart.min_border = properties_dict["min_border"]
-        self.chart.outline_line_width = properties_dict["outline_line_width"]
-        self.chart.outline_line_alpha = properties_dict["outline_line_alpha"]
-        self.chart.outline_line_color = properties_dict["outline_line_color"]
-
-        # x axis title
-        self.chart.xaxis.major_label_text_color = properties_dict["xaxis"][
-            "major_label_text_color"
-        ]
-        self.chart.xaxis.axis_line_width = properties_dict["xaxis"][
-            "axis_line_width"
-        ]
-        self.chart.xaxis.axis_line_color = properties_dict["xaxis"][
-            "axis_line_color"
-        ]
-
-        # y axis title
-        self.chart.yaxis.major_label_text_color = properties_dict["yaxis"][
-            "major_label_text_color"
-        ]
-        self.chart.yaxis.axis_line_width = properties_dict["yaxis"][
-            "axis_line_width"
-        ]
-        self.chart.yaxis.axis_line_color = properties_dict["yaxis"][
-            "axis_line_color"
-        ]
-
-        # axis ticks
-        self.chart.axis.major_tick_line_color = properties_dict["axis"][
-            "major_tick_line_color"
-        ]
-        self.chart.axis.minor_tick_line_color = properties_dict["axis"][
-            "minor_tick_line_color"
-        ]
-        self.chart.axis.minor_tick_out = properties_dict["axis"][
-            "minor_tick_out"
-        ]
-        self.chart.axis.major_tick_out = properties_dict["axis"][
-            "major_tick_out"
-        ]
-        self.chart.axis.major_tick_in = properties_dict["axis"][
-            "major_tick_in"
-        ]
+            self.legend_added = False
+            self.render_legend()

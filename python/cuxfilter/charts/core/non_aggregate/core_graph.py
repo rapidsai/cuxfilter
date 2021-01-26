@@ -35,7 +35,7 @@ class BaseGraph(BaseChart):
         edge_aggregate_col=None,
         node_aggregate_fn="count",
         edge_aggregate_fn="count",
-        node_color_palette=CUXF_DEFAULT_COLOR_PALETTE,
+        node_color_palette=None,
         edge_color_palette=["#000000"],
         node_point_size=1,
         node_point_shape="circle",
@@ -115,7 +115,12 @@ class BaseGraph(BaseChart):
         self.edge_aggregate_col = edge_aggregate_col
         self.node_aggregate_fn = node_aggregate_fn
         self.edge_aggregate_fn = edge_aggregate_fn
-        self.node_color_palette = list(node_color_palette)
+        if node_color_palette is None:
+            self.no_colors_set = True
+            self.node_color_palette = CUXF_DEFAULT_COLOR_PALETTE
+        else:
+            self.node_color_palette = list(node_color_palette)
+
         self.edge_color_palette = list(edge_color_palette)
         self.node_point_size = node_point_size
         self.node_point_shape = node_point_shape
