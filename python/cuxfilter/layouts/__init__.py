@@ -16,4 +16,4 @@ from .layouts import (
     Layout12 as three_by_three,
 )
 
-STATIC_DIR = pathlib.Path(__file__).parent / "assets"
+STATIC_DIR_LAYOUT = pathlib.Path(__file__).parent / "assets"

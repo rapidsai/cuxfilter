@@ -1,3 +1,7 @@
-from .light import Theme as light
-from .dark import Theme as dark
-from .rapids import Theme as rapids
+import pathlib
+
+from .light import LightTheme as light
+from .dark import DarkTheme as dark
+from .rapids import RapidsTheme as rapids
+
+STATIC_DIR_THEMES = pathlib.Path(__file__).parent / "assets"

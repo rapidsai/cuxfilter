@@ -1,8 +1,6 @@
 import re
 import numpy as np
 import panel as pn
-from ..themes import dark, rapids
-from panel.template import DarkTheme
 
 from .custom_react_template import ReactTemplate
 
@@ -33,11 +31,7 @@ class _LayoutBase:
     def generate_dashboard(self, title, charts, theme, layout_array=None):
         pn.config.sizing_mode = "stretch_both"
         self._layout_array = layout_array
-        if theme in [dark, rapids]:
-            tmpl = ReactTemplate(title=title, theme=DarkTheme, compact="both")
-        else:
-            tmpl = ReactTemplate(title=title, compact="both")
-
+        tmpl = ReactTemplate(title=title, theme=theme, compact="both")
         widgets = [x for x in charts.values() if is_widget(x)]
         tmpl = self._process_widgets(widgets, tmpl)
         self._apply_themes(charts, theme)
@@ -48,7 +42,7 @@ class _LayoutBase:
     def _apply_themes(self, charts, theme):
         for chart in charts.values():
             if hasattr(chart, "apply_theme"):
-                chart.apply_theme(theme.chart_properties)
+                chart.apply_theme(theme)
 
     def _process_widgets(self, widgets_list, tmpl):
         for obj in widgets_list:

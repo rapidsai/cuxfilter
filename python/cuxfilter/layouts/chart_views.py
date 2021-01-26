@@ -1,10 +1,6 @@
 import panel as pn
 
 
-def is_widget(obj):
-    return "widget" in obj.chart_type or obj.chart_type == "datasize_indicator"
-
-
 def chart_view(*charts, **params):
     """
     Parameters:

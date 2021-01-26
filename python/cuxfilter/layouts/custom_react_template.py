@@ -1,6 +1,3 @@
-"""
-React template
-"""
 import pathlib
 from urllib.parse import urljoin
 import param
@@ -10,10 +7,10 @@ from panel.util import url_path
 from panel.depends import depends
 from panel.layout import Card, GridSpec
 from panel.template.base import BasicTemplate
-from panel.template.theme import DarkTheme, DefaultTheme
 import os
 
-CUSTOM_DIST_PATH = "custom-react"
+CUSTOM_DIST_PATH_LAYOUTS = "layouts"
+CUSTOM_DIST_PATH_THEMES = "themes"
 ASSETS_PATH = pathlib.Path(__file__).parent / "assets"
 
 
@@ -90,12 +87,12 @@ class ReactTemplate(BasicTemplate):
 
         # CSS files
         base_css = os.path.basename(self._css)
-        css_files["base"] = f"{CUSTOM_DIST_PATH}/{base_css}"
+        css_files["base"] = f"{CUSTOM_DIST_PATH_LAYOUTS}/{base_css}"
         if self.theme:
             theme = self.theme.find_theme(type(self))
             if theme and theme.css:
                 basename = os.path.basename(theme.css)
-                css_files["theme"] = f"{CUSTOM_DIST_PATH}/{basename}"
+                css_files["theme"] = f"{CUSTOM_DIST_PATH_THEMES}/{basename}"
         return {"css": css_files, "js": js_files}
 
     def __init__(self, **params):
@@ -129,17 +126,3 @@ class ReactTemplate(BasicTemplate):
         self._render_variables["cols"] = self.cols
         self._render_variables["rowHeight"] = self.row_height
         self._render_variables["compact"] = self.compact
-
-
-class ReactDefaultTheme(DefaultTheme):
-
-    css = param.Filename(default=ASSETS_PATH / "default.css")
-
-    _template = ReactTemplate
-
-
-class ReactDarkTheme(DarkTheme):
-
-    css = param.Filename(default=ASSETS_PATH / "custom-dark.css")
-
-    _template = ReactTemplate
