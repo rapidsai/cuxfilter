@@ -957,7 +957,7 @@ class Line(BaseLine):
         """
         apply thematic changes to the chart based on the theme
         """
-        if self.no_colors_set:
+        if self.no_color_set:
             self.color = theme.chart_color
             self.interactive_image.update_chart()
 
