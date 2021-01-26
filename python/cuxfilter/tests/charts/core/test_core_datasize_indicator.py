@@ -1,5 +1,6 @@
 import pytest
 import pandas as pd
+import panel as pn
 import cudf
 
 import cuxfilter
@@ -42,13 +43,10 @@ class TestBaseDataSizeIndicator:
         dashboard = self.cux_df.dashboard(charts=[])
         bdsi.initiate_chart(dashboard)
         bdsi.chart = chart
+        bdsi.progress_bar = None
 
         assert str(bdsi.view()) == str(
-            chart_view(
-                _chart,
-                css_classes=["non-handle-temp"],
-                title="Datapoints Selected",
-            )
+            chart_view(pn.Column(_chart, None), title="Datapoints Selected",)
         )
 
     def test_calculate_source(self):
