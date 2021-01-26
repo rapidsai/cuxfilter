@@ -113,7 +113,7 @@ class BaseChoropleth(BaseChart):
         self.tooltip = tooltip
         self.tooltip_include_cols = tooltip_include_cols
         self.nan_color = nan_color
-        self.title = title if title else f"choropleth for {self.x} "
+        self.title = title if title else f"{self.x}"
         if "x_range" not in self.library_specific_params:
             self.library_specific_params["x_range"] = x_range
 

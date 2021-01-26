@@ -28,7 +28,7 @@ class BaseWidget:
 
     @property
     def name(self):
-        return self.x + "_" + self.chart_type
+        return self.x
 
     @property
     def stride(self):
