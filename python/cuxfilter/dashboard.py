@@ -12,7 +12,7 @@ from .charts.constants import (
     CUSTOM_DIST_PATH_THEMES,
     CUSTOM_DIST_PATH_LAYOUTS,
     STATIC_DIR_LAYOUT,
-    STATIC_DIR_THEMES
+    STATIC_DIR_THEMES,
 )
 from .datatile import DataTile
 from .layouts import single_feature
