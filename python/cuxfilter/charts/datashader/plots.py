@@ -13,7 +13,6 @@ from .custom_extensions import (
 from distutils.version import LooseVersion
 import datashader as ds
 from datashader import transfer_functions as tf
-from datashader.colors import Hot
 import dask_cudf
 import dask.dataframe as dd
 import numpy as np
@@ -148,7 +147,6 @@ class Scatter(BaseScatter):
     reset_event = events.Reset
     data_y_axis = "y"
     data_x_axis = "x"
-    no_colors_set = False
     constant_limit = None
     color_bar = None
     legend_added = False
@@ -261,10 +259,6 @@ class Scatter(BaseScatter):
 
         Ouput:
         """
-        if self.color_palette is None:
-            self.no_colors_set = True
-            self.color_palette = Hot
-
         if len(self.title) == 0:
             self.title = (
                 "Scatter plot for "
@@ -360,8 +354,8 @@ class Scatter(BaseScatter):
         """
         apply thematic changes to the chart based on the theme
         """
-        if self.no_colors_set:
-            self.color_palette = theme.color_palette
+        if not self.colors_set:
+            self.default_palette = theme.color_palette
             self.render_legend()
             self.interactive_image.update_chart()
 
@@ -374,7 +368,6 @@ class Graph(BaseGraph):
     reset_event = events.Reset
     data_y_axis = "node_y"
     data_x_axis = "node_x"
-    no_colors_set = False
     image = None
     constant_limit_nodes = None
     constant_limit_edges = None
@@ -609,10 +602,6 @@ class Graph(BaseGraph):
 
         Ouput:
         """
-        if self.node_color_palette is None:
-            self.no_colors_set = True
-            self.node_color_palette = Hot
-
         if len(self.title) == 0:
             self.title = "Graph"
         self.x_range = (
@@ -770,8 +759,8 @@ class Graph(BaseGraph):
         """
         apply thematic changes to the chart based on the theme
         """
-        if self.no_colors_set:
-            self.node_color_palette = theme.color_palette
+        if not self.colors_set:
+            self.default_palette = theme.color_palette
             self.render_legend()
             self.interactive_image.update_chart()
 
@@ -868,10 +857,6 @@ class Line(BaseLine):
 
         Ouput:
         """
-        if self.color is None:
-            self.color = "#8735fb"
-            self.no_color_set = True
-
         if len(self.title) == 0:
             if self.x == self.y:
                 self.title = "Line plot for " + self.x
@@ -957,8 +942,8 @@ class Line(BaseLine):
         """
         apply thematic changes to the chart based on the theme
         """
-        if self.no_color_set:
-            self.color = theme.chart_color
+        if not self.color_set:
+            self.default_color = theme.chart_color
             self.interactive_image.update_chart()
 
 
@@ -971,7 +956,6 @@ class StackedLines(BaseStackedLine):
     data_y_axis = "y"
     data_x_axis = "x"
     use_data_tiles = False
-    no_colors_set = False
     color_bar = None
     legend_added = False
 
@@ -1087,11 +1071,6 @@ class StackedLines(BaseStackedLine):
 
         Ouput:
         """
-
-        if self.colors == []:
-            self.no_colors_set = True
-            self.colors = ["#8735fb"] * len(self.y)
-
         if len(self.title) == 0:
             self.title = "Stacked Line plots on x-axis: " + self.x
 
@@ -1182,8 +1161,8 @@ class StackedLines(BaseStackedLine):
         """
         apply thematic changes to the chart based on the theme
         """
-        if self.no_colors_set:
-            self.colors = [theme.chart_color] * len(self.y)
+        if not self.colors_set:
+            self.default_colors = [theme.chart_color]
             self.interactive_image.update_chart()
             self.legend_added = False
             self.render_legend()

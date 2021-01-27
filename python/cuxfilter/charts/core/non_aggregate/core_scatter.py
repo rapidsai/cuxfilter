@@ -15,6 +15,17 @@ class BaseScatter(BaseNonAggregate):
     x_range: Tuple = None
     y_range: Tuple = None
     aggregate_col = None
+    default_palette = CUXF_DEFAULT_COLOR_PALETTE
+
+    @property
+    def colors_set(self):
+        return self._color_palette_input is not None
+
+    @property
+    def color_palette(self):
+        if self.colors_set:
+            return list(self._color_palette_input)
+        return self.default_palette
 
     def __init__(
         self,
@@ -79,12 +90,7 @@ class BaseScatter(BaseNonAggregate):
         else:
             self.aggregate_col = self.y
 
-        # if tuple, typecasting color_palette to a list
-        if color_palette is None:
-            self.no_colors_set = True
-            self.color_palette = CUXF_DEFAULT_COLOR_PALETTE
-        else:
-            self.color_palette = list(color_palette)
+        self._color_palette_input = color_palette
         self.aggregate_fn = aggregate_fn
         self.width = width
         self.height = height

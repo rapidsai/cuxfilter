@@ -20,6 +20,17 @@ class BaseGraph(BaseChart):
     x_range: Tuple = None
     y_range: Tuple = None
     use_data_tiles = False
+    default_palette = CUXF_DEFAULT_COLOR_PALETTE
+
+    @property
+    def colors_set(self):
+        return self._node_color_palette_input is not None
+
+    @property
+    def node_color_palette(self):
+        if self.colors_set:
+            return list(self._node_color_palette_input)
+        return self.default_palette
 
     def __init__(
         self,
@@ -115,12 +126,7 @@ class BaseGraph(BaseChart):
         self.edge_aggregate_col = edge_aggregate_col
         self.node_aggregate_fn = node_aggregate_fn
         self.edge_aggregate_fn = edge_aggregate_fn
-        if node_color_palette is None:
-            self.no_colors_set = True
-            self.node_color_palette = CUXF_DEFAULT_COLOR_PALETTE
-        else:
-            self.node_color_palette = list(node_color_palette)
-
+        self._node_color_palette_input = node_color_palette
         self.edge_color_palette = list(edge_color_palette)
         self.node_point_size = node_point_size
         self.node_point_shape = node_point_shape
