@@ -1,5 +1,6 @@
 from ..core_chart import BaseChart
 from ....layouts import chart_view
+import panel as pn
 
 
 class BaseDataSizeIndicator(BaseChart):
@@ -44,8 +45,7 @@ class BaseDataSizeIndicator(BaseChart):
 
     def view(self):
         return chart_view(
-            self.chart,
-            css_classes=["non-handle-temp"],
+            pn.Column(self.chart, self.progress_bar),
             title="Datapoints Selected",
         )
 

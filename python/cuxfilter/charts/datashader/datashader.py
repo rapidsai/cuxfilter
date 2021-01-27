@@ -1,5 +1,4 @@
 from . import plots
-from ..constants import CUXF_DEFAULT_COLOR_PALETTE
 
 
 def scatter(
@@ -8,7 +7,7 @@ def scatter(
     x_range=None,
     y_range=None,
     add_interaction=True,
-    color_palette=CUXF_DEFAULT_COLOR_PALETTE,
+    color_palette=None,
     aggregate_col=None,
     aggregate_fn="count",
     point_size=1,
@@ -145,7 +144,7 @@ def graph(
     edge_aggregate_col=None,
     node_aggregate_fn="count",
     edge_aggregate_fn="count",
-    node_color_palette=CUXF_DEFAULT_COLOR_PALETTE,
+    node_color_palette=None,
     edge_color_palette=["#000000"],
     node_point_size=8,
     node_point_shape="circle",
@@ -320,7 +319,7 @@ def heatmap(
     x_range=None,
     y_range=None,
     add_interaction=True,
-    color_palette=CUXF_DEFAULT_COLOR_PALETTE,
+    color_palette=None,
     aggregate_col=None,
     aggregate_fn="mean",
     point_size=10,

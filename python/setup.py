@@ -27,6 +27,12 @@ setup(
         include=["cuxfilter", "cuxfilter.*"],
         exclude=("tests", "docs", "notebooks"),
     ),
+    package_data=dict.fromkeys(
+        find_packages(
+            include=["cuxfilter.layouts.assets", "cuxfilter.themes.assets"]
+        ),
+        ["*.css", "*.html"],
+    ),
     cmdclass=versioneer.get_cmdclass(),
     zip_safe=False,
 )

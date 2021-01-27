@@ -22,6 +22,7 @@ class BaseStackedLine(BaseChart):
     use_data_tiles = False
     y: list = []
     colors: list = []
+    default_colors = ["#8735fb"]
 
     @property
     def y_dtype(self):
@@ -32,6 +33,16 @@ class BaseStackedLine(BaseChart):
         if isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
             return self.source[self.y[0]].dtype
         return None
+
+    @property
+    def colors_set(self):
+        return self._colors_input != []
+
+    @property
+    def colors(self):
+        if self.colors_set:
+            return list(self._colors_input)
+        return self.default_colors * len(self.y)
 
     def __init__(
         self,
@@ -89,7 +100,7 @@ class BaseStackedLine(BaseChart):
         self.stride = step_size
         if not isinstance(colors, list):
             raise TypeError("colors must be a list of colors")
-        self.colors = colors
+        self._colors_input = colors
         self.stride_type = step_size_type
         self.title = title
         self.timeout = timeout

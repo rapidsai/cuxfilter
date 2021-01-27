@@ -60,12 +60,12 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
         temp_df[chart.y] = data.dropna(subset=[chart.x])[chart.y]
         if isinstance(temp_df, dask_cudf.core.DataFrame):
             groupby_res = getattr(
-                temp_df.groupby(by=[chart.x]), chart.aggregate_fn
+                temp_df.groupby(by=[chart.x], sort=True), chart.aggregate_fn
             )()
             groupby_res = groupby_res.reset_index().compute().to_pandas()
         else:
             groupby_res = (
-                temp_df.groupby(by=[chart.x], as_index=False)
+                temp_df.groupby(by=[chart.x], sort=True, as_index=False)
                 .agg({chart.y: chart.aggregate_fn})
                 .to_pandas()
             )
@@ -76,7 +76,7 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
             groupby_res = None
             for key, agg_fn in agg.items():
                 groupby_res_temp = getattr(
-                    temp_df[[chart.x, key]].groupby(chart.x), agg_fn
+                    temp_df[[chart.x, key]].groupby(chart.x, sort=True), agg_fn
                 )()
                 if groupby_res is None:
                     groupby_res = groupby_res_temp.reset_index().compute()
@@ -90,7 +90,7 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
             groupby_res = groupby_res.to_pandas()
         else:
             groupby_res = (
-                temp_df.groupby(by=[chart.x], as_index=False)
+                temp_df.groupby(by=[chart.x], sort=True, as_index=False)
                 .agg(agg)
                 .to_pandas()
             )

@@ -1,4 +1,3 @@
-import pathlib
 from .chart_views import chart_view
 from .layouts import (
     Layout0 as single_feature,
@@ -15,5 +14,3 @@ from .layouts import (
     Layout11 as double_feature_quad_base,
     Layout12 as three_by_three,
 )
-
-STATIC_DIR = pathlib.Path(__file__).parent / "assets"

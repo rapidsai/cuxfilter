@@ -61,16 +61,12 @@ class RangeSlider(BaseWidget):
         )
         self.compute_stride()
 
-    def apply_theme(self, properties_dict):
+    def apply_theme(self, theme):
         """
-        apply thematic changes to the chart based on the input
-        properties dictionary.
-
+        apply thematic changes to the chart based on the theme
         """
         # interactive slider
-        self.datatile_active_color = properties_dict["widgets"][
-            "datatile_active_color"
-        ]
+        self.datatile_active_color = theme.datatile_active_color
 
     def add_events(self, dashboard_cls):
         """
@@ -176,16 +172,12 @@ class DateRangeSlider(BaseWidget):
             **self.params,
         )
 
-    def apply_theme(self, properties_dict):
+    def apply_theme(self, theme):
         """
-        apply thematic changes to the chart based on the input
-        properties dictionary.
-
+        apply thematic changes to the chart based on the theme
         """
         # interactive slider
-        self.datatile_active_color = properties_dict["widgets"][
-            "datatile_active_color"
-        ]
+        self.datatile_active_color = theme.datatile_active_color
 
     def add_events(self, dashboard_cls):
         """
@@ -279,16 +271,12 @@ class IntSlider(BaseWidget):
                 **self.params,
             )
 
-    def apply_theme(self, properties_dict):
+    def apply_theme(self, theme):
         """
-        apply thematic changes to the chart based on the input
-        properties dictionary.
-
+        apply thematic changes to the chart based on the theme
         """
         # interactive slider
-        self.datatile_active_color = properties_dict["widgets"][
-            "datatile_active_color"
-        ]
+        self.datatile_active_color = theme.datatile_active_color
 
     def add_events(self, dashboard_cls):
         """
@@ -378,16 +366,12 @@ class FloatSlider(BaseWidget):
                 **self.params,
             )
 
-    def apply_theme(self, properties_dict):
+    def apply_theme(self, theme):
         """
-        apply thematic changes to the chart based on the input
-        properties dictionary.
-
+        apply thematic changes to the chart based on the theme
         """
         # interactive slider
-        self.datatile_active_color = properties_dict["widgets"][
-            "datatile_active_color"
-        ]
+        self.datatile_active_color = theme.datatile_active_color
 
     def add_events(self, dashboard_cls):
         """
@@ -483,21 +467,12 @@ class DropDown(BaseWidget):
             **self.params,
         )
 
-    def apply_theme(self, properties_dict):
+    def apply_theme(self, theme):
         """
-        apply thematic changes to the chart based on the input
-        properties dictionary.
+        apply thematic changes to the chart based on the theme
 
         """
-        css = """
-            .custom-dropdown select, .custom-dropdown option {{
-                background-color: {0} !important;
-            }}
-            """
-        css = css.format(properties_dict["widgets"]["background_color"])
-        pn.config.raw_css = pn.config.raw_css + [css]
-
-        self.chart.css_classes = ["custom-dropdown"]
+        pass
 
     def add_events(self, dashboard_cls):
         """
@@ -592,26 +567,12 @@ class MultiSelect(BaseWidget):
             **self.params,
         )
 
-    def apply_theme(self, properties_dict):
+    def apply_theme(self, theme):
         """
-        apply thematic changes to the chart based on the input
-        properties dictionary.
+        apply thematic changes to the chart based on the theme
 
         """
-        css = """
-            .custom-dropdown select, .custom-dropdown option {{
-                background-color: {0} !important;
-
-            }}
-            .custom-dropdown {{
-                font-size: 15px !important;
-                margin-bottom: 5px;
-            }}
-            """
-        css = css.format(properties_dict["widgets"]["background_color"])
-        pn.config.raw_css = pn.config.raw_css + [css]
-
-        self.chart.css_classes = ["custom-dropdown"]
+        pass
 
     def add_events(self, dashboard_cls):
         """
@@ -653,13 +614,8 @@ class DataSizeIndicator(BaseDataSizeIndicator):
     """
 
     css = """
-        .non-handle-temp .noUi-handle {
-            display: none !important;
-            color:blue;
-        }
-
-        .non-handle-temp [disabled] .bk-noUi-connect {
-            background: purple;
+        .indicator {
+            text-align: center;
         }
         """
     pn.config.raw_css = pn.config.raw_css + [css]
@@ -674,10 +630,13 @@ class DataSizeIndicator(BaseDataSizeIndicator):
 
         """
         if patch_update:
-            self.chart.value = float(source_dict["Y"][0])
+            self.chart.value = int(source_dict["Y"][0])
+            self.progress_bar.value = int(
+                (self.chart.value / self.max_value) * 100
+            )
         else:
-            self.source = float(source_dict["Y"][0])
-            self.source_backup = self.source
+            self.source = int(source_dict["Y"][0])
+            self.source_backup = int(self.source)
 
     def get_source_y_axis(self):
         """
@@ -689,21 +648,24 @@ class DataSizeIndicator(BaseDataSizeIndicator):
         """
         generate chart float slider
         """
-        self.chart = pn.widgets.FloatSlider(
-            # name="Data Points selected",
-            width=self.width,
-            start=0,
-            end=self.max_value,
-            value=self.max_value,
+        self.chart = pn.indicators.Number(
+            value=int(self.max_value),
+            format="{value:,}",
+            font_size="18pt",
+            sizing_mode="stretch_width",
+            css_classes=["indicator"],
+        )
+        self.progress_bar = pn.indicators.Progress(
+            name="Progress",
+            value=int((self.chart.value / self.max_value) * 100),
+            sizing_mode="stretch_width",
         )
 
-    def apply_theme(self, properties_dict):
+    def apply_theme(self, theme):
         """
-        apply thematic changes to the chart based on the input
-        properties dictionary.
+        apply thematic changes to the chart based on the theme
         """
-
-        self.chart.bar_color = properties_dict["data_size_indicator_color"]
+        self.progress_bar.bar_color = theme.datasize_indicator_class
 
     def reload_chart(self, data, patch_update=True):
         """
@@ -711,7 +673,7 @@ class DataSizeIndicator(BaseDataSizeIndicator):
         """
         self.calculate_source(data, patch_update=patch_update)
 
-    def reset_chart(self, data: float = -1):
+    def reset_chart(self, data: int = -1):
         """
         Description:
             if len(data) is 0, reset the chart using self.source_backup
@@ -725,4 +687,7 @@ class DataSizeIndicator(BaseDataSizeIndicator):
         if data == -1:
             self.chart.value = self.source_backup
         else:
-            self.chart.value = float(data)
+            self.chart.value = int(data)
+        self.progress_bar.value = int(
+            (self.chart.value / self.max_value) * 100
+        )

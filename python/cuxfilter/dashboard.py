@@ -8,8 +8,14 @@ import os
 import urllib
 
 from .charts.core import BaseChart, BaseWidget, ViewDataFrame
+from .charts.constants import (
+    CUSTOM_DIST_PATH_THEMES,
+    CUSTOM_DIST_PATH_LAYOUTS,
+    STATIC_DIR_LAYOUT,
+    STATIC_DIR_THEMES,
+)
 from .datatile import DataTile
-from .layouts import single_feature, STATIC_DIR
+from .layouts import single_feature
 from .charts.panel_widgets import data_size_indicator
 from .assets import screengrab, get_open_port
 from .themes import light
@@ -377,7 +383,10 @@ class DashBoard:
             show=show,
             start=start,
             title=self.title,
-            static_dirs={"custom-react": STATIC_DIR},
+            static_dirs={
+                CUSTOM_DIST_PATH_LAYOUTS: STATIC_DIR_LAYOUT,
+                CUSTOM_DIST_PATH_THEMES: STATIC_DIR_THEMES,
+            },
             **kwargs,
         )
         server_document(websocket_origin, resources=None)
