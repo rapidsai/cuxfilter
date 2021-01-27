@@ -1,4 +1,3 @@
-import pathlib
 from urllib.parse import urljoin
 import param
 from panel.io.resources import LOCAL_DIST
@@ -8,10 +7,11 @@ from panel.depends import depends
 from panel.layout import Card, GridSpec
 from panel.template.base import BasicTemplate
 import os
-
-CUSTOM_DIST_PATH_LAYOUTS = "layouts"
-CUSTOM_DIST_PATH_THEMES = "themes"
-ASSETS_PATH = pathlib.Path(__file__).parent / "assets"
+from . import STATIC_DIR_LAYOUT
+from ..charts.constants import (
+    CUSTOM_DIST_PATH_LAYOUTS,
+    CUSTOM_DIST_PATH_THEMES,
+)
 
 
 class ReactTemplate(BasicTemplate):
@@ -38,9 +38,9 @@ class ReactTemplate(BasicTemplate):
 
     row_height = param.Integer(default=0)
 
-    _css = ASSETS_PATH / "react.css"
+    _css = STATIC_DIR_LAYOUT / "react.css"
 
-    _template = ASSETS_PATH / "react.html"
+    _template = STATIC_DIR_LAYOUT / "react.html"
 
     _modifiers = {Card: {"children": {"margin": (20, 20)}, "margin": (10, 5)}}
 

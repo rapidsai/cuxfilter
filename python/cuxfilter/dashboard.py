@@ -8,6 +8,7 @@ import os
 import urllib
 
 from .charts.core import BaseChart, BaseWidget, ViewDataFrame
+from .charts.constants import CUSTOM_DIST_PATH_THEMES, CUSTOM_DIST_PATH_LAYOUTS
 from .datatile import DataTile
 from .layouts import single_feature, STATIC_DIR_LAYOUT
 from .charts.panel_widgets import data_size_indicator
@@ -378,8 +379,8 @@ class DashBoard:
             start=start,
             title=self.title,
             static_dirs={
-                "layouts": STATIC_DIR_LAYOUT,
-                "themes": STATIC_DIR_THEMES,
+                CUSTOM_DIST_PATH_LAYOUTS: STATIC_DIR_LAYOUT,
+                CUSTOM_DIST_PATH_THEMES: STATIC_DIR_THEMES,
             },
             **kwargs,
         )

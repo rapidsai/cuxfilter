@@ -1,12 +1,9 @@
-import pathlib
 import param
-
 from bokeh.themes import Theme as _BkTheme
 from bokeh import palettes
 from panel.template.theme import Theme
 from ..layouts.layouts import ReactTemplate
-
-ASSETS_PATH = pathlib.Path(__file__).parent / "assets"
+from . import STATIC_DIR_THEMES
 
 
 class RapidsTheme(Theme):
@@ -78,7 +75,7 @@ class RapidsTheme(Theme):
     mapbox_style = "mapbox://styles/mapbox/dark-v9"
     color_palette = list(palettes.Purples[9])
     chart_color = "#8735fb"
-    css = param.Filename(default=ASSETS_PATH / "rapids.css")
+    css = param.Filename(default=STATIC_DIR_THEMES / "rapids.css")
     datatile_active_color = "#8735fb"
 
     # Custom React Template

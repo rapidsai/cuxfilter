@@ -1,13 +1,10 @@
-import pathlib
 import param
-
 from bokeh.themes import Theme as _BkTheme
 from bokeh import palettes
 from panel.template.theme import DefaultTheme
 from ..layouts.layouts import ReactTemplate
 from ..charts.constants import DATATILE_ACTIVE_COLOR
-
-ASSETS_PATH = pathlib.Path(__file__).parent / "assets"
+from . import STATIC_DIR_THEMES
 
 
 class LightTheme(DefaultTheme):
@@ -78,7 +75,7 @@ class LightTheme(DefaultTheme):
     mapbox_style = "mapbox://styles/mapbox/light-v9"
     color_palette = list(palettes.Blues[9])
     chart_color = "#4292c6"
-    css = param.Filename(default=ASSETS_PATH / "default.css")
+    css = param.Filename(default=STATIC_DIR_THEMES / "default.css")
     datatile_active_color = DATATILE_ACTIVE_COLOR
 
     # Custom React Template
