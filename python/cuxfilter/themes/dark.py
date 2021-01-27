@@ -3,8 +3,7 @@ from bokeh.themes import Theme as _BkTheme
 from bokeh import palettes
 from panel.template.theme import Theme
 from ..layouts.layouts import ReactTemplate
-from ..charts.constants import DATATILE_ACTIVE_COLOR
-from . import STATIC_DIR_THEMES
+from ..charts.constants import DATATILE_ACTIVE_COLOR, STATIC_DIR_THEMES
 
 
 class DarkTheme(Theme):

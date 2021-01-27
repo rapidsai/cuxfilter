@@ -1,5 +1,6 @@
-from bokeh.palettes import Viridis10
 import numpy as np
+import pathlib
+from bokeh.palettes import Viridis10
 
 BOOL_MAP = {0: "False", 1: "True"}
 CUXF_NAN_COLOR = "#d3d3d3"
@@ -14,3 +15,5 @@ DATATILE_INACTIVE_COLOR = "#d3d9e2"
 # Static server paths
 CUSTOM_DIST_PATH_LAYOUTS = "layouts"
 CUSTOM_DIST_PATH_THEMES = "themes"
+STATIC_DIR_LAYOUT = pathlib.Path(__file__).parent.parent / "layouts/assets"
+STATIC_DIR_THEMES = pathlib.Path(__file__).parent.parent / "themes/assets"

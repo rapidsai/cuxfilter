@@ -7,8 +7,8 @@ from panel.depends import depends
 from panel.layout import Card, GridSpec
 from panel.template.base import BasicTemplate
 import os
-from . import STATIC_DIR_LAYOUT
 from ..charts.constants import (
+    STATIC_DIR_LAYOUT,
     CUSTOM_DIST_PATH_LAYOUTS,
     CUSTOM_DIST_PATH_THEMES,
 )

@@ -3,7 +3,7 @@ from bokeh.themes import Theme as _BkTheme
 from bokeh import palettes
 from panel.template.theme import Theme
 from ..layouts.layouts import ReactTemplate
-from . import STATIC_DIR_THEMES
+from ..charts.constants import STATIC_DIR_THEMES
 
 
 class RapidsTheme(Theme):
