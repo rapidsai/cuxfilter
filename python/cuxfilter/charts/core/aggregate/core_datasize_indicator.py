@@ -1,5 +1,6 @@
 from ..core_chart import BaseChart
 from ....layouts import chart_view
+import panel as pn
 
 
 class BaseDataSizeIndicator(BaseChart):
@@ -43,8 +44,6 @@ class BaseDataSizeIndicator(BaseChart):
         self.generate_chart()
 
     def view(self):
-        import panel as pn
-
         return chart_view(
             pn.Column(self.chart, self.progress_bar),
             title="Datapoints Selected",
