@@ -6,13 +6,6 @@ Python:
  - 'python/**'
  - 'notebooks/**'
 
-cpp:
- - 'cpp/**'
-
-CMake:
- - '**/CMakeLists.txt'
- - '**/cmake/**'
-
 gpuCI:
    - 'ci/**'
 
