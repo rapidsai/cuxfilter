@@ -700,12 +700,6 @@ class NumberChart(BaseNumberChart):
         """
     pn.config.raw_css = pn.config.raw_css + [css]
 
-    @property
-    def sizing_mode(self):
-        if "widget" in self.chart_type:
-            return "stretch_width"
-        return "stretch_both"
-
     def calculate_source(self, data, patch_update=False):
         """
         calculate source
@@ -736,7 +730,7 @@ class NumberChart(BaseNumberChart):
 
         self.chart = pn.indicators.Number(
             value=int(self.value),
-            sizing_mode=self.sizing_mode,
+            sizing_mode="stretch_both",
             css_classes=["indicator"],
             format=self.format,
             colors=self.colors,
@@ -780,4 +774,4 @@ class Card:
         self.generate_chart()
 
     def generate_chart(self):
-        self.chart = pn.Column(self.content)
+        self.chart = pn.Column(self.content, sizing_mode="stretch_both")
