@@ -1,19 +1,16 @@
-# from .bokeh import bokeh
-# from .datashader import datashader
-# from .deckgl import deckgl
-# from .panel_widgets import panel_widgets
-
 from .bokeh import bar, line
+from .core import view_dataframe
+from .constants import *
 from .datashader import scatter, stacked_lines, heatmap, graph
 from .deckgl import choropleth
 from .panel_widgets import (
-    range_slider,
-    int_slider,
+    card,
+    data_size_indicator,
+    drop_down,
     date_range_slider,
     float_slider,
+    int_slider,
     multi_select,
-    drop_down,
-    data_size_indicator,
+    number,
+    range_slider,
 )
-from .core import view_dataframe
-from .constants import *

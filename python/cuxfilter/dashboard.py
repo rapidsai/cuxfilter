@@ -647,9 +647,8 @@ class DashBoard:
 
         """
         for chart in self._charts.values():
-            if (
-                self._active_view != chart.name
-                and "widget" not in chart.chart_type
+            if self._active_view != chart.name and hasattr(
+                chart, "query_chart_by_range"
             ):
                 if chart.chart_type == "view_dataframe":
                     chart.query_chart_by_range(
@@ -684,9 +683,8 @@ class DashBoard:
         datatiles using new_indices.
         """
         for chart in self._charts.values():
-            if (
-                self._active_view != chart.name
-                and "widget" not in chart.chart_type
+            if self._active_view != chart.name and hasattr(
+                chart, "query_chart_by_range"
             ):
                 if chart.chart_type == "view_dataframe":
                     chart.query_chart_by_indices(

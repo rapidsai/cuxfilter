@@ -6,4 +6,6 @@ from .panel_widgets import (
     drop_down,
     multi_select,
     data_size_indicator,
+    number,
+    card,
 )

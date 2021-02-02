@@ -123,23 +123,23 @@ def test_format_result(result, return_format_str, return_format):
     )
 
 
-def test_calc_data_tile_for_size():
+def test_calc_1d_data_tile():
     df = cudf.DataFrame(
         {
             "key": [float(i) for i in range(5)] * 5,
             "val": [float(i * 2) for i in range(5, 0, -1)] * 5,
         }
     )
-    col_1 = "key"
-    min_1, max_1 = df[col_1].min(), df[col_1].max()
-    stride_1 = 1
+    active_chart, passive_chart = BaseChart(), BaseChart()
+    active_chart.x = "key"
+    active_chart.min_value = df["key"].min()
+    active_chart.max_value = df["key"].max()
+    active_chart.stride = 1
     cumsum = True
-    return_result = gpu_datatile.calc_data_tile_for_size(
+    return_result = gpu_datatile.calc_1d_data_tile(
         df=df,
-        col_1=col_1,
-        min_1=min_1,
-        max_1=max_1,
-        stride_1=stride_1,
+        active_view=active_chart,
+        passive_view=passive_chart,
         cumsum=cumsum,
     )
 
