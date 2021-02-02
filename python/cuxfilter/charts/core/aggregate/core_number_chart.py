@@ -94,18 +94,46 @@ class BaseNumberChart(BaseChart):
         """
         self.calculate_source(data, patch_update=patch_update)
 
+    def _compute_source(self, query, local_dict, indices):
+        """
+        Compute source dataframe based on the values query and indices.
+        If both are not provided, return the original dataframe.
+        """
+        result = self.source
+        if indices is not None:
+            result = result[indices]
+        if len(query) > 0:
+            result = result.query(query, local_dict)
+
+        return result
+
     def query_chart_by_range(
-        self, active_chart, query_tuple, datatile, query="", local_dict={},
+        self,
+        active_chart,
+        query_tuple,
+        datatile,
+        query="",
+        local_dict={},
+        indices=None,
     ):
         """
         Description:
-
+        Reload the current chart by querying its source with current state
+        & new queried_tuple for the active chart
         -------------------------------------------
         Input:
             1. active_chart: chart object of active_chart
             2. query_tuple: (min_val, max_val) of the query [type: tuple]
             3. datatile: datatile of active chart for current
                         chart[type:pandas df]
+            4. query: query string representing the current filtered state of
+                    the dashboard
+            5. local_dict: dictionary containing the variable:value mapping
+                    local to the query_string.
+                    Passed as a parameter to cudf.query() api
+            6. indices: cudf.Series representing the current filtered state
+                    of the dashboard, apart from the query_string,
+                    since the lasso_select callback results in a boolean mask
         -------------------------------------------
 
         Ouput:
@@ -148,9 +176,12 @@ class BaseNumberChart(BaseChart):
             # cudf.query based computation
             min_val, max_val = query_tuple
             final_query = "@min_val<=" + active_chart.x + "<=@max_val"
+            local_dict.update({"min_val": min_val, "max_val": max_val})
             if len(query) > 0:
                 final_query += " and " + query
-            self.reload_chart(self.source.query(final_query, local_dict), True)
+            self.reload_chart(
+                self._compute_source(final_query, local_dict, indices), True
+            )
 
     def query_chart_by_indices_for_count(
         self,
@@ -231,6 +262,7 @@ class BaseNumberChart(BaseChart):
         datatile=None,
         query="",
         local_dict={},
+        indices=None,
     ):
         """
         Description:
@@ -238,9 +270,17 @@ class BaseNumberChart(BaseChart):
         -------------------------------------------
         Input:
             1. active_chart: chart object of active_chart
-            2. query_tuple: (min_val, max_val) of the query [type: tuple]
-            3. datatile: datatile of active chart for
-                        current chart[type:pandas df]
+            2. old_indices: list of indices selected in previous callback
+            3. new_indices: list of indices selected in currently
+            4. datatile: datatile of active chart for current chart
+            5. query: query string representing the current filtered state of
+                    the dashboard
+            6. local_dict: dictionary containing the variable:value mapping
+                    local to the query_string.
+                    Passed as a parameter to cudf.query() api
+            7. indices: cudf.Series representing the current filtered state
+                    of the dashboard, apart from the query_string,
+                    since the lasso_select callback results in a boolean mask
         -------------------------------------------
 
         Ouput:
@@ -288,8 +328,5 @@ class BaseNumberChart(BaseChart):
                     final_query += f" and {query}"
 
             self.reload_chart(
-                self.source.query(final_query, local_dict)
-                if len(final_query) > 0
-                else self.source,
-                True,
+                self._compute_source(final_query, local_dict, indices), True,
             )
