@@ -9,6 +9,7 @@
 - PR #228 Refactored `core_datasize_indicator` class with `core_number_chart`, acting as base for `datasize_indicator` and `number_chart`
 ## Bug Fixes
 - PR #227 Adds missing css and html template files to the package build and fixed Loading Animation issue for Datashader+Bokeh charts
+- PR #231 fixes the issue which prevented lasso select queries to preserve current filtered state of the dashboard
 
 # cuXfilter 0.17.0 (Date TBD)
 
