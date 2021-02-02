@@ -1,5 +1,6 @@
 from typing import Dict, Type, Union
 import bokeh.embed.util as u
+import cudf
 import panel as pn
 import uuid
 from panel.io.server import get_server
@@ -134,10 +135,29 @@ class DashBoard:
     _dashboard = None
     _theme = None
     _notebook_url = DEFAULT_NOTEBOOK_URL
-    # _current_server_type - show(separate tab)/ app(in-notebook)
     _current_server_type = "show"
     _layout_array = None
     server = None
+
+    @property
+    def queried_indices(self):
+        """
+        Read-only propery queried_indices returns a merged index
+        of all queried index columns present in self._query_str_dict
+        as a cudf.Series.
+
+        Returns None if no index columns are present.
+        """
+        result = None
+        selected_indices = {
+            key: value
+            for (key, value) in self._query_str_dict.items()
+            if type(value) == cudf.Series
+        }
+        if len(selected_indices) > 0:
+            result = cudf.DataFrame(selected_indices).fillna(False).all(axis=1)
+
+        return result
 
     def __init__(
         self,
@@ -248,18 +268,29 @@ class DashBoard:
             self._charts[chart].initiate_chart(self)
             self._charts[chart]._initialized = True
 
-    def _query(self, query_str, local_dict=None):
+    def _compute_df(self, query, local_dict, indices):
+        """
+        Compute source dataframe based on the values query and indices.
+        If both are not provided, return the original dataframe.
+        """
+        result = self._cuxfilter_df.data
+        if indices is not None:
+            result = result[indices]
+        if len(query) > 0:
+            result = result.query(query, local_dict)
+
+        return result
+
+    def _query(self, query_str, local_dict=None, local_indices=None):
         """
         Query the cudf.DataFrame, inplace or create a copy based on the
         value of inplace.
         """
         local_dict = local_dict or self._query_local_variables_dict
-        if len(query_str) > 0:
-            return self._cuxfilter_df.data.query(
-                query_str, local_dict=local_dict
-            )
-        else:
-            return self._cuxfilter_df.data
+        if local_indices is None:
+            local_indices = self.queried_indices
+
+        return self._compute_df(query_str, local_dict, local_indices)
 
     def _generate_query_str(self, query_dict=None, ignore_chart=""):
         """
@@ -275,7 +306,10 @@ class DashBoard:
         ):
             popped_value = query_dict.pop(ignore_chart.name, None)
 
-        return_query_str = " and ".join(list(query_dict.values()))
+        # extract string queries from query_dict,
+        # as self.query_dict also contains cudf.Series indices
+        str_queries_list = [x for x in query_dict.values() if type(x) == str]
+        return_query_str = " and ".join(str_queries_list)
 
         # adding the popped value to the query_str_dict again
         if popped_value is not None:
@@ -661,6 +695,8 @@ class DashBoard:
                         self._query_local_variables_dict,
                     )
                 elif not chart.use_data_tiles:
+                    # if the chart does not use datatiles, pass the query_dict
+                    # & queried_indices for a one-time cudf.query() computation
                     chart.query_chart_by_range(
                         self._charts[self._active_view],
                         query_tuple,
@@ -669,6 +705,7 @@ class DashBoard:
                             ignore_chart=self._charts[self._active_view]
                         ),
                         self._query_local_variables_dict,
+                        self.queried_indices,
                     )
                 else:
                     chart.query_chart_by_range(
@@ -707,6 +744,7 @@ class DashBoard:
                             ignore_chart=self._charts[self._active_view]
                         ),
                         self._query_local_variables_dict,
+                        self.queried_indices,
                     )
                 else:
                     chart.query_chart_by_indices(

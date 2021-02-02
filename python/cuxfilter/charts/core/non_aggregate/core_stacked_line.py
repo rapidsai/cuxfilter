@@ -282,6 +282,7 @@ class BaseStackedLine(BaseChart):
         datatile=None,
         query="",
         local_dict={},
+        indices=None,
     ):
         """
         Description:
@@ -311,6 +312,7 @@ class BaseStackedLine(BaseChart):
         datatile=None,
         query="",
         local_dict={},
+        indices=None,
     ):
         """
         Description:
