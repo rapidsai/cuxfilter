@@ -366,8 +366,13 @@ class DashBoard:
                 self._query_str_dict, self._query_local_variables_dict
             )
 
-            if len(self._generate_query_str()) > 0:
+            if (
+                len(self._generate_query_str()) > 0
+                or self.queried_indices is not None
+            ):
                 print("final query", self._generate_query_str())
+                if self.queried_indices is not None:
+                    print("polygon selected using lasso selection tool")
                 return self._query(self._generate_query_str())
             else:
                 print("no querying done, returning original dataframe")
