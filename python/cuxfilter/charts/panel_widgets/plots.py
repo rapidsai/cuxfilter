@@ -1,5 +1,6 @@
+from cuxfilter.layouts.chart_views import chart_view
 from ..core import BaseWidget
-from ..core.aggregate import BaseDataSizeIndicator
+from ..core.aggregate import BaseNumberChart
 from ..constants import (
     CUDF_DATETIME_TYPES,
     DATATILE_ACTIVE_COLOR,
@@ -608,7 +609,7 @@ class MultiSelect(BaseWidget):
             query_str_dict[self.name] = f"{self.x} in ({indices_string})"
 
 
-class DataSizeIndicator(BaseDataSizeIndicator):
+class DataSizeIndicator(BaseNumberChart):
     """
     Description:
     """
@@ -619,24 +620,102 @@ class DataSizeIndicator(BaseDataSizeIndicator):
         }
         """
     pn.config.raw_css = pn.config.raw_css + [css]
+    title = "Datapoints Selected"
 
-    def format_source_data(self, source_dict, patch_update=False):
+    def calculate_source(self, data, patch_update=False):
         """
-        format source
+        calculate source
 
         Parameters:
         -----------
-        source_dict: {'X': [],'Y': []}
-
+            data: cudf.DataFrame
+            patch_update: bool, default False
         """
+        source_dict = {"X": list([1]), "Y": list([len(data)])}
+
         if patch_update:
-            self.chart.value = int(source_dict["Y"][0])
-            self.progress_bar.value = int(
-                (self.chart.value / self.max_value) * 100
+            self.chart[0].value = int(source_dict["Y"][0])
+            self.chart[1].value = int(
+                (self.chart[0].value / self.max_value) * 100
             )
         else:
             self.source = int(source_dict["Y"][0])
             self.source_backup = int(self.source)
+
+    def get_source_y_axis(self):
+        """
+        get y axis column values
+        """
+        return self.chart[0].value
+
+    def generate_chart(self):
+        """
+        generate chart float slider
+        """
+        self.chart = pn.Column(
+            pn.indicators.Number(
+                value=int(self.max_value),
+                format="{value:,}",
+                font_size="18pt",
+                sizing_mode="stretch_width",
+                css_classes=["indicator"],
+            ),
+            pn.indicators.Progress(
+                name="Progress", value=100, sizing_mode="stretch_width",
+            ),
+        )
+
+    def apply_theme(self, theme):
+        """
+        apply thematic changes to the chart based on the theme
+        """
+        self.chart[1].bar_color = theme.datasize_indicator_class
+
+    def reset_chart(self, data: int = -1):
+        """
+        Description:
+            if len(data) is 0, reset the chart using self.source_backup
+        -------------------------------------------
+        Input:
+        data = list() --> update self.data_y_axis in self.source
+        -------------------------------------------
+        """
+        if data == -1:
+            self.chart[0].value = self.source_backup
+        else:
+            self.chart[0].value = int(data)
+        self.chart[1].value = int((self.chart[0].value / self.max_value) * 100)
+
+
+class NumberChart(BaseNumberChart):
+    """
+    Description: Number chart which can be located in either the main
+    dashboard or side navbar.
+    """
+
+    css = """
+        .indicator {
+            text-align: center;
+        }
+        """
+    pn.config.raw_css = pn.config.raw_css + [css]
+
+    def calculate_source(self, data, patch_update=False):
+        """
+        calculate source
+
+        Parameters:
+        -----------
+            data: cudf.DataFrame
+            patch_update: bool, default False
+        """
+        self.value = getattr(eval(self.expression), self.aggregate_fn)()
+
+        if patch_update:
+            self.chart.value = self.value
+        else:
+            self.source = data
+            self.source_backup = self.value
 
     def get_source_y_axis(self):
         """
@@ -648,46 +727,51 @@ class DataSizeIndicator(BaseDataSizeIndicator):
         """
         generate chart float slider
         """
+
         self.chart = pn.indicators.Number(
-            value=int(self.max_value),
-            format="{value:,}",
-            font_size="18pt",
-            sizing_mode="stretch_width",
+            value=int(self.value),
+            sizing_mode="stretch_both",
             css_classes=["indicator"],
+            format=self.format,
+            colors=self.colors,
+            font_size=self.font_size,
+            **self.library_specific_params,
         )
-        self.progress_bar = pn.indicators.Progress(
-            name="Progress",
-            value=int((self.chart.value / self.max_value) * 100),
-            sizing_mode="stretch_width",
-        )
 
-    def apply_theme(self, theme):
-        """
-        apply thematic changes to the chart based on the theme
-        """
-        self.progress_bar.bar_color = theme.datasize_indicator_class
-
-    def reload_chart(self, data, patch_update=True):
-        """
-        reload chart
-        """
-        self.calculate_source(data, patch_update=patch_update)
-
-    def reset_chart(self, data: int = -1):
+    def reset_chart(self, data: float = -1):
         """
         Description:
             if len(data) is 0, reset the chart using self.source_backup
-        -------------------------------------------
-        Input:
-        data = list() --> update self.data_y_axis in self.source
-        -------------------------------------------
 
-        Ouput:
+        Parameters:
+        -----------
+            data: float, default -1
+
         """
         if data == -1:
             self.chart.value = self.source_backup
         else:
-            self.chart.value = int(data)
-        self.progress_bar.value = int(
-            (self.chart.value / self.max_value) * 100
-        )
+            self.chart.value = data
+
+
+class Card:
+    use_data_tiles = False
+    _initialized = True
+
+    @property
+    def name(self):
+        return f"{self.title}_{self.chart_type}"
+
+    def __init__(self, content="", title="", widget=True):
+        self.content = content
+        self.title = title
+        self.chart_type = "card" if not widget else "card_widget"
+
+    def view(self):
+        return chart_view(self.content, title=self.title)
+
+    def initiate_chart(self, dashboard_cls):
+        self.generate_chart()
+
+    def generate_chart(self):
+        self.chart = pn.Column(self.content, sizing_mode="stretch_both")
