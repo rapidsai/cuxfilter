@@ -6,20 +6,11 @@
 
 ## Bug Fixes
 
-# cuXfilter 0.18.0 (Date TBD)
+# 0.18.0
 
-## New Features
-- PR #226 Added support for React-Grid-Templates allowing resizing, dragging and dynamic layout mapping + loading animation on callback execution
-- PR #227 Added new datasize indicator (with themes)
-- PR #228 Added 2 new chart types - Number & Card
-## Improvements
-- PR #227 Added Template+CSS based themes and refactored old apply_themes functions
-- PR #228 Refactored `core_datasize_indicator` class with `core_number_chart`, acting as base for `datasize_indicator` and `number_chart`
-## Bug Fixes
-- PR #227 Adds missing css and html template files to the package build and fixed Loading Animation issue for Datashader+Bokeh charts
-- PR #231 fixes the issue which prevented lasso select queries to preserve current filtered state of the dashboard
+Please see https://github.com/rapidsai/cuxfilter/releases/tag/branch-0.18-latest for the latest changes to this development branch.
 
-# cuXfilter 0.17.0 (Date TBD)
+# cuXfilter 0.17.0 (10 Dec 2020)
 
 ## New Features
 - PR #208 Adds support for new dtype - datetime for all chart types except choropleths, Added new chart widget type - DateRangeSlider
