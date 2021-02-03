@@ -34,23 +34,25 @@ class DataTile:
         """
         if len(query) > 0:
             data = data.query(str(query))
-        if self.passive_chart.chart_type == "datasize_indicator":
-            return self._calc_data_tile_for_size(data)
+        if self.passive_chart.chart_type in [
+            "number_chart",
+            "number_chart_widget",
+            "datasize_indicator",
+        ]:
+            return self._calc_1d_data_tile(data)
         elif self.passive_chart.chart_type == "choropleth":
             return self._calc_choropleth_data_tile(data)
         if self.dimensions == 2:
             return self._calc_2d_data_tile(data)
 
-    def _calc_data_tile_for_size(self, data):
+    def _calc_1d_data_tile(self, data):
         """
         calc data tiles for dataset size
         """
-        return gpu_datatile.calc_data_tile_for_size(
+        return gpu_datatile.calc_1d_data_tile(
             data,
-            self.active_chart.x,
-            self.active_chart.min_value,
-            self.active_chart.max_value,
-            self.active_chart.stride,
+            self.active_chart,
+            self.passive_chart,
             cumsum=self.cumsum,
             return_format=self.dtype,
         )

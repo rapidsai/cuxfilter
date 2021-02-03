@@ -1,4 +1,7 @@
+from ctypes import ArgumentError
 from .plots import (
+    Card,
+    NumberChart,
     RangeSlider,
     DateRangeSlider,
     IntSlider,
@@ -239,7 +242,7 @@ def multi_select(x, width=400, height=200, **params):
     return plot
 
 
-def data_size_indicator(width=400, height=50, **library_specific_params):
+def data_size_indicator(**library_specific_params):
     """
 
     Widget in the navbar of the cuxfilter dashboard.
@@ -249,15 +252,110 @@ def data_size_indicator(width=400, height=50, **library_specific_params):
     Parameters
     ----------
 
-    width: int,  default 400
+    **params:
+        additional arguments to be passed to the function. See panel
+        documentation for more info
 
-    height: int,  default 200
+    """
+    plot = DataSizeIndicator(
+        title="Datapoints Selected", widget=True, **library_specific_params
+    )
+    plot.chart_type = "datasize_indicator"
+    return plot
+
+
+def number(
+    x=None,
+    expression=None,
+    aggregate_fn="mean",
+    title="",
+    widget=True,
+    format="{value}",
+    colors=[],
+    font_size="18pt",
+    **library_specific_params,
+):
+    """
+
+    Number chart which can be located in either the main dashboard or
+    side navbar.
+
+    Type: number_chart or number_chart_widget
+
+    Parameters
+    ----------
+    x: str
+        column name from gpu dataframe
+
+    expression:
+        string containing computable expression containing column names
+        e.g: "(x+y)/2" will result in number value = (df.x + df.y)/2
+
+    aggregate_fn: {'count', 'mean', 'min', 'max','sum', 'std'}, default 'count'
+
+    title: str,
+        chart title
+
+    widget: bool, default True
+        if widget is True, the chart gets placed on the side navbar,
+        else its placed in the main dashboard
+
+    format: str, default='{value}'
+        A formatter string which accepts a {value}.
+
+    colors: list
+        Color thresholds for the Number indicator,
+        specified as a tuple of the absolute thresholds and the color to
+        switch to.
+        e,g: colors=[(33, 'green'), (66, 'gold'), (100, 'red')]
+
+    font_size: str, default '18pt'
 
     **params:
         additional arguments to be passed to the function. See panel
         documentation for more info
 
     """
-    plot = DataSizeIndicator(width, height, **library_specific_params)
-    plot.chart_type = "datasize_indicator"
+    if not (x or expression):
+        raise ArgumentError(
+            "Atleast one of x or expression arg should be provided"
+        )
+    plot = NumberChart(
+        x,
+        expression,
+        aggregate_fn,
+        title,
+        widget,
+        format,
+        colors,
+        font_size,
+        **library_specific_params,
+    )
     return plot
+
+
+def card(content="", title="", widget=True, **library_specific_params):
+    """
+
+    Card chart contating markdown content and can be located in either
+    the main dashboard or side navbar.
+
+    Type: number_chart or number_chart_widget
+
+    Parameters
+    ----------
+    content: {str, markdown static content}, default ""
+
+    title: str,
+        chart title
+
+    widget: bool, default True
+        if widget is True, the chart gets placed on the side navbar,
+        else its placed in the main dashboard
+
+    **params:
+        additional arguments to be passed to the function. See panel
+        documentation for more info
+
+    """
+    return Card(content, title, widget, **library_specific_params)
