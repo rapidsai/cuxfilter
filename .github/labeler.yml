@@ -12,5 +12,5 @@ gpuCI:
 conda:
    - 'conda/**'
  
- doc:
+doc:
    - 'docs/**'
