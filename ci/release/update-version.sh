@@ -50,7 +50,14 @@ function sed_runner() {
 sed_runner 's/version = .*/version = '"'${NEXT_SHORT_TAG}'"'/g' docs/source/conf.py
 sed_runner 's/release = .*/release = '"'${NEXT_FULL_TAG}'"'/g' docs/source/conf.py
 
-# bump rmm
+# bump cudf
 for FILE in conda/environments/*.yml; do
   sed_runner "s/cudf=.*/cudf=${NEXT_SHORT_TAG}/g" ${FILE};
+  sed_runner "s/cuspatial=.*/cuspatial=${NEXT_SHORT_TAG}/g" ${FILE};
+  sed_runner "s/dask-cuda=.*/dask-cuda=${NEXT_SHORT_TAG}/g" ${FILE};
+  sed_runner "s/dask-cudf=.*/dask-cudf=${NEXT_SHORT_TAG}/g" ${FILE};
 done
+
+# README.md update
+sed_runner "s/version == ${CURRENT_SHORT_TAG}/version == ${NEXT_SHORT_TAG}/g" README.md
+sed_runner "s/cuxfilter=${CURRENT_SHORT_TAG}/cuxfilter=${NEXT_SHORT_TAG}/g" README.md
