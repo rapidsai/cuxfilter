@@ -138,7 +138,7 @@ For the most customized way of installing RAPIDS and cuxfilter, visit the select
 ```bash
 # ex. for CUDA 10.2
 conda install -c rapidsai -c nvidia -c conda-forge \
-    -c defaults cuxfilter=0.15 python=3.6 cudatoolkit=10.2
+    -c defaults cuxfilter=0.18 python=3.6 cudatoolkit=10.2
 ```
 
 ### Docker container
@@ -215,7 +215,7 @@ Currently supported layout templates and example code can be found on the [layou
 | ------------- | ------------- |
 | bokeh  | bar, line  |
 | datashader  | scatter, scatter_geo, line, stacked_lines, heatmap, graph |
-| panel_widgets  | range_slider, date_range_slider, float_slider, int_slider, drop_down, multi_select  |
+| panel_widgets  | range_slider, date_range_slider, float_slider, int_slider, drop_down, multi_select, card, number  |
 | custom    | view_dataframe |
 | pydeck    | choropleth(3d and 2d)   |
 
