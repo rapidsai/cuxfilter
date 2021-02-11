@@ -126,35 +126,49 @@ Troubleshooting help can be found [on our troubleshooting page](https://docs.rap
 - pyppeteer
 - jupyter-server-proxy
 
+## Quick Start
+
+Please see the [Demo Docker Repository](https://hub.docker.com/r/rapidsai/rapidsai/), choosing a tag based on the NVIDIA CUDA version you’re running. This provides a ready to run Docker container with example notebooks and data, showcasing how you can utilize cuxfilter, cuDF and other RAPIDS libraries.
 
 ## Installation
 
+
+### CUDA/GPU requirements
+
+* CUDA 10.1+
+* NVIDIA driver 418.39+
+* Pascal architecture or better (Compute Capability >=6.0)
+
 ### Conda
 
-For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the RAPIDS [Get Started Page](https://rapids.ai/start.html#rapids-release-selector).
+cuxfilter can be installed with conda ([miniconda](https://conda.io/miniconda.html), or the full [Anaconda distribution](https://www.anaconda.com/download)) from the `rapidsai` channel:
 
-*cuxfilter conda example installation:*
-
+For `cuxfilter version == 0.18` :
 ```bash
-# ex. for CUDA 10.2
-conda install -c rapidsai -c nvidia -c conda-forge \
-    -c defaults cuxfilter=0.15 python=3.6 cudatoolkit=10.2
+# for CUDA 10.1
+conda install -c rapidsai -c nvidia -c numba -c conda-forge \
+    cuxfilter=0.18 python=3.7 cudatoolkit=10.1
+
+# or, for CUDA 10.2
+conda install -c rapidsai -c nvidia -c numba -c conda-forge \
+    cuxfilter=0.18 python=3.7 cudatoolkit=10.2
+
 ```
 
-### Docker container
-
-For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the RAPIDS [Get Started Page](https://rapids.ai/start.html#rapids-release-selector).
-
-*cuxfilter docker example installation:*
-
+For the nightly version of `cuxfilter` :
 ```bash
-# ex. for CUDA 10.2
-docker pull rapidsai/rapidsai:cuda10.2-runtime-ubuntu16.04
-docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 \
-    rapidsai/rapidsai:cuda10.2-runtime-ubuntu16.04
+# for CUDA 10.1
+conda install -c rapidsai-nightly -c nvidia -c numba -c conda-forge \
+    cuxfilter python=3.7 cudatoolkit=10.1
 
-# open http://localhost:8888
+# or, for CUDA 10.2
+conda install -c rapidsai-nightly -c nvidia -c numba -c conda-forge \
+    cuxfilter python=3.7 cudatoolkit=10.2
 ```
+
+Note: cuxfilter is supported only on Linux, and with Python versions 3.7 and later.
+
+See the [Get RAPIDS version picker](https://rapids.ai/start.html) for more OS and version info. 
 
 
 ### Build/Install from Source
@@ -215,7 +229,7 @@ Currently supported layout templates and example code can be found on the [layou
 | ------------- | ------------- |
 | bokeh  | bar, line  |
 | datashader  | scatter, scatter_geo, line, stacked_lines, heatmap, graph |
-| panel_widgets  | range_slider, date_range_slider, float_slider, int_slider, drop_down, multi_select  |
+| panel_widgets  | range_slider, date_range_slider, float_slider, int_slider, drop_down, multi_select, card, number  |
 | custom    | view_dataframe |
 | pydeck    | choropleth(3d and 2d)   |
 
