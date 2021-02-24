@@ -39,7 +39,7 @@ class TestBaseStackedLine:
         assert bsl.reset_event is None
         assert bsl.x_range is None
         assert bsl.y_range is None
-        assert bsl.colors == []
+        assert bsl.colors == ["#8735fb"]
 
     def test_exceptions(self):
         with pytest.raises(TypeError):

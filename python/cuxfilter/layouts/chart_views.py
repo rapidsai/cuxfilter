@@ -12,9 +12,8 @@ def chart_view(*charts, **params):
     ------
     layout view
     """
-    view = pn.Column(**params, sizing_mode="scale_both")
+    view = pn.layout.Card(**params, sizing_mode="stretch_both")
     for chart in charts:
         if chart is not None:
             view.append(chart)
-
     return view

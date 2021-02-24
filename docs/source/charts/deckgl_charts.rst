@@ -38,7 +38,6 @@ Example 3d-Choropleth
     # use chart0.view() in a notebook cell to view the individual charts
     chart0.view()
 
-.. image:: ../../_images/deckgl_chart_1.png
 
     
 Example 2d-Choropleth
@@ -70,4 +69,3 @@ Example 2d-Choropleth
     # use chart0.view() in a notebook cell to view the individual charts
     chart0.view()
 
-.. image:: ../../_images/deckgl_chart_2.png

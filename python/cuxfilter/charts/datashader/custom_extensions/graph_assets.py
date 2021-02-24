@@ -165,14 +165,14 @@ def curved_connect_edges(
     edges, edge_source, edge_target, connected_edge_columns, curve_params
 ):
     """
-        edges: cudf DataFrame(x_src, y_src, x_dst, y_dst)
+    edges: cudf DataFrame(x_src, y_src, x_dst, y_dst)
 
-        returns a cudf DataFrame of the form (
-            row1 -> x_src, y_src
-            row2 -> x_dst, y_dst
-            row3 -> nan, nan
-            ...
-        ) as the input to datashader.line
+    returns a cudf DataFrame of the form (
+        row1 -> x_src, y_src
+        row2 -> x_dst, y_dst
+        row3 -> nan, nan
+        ...
+    ) as the input to datashader.line
     """
     bundled_edges = bundle_edges(edges, src=edge_source, dst=edge_target)
     curve_total_steps = curve_params.pop("curve_total_steps")
@@ -234,14 +234,14 @@ def connect_edges(edges, result):
 
 def directly_connect_edges(edges):
     """
-        edges: cudf DataFrame(x_src, y_src, x_dst, y_dst)
+    edges: cudf DataFrame(x_src, y_src, x_dst, y_dst)
 
-        returns a cudf DataFrame of the form (
-            row1 -> x_src, y_src
-            row2 -> x_dst, y_dst
-            row3 -> nan, nan
-            ...
-        ) as the input to datashader.line
+    returns a cudf DataFrame of the form (
+        row1 -> x_src, y_src
+        row2 -> x_dst, y_dst
+        row3 -> nan, nan
+        ...
+    ) as the input to datashader.line
     """
     result = cp.zeros(
         shape=(edges.shape[0], edges.shape[1] - 2, 3), dtype=cp.float32
@@ -276,10 +276,10 @@ def calc_connected_edges(
     curve_params=None,
 ):
     """
-        calculate directly connected edges
-        nodes: cudf.DataFrame
-        edges: cudf.DataFrame
-        edge_type: direct/curved
+    calculate directly connected edges
+    nodes: cudf.DataFrame
+    edges: cudf.DataFrame
+    edge_type: direct/curved
     """
     edges_columns = [
         edge_source,

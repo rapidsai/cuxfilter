@@ -45,19 +45,19 @@ class TestDataTile:
         bac1 = bokeh.bar("val")
         bac1.chart_type = chart_type
         data_tile = DataTile(active_chart=self.bac, passive_chart=bac1)
-        data_tile._calc_data_tile_for_size = f1
+        data_tile._calc_1d_data_tile = f1
         data_tile._calc_2d_data_tile = f2
 
         assert data_tile.calc_data_tile(data=cudf.DataFrame()) == result
 
-    def test_calc_data_tile_for_size(self):
+    def test_calc_1d_data_tile(self):
         datasize_chart = cuxfilter.charts.panel_widgets.data_size_indicator()
         data_tile = DataTile(
             active_chart=self.bac, passive_chart=datasize_chart
         )
         result = pd.DataFrame({0: {0: 1.0, 1: 2.0, 2: 3.0, 3: 4.0, 4: 5.0}})
 
-        assert data_tile._calc_data_tile_for_size(self.df).equals(result)
+        assert data_tile._calc_1d_data_tile(self.df).equals(result)
 
     def test_calc_2d_data_tile(self):
         data_tile = DataTile(active_chart=self.bac, passive_chart=self.bac1)

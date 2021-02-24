@@ -5,6 +5,7 @@ import numpy as np
 from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby
 from ....assets import geo_json_mapper
+from ....layouts import chart_view
 from ....assets.cudf_utils import get_min_max
 from ...constants import CUXF_NAN_COLOR
 
@@ -45,6 +46,7 @@ class BaseChoropleth(BaseChart):
         tooltip=True,
         tooltip_include_cols=[],
         nan_color=CUXF_NAN_COLOR,
+        title=None,
         **library_specific_params,
     ):
         """
@@ -111,6 +113,7 @@ class BaseChoropleth(BaseChart):
         self.tooltip = tooltip
         self.tooltip_include_cols = tooltip_include_cols
         self.nan_color = nan_color
+        self.title = title or f"{self.x}"
         if "x_range" not in self.library_specific_params:
             self.library_specific_params["x_range"] = x_range
 
@@ -148,7 +151,9 @@ class BaseChoropleth(BaseChart):
         self.add_events(dashboard_cls)
 
     def view(self):
-        return self.chart.view()
+        return chart_view(
+            self.chart.view(), width=self.width, title=self.title
+        )
 
     def _compute_array_all_bins(
         self, source_x, source_y, update_data_x, update_data_y

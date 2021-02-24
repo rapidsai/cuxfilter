@@ -11,7 +11,17 @@ class BaseLine(BaseNonAggregate):
     reset_event = None
     filter_widget = None
     x_axis_tick_formatter = None
-    no_color_set = False
+    default_color = "#8735fb"
+
+    @property
+    def color_set(self):
+        return self._color_input is not None
+
+    @property
+    def color(self):
+        if self.color_set:
+            return self._color_input
+        return self.default_color
 
     def __init__(
         self,
@@ -63,12 +73,7 @@ class BaseLine(BaseNonAggregate):
         self.y = y
         self.data_points = data_points
         self.add_interaction = add_interaction
-        if color is None:
-            self.color = "#8735fb"
-            self.no_color_set = True
-        else:
-            self.color = color
-
+        self._color_input = color
         self.stride = step_size
         self.stride_type = step_size_type
         self.pixel_shade_type = pixel_shade_type
@@ -136,7 +141,9 @@ class BaseLine(BaseNonAggregate):
         self.add_events(dashboard_cls)
 
     def view(self):
-        return chart_view(self.chart, self.filter_widget, width=self.width)
+        return chart_view(
+            self.chart, self.filter_widget, width=self.width, title=self.title
+        )
 
     def add_range_slider_filter(self, dashboard_cls):
         """

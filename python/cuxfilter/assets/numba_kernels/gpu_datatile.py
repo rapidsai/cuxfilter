@@ -51,7 +51,7 @@ def get_arrow_stream(record_batch):
 
 def format_result(result_np: np.ndarray, return_format: str):
     """
-        format result as a pandas dataframe
+    format result as a pandas dataframe
     """
     pandas_df = pd.DataFrame(result_np, dtype=np.float64)
 
@@ -67,27 +67,38 @@ def format_result(result_np: np.ndarray, return_format: str):
         return ColumnDataSource(pandas_df)
 
 
-def calc_data_tile_for_size(
+def calc_1d_data_tile(
     df,
-    col_1,
-    min_1,
-    max_1,
-    stride_1,
+    active_view: Type[BaseChart],
+    passive_view: Type[BaseChart],
     cumsum: bool = True,
     return_format="pandas",
 ):
-    df[col_1 + "_mod"] = (
-        ((df[col_1] - min_1) / stride_1).round().astype("int32")
+    col_1, min_1, max_1, stride_1 = (
+        active_view.x,
+        active_view.min_value,
+        active_view.max_value,
+        active_view.stride,
     )
+    if passive_view.x:
+        col_2 = passive_view.x
+        columns = [f"{col_1}_mod", col_2]
+    else:
+        col_2 = f"{col_1}_mod"
+        columns = [col_2]
+
+    aggregate_fn = passive_view.aggregate_fn
+
+    df[columns[0]] = ((df[col_1] - min_1) / stride_1).round().astype("int32")
     if isinstance(df, dask_cudf.core.DataFrame):
         groupby_result = getattr(
-            df[[col_1 + "_mod", col_1]].groupby(col_1 + "_mod"), "count"
+            df[columns + [col_1]].groupby(columns[0]), aggregate_fn
         )().compute()
     else:
         groupby_result = (
-            df[[col_1 + "_mod"]]
-            .groupby(col_1 + "_mod", as_index=True)
-            .agg({col_1 + "_mod": "count"})
+            df[columns]
+            .groupby(columns[0], as_index=True)
+            .agg({col_2: aggregate_fn})
         )
 
     max_s = int(round((max_1 - min_1) / stride_1)) + 1
@@ -107,7 +118,6 @@ def calc_data_tile_for_size(
 
     if cumsum:
         result_np = np.cumsum(result)
-
     else:
         result_np = result
     return format_result(result_np, return_format)

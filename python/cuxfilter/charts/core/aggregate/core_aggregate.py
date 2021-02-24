@@ -182,7 +182,9 @@ class BaseAggregateChart(BaseChart):
         self.add_events(dashboard_cls)
 
     def view(self):
-        return chart_view(self.chart, self.filter_widget, width=self.width)
+        return chart_view(
+            self.chart, self.filter_widget, width=self.width, title=self.title
+        )
 
     def calculate_source(self, data, patch_update=False):
         """

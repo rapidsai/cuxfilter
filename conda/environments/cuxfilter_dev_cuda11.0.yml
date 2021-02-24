@@ -7,13 +7,13 @@ channels:
 - anaconda
 dependencies:
 - cupy>7.1.0,<9.0.0a0
-- cuspatial=0.17
+- cuspatial=0.18
 - python>=3.6,<3.8
-- cudf=0.17
+- cudf=0.18
 - dask>=2.12.0
 - distributed>=2.12.0
-- dask-cuda=0.17
-- dask-cudf=0.17
+- dask-cuda=0.18
+- dask-cudf=0.18
 - datashader>=0.11.1
 - numba>=0.51.2
 - geopandas>=0.6, <=0.8.1
@@ -21,7 +21,7 @@ dependencies:
 - libwebp
 - pandoc=<2.0.0
 - bokeh>=2.1.1,<=2.2.3
-- panel>=0.9.1, <=0.9.7
+- panel>=0.10.3
 - cudatoolkit=11.0
 - nodejs
 - recommonmark

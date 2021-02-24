@@ -1,3 +1,27 @@
+# cuXfilter 0.18.0 (24 Feb 2021)
+
+## Bug Fixes 🐛
+
+- Add static html (#238) @AjayThorve
+
+## Documentation 📖
+
+- Update docs (#236) @AjayThorve
+
+## Improvements 🛠️
+
+- Update stale GHA with exemptions &amp; new labels (#247) @mike-wendt
+- Add GHA to mark issues/prs as stale/rotten (#244) @Ethyling
+- Pin Node version (#239) @ajschmidt8
+- fix state preserving issue for lasso-select callbacks (#231) @AjayThorve
+- Prepare Changelog for Automation (#229) @ajschmidt8
+- New charts - Number &amp; Card (#228) @AjayThorve
+- Refactor themes (#227) @AjayThorve
+- Updated templates using Panel template + React-grid-layout (#226) @AjayThorve
+- Auto-label PRs based on their content (#223) @jolorunyomi
+- Fix forward-merger conflicts for #218 (#221) @ajschmidt8
+- Branch 0.18 merge 0.17 - fix auto merge conflicts (#219) @AjayThorve
+
 # cuXfilter 0.17.0 (10 Dec 2020)
 
 ## New Features

@@ -205,6 +205,7 @@ class TestDashBoard:
         dashboard._calc_data_tiles(cumsum=False)
 
         bac1.source.data["top"] = np.array(prev_result)
+        dashboard._charts["_datasize_indicator"].reset_chart(len(old_indices))
         dashboard._query_datatiles_by_indices(
             old_indices=old_indices, new_indices=new_indices
         )

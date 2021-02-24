@@ -50,11 +50,13 @@ class TestBaseAggregateChart:
 
     @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
     def test_view(self, chart, _chart):
-        bnac = BaseAggregateChart(x="test_x")
+        bnac = BaseAggregateChart(x="test_x", add_interaction=False)
         bnac.chart = chart
         bnac.width = 400
 
-        assert str(bnac.view()) == str(chart_view(_chart, width=bnac.width))
+        assert str(bnac.view()) == str(
+            chart_view(_chart, width=bnac.width, title=bnac.title)
+        )
 
     @pytest.mark.parametrize(
         "bb, result",

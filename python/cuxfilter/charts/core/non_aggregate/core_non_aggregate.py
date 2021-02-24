@@ -10,17 +10,18 @@ from ....layouts import chart_view
 
 class BaseNonAggregate(BaseChart):
     """
-        No datatiles support in non_data_tiles plot charts
+    No datatiles support in non_data_tiles plot charts
 
-        If dataset size is greater than a few thousand points,
-        scatter geos can crash the browser tabs, and is only recommended
-        with datashader plugin, in which case an image is
-        rendered instead of points on canvas
+    If dataset size is greater than a few thousand points,
+    scatter geos can crash the browser tabs, and is only recommended
+    with datashader plugin, in which case an image is
+    rendered instead of points on canvas
     """
 
     reset_event = None
     x_range: Tuple = None
     y_range: Tuple = None
+    selected_indices: cudf.Series = None
     aggregate_col = None
     use_data_tiles = False
 
@@ -56,7 +57,7 @@ class BaseNonAggregate(BaseChart):
         self.add_events(dashboard_cls)
 
     def view(self):
-        return chart_view(self.chart, width=self.width)
+        return chart_view(self.chart, width=self.width, title=self.title)
 
     def calculate_source(self, data):
         """
@@ -84,6 +85,8 @@ class BaseNonAggregate(BaseChart):
         """
 
         def lasso_callback(xs, ys):
+            # set box selected ranges to None
+            self.x_range, self.y_range = None, None
             # convert datetime to int64 since, point_in_polygon does not
             # support datetime
             indices = cuspatial.point_in_polygon(
@@ -94,7 +97,12 @@ class BaseNonAggregate(BaseChart):
                 xs,
                 ys,
             )
-            temp_data = self.source[indices.selection]
+            self.selected_indices = indices.selection
+            temp_data = dashboard_cls._query(
+                dashboard_cls._generate_query_str(),
+                local_indices=indices.selection,
+            )
+
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(
                 data=temp_data, ignore_cols=[self.name]
@@ -106,6 +114,8 @@ class BaseNonAggregate(BaseChart):
         def box_callback(xmin, xmax, ymin, ymax):
             self.x_range = (xmin, xmax)
             self.y_range = (ymin, ymax)
+            # set lasso selected indices to None
+            self.selected_indices = None
 
             query = (
                 f"@{self.x}_min<={self.x}<=@{self.x}_max"
@@ -186,7 +196,11 @@ class BaseNonAggregate(BaseChart):
             }
             query_local_variables_dict.update(temp_local_dict)
         else:
-            query_str_dict.pop(self.name, None)
+            if self.selected_indices is not None:
+                query_str_dict[self.name] = self.selected_indices
+            else:
+                query_str_dict.pop(self.name, None)
+
             for key in [
                 self.x + "_min",
                 self.x + "_max",
@@ -232,11 +246,21 @@ class BaseNonAggregate(BaseChart):
                 dashboard_cls._reset_current_view(new_active_view=self)
             self.x_range = None
             self.y_range = None
+            self.selected_indices = None
             dashboard_cls._query_str_dict.pop(self.name, None)
             dashboard_cls._reload_charts()
 
         # add callback to reset chart button
         self.add_event(self.reset_event, reset_callback)
+
+    def _compute_source(self, query, local_dict, indices):
+        result = self.source
+        if indices is not None:
+            result = result[indices]
+        if len(query) > 0:
+            result = result.query(query, local_dict)
+
+        return result
 
     def query_chart_by_range(
         self,
@@ -245,6 +269,7 @@ class BaseNonAggregate(BaseChart):
         datatile=None,
         query="",
         local_dict={},
+        indices=None,
     ):
         """
         Description:
@@ -254,16 +279,25 @@ class BaseNonAggregate(BaseChart):
             1. active_chart: chart object of active_chart
             2. query_tuple: (min_val, max_val) of the query [type: tuple]
             3. datatile: None in case of Gpu Geo Scatter charts
+            4. query: query string representing the current filtered state of
+                    the dashboard
+            5. local_dict: dictionary containing the variable:value mapping
+                    local to the query_string.
+                    Passed as a parameter to cudf.query() api
+            6. indices: cudf.Series representing the current filtered state
+                    of the dashboard, apart from the query_string,
+                    since the lasso_select callback results in a boolean mask
         -------------------------------------------
 
         Ouput:
         """
         min_val, max_val = query_tuple
         final_query = "@min_val<=" + active_chart.x + "<=@max_val"
+        local_dict.update({"min_val": min_val, "max_val": max_val})
         if len(query) > 0:
             final_query += " and " + query
         self.reload_chart(
-            self.source.query(final_query, local_dict), False,
+            self._compute_source(final_query, local_dict, indices), False,
         )
 
     def query_chart_by_indices(
@@ -274,6 +308,7 @@ class BaseNonAggregate(BaseChart):
         datatile=None,
         query="",
         local_dict={},
+        indices=None,
     ):
         """
         Description:
@@ -281,8 +316,17 @@ class BaseNonAggregate(BaseChart):
         -------------------------------------------
         Input:
             1. active_chart: chart object of active_chart
-            2. query_tuple: (min_val, max_val) of the query [type: tuple]
-            3. datatile: None in case of Gpu Geo Scatter charts
+            2. old_indices: list of indices selected in previous callback
+            3. new_indices: list of indices selected in currently
+            4. datatile: None in case of Geo scatter charts
+            5. query: query string representing the current filtered state of
+                    the dashboard
+            6. local_dict: dictionary containing the variable:value mapping
+                    local to the query_string.
+                    Passed as a parameter to cudf.query() api
+            7. indices: cudf.Series representing the current filtered state
+                    of the dashboard, apart from the query_string,
+                    since the lasso_select callback results in a boolean mask
         -------------------------------------------
 
         Ouput:
@@ -304,10 +348,7 @@ class BaseNonAggregate(BaseChart):
                 final_query += f" and {query}"
 
         self.reload_chart(
-            self.source.query(final_query, local_dict)
-            if len(final_query) > 0
-            else self.source,
-            False,
+            self._compute_source(final_query, local_dict, indices), False,
         )
 
     def add_selection_geometry_event(self, callback):
