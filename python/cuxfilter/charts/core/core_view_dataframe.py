@@ -166,8 +166,26 @@ class ViewDataFrame:
         if height is not None:
             self.chart.height = height
 
+    def _compute_source(self, data, query, local_dict, indices):
+        """
+        Compute source dataframe based on the values query and indices.
+        If both are not provided, return the original dataframe.
+        """
+        if indices is not None:
+            data = data[indices]
+        if len(query) > 0:
+            data = data.query(query, local_dict)
+
+        return data
+
     def query_chart_by_range(
-        self, active_chart: BaseChart, query_tuple, data, query=""
+        self,
+        active_chart: BaseChart,
+        query_tuple,
+        data,
+        query="",
+        local_dict={},
+        indices=None,
     ):
         """
         Description:
@@ -188,7 +206,8 @@ class ViewDataFrame:
         if len(query) > 0:
             final_query += " and " + query
         self.reload_chart(
-            data.query(final_query), False,
+            self._compute_source(data, final_query, local_dict, indices),
+            False,
         )
 
     def query_chart_by_indices(
@@ -199,6 +218,7 @@ class ViewDataFrame:
         data,
         query="",
         local_dict={},
+        indices=None,
     ):
         """
         Description:
@@ -229,8 +249,6 @@ class ViewDataFrame:
                 final_query += " and " + query
 
         self.reload_chart(
-            data.query(final_query, local_dict)
-            if len(final_query) > 0
-            else data,
+            self._compute_source(data, final_query, local_dict, indices),
             False,
         )

@@ -693,11 +693,12 @@ class DashBoard:
                     chart.query_chart_by_range(
                         self._charts[self._active_view],
                         query_tuple,
-                        self._cuxfilter_df.data,
-                        self._generate_query_str(
-                            self._charts[self._active_view]
+                        data=self._cuxfilter_df.data,
+                        query=self._generate_query_str(
+                            ignore_chart=self._charts[self._active_view]
                         ),
-                        self._query_local_variables_dict,
+                        local_dict=self._query_local_variables_dict,
+                        indices=self.queried_indices,
                     )
                 elif not chart.use_data_tiles:
                     # if the chart does not use datatiles, pass the query_dict
@@ -705,18 +706,18 @@ class DashBoard:
                     chart.query_chart_by_range(
                         self._charts[self._active_view],
                         query_tuple,
-                        self._data_tiles[chart.name],
-                        self._generate_query_str(
+                        datatile=None,
+                        query=self._generate_query_str(
                             ignore_chart=self._charts[self._active_view]
                         ),
-                        self._query_local_variables_dict,
-                        self.queried_indices,
+                        local_dict=self._query_local_variables_dict,
+                        indices=self.queried_indices,
                     )
                 else:
                     chart.query_chart_by_range(
                         self._charts[self._active_view],
                         query_tuple,
-                        self._data_tiles[chart.name],
+                        datatile=self._data_tiles[chart.name],
                     )
 
     def _query_datatiles_by_indices(self, old_indices, new_indices):
@@ -733,30 +734,31 @@ class DashBoard:
                         self._charts[self._active_view],
                         old_indices,
                         new_indices,
-                        self._cuxfilter_df.data,
-                        self._generate_query_str(
+                        data=self._cuxfilter_df.data,
+                        query=self._generate_query_str(
                             ignore_chart=self._charts[self._active_view]
                         ),
-                        self._query_local_variables_dict,
+                        local_dict=self._query_local_variables_dict,
+                        indices=self.queried_indices,
                     )
                 elif not chart.use_data_tiles:
                     chart.query_chart_by_indices(
                         self._charts[self._active_view],
                         old_indices,
                         new_indices,
-                        self._data_tiles[chart.name],
-                        self._generate_query_str(
+                        datatile=None,
+                        query=self._generate_query_str(
                             ignore_chart=self._charts[self._active_view]
                         ),
-                        self._query_local_variables_dict,
-                        self.queried_indices,
+                        local_dict=self._query_local_variables_dict,
+                        indices=self.queried_indices,
                     )
                 else:
                     chart.query_chart_by_indices(
                         self._charts[self._active_view],
                         old_indices,
                         new_indices,
-                        self._data_tiles[chart.name],
+                        datatile=self._data_tiles[chart.name],
                     )
 
     def _reset_current_view(self, new_active_view: CUXF_BASE_CHARTS):
