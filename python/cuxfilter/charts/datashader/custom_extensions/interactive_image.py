@@ -94,6 +94,9 @@ class InteractiveImage(object):
                 }
             }
 
+            window.addEventListener('resize', update_plot);
+
+
             if (!Bokeh._queued) {{
                 Bokeh._queued = [];
                 //so that first callback is executed
