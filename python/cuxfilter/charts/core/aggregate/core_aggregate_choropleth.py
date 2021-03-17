@@ -322,7 +322,7 @@ class BaseChoropleth(BaseChart):
         """
         print("function to be overridden by library specific extensions")
 
-    def query_chart_by_range(self, active_chart, query_tuple, datatile_dict):
+    def query_chart_by_range(self, active_chart, query_tuple, datatile):
         """
         Description:
 
@@ -330,14 +330,17 @@ class BaseChoropleth(BaseChart):
         Input:
             1. active_chart: chart object of active_chart
             2. query_tuple: (min_val, max_val) of the query [type: tuple]
-            3. datatile: datatile of active chart for
+            3. datatile: dict, datatile of active chart for
                             current chart[type: pandas df]
         -------------------------------------------
 
         Ouput:
         """
-        for key in datatile_dict:
-            datatile = datatile_dict[key]
+        if type(datatile) != dict:
+            # choropleth datatile should be a dictionary
+            datatile = {self.color_column: datatile}
+        for key in datatile:
+            datatile = datatile[key]
             datatile_result = None
             min_val, max_val = query_tuple
             datatile_index_min = int(
@@ -578,7 +581,7 @@ class BaseChoropleth(BaseChart):
         return datatile_result
 
     def query_chart_by_indices(
-        self, active_chart, old_indices, new_indices, datatile_dict
+        self, active_chart, old_indices, new_indices, datatile
     ):
         """
         Description:
@@ -586,15 +589,19 @@ class BaseChoropleth(BaseChart):
         -------------------------------------------
         Input:
             1. active_chart: chart object of active_chart
-            2. query_tuple: (min_val, max_val) of the query [type: tuple]
-            3. datatile: datatile of active chart for
+            2. old_indices: list
+            3. new_indices: list
+            4. datatile: dict, datatile of active chart for
                         current chart[type: pandas df]
         -------------------------------------------
 
         Ouput:
         """
-        for key in datatile_dict:
-            datatile = datatile_dict[key]
+        if type(datatile) != dict:
+            # choropleth datatile should be a dictionary
+            datatile = {self.color_column: datatile}
+        for key in datatile:
+            datatile = datatile[key]
             calc_new = list(set(new_indices) - set(old_indices))
             remove_old = list(set(old_indices) - set(new_indices))
 
