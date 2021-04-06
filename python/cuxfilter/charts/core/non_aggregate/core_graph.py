@@ -31,7 +31,10 @@ class BaseGraph(BaseChart):
     def name(self):
         # overwrite BaseChart name function to allow unique chart on value x
         chart_type = self.chart_type if self.chart_type else "chart"
-        return f"{self.node_x}_{self.node_y}_{self.node_id}_{chart_type}"
+        return (
+            f"{self.node_x}_{self.node_y}_{self.node_id}_"
+            f"{self.node_aggregate_fn}_{chart_type}"
+        )
 
     @property
     def node_color_palette(self):
