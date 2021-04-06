@@ -99,7 +99,7 @@ class TestBaseStackedLine:
         dashboard = cuxfilter.dashboard.DashBoard(
             dataframe=cuxfilter.DataFrame.from_dataframe(df)
         )
-        dashboard._active_view = bsl.name
+        dashboard._active_view = bsl
 
         class evt:
             geometry = dict(x0=1, x1=2, y0=3, y1=4, type="rect")
@@ -128,7 +128,7 @@ class TestBaseStackedLine:
             dashboard._query_str_dict, dashboard._query_local_variables_dict
         )
 
-        assert dashboard._query_str_dict["x_stacked_lines"] == query
+        assert dashboard._query_str_dict["x_y_stacked_lines"] == query
         for key in local_dict:
             assert (
                 dashboard._query_local_variables_dict[key] == local_dict[key]
@@ -176,7 +176,7 @@ class TestBaseStackedLine:
         dashboard = cuxfilter.dashboard.DashBoard(
             dataframe=cuxfilter.DataFrame.from_dataframe(df)
         )
-        dashboard._active_view = "a_stacked_lines"
+        dashboard._active_view = bsl
 
         def t_func1(event, fn):
             fn("event")
@@ -187,7 +187,6 @@ class TestBaseStackedLine:
 
         assert bsl.x_range is None
         assert bsl.y_range is None
-        assert dashboard._active_view == "a_stacked_lines"
 
     def test_query_chart_by_range(self):
         bsl = BaseStackedLine("a", ["b"])

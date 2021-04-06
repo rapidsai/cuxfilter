@@ -1,10 +1,9 @@
 import pytest
-import pandas as pd
 import cudf
 
 import cuxfilter
 from cuxfilter.charts.core.aggregate.core_number_chart import BaseNumberChart
-from cuxfilter.charts import bar
+from cuxfilter.charts import bar, panel_widgets
 from cuxfilter.layouts import chart_view
 
 
@@ -62,21 +61,17 @@ class TestBaseNumberChart:
         "query_tuple, result", [((1, 4), 4.0), ((0, 4), 5.0), ((1, 1), 1.0)]
     )
     def test_query_chart_by_range(self, query_tuple, result):
-        dashboard = self.cux_df.dashboard(charts=[])
         active_chart = bar(x="key")
         active_chart.stride = 1
         active_chart.min_value = 0
-        bnc = dashboard._charts["_datasize_indicator"]
-        self.result = ""
-
-        def reset_chart(datatile_result):
-            self.result = datatile_result
-
-        bnc.reset_chart = reset_chart
-        datatile = pd.DataFrame({0: {0: 1.0, 1: 2.0, 2: 3.0, 3: 4.0, 4: 5.0}})
+        dashboard = self.cux_df.dashboard(charts=[active_chart])
+        dashboard._active_view = active_chart
+        dashboard._calc_data_tiles()
+        bnc = dashboard._sidebar["_datasize_indicator"]
+        datatile = dashboard._data_tiles["_datasize_indicator"]
         bnc.query_chart_by_range(active_chart, query_tuple, datatile)
 
-        assert result == self.result
+        assert result == bnc.chart[0].value
 
     @pytest.mark.parametrize(
         "old_indices, new_indices, prev_value, result",
@@ -85,23 +80,16 @@ class TestBaseNumberChart:
     def test_query_chart_by_indices(
         self, old_indices, new_indices, prev_value, result
     ):
-        active_chart = bar(x="key")
-        active_chart.stride = 1
-        active_chart.min_value = 0
-        self.result = ""
+        active_chart = panel_widgets.multi_select("key")
         dashboard = self.cux_df.dashboard(charts=[active_chart])
-        dashboard._active_view = active_chart.name
+        dashboard._active_view = active_chart
         dashboard._calc_data_tiles(cumsum=False)
-        bnc = dashboard._charts["_datasize_indicator"]
+        bnc = dashboard._sidebar["_datasize_indicator"]
         bnc.reset_chart(prev_value)
 
-        def reset_chart(datatile_result):
-            self.result = datatile_result
-
-        bnc.reset_chart = reset_chart
-        datatile = pd.DataFrame({0: {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0}})
+        datatile = dashboard._data_tiles["_datasize_indicator"]
         bnc.query_chart_by_indices(
             active_chart, old_indices, new_indices, datatile
         )
 
-        assert result == self.result
+        assert result == bnc.chart[0].value
