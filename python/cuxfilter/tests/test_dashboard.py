@@ -1,7 +1,7 @@
 import pytest
 
 import cuxfilter
-from cuxfilter.charts import bokeh
+from cuxfilter.charts import bokeh, panel_widgets
 import cudf
 import pandas as pd
 import numpy as np
@@ -29,16 +29,43 @@ class TestDashBoard:
         assert self.dashboard._active_view is None
 
     def test_add_charts(self):
+        dashboard = self.cux_df.dashboard(charts=[], title="test_title")
         bac = bokeh.bar("key")
         for _ in range(3):
             bac = bokeh.bar("key")
             bac.chart_type = "chart_" + str(_ + 1)
-            self.dashboard.add_charts(charts=[bac])
+            dashboard.add_charts(charts=[bac])
 
-        assert list(self.dashboard._charts.keys()) == [
+        assert list(dashboard._charts.keys()) == [
             "key_count_chart_1",
             "key_count_chart_2",
             "key_count_chart_3",
+        ]
+
+    def test_add_sidebar(self):
+        dashboard = self.cux_df.dashboard(charts=[], title="test_title")
+        dashboard1 = self.cux_df.dashboard(charts=[], title="test_title")
+        bac = bokeh.bar("key")
+        for _ in range(3):
+            bac = bokeh.bar("key")
+            bac.chart_type = "chart_" + str(_ + 1)
+            dashboard.add_charts(sidebar=[bac])
+
+        for _ in range(3):
+            dashboard1.add_charts(
+                sidebar=[panel_widgets.card(title=f"test{_}")]
+            )
+
+        assert len(dashboard._charts) == 0
+        assert len(dashboard._sidebar) == 1
+        assert list(dashboard._sidebar.keys()) == ["_datasize_indicator"]
+        assert len(dashboard1._charts) == 0
+        assert len(dashboard1._sidebar) == 4
+        assert list(dashboard1._sidebar.keys()) == [
+            "_datasize_indicator",
+            "test0_card",
+            "test1_card",
+            "test2_card",
         ]
 
     @pytest.mark.parametrize(
@@ -145,10 +172,7 @@ class TestDashBoard:
         else:
             assert dashboard._data_tiles[passive_view].equals(result)
 
-        assert (
-            dashboard._active_view.datatile_loaded_state
-            is True
-        )
+        assert dashboard._active_view.datatile_loaded_state is True
 
     @pytest.mark.parametrize(
         "query_tuple, result",
