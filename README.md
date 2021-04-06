@@ -67,7 +67,7 @@ chart3 = cuxfilter.charts.bar('DAY_WEEK', x_label_map=label_map)
 chart4 = cuxfilter.charts.bar('MONTH')
 
 #declare dashboard
-d = cux_df.dashboard([chart1, chart2, chart3, chart4], layout=cuxfilter.layouts.feature_and_double_base, title='Auto Accident Dataset')
+d = cux_df.dashboard([chart1, chart3, chart4], sidebar=[chart2], layout=cuxfilter.layouts.feature_and_double_base, title='Auto Accident Dataset')
 #run the dashboard as a webapp:
 d.show('jupyter-notebook/lab-url')
 ```
@@ -98,7 +98,7 @@ chart3 = cuxfilter.charts.range_slider('borrower_credit_score',data_points=50)
 chart1 = cuxfilter.charts.drop_down('dti')
 
 #declare dashboard
-d = cux_df.dashboard([chart0, chart2, chart3, chart1], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Mortgage Dashboard')
+d = cux_df.dashboard([chart0, chart2],sidebar=[chart3, chart1], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Mortgage Dashboard')
 
 #run the dashboard as a webapp:
 d.show('jupyter-notebook/lab-url')
