@@ -31,7 +31,7 @@ class BaseGraph(BaseChart):
     def name(self):
         # overwrite BaseChart name function to allow unique chart on value x
         chart_type = self.chart_type if self.chart_type else "chart"
-        return f"{self.node_x}_{self.node_y}_{self._node_id}_{chart_type}"
+        return f"{self.node_x}_{self.node_y}_{self.node_id}_{chart_type}"
 
     @property
     def node_color_palette(self):
@@ -272,7 +272,7 @@ class BaseGraph(BaseChart):
             dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])
 
             # reload graph chart separately as it has an extra edges argument
-            self.reload_chart(nodes=nodes, edges=edges)
+            self.reload_chart(data=nodes, edges=edges)
             del nodes, edges
 
         def box_callback(xmin, xmax, ymin, ymax):
@@ -315,7 +315,7 @@ class BaseGraph(BaseChart):
             dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])
 
             # reload graph chart separately as it has an extra edges argument
-            self.reload_chart(nodes=nodes, edges=edges)
+            self.reload_chart(data=nodes, edges=edges)
             del nodes, edges
 
         def selection_callback(event):
@@ -422,7 +422,7 @@ class BaseGraph(BaseChart):
             nodes = dashboard_cls._query(dashboard_cls._generate_query_str())
             dashboard_cls._reload_charts(nodes)
             # reload graph chart separately as it has an extra edges argument
-            self.reload_chart(nodes=nodes)
+            self.reload_chart(data=nodes)
             del nodes
 
         # add callback to reset chart button
