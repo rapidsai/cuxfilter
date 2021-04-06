@@ -106,7 +106,7 @@ class DashBoard:
 
     >>> import cudf
     >>> import cuxfilter
-    >>> from cuxfilter.charts import bokeh, panel_widget
+    >>> from cuxfilter.charts import bokeh, panel_widgets
     >>> df = cudf.DataFrame(
     >>>     {'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}
     >>> )
@@ -117,7 +117,7 @@ class DashBoard:
     >>> line_chart_2 = bokeh.bar(
     >>>     'val', 'key', data_points=5, add_interaction=False
     >>> )
-    >>> sidebar_widget = panel_widget.card("test")
+    >>> sidebar_widget = panel_widgets.card("test")
     >>> d = cux_df.dashboard(charts=[line_chart_1, line_chart_2],
     >>> sidebar=[sidebar_widget])
     >>> d
