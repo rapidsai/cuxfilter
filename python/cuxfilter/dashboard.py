@@ -106,7 +106,7 @@ class DashBoard:
 
     >>> import cudf
     >>> import cuxfilter
-    >>> from cuxfilter.charts import bokeh
+    >>> from cuxfilter.charts import bokeh, panel_widget
     >>> df = cudf.DataFrame(
     >>>     {'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}
     >>> )
@@ -117,10 +117,13 @@ class DashBoard:
     >>> line_chart_2 = bokeh.bar(
     >>>     'val', 'key', data_points=5, add_interaction=False
     >>> )
-    >>> d = cux_df.dashboard([line_chart_1, line_chart_2])
+    >>> sidebar_widget = panel_widget.card("test")
+    >>> d = cux_df.dashboard(charts=[line_chart_1, line_chart_2],
+    >>> sidebar=[sidebar_widget])
     >>> d
     `cuxfilter DashBoard
     [title] Markdown(str)
+    [chart0] Markdown(str, sizing_mode='stretch_both'), ['nav'])
     [chart1] Column(sizing_mode='scale_both', width=1600)
         [0] Bokeh(Figure)
     [chart2] Column(sizing_mode='scale_both', width=1600)
@@ -218,17 +221,23 @@ class DashBoard:
         charts: list
             list of cuxfilter.charts objects
 
+        sidebar: list
+            list of cuxfilter.charts.panel_widget objects
+
         Notes
         -----
             After adding the charts, refresh the dashboard app
             tab to see the updated charts.
+
+            Charts of type widget cannot be added to sidebar but
+            widgets can be added to charts(main layout)
 
         Examples
         --------
 
         >>> import cudf
         >>> import cuxfilter
-        >>> from cuxfilter.charts import bokeh
+        >>> from cuxfilter.charts import bokeh, panel_widgets
         >>> df = cudf.DataFrame(
         >>>     {
         >>>         'key': [0, 1, 2, 3, 4],
@@ -243,7 +252,9 @@ class DashBoard:
         >>> line_chart_2 = bokeh.bar(
         >>>     'val', 'key', data_points=5, add_interaction=False
         >>> )
-        >>> d.add_charts([line_chart_2])
+        >>> d.add_charts(charts=[line_chart_2])
+        >>> # or
+        >>> d.add_charts(charts=[], sidebar=[panel_widgets.card("test")])
 
         """
         self._data_tiles = {}
