@@ -271,18 +271,14 @@ class DashBoard:
     def _reinit_all_charts(self):
         self._query_str_dict = dict()
 
-        for chart in self._charts.values():
-            chart.source = None
+        for chart in self.charts.values():
+            if chart.is_widget and chart.chart_type == "datasize_indicator":
+                # reinitialize data_size_indicator chart
+                chart = data_size_indicator()
+            elif not chart.is_widget:
+                chart.source = None
             chart.initiate_chart(self)
             chart._initialized = True
-
-        for chart in self._sidebar.values:
-            if chart.is_widget:
-                if chart.chart_type == "datasize_indicator":
-                    # reinitialize data_size_indicator chart
-                    chart = data_size_indicator()
-                chart.initiate_chart(self)
-                chart._initialized = True
 
     def _compute_df(self, query, local_dict, indices):
         """
