@@ -256,7 +256,7 @@ class DashBoard:
                 if chart not in self._charts:
                     self._charts[chart.name] = chart
             for chart in sidebar:
-                if chart not in self._sidebar:
+                if chart not in self._sidebar and chart.is_widget:
                     self._sidebar[chart.name] = chart
             self._reinit_all_charts()
             self._restart_current_server()
