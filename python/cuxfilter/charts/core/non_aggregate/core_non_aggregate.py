@@ -25,6 +25,12 @@ class BaseNonAggregate(BaseChart):
     aggregate_col = None
     use_data_tiles = False
 
+    @property
+    def name(self):
+        # overwrite BaseChart name function to allow unique chart on value x
+        chart_type = self.chart_type if self.chart_type else "chart"
+        return f"{self.x}_{self.y}_{chart_type}"
+
     def initiate_chart(self, dashboard_cls):
         """
         Description:
@@ -149,7 +155,7 @@ class BaseNonAggregate(BaseChart):
 
         def selection_callback(event):
             self.test_event = event
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 # reset previous active view and
                 # set current chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
@@ -240,7 +246,7 @@ class BaseNonAggregate(BaseChart):
         """
 
         def reset_callback(event):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 # reset previous active view and set current
                 # chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)

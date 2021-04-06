@@ -34,13 +34,13 @@ class BaseChart:
     x_label_map = {}
     y_label_map = {}
     _initialized = False
+    # widget=False can only be rendered the main layout
+    is_widget = False
 
     @property
     def name(self):
-        if self.chart_type is not None:
-            return self.x + "_" + self.chart_type
-        else:
-            return self.x + "_"
+        chart_type = self.chart_type if self.chart_type else "chart"
+        return f"{self.x}_{chart_type}"
 
     @property
     def width(self):

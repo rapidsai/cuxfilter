@@ -35,6 +35,8 @@ class ViewDataFrame:
     use_data_tiles = False
     drop_duplicates = False
     _initialized = False
+    # widget=False can only be rendered the main layout
+    is_widget = False
 
     def __init__(
         self,

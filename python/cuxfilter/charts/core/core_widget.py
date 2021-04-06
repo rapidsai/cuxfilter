@@ -25,10 +25,13 @@ class BaseWidget:
     label_map: Dict[str, str] = None
     use_data_tiles = False
     _initialized = False
+    # widget is a chart type that can be rendered in a sidebar or main layout
+    is_widget = True
 
     @property
     def name(self):
-        return self.x
+        chart_type = self.chart_type if self.chart_type else "widget"
+        return f"{self.x}_{chart_type}"
 
     @property
     def stride(self):

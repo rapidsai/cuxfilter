@@ -28,6 +28,12 @@ class BaseGraph(BaseChart):
         return self._node_color_palette_input is not None
 
     @property
+    def name(self):
+        # overwrite BaseChart name function to allow unique chart on value x
+        chart_type = self.chart_type if self.chart_type else "chart"
+        return f"{self.node_x}_{self.node_y}_{self._node_id}_{chart_type}"
+
+    @property
     def node_color_palette(self):
         if self.colors_set:
             return list(self._node_color_palette_input)
@@ -313,7 +319,7 @@ class BaseGraph(BaseChart):
             del nodes, edges
 
         def selection_callback(event):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 # reset previous active view and
                 # set current chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
@@ -404,7 +410,7 @@ class BaseGraph(BaseChart):
         """
 
         def reset_callback(event):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 # reset previous active view and set current
                 # chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)

@@ -157,6 +157,7 @@ class DataFrame:
     def dashboard(
         self,
         charts: list,
+        sidebar: list = [],
         layout=single_feature,
         theme=light,
         title="Dashboard",
@@ -215,6 +216,7 @@ class DataFrame:
 
         return DashBoard(
             charts,
+            sidebar,
             self,
             layout,
             theme,
