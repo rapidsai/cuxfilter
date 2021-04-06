@@ -51,7 +51,7 @@ class BaseWidget:
             dates: list | tuple of datetime.datetime objects
         """
         # self.x_dtype is a computed read-only property
-        return dt.to_np_dt64_if_datetime(dates, self.stride_type)
+        return dt.to_np_dt64_if_datetime(dates, self.x_dtype)
 
     def __init__(
         self,

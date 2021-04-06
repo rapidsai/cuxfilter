@@ -162,7 +162,7 @@ class BaseChart:
 
     def _xaxis_np_dt64_transform(self, dates):
         """
-        Description: convert to datetime64 if self.y_dtype is of type datetime
+        Description: convert to datetime64 if self.x_dtype is of type datetime
         -----------------------------------------------------------------
         Input:
             dates: list | tuple of datetime.datetime objects
