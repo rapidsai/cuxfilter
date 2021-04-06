@@ -184,7 +184,7 @@ class DashBoard:
 
         # widgets can be places both in sidebar area AND chart area
         # but charts cannot be placed in the sidebar area due to size
-        # and resolution constriants
+        # and resolution constraints
         # process all main dashboard charts
         for chart in charts:
             self._charts[chart.name] = chart
