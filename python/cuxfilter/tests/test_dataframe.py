@@ -29,4 +29,3 @@ class TestDataFrame:
             dashboard._dashboard.__class__ == cuxfilter.layouts.single_feature
         )
         assert dashboard._theme == cuxfilter.themes.light
-        assert dashboard.data_size_widget is True

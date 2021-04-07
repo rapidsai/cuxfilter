@@ -75,7 +75,7 @@ class RangeSlider(BaseWidget):
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles()
 
@@ -186,7 +186,7 @@ class DateRangeSlider(BaseWidget):
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles()
             query_tuple = self._xaxis_np_dt64_transform(event.new)
@@ -285,7 +285,7 @@ class IntSlider(BaseWidget):
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles()
             dashboard_cls._query_datatiles_by_indices([], [event.new])
@@ -380,7 +380,7 @@ class FloatSlider(BaseWidget):
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles(cumsum=False)
 
@@ -481,7 +481,7 @@ class DropDown(BaseWidget):
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles(cumsum=False)
             dashboard_cls._query_datatiles_by_indices([], [event.new])
@@ -581,7 +581,7 @@ class MultiSelect(BaseWidget):
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles(cumsum=False)
             dashboard_cls._query_datatiles_by_indices(event.old, event.new)
@@ -757,6 +757,8 @@ class NumberChart(BaseNumberChart):
 class Card:
     use_data_tiles = False
     _initialized = True
+    # widget is a chart type that can be rendered in a sidebar or main layout
+    is_widget = True
 
     @property
     def name(self):
@@ -765,7 +767,7 @@ class Card:
     def __init__(self, content="", title="", widget=True):
         self.content = content
         self.title = title
-        self.chart_type = "card" if not widget else "card_widget"
+        self.chart_type = "card"
 
     def view(self):
         return chart_view(self.content, title=self.title)

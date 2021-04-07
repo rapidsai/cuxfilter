@@ -55,7 +55,7 @@ def range_slider(
     plot = RangeSlider(
         x, width, height, data_points, step_size, step_size_type, **params
     )
-    plot.chart_type = "widget_range_slider"
+    plot.chart_type = "range_slider"
     return plot
 
 
@@ -98,7 +98,7 @@ def date_range_slider(
         step_size_type=CUDF_TIMEDELTA_TYPE,
         **params,
     )
-    plot.chart_type = "widget_date_range_slider"
+    plot.chart_type = "date_range_slider"
     return plot
 
 
@@ -136,7 +136,7 @@ def int_slider(
     plot = IntSlider(
         x, width, height, data_points, step_size, step_size_type=int, **params
     )
-    plot.chart_type = "widget_int_slider"
+    plot.chart_type = "int_slider"
     return plot
 
 
@@ -180,7 +180,7 @@ def float_slider(
         step_size_type=float,
         **params,
     )
-    plot.chart_type = "widget_float_slider"
+    plot.chart_type = "float_slider"
     return plot
 
 
@@ -209,7 +209,7 @@ def drop_down(x, width=400, height=50, **params):
 
     """
     plot = DropDown(x, width, height, **params)
-    plot.chart_type = "widget_dropdown"
+    plot.chart_type = "dropdown"
     return plot
 
 
@@ -238,7 +238,7 @@ def multi_select(x, width=400, height=200, **params):
 
     """
     plot = MultiSelect(x, width, height, **params)
-    plot.chart_type = "widget_multi_select"
+    plot.chart_type = "multi_select"
     return plot
 
 

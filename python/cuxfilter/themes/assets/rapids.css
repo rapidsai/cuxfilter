@@ -11,6 +11,10 @@ body {
     background-color: #000 !important;
   }
   
+  .drag-handle, .react-resizable-handle {
+    filter: brightness(0) invert(1);
+  }
+  
   #main {
     color: white;
     background-color: #121212;

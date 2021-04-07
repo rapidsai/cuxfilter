@@ -5,10 +5,6 @@ import panel as pn
 from .custom_react_template import ReactTemplate
 
 
-def is_widget(obj):
-    return "widget" in obj.chart_type or obj.chart_type == "datasize_indicator"
-
-
 def compute_position(arr, i, pos, offset):
     x, y = (
         np.array(
@@ -28,14 +24,16 @@ class _LayoutBase:
     _layout_array: list
     _num_charts_pat = re.compile("roots.chart")
 
-    def generate_dashboard(self, title, charts, theme, layout_array=None):
+    def generate_dashboard(
+        self, title, charts, sidebar, theme, layout_array=None
+    ):
         pn.config.sizing_mode = "stretch_both"
         self._layout_array = layout_array
         tmpl = ReactTemplate(title=title, theme=theme, compact="both")
-        widgets = [x for x in charts.values() if is_widget(x)]
+        widgets = [x for x in sidebar.values() if x.is_widget]
         tmpl = self._process_widgets(widgets, tmpl)
         self._apply_themes(charts, theme)
-        plots = [x for x in charts.values() if not is_widget(x)]
+        plots = [x for x in charts.values()]
         self._process_plots(plots, tmpl)
         return tmpl
 
