@@ -177,7 +177,7 @@ class BaseLine(BaseNonAggregate):
             )
 
         def filter_widget_callback(event):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles()
             query_tuple = self._xaxis_np_dt64_transform(event.new)

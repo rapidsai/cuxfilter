@@ -5,6 +5,8 @@ from ....layouts import chart_view
 
 class BaseNumberChart(BaseChart):
     stride = 1
+    # widget is a chart type that can be rendered in a sidebar or main layout
+    is_widget = True
 
     @property
     def use_data_tiles(self):

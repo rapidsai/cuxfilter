@@ -35,6 +35,12 @@ class BaseStackedLine(BaseChart):
         return None
 
     @property
+    def name(self):
+        # overwrite BaseChart name function to allow unique chart on value x
+        chart_type = self.chart_type if self.chart_type else "chart"
+        return f"{self.x}_{self.y[0]}_{chart_type}"
+
+    @property
     def colors_set(self):
         return self._colors_input != []
 
@@ -174,7 +180,7 @@ class BaseStackedLine(BaseChart):
             xmin, xmax = self._xaxis_dt_transform(
                 (event.geometry["x0"], event.geometry["x1"])
             )
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 # reset previous active view and
                 # set current chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
@@ -262,7 +268,7 @@ class BaseStackedLine(BaseChart):
         """
 
         def reset_callback(event):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 # reset previous active view and
                 # set current chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)

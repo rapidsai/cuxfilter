@@ -191,13 +191,13 @@ p.bk.card-button {
 
 .drag-handle {
   position: absolute;
-  top: 12px;
+  top: 18px;
   left: 12px;
   width: 24px;
   height: 24px;
   z-index: 10000;
   background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij48cGF0aCBmaWxsPSJub25lIiBkPSJNMCAwaDI0djI0SDB6Ii8+PHBhdGggZD0iTTE2IDEzbDYuOTY0IDQuMDYyLTIuOTczLjg1IDIuMTI1IDMuNjgxLTEuNzMyIDEtMi4xMjUtMy42OC0yLjIyMyAyLjE1TDE2IDEzem0tMi03aDJ2Mmg1YTEgMSAwIDAgMSAxIDF2NGgtMnYtM0gxMHYxMGg0djJIOWExIDEgMCAwIDEtMS0xdi01SDZ2LTJoMlY5YTEgMSAwIDAgMSAxLTFoNVY2ek00IDE0djJIMnYtMmgyem0wLTR2Mkgydi0yaDJ6bTAtNHYySDJWNmgyem0wLTR2MkgyVjJoMnptNCAwdjJINlYyaDJ6bTQgMHYyaC0yVjJoMnptNCAwdjJoLTJWMmgyeiIvPjwvc3ZnPg==');
-  opacity: 0;
+  opacity: 0.75;
   transition-delay: 0.5s;
   transition: 0.5s;
 }
@@ -223,7 +223,13 @@ p.bk.card-button {
   box-sizing: border-box;
   background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2IDYiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiNmZmZmZmYwMCIgeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSI2cHgiIGhlaWdodD0iNnB4Ij48ZyBvcGFjaXR5PSIwLjMwMiI+PHBhdGggZD0iTSA2IDYgTCAwIDYgTCAwIDQuMiBMIDQgNC4yIEwgNC4yIDQuMiBMIDQuMiAwIEwgNiAwIEwgNiA2IEwgNiA2IFoiIGZpbGw9IiMwMDAwMDAiLz48L2c+PC9zdmc+');
   background-position: bottom right;
+  opacity: 0.75;
   padding: 0 3px 3px 0;
+}
+
+.react-resizable-handle:hover {
+  transition: 0.5s;
+  opacity: 1;
 }
 .react-resizable-handle-sw {
   bottom: 0;
