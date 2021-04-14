@@ -49,7 +49,7 @@ for PROJECT in ${PROJECTS[@]}; do
     if [ ! -d "api/$PROJECT/$BRANCH_VERSION" ]; then
         mkdir -p api/$PROJECT/$BRANCH_VERSION
     fi
-    rm -rf "$DOCS_WORKSPACE/api/"$PROJECT/$BRANCH_VERSION/*	
+    rm -rf "$DOCS_WORKSPACE/api/$PROJECT/$BRANCH_VERSION/*	
 done
 
-mv $PROJECT_WORKSPACE/docs/_build/html/* "$DOCS_WORKSPACE/api/cuxfilter/"$BRANCH_VERSION
+mv $PROJECT_WORKSPACE/docs/_build/html/* "$DOCS_WORKSPACE/api/cuxfilter/$BRANCH_VERSION
