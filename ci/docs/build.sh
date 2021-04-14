@@ -10,9 +10,9 @@ if [ -z "$PROJECT_WORKSPACE" ]; then
     exit 1
 fi
 
-export DOCS_WORKSPACE=$WORKSPACE/docs
+export DOCS_WORKSPACE="$WORKSPACE/docs"
 export PATH=/opt/conda/bin:/usr/local/cuda/bin:$PATH
-export HOME=$WORKSPACE
+export HOME="$WORKSPACE"
 export PROJECT_WORKSPACE=/rapids/cuxfilter
 export LIBCUDF_KERNEL_CACHE_PATH="$HOME/.jitify-cache"
 export NIGHTLY_VERSION=$(echo $BRANCH_VERSION | awk -F. '{print $2}')
@@ -43,13 +43,13 @@ cd $PROJECT_WORKSPACE/docs
 make html
 
 #Commit to Website
-cd $DOCS_WORKSPACE
+cd "$DOCS_WORKSPACE"
 
 for PROJECT in ${PROJECTS[@]}; do
     if [ ! -d "api/$PROJECT/$BRANCH_VERSION" ]; then
         mkdir -p api/$PROJECT/$BRANCH_VERSION
     fi
-    rm -rf $DOCS_WORKSPACE/api/$PROJECT/$BRANCH_VERSION/*	
+    rm -rf "$DOCS_WORKSPACE/api/"$PROJECT/$BRANCH_VERSION/*	
 done
 
-mv $PROJECT_WORKSPACE/docs/_build/html/* $DOCS_WORKSPACE/api/cuxfilter/$BRANCH_VERSION
+mv $PROJECT_WORKSPACE/docs/_build/html/* "$DOCS_WORKSPACE/api/cuxfilter/"$BRANCH_VERSION

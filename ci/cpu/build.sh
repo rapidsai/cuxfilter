@@ -15,7 +15,7 @@ export PATH=/opt/conda/bin:/usr/local/cuda/bin:$PATH
 export PARALLEL_LEVEL=${PARALLEL_LEVEL:-4}
 
 # Set home to the job's workspace
-export HOME=$WORKSPACE
+export HOME="$WORKSPACE"
 
 # Determine CUDA release version
 export CUDA_REL=${CUDA_VERSION%.*}
@@ -25,7 +25,7 @@ export GPUCI_CONDA_RETRY_MAX=1
 export GPUCI_CONDA_RETRY_SLEEP=30
 
 # Switch to project root; also root of repo checkout
-cd $WORKSPACE
+cd "$WORKSPACE"
 
 # If nightly build, append current YYMMDD to version
 if [[ "$BUILD_MODE" = "branch" && "$SOURCE_BRANCH" = branch-* ]] ; then
