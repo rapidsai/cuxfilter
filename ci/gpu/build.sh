@@ -53,7 +53,8 @@ nvidia-smi
 gpuci_logger "Activate conda env"
 . /opt/conda/etc/profile.d/conda.sh
 conda activate rapids
-conda install "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
+gpuci_conda_retry install -y \
+               "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
                "cugraph=$MINOR_VERSION.*" \
                "cuspatial=$MINOR_VERSION.*" \
                "dask-cudf=$MINOR_VERSION.*" "dask-cuda=$MINOR_VERSION.*" \
