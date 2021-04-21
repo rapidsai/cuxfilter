@@ -36,10 +36,11 @@ class TestCoreNonAggregateChart:
         assert bnac.y_label_map == {}
 
         # test chart name setter
-        bnac.x = "test_x"
+        bnac.x = "x"
+        bnac.y = "y"
         bnac.chart_type = "test_chart_type"
 
-        assert bnac.name == "test_x_test_chart_type"
+        assert bnac.name == "x_y_test_chart_type"
 
         # BaseNonAggregateChart variables
         assert bnac.use_data_tiles is False
@@ -96,7 +97,7 @@ class TestCoreNonAggregateChart:
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
-        dashboard._active_view = bnac.name
+        dashboard._active_view = bnac
 
         class evt:
             geometry = dict(x0=1, x1=2, y0=3, y1=4, type="rect")
@@ -189,7 +190,7 @@ class TestCoreNonAggregateChart:
             dashboard._query_str_dict, dashboard._query_local_variables_dict
         )
 
-        assert dashboard._query_str_dict["x_test"] == query
+        assert dashboard._query_str_dict["x_y_test"] == query
         for key in local_dict:
             assert (
                 dashboard._query_local_variables_dict[key] == local_dict[key]
@@ -237,7 +238,7 @@ class TestCoreNonAggregateChart:
 
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
-        dashboard._active_view = "a_test"
+        dashboard._active_view = bnac
 
         def t_func1(event, fn):
             fn("event")
@@ -248,7 +249,6 @@ class TestCoreNonAggregateChart:
 
         assert bnac.x_range is None
         assert bnac.y_range is None
-        assert dashboard._active_view == "a_test"
 
     def test_query_chart_by_range(self):
         bnac = BaseNonAggregate()

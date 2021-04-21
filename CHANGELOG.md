@@ -1,3 +1,22 @@
+# cuXfilter 0.19.0 (21 Apr 2021)
+
+## 🐛 Bug Fixes
+
+- Bug fix ([#261](https://github.com//rapidsai/cuxfilter/pull/261)) [@AjayThorve](https://github.com/AjayThorve)
+- Bug fixes ([#257](https://github.com//rapidsai/cuxfilter/pull/257)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 📖 Documentation
+
+- Fea/sidebar api change ([#262](https://github.com//rapidsai/cuxfilter/pull/262)) [@AjayThorve](https://github.com/AjayThorve)
+- Auto-merge branch-0.18 to branch-0.19 ([#237](https://github.com//rapidsai/cuxfilter/pull/237)) [@GPUtester](https://github.com/GPUtester)
+
+## 🛠️ Improvements
+
+- Update Changelog Link ([#258](https://github.com//rapidsai/cuxfilter/pull/258)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Prepare Changelog for Automation ([#253](https://github.com//rapidsai/cuxfilter/pull/253)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Update 0.18 changelog entry ([#252](https://github.com//rapidsai/cuxfilter/pull/252)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Fix merge conflicts in #233 ([#234](https://github.com//rapidsai/cuxfilter/pull/234)) [@ajschmidt8](https://github.com/ajschmidt8)
+
 # cuXfilter 0.18.0 (24 Feb 2021)
 
 ## Bug Fixes 🐛

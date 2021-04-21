@@ -22,6 +22,15 @@ class BaseChoropleth(BaseChart):
     def datatile_loaded_state(self):
         return self._datatile_loaded_state
 
+    @property
+    def name(self):
+        # overwrite BaseChart name function to allow unique choropleths on
+        # value x
+        if self.chart_type is not None:
+            return f"{self.x}_{self.aggregate_fn}_{self.chart_type}"
+        else:
+            return f"{self.x}_{self.aggregate_fn}_chart"
+
     @datatile_loaded_state.setter
     def datatile_loaded_state(self, state: bool):
         self._datatile_loaded_state = state
@@ -228,7 +237,7 @@ class BaseChoropleth(BaseChart):
         """
 
         def selection_callback(old, new):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles(cumsum=False)
             dashboard_cls._query_datatiles_by_indices(old, new)
@@ -286,7 +295,7 @@ class BaseChoropleth(BaseChart):
         """
 
         def reset_callback(event):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 # reset previous active view and set current chart as
                 # active view
                 dashboard_cls._reset_current_view(new_active_view=self)
@@ -322,7 +331,7 @@ class BaseChoropleth(BaseChart):
         """
         print("function to be overridden by library specific extensions")
 
-    def query_chart_by_range(self, active_chart, query_tuple, datatile_dict):
+    def query_chart_by_range(self, active_chart, query_tuple, datatile):
         """
         Description:
 
@@ -330,14 +339,16 @@ class BaseChoropleth(BaseChart):
         Input:
             1. active_chart: chart object of active_chart
             2. query_tuple: (min_val, max_val) of the query [type: tuple]
-            3. datatile: datatile of active chart for
+            3. datatile: dict, datatile of active chart for
                             current chart[type: pandas df]
         -------------------------------------------
 
         Ouput:
         """
-        for key in datatile_dict:
-            datatile = datatile_dict[key]
+        if type(datatile) != dict:
+            # choropleth datatile should be a dictionary
+            datatile = {self.color_column: datatile}
+        for key in datatile:
             datatile_result = None
             min_val, max_val = query_tuple
             datatile_index_min = int(
@@ -359,42 +370,46 @@ class BaseChoropleth(BaseChart):
 
                 if temp_agg_function == "mean":
                     datatile_result_sum = np.array(
-                        datatile[0].loc[datatile_indices, datatile_index_max]
+                        datatile[key][0].loc[
+                            datatile_indices, datatile_index_max
+                        ]
                     )
                     datatile_result_count = np.array(
-                        datatile[1].loc[datatile_indices, datatile_index_max]
+                        datatile[key][1].loc[
+                            datatile_indices, datatile_index_max
+                        ]
                     )
                     datatile_result = (
                         datatile_result_sum / datatile_result_count
                     )
                 elif temp_agg_function in ["count", "sum"]:
-                    datatile_result = datatile.loc[
+                    datatile_result = datatile[key].loc[
                         datatile_indices, datatile_index_max
                     ]
                 elif temp_agg_function in ["min", "max"]:
                     datatile_result = np.array(
                         getattr(
-                            datatile.loc[datatile_indices, 1:],
+                            datatile[key].loc[datatile_indices, 1:],
                             temp_agg_function,
                         )(axis=1, skipna=True)
                     )
             else:
                 datatile_index_min -= 1
                 if temp_agg_function == "mean":
-                    datatile_max0 = datatile[0].loc[
+                    datatile_max0 = datatile[key][0].loc[
                         datatile_indices, datatile_index_max
                     ]
-                    datatile_min0 = datatile[0].loc[
+                    datatile_min0 = datatile[key][0].loc[
                         datatile_indices, datatile_index_min
                     ]
                     datatile_result_sum = np.array(
                         datatile_max0 - datatile_min0
                     )
 
-                    datatile_max1 = datatile[1].loc[
+                    datatile_max1 = datatile[key][1].loc[
                         datatile_indices, datatile_index_max
                     ]
-                    datatile_min1 = datatile[1].loc[
+                    datatile_min1 = datatile[key][1].loc[
                         datatile_indices, datatile_index_min
                     ]
                     datatile_result_count = np.array(
@@ -405,17 +420,17 @@ class BaseChoropleth(BaseChart):
                         datatile_result_sum / datatile_result_count
                     )
                 elif temp_agg_function in ["count", "sum"]:
-                    datatile_max = datatile.loc[
+                    datatile_max = datatile[key].loc[
                         datatile_indices, datatile_index_max
                     ]
-                    datatile_min = datatile.loc[
+                    datatile_min = datatile[key].loc[
                         datatile_indices, datatile_index_min
                     ]
                     datatile_result = np.array(datatile_max - datatile_min)
                 elif temp_agg_function in ["min", "max"]:
                     datatile_result = np.array(
                         getattr(
-                            datatile.loc[
+                            datatile[key].loc[
                                 datatile_indices,
                                 datatile_index_min:datatile_index_max,
                             ],
@@ -578,7 +593,7 @@ class BaseChoropleth(BaseChart):
         return datatile_result
 
     def query_chart_by_indices(
-        self, active_chart, old_indices, new_indices, datatile_dict
+        self, active_chart, old_indices, new_indices, datatile
     ):
         """
         Description:
@@ -586,15 +601,18 @@ class BaseChoropleth(BaseChart):
         -------------------------------------------
         Input:
             1. active_chart: chart object of active_chart
-            2. query_tuple: (min_val, max_val) of the query [type: tuple]
-            3. datatile: datatile of active chart for
+            2. old_indices: list
+            3. new_indices: list
+            4. datatile: dict, datatile of active chart for
                         current chart[type: pandas df]
         -------------------------------------------
 
         Ouput:
         """
-        for key in datatile_dict:
-            datatile = datatile_dict[key]
+        if type(datatile) != dict:
+            # choropleth datatile should be a dictionary
+            datatile = {self.color_column: datatile}
+        for key in datatile:
             calc_new = list(set(new_indices) - set(old_indices))
             remove_old = list(set(old_indices) - set(new_indices))
 
@@ -613,7 +631,7 @@ class BaseChoropleth(BaseChart):
                     active_chart,
                     old_indices,
                     new_indices,
-                    datatile,
+                    datatile[key],
                     calc_new,
                     remove_old,
                 )
@@ -622,7 +640,7 @@ class BaseChoropleth(BaseChart):
                     active_chart,
                     old_indices,
                     new_indices,
-                    datatile,
+                    datatile[key],
                     calc_new,
                     remove_old,
                     key,
@@ -632,7 +650,7 @@ class BaseChoropleth(BaseChart):
                     active_chart,
                     old_indices,
                     new_indices,
-                    datatile,
+                    datatile[key],
                     temp_agg_function,
                 )
             if isinstance(datatile_result, np.ndarray):

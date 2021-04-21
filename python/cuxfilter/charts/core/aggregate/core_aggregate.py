@@ -30,6 +30,15 @@ class BaseAggregateChart(BaseChart):
     def datatile_loaded_state(self):
         return self._datatile_loaded_state
 
+    @property
+    def name(self):
+        # overwrite BaseChart name function to allow unique choropleths on
+        # value x
+        if self.chart_type is not None:
+            return f"{self.x}_{self.aggregate_fn}_{self.chart_type}"
+        else:
+            return f"{self.x}_{self.aggregate_fn}_chart"
+
     @datatile_loaded_state.setter
     def datatile_loaded_state(self, state: bool):
         self._datatile_loaded_state = state
@@ -289,7 +298,7 @@ class BaseAggregateChart(BaseChart):
             )
 
         def filter_widget_callback(event):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 dashboard_cls._reset_current_view(new_active_view=self)
                 dashboard_cls._calc_data_tiles()
             query_tuple = self._xaxis_np_dt64_transform(event.new)

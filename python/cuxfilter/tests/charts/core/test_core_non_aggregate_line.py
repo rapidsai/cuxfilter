@@ -90,7 +90,8 @@ class TestNonAggregateBaseLine:
         )
 
         assert (
-            self.dashboard._query_str_dict["key_non_aggregate_line"] == query
+            self.dashboard._query_str_dict["key_val_non_aggregate_line"]
+            == query
         )
         for key in local_dict:
             assert (

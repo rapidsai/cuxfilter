@@ -706,7 +706,7 @@ class Graph(BaseGraph):
         if height is not None:
             self.chart.plot_height = height
 
-    def reload_chart(self, nodes, edges=None, patch_update=False):
+    def reload_chart(self, data, edges=None, patch_update=False):
         """
         Description:
 
@@ -717,15 +717,15 @@ class Graph(BaseGraph):
 
         Ouput:
         """
-        if nodes is not None:
-            if len(nodes) == 0:
-                nodes = cudf.DataFrame({k: cp.nan for k in self.nodes.columns})
+        if data is not None:
+            if len(data) == 0:
+                data = cudf.DataFrame({k: cp.nan for k in self.nodes.columns})
 
             # update connected_edges value for datashaded edges
             # if display edge toggle is active
             if self.display_edges._active:
                 self.connected_edges = calc_connected_edges(
-                    nodes,
+                    data,
                     self.edges if edges is None else edges,
                     self.node_x,
                     self.node_y,
@@ -739,7 +739,7 @@ class Graph(BaseGraph):
                     self.curve_params,
                 )
 
-            self.interactive_image.update_chart(data_source=nodes)
+            self.interactive_image.update_chart(data_source=data)
 
     def add_selection_geometry_event(self, callback):
         """

@@ -28,6 +28,15 @@ class BaseGraph(BaseChart):
         return self._node_color_palette_input is not None
 
     @property
+    def name(self):
+        # overwrite BaseChart name function to allow unique chart on value x
+        chart_type = self.chart_type if self.chart_type else "chart"
+        return (
+            f"{self.node_x}_{self.node_y}_{self.node_id}_"
+            f"{self.node_aggregate_fn}_{chart_type}"
+        )
+
+    @property
     def node_color_palette(self):
         if self.colors_set:
             return list(self._node_color_palette_input)
@@ -266,7 +275,7 @@ class BaseGraph(BaseChart):
             dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])
 
             # reload graph chart separately as it has an extra edges argument
-            self.reload_chart(nodes=nodes, edges=edges)
+            self.reload_chart(data=nodes, edges=edges)
             del nodes, edges
 
         def box_callback(xmin, xmax, ymin, ymax):
@@ -309,11 +318,11 @@ class BaseGraph(BaseChart):
             dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])
 
             # reload graph chart separately as it has an extra edges argument
-            self.reload_chart(nodes=nodes, edges=edges)
+            self.reload_chart(data=nodes, edges=edges)
             del nodes, edges
 
         def selection_callback(event):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 # reset previous active view and
                 # set current chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
@@ -404,7 +413,7 @@ class BaseGraph(BaseChart):
         """
 
         def reset_callback(event):
-            if dashboard_cls._active_view != self.name:
+            if dashboard_cls._active_view != self:
                 # reset previous active view and set current
                 # chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
@@ -416,7 +425,7 @@ class BaseGraph(BaseChart):
             nodes = dashboard_cls._query(dashboard_cls._generate_query_str())
             dashboard_cls._reload_charts(nodes)
             # reload graph chart separately as it has an extra edges argument
-            self.reload_chart(nodes=nodes)
+            self.reload_chart(data=nodes)
             del nodes
 
         # add callback to reset chart button

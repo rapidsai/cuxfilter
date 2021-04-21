@@ -21,6 +21,9 @@ body {
   border-color: #292929 !important;
   background-color: #121212 !important;
 }
+.drag-handle, .react-resizable-handle {
+  filter: brightness(0) invert(1);
+}
 
 .bk.card {
   color: white;

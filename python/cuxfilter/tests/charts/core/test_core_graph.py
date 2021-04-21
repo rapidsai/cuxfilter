@@ -98,12 +98,12 @@ class TestCoreGraph:
         bg.inspect_neighbors = inspect_neighbors
         self.result = None
 
-        def t_function(nodes, edges=None, patch_update=False):
-            self.result = nodes.reset_index(drop=True)
+        def t_function(data, edges=None, patch_update=False):
+            self.result = data.reset_index(drop=True)
 
         bg.reload_chart = t_function
 
-        dashboard._active_view = bg.name
+        dashboard._active_view = bg
 
         class evt:
             geometry = dict(x0=1, x1=3, y0=0, y1=1, type="rect")
@@ -127,7 +127,7 @@ class TestCoreGraph:
         bg.edges = edges
         bg.inspect_neighbors = CustomInspectTool(_active=False)
 
-        def t_function(nodes, edges=None, patch_update=False):
+        def t_function(data, edges=None, patch_update=False):
             pass
 
         bg.reload_chart = t_function
@@ -174,7 +174,8 @@ class TestCoreGraph:
         bg.compute_query_dict(
             dashboard._query_str_dict, dashboard._query_local_variables_dict
         )
-        assert dashboard._query_str_dict["x_test"] == query
+        print(dashboard._query_str_dict)
+        assert dashboard._query_str_dict["x_y_vertex_count_test"] == query
         for key in local_dict:
             assert (
                 dashboard._query_local_variables_dict[key] == local_dict[key]
@@ -223,12 +224,12 @@ class TestCoreGraph:
 
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
-        dashboard._active_view = "a_test"
+        dashboard._active_view = bg
 
         def t_func1(event, fn):
             fn("event")
 
-        def reload_fn(nodes, edges=None, patch_update=False):
+        def reload_fn(data, edges=None, patch_update=False):
             pass
 
         bg.add_event = t_func1
@@ -237,7 +238,6 @@ class TestCoreGraph:
 
         assert bg.x_range is None
         assert bg.y_range is None
-        assert dashboard._active_view == "a_test"
 
     def test_query_chart_by_range(self):
         bg = BaseGraph()
