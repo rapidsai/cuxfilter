@@ -71,7 +71,10 @@ class LightTheme(DefaultTheme):
         }
     }
     bokeh_theme = _BkTheme(json=LIGHT)
-    mapbox_style = "mapbox://styles/mapbox/light-v9"
+    map_style = "mapbox://styles/mapbox/light-v9"
+    map_style_without_token = (
+        "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+    )
     color_palette = list(palettes.Blues[9])
     chart_color = "#4292c6"
     css = param.Filename(default=STATIC_DIR_THEMES / "default.css")
