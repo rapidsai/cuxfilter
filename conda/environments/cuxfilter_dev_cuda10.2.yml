@@ -8,13 +8,13 @@ channels:
 - anaconda
 dependencies:
 - cupy>7.1.0,<10.0.0a0
-- cuspatial=0.20
+- cuspatial=21.06
 - python>=3.6,<3.8
-- cudf=0.20
+- cudf=21.06
 - dask>=2.12.0
 - distributed>=2.12.0
-- dask-cuda=0.20
-- dask-cudf=0.20
+- dask-cuda=21.06
+- dask-cudf=21.06
 - datashader>=0.11.1
 - numba>=0.51.2
 - geopandas>=0.6, <=0.8.1
