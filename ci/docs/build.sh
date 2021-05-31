@@ -52,4 +52,4 @@ for PROJECT in ${PROJECTS[@]}; do
     rm -rf "$DOCS_WORKSPACE/api/$PROJECT/$BRANCH_VERSION/"*	
 done
 
-mv $PROJECT_WORKSPACE/docs/_build/html/* "$DOCS_WORKSPACE/api/cuxfilter/$BRANCH_VERSION"
+mv "$PROJECT_WORKSPACE/docs/_build/html/"* "$DOCS_WORKSPACE/api/cuxfilter/$BRANCH_VERSION"
