@@ -1,8 +1,8 @@
 #!/bin/bash
 
-NOTEBOOKS_DIR=${WORKSPACE}/notebooks
-NBTEST=${WORKSPACE}/ci/utils/nbtest.sh
-LIBCUDF_KERNEL_CACHE_PATH=${WORKSPACE}/.jitcache
+NOTEBOOKS_DIR="$WORKSPACE/notebooks"
+NBTEST="$WORKSPACE/ci/utils/nbtest.sh"
+LIBCUDF_KERNEL_CACHE_PATH="$WORKSPACE/.jitcache"
 
 # Add notebooks that should be skipped here
 # (space-separated list of filenames without paths)
