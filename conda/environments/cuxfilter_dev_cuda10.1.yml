@@ -16,7 +16,7 @@ dependencies:
 - dask-cudf=21.08
 - datashader>=0.11.1
 - numba>=0.51.2
-- geopandas>=0.6, <=0.8.1
+- geopandas >=0.9.0,<0.10.0a0
 - pyproj>=2.4, <=3.0.1
 - libwebp
 - pandoc=<2.0.0
