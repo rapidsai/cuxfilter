@@ -1,6 +1,12 @@
-# cuXfilter 21.06.00 (Date TBD)
+# cuXfilter 21.06.00 (9 Jun 2021)
 
-Please see https://github.com/rapidsai/cuxfilter/releases/tag/v21.06.00a for the latest changes to this development branch.
+## 🛠️ Impovements
+
+- Update `geopandas` vesion spec ([#292](https://github.com/rapidsai/cuxfilter/pull/292)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Update envionment vaiable used to detemine `cuda_vesion` ([#289](https://github.com/rapidsai/cuxfilter/pull/289)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Update `CHANGELOG.md` links fo calve ([#287](https://github.com/rapidsai/cuxfilter/pull/287)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Update docs build scipt ([#286](https://github.com/rapidsai/cuxfilter/pull/286)) [@ajschmidt8](https://github.com/ajschmidt8)
+- suppot space in wokspace ([#267](https://github.com/rapidsai/cuxfilter/pull/267)) [@jolounyomi](https://github.com/jolounyomi)
 
 # cuXfilter 0.19.0 (21 Apr 2021)
 
