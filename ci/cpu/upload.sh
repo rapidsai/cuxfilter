@@ -43,5 +43,5 @@ if [ "$UPLOAD_CUXFILTER" == "1" ]; then
   test -e ${CUXFILTER_FILE}
   echo "Upload cuXfilter"
   echo ${CUXFILTER_FILE}
-  gpuci_retry anaconda -t ${MY_UPLOAD_KEY} upload -u ${CONDA_USERNAME:-rapidsai} ${LABEL_OPTION} --skip-existing ${CUXFILTER_FILE}
+  gpuci_retry anaconda -t ${MY_UPLOAD_KEY} upload -u ${CONDA_USERNAME:-rapidsai} ${LABEL_OPTION} --skip-existing ${CUXFILTER_FILE} --no-progress
 fi

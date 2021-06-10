@@ -85,7 +85,7 @@ img.app-logo {
   transform-origin: center left; /* Set the transformed position of sidebar to center left side. */
   width: 300px;
   height: calc(100vh - 76px);
-  overflow-y: scroll;
+  overflow-y: auto;
   padding: 10px;
 }
 
@@ -98,7 +98,7 @@ img.app-logo {
   width: 100%;
   height: 100%;
   padding-bottom: 20px;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 #sidebarCollapse {
@@ -113,7 +113,7 @@ p.bk.card-button {
 .sidenav {
   padding-top: 15px;
   position: absolute;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .bk.card-title {
@@ -151,7 +151,7 @@ p.bk.card-button {
 }
 
 .pn-modal {
-  overflow-y: scroll;
+  overflow-y: auto;
   width: 100%;
   position: absolute;
   display: none;

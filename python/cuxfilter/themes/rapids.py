@@ -72,7 +72,10 @@ class RapidsTheme(Theme):
     }
 
     bokeh_theme = _BkTheme(json=DARK)
-    mapbox_style = "mapbox://styles/mapbox/dark-v9"
+    map_style = "mapbox://styles/mapbox/dark-v9"
+    map_style_without_token = (
+        "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
+    )
     color_palette = list(palettes.Purples[9])
     chart_color = "#8735fb"
     css = param.Filename(default=STATIC_DIR_THEMES / "rapids.css")

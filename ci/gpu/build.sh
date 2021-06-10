@@ -18,10 +18,10 @@ export PARALLEL_LEVEL=${PARALLEL_LEVEL:-4}
 export CUDA_REL=${CUDA_VERSION%.*}
 
 # Set home to the job's workspace
-export HOME=$WORKSPACE
+export HOME="$WORKSPACE"
 
 # Parse git describe
-cd $WORKSPACE
+cd "$WORKSPACE"
 export GIT_DESCRIBE_TAG=`git describe --tags`
 export MINOR_VERSION=`echo $GIT_DESCRIBE_TAG | grep -o -E '([0-9]+\.[0-9]+)'`
 # Set `LIBCUDF_KERNEL_CACHE_PATH` environment variable to $HOME/.jitify-cache because
@@ -53,7 +53,8 @@ nvidia-smi
 gpuci_logger "Activate conda env"
 . /opt/conda/etc/profile.d/conda.sh
 conda activate rapids
-conda install "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
+gpuci_conda_retry install -y \
+               "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
                "cugraph=$MINOR_VERSION.*" \
                "cuspatial=$MINOR_VERSION.*" \
                "dask-cudf=$MINOR_VERSION.*" "dask-cuda=$MINOR_VERSION.*" \
@@ -79,7 +80,7 @@ conda list --show-channel-urls
 ################################################################################
 
 gpuci_logger "Build cuxfilter"
-$WORKSPACE/build.sh clean cuxfilter
+"$WORKSPACE/build.sh" clean cuxfilter
 
 ################################################################################
 # TEST - Run pytest 
@@ -95,12 +96,12 @@ else
     gpuci_logger "Check GPU usage"
     nvidia-smi
 
-    cd $WORKSPACE/python/cuxfilter/tests
+    cd "$WORKSPACE/python/cuxfilter/tests"
     gpuci_logger "Python py.test for cuxfilter"
-    py.test --cache-clear --junitxml=${WORKSPACE}/junit-cuxfilter.xml -v
+    py.test --cache-clear --junitxml="$WORKSPACE/junit-cuxfilter.xml" -v
 
-    ${WORKSPACE}/ci/gpu/test-notebooks.sh 2>&1 | tee nbtest.log
-    python ${WORKSPACE}/ci/utils/nbtestlog2junitxml.py nbtest.log
+    "$WORKSPACE/ci/gpu/test-notebooks.sh" 2>&1 | tee nbtest.log
+    python "$WORKSPACE/ci/utils/nbtestlog2junitxml.py" nbtest.log
 fi
 
 return ${EXITCODE}

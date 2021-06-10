@@ -242,4 +242,7 @@ class Choropleth(BaseChoropleth):
             self.compute_colors()
             self.chart.colors = self.source_df[self.rgba_columns]
         if self.map_style is None:
-            self.chart._deck.map_style = theme.mapbox_style
+            if self.mapbox_api_key is None:
+                self.chart._deck.map_style = theme.map_style_without_token
+            else:
+                self.chart._deck.map_style = theme.map_style
