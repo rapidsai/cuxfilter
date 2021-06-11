@@ -2,9 +2,15 @@
 
 Please see https://github.com/rapidsai/cuxfilter/releases/tag/v21.08.00a for the latest changes to this development branch.
 
-# cuXfilter 21.06.00 (Date TBD)
+# cuXfilter 21.06.00 (9 Jun 2021)
 
-Please see https://github.com/rapidsai/cuxfilter/releases/tag/v21.06.00a for the latest changes to this development branch.
+## 🛠️ Improvements
+
+- Update `geopandas` version spec ([#292](https://github.com/rapidsai/cuxfilter/pull/292)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Update environment variable used to determine `cuda_version` ([#289](https://github.com/rapidsai/cuxfilter/pull/289)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Update `CHANGELOG.md` links for calver ([#287](https://github.com/rapidsai/cuxfilter/pull/287)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Update docs build script ([#286](https://github.com/rapidsai/cuxfilter/pull/286)) [@ajschmidt8](https://github.com/ajschmidt8)
+- support space in workspace ([#267](https://github.com/rapidsai/cuxfilter/pull/267)) [@jolorunyomi](https://github.com/jolorunyomi)
 
 # cuXfilter 0.19.0 (21 Apr 2021)
 
