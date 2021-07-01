@@ -1,3 +1,5 @@
+from bokeh import tile_providers
+from holoviews.operation.datashader import aggregate
 from ..core.non_aggregate import (
     BaseScatter,
     BaseLine,
@@ -8,6 +10,7 @@ from .custom_extensions import (
     InteractiveImage,
     CustomInspectTool,
     calc_connected_edges,
+    InteractiveDatashaderPoints
 )
 
 from distutils.version import LooseVersion
@@ -267,6 +270,18 @@ class Scatter(BaseScatter):
                 + self.aggregate_fn
             )
 
+        # self.chart = InteractiveDatashaderPoints(
+        #     source_df=self.source,
+        #     x=self.x,
+        #     y=self.y,
+        #     aggregate_col=self.aggregate_col,
+        #     aggregate_fn=self.aggregate_fn,
+        #     color_palette=self.color_palette,
+        #     width=self.width,
+        #     height=self.height,
+        #     pixel_shade_type=self.pixel_shade_type,
+        #     tile_provider=self.tile_provider
+        # )
         self.chart = figure(
             toolbar_location="right",
             tools="pan, wheel_zoom, reset",
@@ -335,6 +350,7 @@ class Scatter(BaseScatter):
             if len(data) == 0:
                 data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.interactive_image.update_chart(data_source=data)
+            # self.chart.update_points(data)
 
     def add_selection_geometry_event(self, callback):
         """
