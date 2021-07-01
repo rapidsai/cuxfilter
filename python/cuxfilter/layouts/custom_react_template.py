@@ -74,9 +74,9 @@ class ReactTemplate(BasicTemplate):
             theme = self.theme.find_theme(type(self))
             if theme and theme.css:
                 basename = os.path.basename(theme.css)
-                resources["css"]["theme"] = (
-                    f"{CUSTOM_DIST_PATH_THEMES}/{basename}"
-                )
+                resources["css"][
+                    "theme"
+                ] = f"{CUSTOM_DIST_PATH_THEMES}/{basename}"
         return resources
 
     def __init__(self, **params):
