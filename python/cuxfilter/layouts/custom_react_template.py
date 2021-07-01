@@ -1,9 +1,5 @@
-from urllib.parse import urljoin
+from panel import depends
 import param
-from panel.io.resources import LOCAL_DIST
-from panel.io.state import state
-from panel.util import url_path
-from panel.depends import depends
 from panel.layout import Card, GridSpec
 from panel.template.base import BasicTemplate
 import os
@@ -70,30 +66,18 @@ class ReactTemplate(BasicTemplate):
     }
 
     def _template_resources(self):
-        name = type(self).__name__.lower()
-        base_url = state.base_url
-        if state.base_url.startswith("/"):
-            base_url = state.base_url[1:]
-        dist_path = urljoin(base_url, LOCAL_DIST)
-        # External resources
-        css_files = dict(self._resources["css"])
-        for cssname, css in css_files.items():
-            css_path = url_path(css)
-            css_files[cssname] = dist_path + f"bundled/{name}/{css_path}"
-        js_files = dict(self._resources["js"])
-        for jsname, js in js_files.items():
-            js_path = url_path(js)
-            js_files[jsname] = dist_path + f"bundled/{name}/{js_path}"
-
+        resources = super()._template_resources()
         # CSS files
         base_css = os.path.basename(self._css)
-        css_files["base"] = f"{CUSTOM_DIST_PATH_LAYOUTS}/{base_css}"
+        resources["css"]["base"] = f"{CUSTOM_DIST_PATH_LAYOUTS}/{base_css}"
         if self.theme:
             theme = self.theme.find_theme(type(self))
             if theme and theme.css:
                 basename = os.path.basename(theme.css)
-                css_files["theme"] = f"{CUSTOM_DIST_PATH_THEMES}/{basename}"
-        return {"css": css_files, "js": js_files}
+                resources["css"]["theme"] = (
+                    f"{CUSTOM_DIST_PATH_THEMES}/{basename}"
+                )
+        return resources
 
     def __init__(self, **params):
         if "main" not in params:

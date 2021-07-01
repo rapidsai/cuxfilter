@@ -1,4 +1,4 @@
-from bokeh.core.properties import Image, Bool, String
+from bokeh.core.properties import Image, Bool, String, Nullable
 from bokeh.models import Tool
 from bokeh.util.compiler import TypeScript
 
@@ -13,7 +13,7 @@ export class CustomInspectToolView extends InspectToolView {
       super.connect_signals()
 
       this.connect(this.model.properties.active.change, () => {
-          this.model._active = this.model.properties.active.spec.value
+          this.model._active = this.model.active
       })
   }
 }
@@ -53,6 +53,6 @@ export class CustomInspectTool extends InspectTool {
 
 class CustomInspectTool(Tool):
     __implementation__ = TypeScript(TS_CODE)
-    _active = Bool
+    _active = Nullable(Bool)
     icon = Image()
-    tool_name = String
+    tool_name = String()
