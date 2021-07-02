@@ -59,7 +59,6 @@ gpuci_conda_retry install -y \
                "cuspatial=$MINOR_VERSION.*" \
                "dask-cudf=$MINOR_VERSION.*" "dask-cuda=$MINOR_VERSION.*" \
                "numba>=0.51.2" \
-               "bokeh<=2.2.3" \
                "rapids-build-env=$MINOR_VERSION.*" \
                "rapids-notebook-env=$MINOR_VERSION.*"
 
