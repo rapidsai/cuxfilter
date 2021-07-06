@@ -63,7 +63,7 @@ gpuci_conda_retry install -y \
                "rapids-notebook-env=$MINOR_VERSION.*"
 
 # https://docs.rapids.ai/maintainers/depmgmt/ 
-conda remove -f rapids-build-env rapids-notebook-env
+conda remove --force rapids-build-env rapids-notebook-env
 conda install "bokeh>=2.3.2, <2.4"
 
 gpuci_logger "Check versions"
