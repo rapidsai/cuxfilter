@@ -59,12 +59,13 @@ gpuci_conda_retry install -y \
                "cuspatial=$MINOR_VERSION.*" \
                "dask-cudf=$MINOR_VERSION.*" "dask-cuda=$MINOR_VERSION.*" \
                "numba>=0.51.2" \
+               "bokeh>=2.3.2,<2.4" \
                "rapids-build-env=$MINOR_VERSION.*" \
                "rapids-notebook-env=$MINOR_VERSION.*"
 
 # https://docs.rapids.ai/maintainers/depmgmt/ 
-conda remove --force rapids-build-env rapids-notebook-env
-conda install "bokeh>=2.3.2, <2.4"
+# conda remove -f rapids-build-env rapids-notebook-env
+# conda install "your-pkg=1.0.0"
 
 gpuci_logger "Check versions"
 python --version
