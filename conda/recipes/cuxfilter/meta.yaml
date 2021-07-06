@@ -35,7 +35,7 @@ requirements:
     - numba >=0.51.2
     - cupy >=7.8.0,<10.0.0a0
     - panel >=0.10.3
-    - bokeh >=2.1.1,<=2.2.3
+    - bokeh >=2.3.2,<2.4
     - pyproj >=2.4, <=3.1
     - geopandas >=0.9.0,<0.10.0a0
     - nodejs >=12,<15
