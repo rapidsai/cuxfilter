@@ -66,6 +66,10 @@ class ReactTemplate(BasicTemplate):
     }
 
     def _template_resources(self):
+        # resolves bug in panel where theme is expected to have base_css even
+        # when css property is present
+        self.theme.base_css = self.theme.css
+
         resources = super()._template_resources()
         # CSS files
         base_css = os.path.basename(self._css)

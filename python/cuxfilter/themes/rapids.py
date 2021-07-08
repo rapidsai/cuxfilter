@@ -7,7 +7,7 @@ from ..charts.constants import STATIC_DIR_THEMES
 
 
 class RapidsTheme(Theme):
-    DARK = {
+    RAPIDS = {
         "attrs": {
             "Figure": {
                 "background_fill_color": "#2f2f2f",
@@ -71,7 +71,7 @@ class RapidsTheme(Theme):
         }
     }
 
-    bokeh_theme = _BkTheme(json=DARK)
+    bokeh_theme = _BkTheme(json=RAPIDS)
     map_style = "mapbox://styles/mapbox/dark-v9"
     map_style_without_token = (
         "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
