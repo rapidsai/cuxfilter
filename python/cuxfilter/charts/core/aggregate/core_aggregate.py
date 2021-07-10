@@ -1,8 +1,6 @@
 import panel as pn
 import numpy as np
-from bokeh.models import DatetimeTickFormatter, ColumnDataSource
-import cudf
-import dask_cudf
+from bokeh.models import DatetimeTickFormatter
 
 from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby, calc_value_counts
