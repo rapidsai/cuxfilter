@@ -688,8 +688,6 @@ class DashBoard:
         """
         Calculate data tiles for all aggregate type charts.
         """
-        # query_str = self._generate_query_str(self._active_view)
-
         # NO DATATILES for scatter types, as they are essentially all
         # points in the dataset
         query = self._generate_query_str(ignore_chart=self._active_view)
