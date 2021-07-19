@@ -53,7 +53,7 @@ nvidia-smi
 gpuci_logger "Activate conda env"
 . /opt/conda/etc/profile.d/conda.sh
 conda activate rapids
-gpuci_conda_retry install -y \
+gpuci_mamba_retry install -y \
                "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
                "cugraph=$MINOR_VERSION.*" \
                "cuspatial=$MINOR_VERSION.*" \
