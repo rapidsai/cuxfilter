@@ -43,6 +43,11 @@ class BaseWidget:
             self.stride_type = type(value)
         self._stride = value
 
+    @property
+    def x_dtype(self):
+        # default x_dtype
+        return float
+
     def _xaxis_np_dt64_transform(self, dates):
         """
         Description: convert to datetime64 if self.x_dtype is of type datetime
