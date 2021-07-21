@@ -64,9 +64,11 @@ class BaseNonAggregate(BaseChart):
 
     def view(self):
         return chart_view(
-            self.chart, width=self.width, title=self.title
-            # self.chart.view(), width=self.width, title=self.title
+            self.chart.view(), width=self.width, title=self.title,
         )
+
+    def update_dimensions(self, **kwargs):
+        pass
 
     def calculate_source(self, data):
         """
@@ -222,6 +224,7 @@ class BaseNonAggregate(BaseChart):
             )
             self.reload_chart(temp_data, False)
             del temp_data
+
         return cb
 
     def get_lasso_select_callback(self, dashboard_cls):
@@ -312,15 +315,12 @@ class BaseNonAggregate(BaseChart):
         Ouput:
         """
         if self.add_interaction:
-            self.add_selection_geometry_event(
-                self.get_selection_geometry_callback(dashboard_cls)
+            self.chart.add_lasso_select_callback(
+                self.get_lasso_select_callback(dashboard_cls)
             )
-            # self.chart.add_lasso_select_callback(
-            #     self.get_lasso_select_callback(dashboard_cls)
-            # )
-            # self.chart.add_box_select_callback(
-            #     self.get_box_select_callback(dashboard_cls)
-            # )
+            self.chart.add_box_select_callback(
+                self.get_box_select_callback(dashboard_cls)
+            )
         if self.reset_event is not None:
             self.add_reset_event(dashboard_cls)
 
@@ -336,20 +336,18 @@ class BaseNonAggregate(BaseChart):
         Ouput:
         """
         # def reset_callback():
-        def reset_callback(event):
+        def reset_callback(resetting):
             if dashboard_cls._active_view != self:
                 # reset previous active view and set current
                 # chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
-            self.x_range = None
-            self.y_range = None
             self.selected_indices = None
+            self.chart.reset_all_selections()
             dashboard_cls._query_str_dict.pop(self.name, None)
             dashboard_cls._reload_charts()
 
         # add callback to reset chart button
-        self.add_event(self.reset_event, reset_callback)
-        # self.chart.add_reset_event(reset_callback)
+        self.chart.add_reset_event(reset_callback)
 
     def _compute_source(self, query, local_dict, indices):
         result = self.source

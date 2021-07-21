@@ -1,5 +1,3 @@
-from bokeh import tile_providers
-from holoviews.operation.datashader import aggregate
 from ..core.non_aggregate import (
     BaseScatter,
     BaseLine,
@@ -10,7 +8,7 @@ from .custom_extensions import (
     InteractiveImage,
     CustomInspectTool,
     calc_connected_edges,
-    InteractiveDatashaderPoints
+    InteractiveDatashaderPoints,
 )
 
 from distutils.version import LooseVersion
@@ -190,67 +188,6 @@ class Scatter(BaseScatter):
                 self.chart.add_layout(self.color_bar, self.legend_position)
                 self.legend_added = True
 
-    def generate_InteractiveImage_callback(self):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-
-        def viewInteractiveImage(
-            x_range, y_range, w, h, data_source, **kwargs
-        ):
-            dd = data_source[[self.x, self.y, self.aggregate_col]]
-            dd[self.x] = self._to_xaxis_type(dd[self.x])
-            dd[self.y] = self._to_yaxis_type(dd[self.y])
-
-            x_range = self._to_xaxis_type(x_range)
-            y_range = self._to_yaxis_type(y_range)
-
-            cvs = ds.Canvas(
-                plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
-            )
-            aggregator, cmap = _compute_datashader_assets(
-                dd,
-                self.x,
-                self.aggregate_col,
-                self.aggregate_fn,
-                self.color_palette,
-            )
-            agg = cvs.points(dd, self.x, self.y, aggregator,)
-
-            if self.constant_limit is None or self.aggregate_fn == "count":
-                self.constant_limit = [
-                    float(cp.nanmin(agg.data)),
-                    float(cp.nanmax(agg.data)),
-                ]
-                self.render_legend()
-
-            span = {"span": self.constant_limit}
-            if self.pixel_shade_type == "eq_hist":
-                span = {}
-
-            img = tf.shade(agg, how=self.pixel_shade_type, **cmap, **span)
-
-            if self.pixel_spread == "dynspread":
-                return tf.dynspread(
-                    img,
-                    threshold=self.pixel_density,
-                    max_px=self.point_size,
-                    shape=self.point_shape,
-                )
-            else:
-                return tf.spread(
-                    img, px=self.point_size, shape=self.point_shape
-                )
-
-        return viewInteractiveImage
-
     def generate_chart(self):
         """
         Description:
@@ -270,70 +207,18 @@ class Scatter(BaseScatter):
                 + self.aggregate_fn
             )
 
-        # self.chart = InteractiveDatashaderPoints(
-        #     source_df=self.source,
-        #     x=self.x,
-        #     y=self.y,
-        #     aggregate_col=self.aggregate_col,
-        #     aggregate_fn=self.aggregate_fn,
-        #     color_palette=self.color_palette,
-        #     width=self.width,
-        #     height=self.height,
-        #     pixel_shade_type=self.pixel_shade_type,
-        #     tile_provider=self.tile_provider
-        # )
-        self.chart = figure(
-            toolbar_location="right",
-            tools="pan, wheel_zoom, reset",
-            active_scroll="wheel_zoom",
-            active_drag="pan",
-            x_range=self.x_range,
-            y_range=self.y_range,
-            width=self.width,
-            height=self.height,
+        self.chart = InteractiveDatashaderPoints(
+            source_df=self.source,
+            x=self.x,
+            y=self.y,
+            aggregate_col=self.aggregate_col,
+            aggregate_fn=self.aggregate_fn,
+            color_palette=self.color_palette,
+            pixel_shade_type=self.pixel_shade_type,
+            tile_provider=self.tile_provider,
+            legend=self.legend,
+            legend_position=self.legend_position,
         )
-
-        self.chart.add_tools(BoxSelectTool())
-        self.chart.add_tools(LassoSelectTool())
-
-        self.tile_provider = _get_provider(self.tile_provider)
-        if self.tile_provider is not None:
-            self.chart.add_tile(self.tile_provider)
-            self.chart.axis.visible = False
-        # reset legend and color_bar
-        self.legend_added = False
-        self.color_bar = None
-
-        self.chart.xgrid.grid_line_color = None
-        self.chart.ygrid.grid_line_color = None
-
-        self.interactive_image = InteractiveImage(
-            self.chart,
-            self.generate_InteractiveImage_callback(),
-            data_source=self.source,
-            timeout=self.timeout,
-            x_dtype=self.x_dtype,
-            y_dtype=self.y_dtype,
-        )
-
-        if self.legend_added is False:
-            self.render_legend()
-
-    def update_dimensions(self, width=None, height=None):
-        """
-        Description:
-
-
-        Input:
-
-
-
-        Ouput:
-        """
-        if width is not None:
-            self.chart.plot_width = width
-        if height is not None:
-            self.chart.plot_height = height
 
     def reload_chart(self, data=None, patch_update=False):
         """
@@ -349,8 +234,7 @@ class Scatter(BaseScatter):
         if data is not None:
             if len(data) == 0:
                 data = cudf.DataFrame({k: cp.nan for k in data.columns})
-            self.interactive_image.update_chart(data_source=data)
-            # self.chart.update_points(data)
+            self.chart.update_points(data)
 
     def add_selection_geometry_event(self, callback):
         """
@@ -371,9 +255,8 @@ class Scatter(BaseScatter):
         apply thematic changes to the chart based on the theme
         """
         if not self.colors_set:
-            self.default_palette = theme.color_palette
-            self.render_legend()
-            self.interactive_image.update_chart()
+            self.chart.color_palette = theme.color_palette
+            self.chart._compute_datashader_assets()
 
 
 class Graph(BaseGraph):
