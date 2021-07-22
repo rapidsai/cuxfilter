@@ -1,4 +1,7 @@
-from pyppeteer import launch
+try:
+    from pyppeteer import launch
+except ImportError:
+    pass
 
 
 async def screengrab(url):
