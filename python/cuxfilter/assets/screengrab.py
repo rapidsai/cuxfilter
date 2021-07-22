@@ -1,4 +1,7 @@
-from pyppeteer import launch
+try:
+    from pyppeteer import launch
+except ImportError:
+    pass
 
 
 async def screengrab(url):
@@ -10,16 +13,3 @@ async def screengrab(url):
     await page.goto(url, waitUntil="networkidle2")
     await page.screenshot({"path": "temp.png"})
     await browser.close()
-
-
-# async def screengrab(url):
-#     print('screen grab started')
-
-#     print('screen grabbed')
-
-
-# def screengrab(url):
-#     import os
-#     script = 'node ./assets/js/index.js '+url
-#     print(script)
-#     os.system("bash -c '%s'" % script)
