@@ -35,7 +35,6 @@ dependencies:
 - nbsphinx
 - numpydoc
 - ipython
-- pyppeteer<=0.2.2
 - jupyterlab
 - flake8=3.8.3
 - black=19.10
