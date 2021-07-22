@@ -197,6 +197,9 @@ jupyter labextension install @pyviz/jupyterlab_pyviz
 jupyter labextension install jupyterlab_bokeh
 ```
 
+**Pyppeteer package not found**
+
+Due to a [CVE](https://github.com/pyppeteer/pyppeteer/issues/275#issuecomment-882838194) that affects our CI containers, pyppeteer is no longer packaged in 21.06 until the issues are resolved. To use the `dashboard.preview()` feature, pyppeteer can be installed via pip (`pip install -U git+https://github.com/pyppeteer/pyppeteer@dev`).
 
 ## Download Datasets
 
