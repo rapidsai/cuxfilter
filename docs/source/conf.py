@@ -29,7 +29,7 @@ author = 'NVIDIA'
 # The short X.Y version.
 version = '21.06'
 # The full version, including alpha/beta/rc tags
-release = '21.06.00'
+release = '21.06.01'
 
 nbsphinx_allow_errors = True
 # -- General configuration ---------------------------------------------------
