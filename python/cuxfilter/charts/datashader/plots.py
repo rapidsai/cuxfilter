@@ -29,6 +29,7 @@ from bokeh.models import (
     LassoSelectTool,
     LinearColorMapper,
     LogColorMapper,
+    EqHistColorMapper,
     BasicTicker,
     FixedTicker,
 )
@@ -39,7 +40,11 @@ from io import BytesIO
 
 ds_version = LooseVersion(ds.__version__)
 
-_color_mapper = {"linear": LinearColorMapper, "log": LogColorMapper}
+_color_mapper = {
+    "eq_hist": EqHistColorMapper,
+    "linear": LinearColorMapper,
+    "log": LogColorMapper,
+}
 
 
 def load_image(url):
@@ -202,7 +207,7 @@ class Scatter(BaseScatter):
         if len(self.title) == 0:
             self.title = (
                 "Scatter plot for "
-                + self.aggregate_col
+                + (self.aggregate_col or "")
                 + " "
                 + self.aggregate_fn
             )
@@ -218,6 +223,9 @@ class Scatter(BaseScatter):
             tile_provider=self.tile_provider,
             legend=self.legend,
             legend_position=self.legend_position,
+            spread_threshold=self.pixel_density,
+            point_shape=self.point_shape,
+            max_px=self.point_size,
         )
 
     def reload_chart(self, data=None, patch_update=False):
@@ -257,6 +265,22 @@ class Scatter(BaseScatter):
         if not self.colors_set:
             self.chart.color_palette = theme.color_palette
             self.chart._compute_datashader_assets()
+
+    def update_dimensions(self, width=None, height=None):
+        """
+        Description:
+
+
+        Input:
+
+
+
+        Ouput:
+        """
+        if width is not None:
+            self.chart.width = width
+        if height is not None:
+            self.chart.height = height
 
 
 class Graph(BaseGraph):

@@ -2,11 +2,96 @@ import holoviews as hv
 import panel as pn
 import param
 import datashader as ds
-from holoviews.operation.datashader import rasterize
-from holoviews.element.tiles import tile_sources
+import numpy as np
 import cudf
-
+from holoviews.element.tiles import tile_sources
+from holoviews.operation.datashader import datashade, dynspread
+from bokeh.models import (
+    LinearColorMapper,
+    LogColorMapper,
+    BasicTicker,
+    ColorBar,
+    BinnedTicker,
+)
 from ...constants import CUXF_DEFAULT_COLOR_PALETTE
+
+
+def _rect_vertical_mask(px):
+    """
+    Produce a vertical rectangle mask with truth
+    values in ``(2 * px + 1) * ((2 * px + 1)/2)``
+    """
+    px = int(px)
+    w = 2 * px + 1
+    zero_bool = np.zeros((w, px), dtype="bool")
+    x_bool = np.ones((w, w - px), dtype="bool")
+    return np.concatenate((x_bool, zero_bool), axis=1)
+
+
+def _rect_horizontal_mask(px):
+    """
+    Produce a horizontal rectangle mask with truth
+    values in ``((2 * px + 1)/2) * (2 * px + 1)``
+    """
+    px = int(px)
+    w = 2 * px + 1
+    zero_bool = np.zeros((px, w), dtype="bool")
+    x_bool = np.ones((w - px, w), dtype="bool")
+    return np.concatenate((x_bool, zero_bool), axis=0)
+
+
+def _cross_mask(px):
+    """
+    Produce a cross symbol mask with truth
+    values in ``((2 * px + 1)/2) * (2 * px + 1)``
+    """
+
+    px = int(px)
+    w = 2 * px + 1
+    zero_bool = np.zeros((w, w), dtype="bool")
+    np.fill_diagonal(zero_bool, True)
+    np.fill_diagonal(np.fliplr(zero_bool), True)
+    return zero_bool
+
+
+ds.transfer_functions._mask_lookup["rect_vertical"] = _rect_vertical_mask
+ds.transfer_functions._mask_lookup["rect_horizontal"] = _rect_horizontal_mask
+ds.transfer_functions._mask_lookup["cross"] = _cross_mask
+
+dynspread.shape = param.ObjectSelector(
+    default="circle",
+    objects=["circle", "square", "rect_vertical", "rect_horizontal", "cross"],
+)
+
+
+_color_mapper = {
+    "linear": LinearColorMapper,
+    "log": LogColorMapper,
+}
+
+
+def _generate_legend(
+    pixel_shade_type, color_palette, legend_title, constant_limit,
+):
+    mapper = _color_mapper[pixel_shade_type](
+        palette=color_palette, low=constant_limit[0], high=constant_limit[1]
+    )
+    color_bar = ColorBar(
+        color_mapper=mapper,
+        location=(0, 0),
+        ticker=BasicTicker(desired_num_ticks=len(color_palette))
+        if pixel_shade_type != "eq_hist"
+        else BinnedTicker(mapper=mapper, num_major_ticks=len(color_palette)),
+        title=legend_title,
+    )
+    return color_bar
+
+
+def _get_legend_title(aggregate_fn, aggregate_col):
+    if aggregate_fn == "count":
+        return aggregate_fn
+    else:
+        return aggregate_fn + " " + aggregate_col
 
 
 class InteractiveDatashaderPoints(param.Parameterized):
@@ -17,10 +102,12 @@ class InteractiveDatashaderPoints(param.Parameterized):
     )
     x = param.String("x")
     y = param.String("y")
-    aggregate_col = param.String()
+    aggregate_col = param.String(allow_None=True)
+    width = param.Integer(400)
+    height = param.Integer(400)
     legend = param.Boolean(True, doc="whether to display legends or not")
     legend_position = param.String("right", doc="position of legend")
-    pixel_shade_type = param.String("eq_hist")
+    pixel_shade_type = param.String("linear")
     aggregate_fn = param.String("count")
     cmap = param.Dict(default={"cmap": CUXF_DEFAULT_COLOR_PALETTE})
     tools = param.List(
@@ -38,7 +125,63 @@ class InteractiveDatashaderPoints(param.Parameterized):
         class_=hv.streams.PlotReset,
         default=hv.streams.PlotReset(resetting=False),
     )
+    spread_threshold = param.Number(
+        0, doc="threshold parameter passed to dynspread function"
+    )
     tile_provider = param.String(None)
+    clims = param.Tuple(default=(None, None))
+    point_shape = param.ObjectSelector(
+        default="circle",
+        objects=[
+            "circle",
+            "square",
+            "rect_vertical",
+            "rect_horizontal",
+            "cross",
+        ],
+    )
+    max_px = param.Integer(10)
+
+    @property
+    def vdims(self):
+        if self.aggregate_col is None:
+            return [self.y]
+        return [self.y, self.aggregate_col]
+
+    @property
+    def hook(self):
+        def hook(plot, element):
+            if (
+                len(getattr(plot.state, self.legend_position)) == 0
+                or getattr(plot.state, self.legend_position)[-1]
+                != self.legend_chart
+            ):
+                plot.state.add_layout(self.legend_chart, self.legend_position)
+
+        return hook
+
+    @property
+    def legend_chart(self):
+        return _generate_legend(
+            self.pixel_shade_type,
+            self.color_palette,
+            _get_legend_title(self.aggregate_fn, self.aggregate_col),
+            self.clims,
+        )
+
+    def _compute_clims(self):
+        self.clims = (
+            self.source_df[
+                self.aggregate_col
+                if self.aggregate_col is not None
+                else self.y
+            ].min(),
+            self.source_df[
+                self.aggregate_col
+                if self.aggregate_col is not None
+                else self.y
+            ].max(),
+        )
 
     def _compute_datashader_assets(self):
         self.aggregator = None
@@ -75,15 +218,15 @@ class InteractiveDatashaderPoints(param.Parameterized):
             else self.tile_provider
         )
         self._compute_datashader_assets()
+        self._compute_clims()
 
     def update_points(self, data):
         self.source_df = data
+        self._compute_clims()
 
     @param.depends("source_df")
     def points(self, **kwargs):
-        return hv.Scatter(
-            self.source_df, kdims=[self.x], vdims=[self.y, self.aggregate_col],
-        )
+        return hv.Scatter(self.source_df, kdims=[self.x], vdims=self.vdims)
 
     def add_box_select_callback(self, callback_fn):
         self.box_stream = hv.streams.SelectionXY(subscribers=[callback_fn])
@@ -92,32 +235,46 @@ class InteractiveDatashaderPoints(param.Parameterized):
         self.lasso_stream = hv.streams.Lasso(subscribers=[callback_fn])
 
     def view(self):
-        ropts = dict(
-            colorbar=self.legend,
-            colorbar_position=self.legend_position,
-            responsive=True,
-            xaxis=None,
-            yaxis=None,
+        dmap = datashade(
+            hv.DynamicMap(
+                self.points,
+                streams=[
+                    self.box_stream,
+                    self.lasso_stream,
+                    self.reset_stream,
+                ],
+            ),
+            aggregator=self.aggregator,
+            cnorm=self.pixel_shade_type,
+            **self.cmap,
         )
-        dmap = (
-            rasterize(
-                hv.DynamicMap(
-                    self.points,
-                    streams=[
-                        self.box_stream,
-                        self.lasso_stream,
-                        self.reset_stream,
-                    ],
-                ),
-                aggregator=self.aggregator,
+        if self.pixel_shade_type == "eq_hist":
+            # eq_hist does not(yet) support clims parameter
+            dmap = dynspread(
+                dmap,
+                threshold=self.spread_threshold,
+                shape=self.point_shape,
+                max_px=self.max_px,
+            ).opts(tools=self.tools, xaxis=None, yaxis=None, responsive=True,)
+        else:
+            dmap = dynspread(
+                dmap,
+                threshold=self.spread_threshold,
+                shape=self.point_shape,
+                max_px=self.max_px,
+            ).opts(
+                tools=self.tools,
+                xaxis=None,
+                yaxis=None,
+                responsive=True,
+                hooks=[self.hook],
+                clims=self.clims,
             )
-            .opts(cnorm=self.pixel_shade_type, **self.cmap)
-            .opts(tools=self.tools, **ropts)
-        )
+
         return pn.pane.HoloViews(
             self.tiles * dmap if self.tiles is not None else dmap,
             sizing_mode="stretch_both",
-            width_policy="fit",
+            height=self.height,
         )
 
     def reset_all_selections(self):
