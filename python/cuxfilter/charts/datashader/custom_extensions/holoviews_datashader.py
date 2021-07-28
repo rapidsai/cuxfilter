@@ -5,7 +5,7 @@ import datashader as ds
 import numpy as np
 import cudf
 from holoviews.element.tiles import tile_sources
-from holoviews.operation.datashader import datashade, dynspread
+from holoviews.operation.datashader import datashade, dynspread, rasterize
 from bokeh.models import (
     LinearColorMapper,
     LogColorMapper,
@@ -94,7 +94,7 @@ def _get_legend_title(aggregate_fn, aggregate_col):
         return aggregate_fn + " " + aggregate_col
 
 
-class InteractiveDatashaderPoints(param.Parameterized):
+class InteractiveDatashader(param.Parameterized):
     source_df = param.ClassSelector(
         class_=cudf.DataFrame,
         default=cudf.DataFrame(),
@@ -102,19 +102,9 @@ class InteractiveDatashaderPoints(param.Parameterized):
     )
     x = param.String("x")
     y = param.String("y")
-    aggregate_col = param.String(allow_None=True)
     width = param.Integer(400)
     height = param.Integer(400)
-    legend = param.Boolean(True, doc="whether to display legends or not")
-    legend_position = param.String("right", doc="position of legend")
     pixel_shade_type = param.String("linear")
-    aggregate_fn = param.String("count")
-    cmap = param.Dict(default={"cmap": CUXF_DEFAULT_COLOR_PALETTE})
-    tools = param.List(
-        default=["reset", "lasso_select", "wheel_zoom"],
-        doc="interactive tools to add to the chart",
-    )
-    color_palette = param.List()
     box_stream = param.ClassSelector(
         class_=hv.streams.SelectionXY, default=hv.streams.SelectionXY()
     )
@@ -129,7 +119,49 @@ class InteractiveDatashaderPoints(param.Parameterized):
         0, doc="threshold parameter passed to dynspread function"
     )
     tile_provider = param.String(None)
-    clims = param.Tuple(default=(None, None))
+
+    @property
+    def vdims(self):
+        if self.aggregate_col is None:
+            return [self.y]
+        return [self.y, self.aggregate_col]
+
+    def __init__(self, **params):
+        """
+        initialize InteractiveDatashader object, and set a listener on self.data
+        """
+        super(InteractiveDatashader, self).__init__(**params)
+        self.tiles = (
+            tile_sources[self.tile_provider]()
+            if (self.tile_provider is not None)
+            else self.tile_provider
+        )
+
+    def add_box_select_callback(self, callback_fn):
+        self.box_stream = hv.streams.SelectionXY(subscribers=[callback_fn])
+
+    def add_lasso_select_callback(self, callback_fn):
+        self.lasso_stream = hv.streams.Lasso(subscribers=[callback_fn])
+
+    def reset_all_selections(self):
+        self.lasso_stream.reset()
+        self.box_stream.reset()
+
+    def add_reset_event(self, callback_fn):
+        self.reset_stream = hv.streams.PlotReset(subscribers=[callback_fn])
+
+
+class InteractiveDatashaderPoints(InteractiveDatashader):
+    aggregate_col = param.String(allow_None=True)
+    aggregate_fn = param.String("count")
+    legend = param.Boolean(True, doc="whether to display legends or not")
+    legend_position = param.String("right", doc="position of legend")
+    cmap = param.Dict(default={"cmap": CUXF_DEFAULT_COLOR_PALETTE})
+    tools = param.List(
+        default=["reset", "lasso_select", "wheel_zoom"],
+        doc="interactive tools to add to the chart",
+    )
+    color_palette = param.List()
     point_shape = param.ObjectSelector(
         default="circle",
         objects=[
@@ -141,33 +173,11 @@ class InteractiveDatashaderPoints(param.Parameterized):
         ],
     )
     max_px = param.Integer(10)
+    clims = param.Tuple(default=(None, None))
 
-    @property
-    def vdims(self):
-        if self.aggregate_col is None:
-            return [self.y]
-        return [self.y, self.aggregate_col]
-
-    @property
-    def hook(self):
-        def hook(plot, element):
-            if (
-                len(getattr(plot.state, self.legend_position)) == 0
-                or getattr(plot.state, self.legend_position)[-1]
-                != self.legend_chart
-            ):
-                plot.state.add_layout(self.legend_chart, self.legend_position)
-
-        return hook
-
-    @property
-    def legend_chart(self):
-        return _generate_legend(
-            self.pixel_shade_type,
-            self.color_palette,
-            _get_legend_title(self.aggregate_fn, self.aggregate_col),
-            self.clims,
-        )
+    def __init__(self, **params):
+        super(InteractiveDatashaderPoints, self).__init__(**params)
+        self._compute_datashader_assets()
 
     def _compute_clims(self):
         self.clims = (
@@ -181,6 +191,12 @@ class InteractiveDatashaderPoints(param.Parameterized):
                 if self.aggregate_col is not None
                 else self.y
             ].max(),
+        )
+        self.legend_chart = _generate_legend(
+            self.pixel_shade_type,
+            self.color_palette,
+            _get_legend_title(self.aggregate_fn, self.aggregate_col),
+            self.clims,
         )
 
     def _compute_datashader_assets(self):
@@ -207,17 +223,6 @@ class InteractiveDatashaderPoints(param.Parameterized):
                     self.aggregate_col
                 )
 
-    def __init__(self, **params):
-        """
-        initialize pydeck object, and set a listener on self.data
-        """
-        super(InteractiveDatashaderPoints, self).__init__(**params)
-        self.tiles = (
-            tile_sources[self.tile_provider]()
-            if (self.tile_provider is not None)
-            else self.tile_provider
-        )
-        self._compute_datashader_assets()
         self._compute_clims()
 
     def update_points(self, data):
@@ -228,14 +233,8 @@ class InteractiveDatashaderPoints(param.Parameterized):
     def points(self, **kwargs):
         return hv.Scatter(self.source_df, kdims=[self.x], vdims=self.vdims)
 
-    def add_box_select_callback(self, callback_fn):
-        self.box_stream = hv.streams.SelectionXY(subscribers=[callback_fn])
-
-    def add_lasso_select_callback(self, callback_fn):
-        self.lasso_stream = hv.streams.Lasso(subscribers=[callback_fn])
-
     def view(self):
-        dmap = datashade(
+        dmap = rasterize(
             hv.DynamicMap(
                 self.points,
                 streams=[
@@ -245,41 +244,23 @@ class InteractiveDatashaderPoints(param.Parameterized):
                 ],
             ),
             aggregator=self.aggregator,
+        ).opts(
             cnorm=self.pixel_shade_type,
             **self.cmap,
+            colorbar=True,
+            clim=self.clims,
+            nodata=0,
         )
-        if self.pixel_shade_type == "eq_hist":
-            # eq_hist does not(yet) support clims parameter
-            dmap = dynspread(
-                dmap,
-                threshold=self.spread_threshold,
-                shape=self.point_shape,
-                max_px=self.max_px,
-            ).opts(tools=self.tools, xaxis=None, yaxis=None, responsive=True,)
-        else:
-            dmap = dynspread(
-                dmap,
-                threshold=self.spread_threshold,
-                shape=self.point_shape,
-                max_px=self.max_px,
-            ).opts(
-                tools=self.tools,
-                xaxis=None,
-                yaxis=None,
-                responsive=True,
-                hooks=[self.hook],
-                clims=self.clims,
-            )
+
+        dmap = dynspread(
+            dmap,
+            threshold=self.spread_threshold,
+            shape=self.point_shape,
+            max_px=self.max_px,
+        ).opts(tools=self.tools, xaxis=None, yaxis=None, responsive=True,)
 
         return pn.pane.HoloViews(
             self.tiles * dmap if self.tiles is not None else dmap,
             sizing_mode="stretch_both",
             height=self.height,
         )
-
-    def reset_all_selections(self):
-        self.lasso_stream.reset()
-        self.box_stream.reset()
-
-    def add_reset_event(self, callback_fn):
-        self.reset_stream = hv.streams.PlotReset(subscribers=[callback_fn])
