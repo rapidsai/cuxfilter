@@ -25,6 +25,7 @@ class BaseAggregateChart(BaseChart):
     datatile_active_color = DATATILE_ACTIVE_COLOR
     stride = None
     data_points = None
+    _x_dtype = float
 
     @property
     def datatile_loaded_state(self):
@@ -49,8 +50,30 @@ class BaseAggregateChart(BaseChart):
                 self.filter_widget.bar_color = DATATILE_INACTIVE_COLOR
 
     @property
+    def x_dtype(self):
+        """
+        override core_chart x_dtype and make it constant, as panel 0.11 seems
+        to update the datetime x_axis type to float during runtime
+        """
+        return self._x_dtype
+
+    @x_dtype.setter
+    def x_dtype(self, value):
+        self._x_dtype = value
+
+    @property
     def custom_binning(self):
         return self._stride is not None or self._data_points is not None
+
+    def _transformed_source_data(self, property):
+        """
+        this fixes a bug introduced with panel 0.11, where bokeh CDS
+        x-axis datetime is converted to float, and the only way to
+        convert it back to datetime is using datetime64[ms]
+        """
+        if self.x_dtype in CUDF_DATETIME_TYPES:
+            return self.source.data[property].astype("datetime64[ms]")
+        return self.source.data[property]
 
     def __init__(
         self,
@@ -110,15 +133,14 @@ class BaseAggregateChart(BaseChart):
         self.y_axis_tick_formatter = y_axis_tick_formatter
         self.library_specific_params = library_specific_params
 
-    def _compute_array_all_bins(
-        self, source_x, source_y, update_data_x, update_data_y
-    ):
+    def _compute_array_all_bins(self, source_x, update_data_x, update_data_y):
         """
         source_x: current_source_x, np.array()
-        source_y: current_source_y, np.array()
         update_data_x: updated_data_x, np.array()
         update_data_y: updated_data_x, np.array()
         """
+        if self.x_dtype in CUDF_DATETIME_TYPES:
+            source_x = source_x.astype("datetime64[ms]")
         result_array = np.zeros(shape=source_x.shape)
         indices = [np.where(x_ == source_x)[0][0] for x_ in update_data_x]
         np.put(result_array, indices, update_data_y)
@@ -154,7 +176,7 @@ class BaseAggregateChart(BaseChart):
         Ouput:
 
         """
-        self.source = dashboard_cls._cuxfilter_df.data
+        self.x_dtype = dashboard_cls._cuxfilter_df.data[self.x].dtype
         # reset data_point to input _data_points
         self.data_points = self._data_points
         # reset stride to input _stride
@@ -248,19 +270,18 @@ class BaseAggregateChart(BaseChart):
         }
 
         if patch_update and len(dict_temp["X"]) < len(
-            self.source.data[self.data_x_axis]
+            self._transformed_source_data(self.data_x_axis)
         ):
             # if not all X axis bins are provided, filling bins not updated
             # with zeros
             y_axis_data = self._compute_array_all_bins(
-                self.source.data[self.data_x_axis],
-                self.source.data[self.data_y_axis],
+                self._transformed_source_data(self.data_x_axis),
                 dict_temp["X"],
                 dict_temp["Y"],
             )
 
             dict_temp = {
-                "X": self.source.data[self.data_x_axis],
+                "X": self._transformed_source_data(self.data_x_axis),
                 "Y": y_axis_data,
             }
 
@@ -393,10 +414,13 @@ class BaseAggregateChart(BaseChart):
             round((max_val - active_chart.min_value) / active_chart.stride)
         )
         if self.custom_binning:
-            datatile_indices = self.source.data[self.data_x_axis]
+            datatile_indices = self._transformed_source_data(self.data_x_axis)
         else:
             datatile_indices = (
-                (self.source.data[self.data_x_axis] - self.min_value)
+                (
+                    self._transformed_source_data(self.data_x_axis)
+                    - self.min_value
+                )
                 / self.stride
             ).astype(int)
 
@@ -473,10 +497,13 @@ class BaseAggregateChart(BaseChart):
         Ouput:
         """
         if self.custom_binning:
-            datatile_indices = self.source.data[self.data_x_axis]
+            datatile_indices = self._transformed_source_data(self.data_x_axis)
         else:
             datatile_indices = (
-                (self.source.data[self.data_x_axis] - self.min_value)
+                (
+                    self._transformed_source_data(self.data_x_axis)
+                    - self.min_value
+                )
                 / self.stride
             ).astype(int)
         if len(new_indices) == 0 or new_indices == [""]:
@@ -525,10 +552,13 @@ class BaseAggregateChart(BaseChart):
         Ouput:
         """
         if self.custom_binning:
-            datatile_indices = self.source.data[self.data_x_axis]
+            datatile_indices = self._transformed_source_data(self.data_x_axis)
         else:
             datatile_indices = (
-                (self.source.data[self.data_x_axis] - self.min_value)
+                (
+                    self._transformed_source_data(self.data_x_axis)
+                    - self.min_value
+                )
                 / self.stride
             ).astype(int)
         if len(new_indices) == 0 or new_indices == [""]:
@@ -577,10 +607,13 @@ class BaseAggregateChart(BaseChart):
         Ouput:
         """
         if self.custom_binning:
-            datatile_indices = self.source.data[self.data_x_axis]
+            datatile_indices = self._transformed_source_data(self.data_x_axis)
         else:
             datatile_indices = (
-                (self.source.data[self.data_x_axis] - self.min_value)
+                (
+                    self._transformed_source_data(self.data_x_axis)
+                    - self.min_value
+                )
                 / self.stride
             ).astype(int)
 

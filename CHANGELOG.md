@@ -1,3 +1,16 @@
+# cuXfilter 21.08.00 (4 Aug 2021)
+
+## 🐛 Bug Fixes
+
+- Fix/follow up to #303 ([#304](https://github.com/rapidsai/cuxfilter/pull/304)) [@AjayThorve](https://github.com/AjayThorve)
+- update pyproj version ([#302](https://github.com/rapidsai/cuxfilter/pull/302)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- Fix/update bokeh version ([#303](https://github.com/rapidsai/cuxfilter/pull/303)) [@AjayThorve](https://github.com/AjayThorve)
+- Fix `21.08` forward-merge conflicts ([#301](https://github.com/rapidsai/cuxfilter/pull/301)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Fix merge conflicts ([#290](https://github.com/rapidsai/cuxfilter/pull/290)) [@ajschmidt8](https://github.com/ajschmidt8)
+
 # cuXfilter 21.06.00 (9 Jun 2021)
 
 ## 🛠️ Improvements
