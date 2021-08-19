@@ -180,48 +180,54 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
         self._compute_datashader_assets()
 
     def _compute_clims(self):
-        self.clims = (
-            self.source_df[
-                self.aggregate_col
-                if self.aggregate_col is not None
-                else self.y
-            ].min(),
-            self.source_df[
-                self.aggregate_col
-                if self.aggregate_col is not None
-                else self.y
-            ].max(),
-        )
-        self.legend_chart = _generate_legend(
-            self.pixel_shade_type,
-            self.color_palette,
-            _get_legend_title(self.aggregate_fn, self.aggregate_col),
-            self.clims,
-        )
+        if not isinstance(
+            self.source_df[self.aggregate_col].dtype,
+            cudf.core.dtypes.CategoricalDtype,
+        ):
+            self.clims = (
+                self.source_df[
+                    self.aggregate_col
+                    if self.aggregate_col is not None
+                    else self.y
+                ].min(),
+                self.source_df[
+                    self.aggregate_col
+                    if self.aggregate_col is not None
+                    else self.y
+                ].max(),
+            )
+        # self.legend_chart = _generate_legend(
+        #     self.pixel_shade_type,
+        #     self.color_palette,
+        #     _get_legend_title(self.aggregate_fn, self.aggregate_col),
+        #     self.clims,
+        # )
 
     def _compute_datashader_assets(self):
         self.aggregator = None
         self.cmap = {"cmap": self.color_palette}
         if isinstance(
-            self.source_df[self.x].dtype, cudf.core.dtypes.CategoricalDtype
+            self.source_df[self.aggregate_col].dtype,
+            cudf.core.dtypes.CategoricalDtype,
         ):
-            self.aggregator = ds.by(
-                self.x, getattr(ds, self.aggregate_fn)(self.aggregate_col)
-            )
             self.cmap = {
                 "color_key": {
                     k: v
                     for k, v in zip(
-                        list(self.source_df[self.x].cat.categories),
+                        list(
+                            self.source_df[
+                                self.aggregate_col
+                            ].cat.categories.to_pandas()
+                        ),
                         self.color_palette,
                     )
                 }
             }
-        else:
-            if self.aggregate_fn:
-                self.aggregator = getattr(ds, self.aggregate_fn)(
-                    self.aggregate_col
-                )
+
+        if self.aggregate_fn:
+            self.aggregator = getattr(ds, self.aggregate_fn)(
+                self.aggregate_col
+            )
 
         self._compute_clims()
 
@@ -233,7 +239,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
     def points(self, **kwargs):
         return hv.Scatter(self.source_df, kdims=[self.x], vdims=self.vdims)
 
-    def view(self):
+    def get_chart(self):
         dmap = rasterize(
             hv.DynamicMap(
                 self.points,
@@ -244,13 +250,17 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
                 ],
             ),
             aggregator=self.aggregator,
+            *self.cmap,
         ).opts(
-            cnorm=self.pixel_shade_type,
-            **self.cmap,
-            colorbar=True,
-            clim=self.clims,
-            nodata=0,
+            cnorm=self.pixel_shade_type, **self.cmap, colorbar=True, nodata=0,
         )
+        if self.aggregate_fn != "count":
+            dmap = dmap.opts(clim=self.clims)
+
+        return dmap
+
+    def view(self):
+        dmap = self.get_chart()
 
         dmap = dynspread(
             dmap,
