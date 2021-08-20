@@ -40,11 +40,7 @@ class TestCoreNonAggregateChart:
         bnac.x = "x"
         bnac.y = "y"
         bnac.chart_type = "test_chart_type"
-        print(bnac.name)
-        assert bnac.name == (
-            f"x_y_{bnac.aggregate_col or ''}_{bnac.aggregate_fn or ''}"
-            f"_test_chart_type_{bnac.title}"
-        )
+        assert bnac.name == "x_y_count_test_chart_type_"
 
         # BaseNonAggregateChart variables
         assert bnac.use_data_tiles is False
@@ -195,8 +191,9 @@ class TestCoreNonAggregateChart:
         )
 
         bnac_key = (
-            f"{bnac.x}_{bnac.y}_{bnac.aggregate_col or ''}_"
-            f"{bnac.aggregate_fn}_{bnac.chart_type}_{bnac.title}"
+            f"{bnac.x}_{bnac.y}"
+            f"{'_' + bnac.aggregate_col if bnac.aggregate_col else ''}"
+            f"_{bnac.aggregate_fn}_{bnac.chart_type}_{bnac.title}"
         )
 
         assert dashboard._query_str_dict[bnac_key] == query
