@@ -509,7 +509,7 @@ class Graph(BaseGraph):
 
         Ouput:
         """
-        if isinstance(dataframe, cudf.core.DataFrame):
+        if isinstance(dataframe, cudf.DataFrame):
             self.nodes = dataframe
         else:
             self.nodes = dataframe.data
