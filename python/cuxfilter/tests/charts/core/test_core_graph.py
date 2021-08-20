@@ -175,7 +175,10 @@ class TestCoreGraph:
             dashboard._query_str_dict, dashboard._query_local_variables_dict
         )
         print(dashboard._query_str_dict)
-        assert dashboard._query_str_dict["x_y_vertex_count_test"] == query
+        assert (
+            dashboard._query_str_dict[f"x_y_vertex_count_test_{bg.title}"]
+            == query
+        )
         for key in local_dict:
             assert (
                 dashboard._query_local_variables_dict[key] == local_dict[key]
