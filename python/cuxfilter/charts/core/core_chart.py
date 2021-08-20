@@ -36,6 +36,7 @@ class BaseChart:
     _initialized = False
     # widget=False can only be rendered the main layout
     is_widget = False
+    title = ""
 
     @property
     def name(self):

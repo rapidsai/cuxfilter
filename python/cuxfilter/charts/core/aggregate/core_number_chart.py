@@ -26,7 +26,7 @@ class BaseNumberChart(BaseChart):
         x=None,
         expression=None,
         aggregate_fn="count",
-        title=None,
+        title="",
         widget=True,
         format="{value}",
         colors=[],

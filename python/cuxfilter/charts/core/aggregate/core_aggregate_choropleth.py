@@ -57,7 +57,7 @@ class BaseChoropleth(BaseChart):
         tooltip=True,
         tooltip_include_cols=[],
         nan_color=CUXF_NAN_COLOR,
-        title=None,
+        title="",
         **library_specific_params,
     ):
         """

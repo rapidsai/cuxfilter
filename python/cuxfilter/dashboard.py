@@ -102,9 +102,11 @@ def _check_if_duplicates(charts):
     dups = list((Counter(_charts) - Counter(set(_charts))).keys())
     if len(dups) > 0:
         print(
-            f"""DuplicateChartsWarning: {dups} \n Only unique chart names
-            are supported, please provide a unique title parameter to each
-            chart"""
+            (
+                f"DuplicateChartsWarning: {dups} \n Only unique chart names"
+                "are supported, please provide a unique title parameter to "
+                "each chart"
+            )
         )
 
 
