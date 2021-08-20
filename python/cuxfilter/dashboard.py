@@ -7,6 +7,7 @@ from panel.io.server import get_server
 from bokeh.embed import server_document
 import os
 import urllib
+import warnings
 
 from .charts.core import BaseChart, BaseWidget, ViewDataFrame
 from .charts.constants import (
@@ -97,16 +98,21 @@ def _create_app(
     return server
 
 
+class DuplicateChartsWarning(Warning):
+    ...
+
+
 def _check_if_duplicates(charts):
     _charts = [i.name for i in charts]
-    dups = list((Counter(_charts) - Counter(set(_charts))).keys())
+    dups = [k for k, v in Counter(_charts).items() if v > 1]
     if len(dups) > 0:
-        print(
+        warnings.warn(
             (
-                f"DuplicateChartsWarning: {dups} \n Only unique chart names"
+                f"{dups} \n Only unique chart names "
                 "are supported, please provide a unique title parameter to "
                 "each chart"
-            )
+            ),
+            DuplicateChartsWarning,
         )
 
 
