@@ -19,7 +19,7 @@ class BaseNumberChart(BaseChart):
     @property
     def name(self):
         value = (self.x or self.expression) or ""
-        return value + "_" + self.chart_type
+        return f"{value}_{self.chart_type}_{self.title}"
 
     def __init__(
         self,

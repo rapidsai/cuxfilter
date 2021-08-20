@@ -38,7 +38,7 @@ class BaseStackedLine(BaseChart):
     def name(self):
         # overwrite BaseChart name function to allow unique chart on value x
         chart_type = self.chart_type if self.chart_type else "chart"
-        return f"{self.x}_{self.y[0]}_{chart_type}"
+        return f"{self.x}_{self.y[0]}_{chart_type}_{self.title}"
 
     @property
     def colors_set(self):

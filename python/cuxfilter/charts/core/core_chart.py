@@ -40,7 +40,7 @@ class BaseChart:
     @property
     def name(self):
         chart_type = self.chart_type if self.chart_type else "chart"
-        return f"{self.x}_{chart_type}"
+        return f"{self.x}_{chart_type}_{self.title}"
 
     @property
     def width(self):

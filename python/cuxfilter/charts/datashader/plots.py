@@ -259,7 +259,7 @@ class Scatter(BaseScatter):
 
         Ouput:
         """
-        if len(self.title) == 0:
+        if self.title:
             self.title = (
                 "Scatter plot for "
                 + self.aggregate_col
@@ -602,7 +602,7 @@ class Graph(BaseGraph):
 
         Ouput:
         """
-        if len(self.title) == 0:
+        if self.title:
             self.title = "Graph"
         self.x_range = (
             self.x_range[0] - self.node_point_size,
@@ -857,7 +857,7 @@ class Line(BaseLine):
 
         Ouput:
         """
-        if len(self.title) == 0:
+        if self.title:
             if self.x == self.y:
                 self.title = "Line plot for " + self.x
             else:
@@ -1071,7 +1071,7 @@ class StackedLines(BaseStackedLine):
 
         Ouput:
         """
-        if len(self.title) == 0:
+        if self.title:
             self.title = "Stacked Line plots on x-axis: " + self.x
 
         self.chart = figure(
