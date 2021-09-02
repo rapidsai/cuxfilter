@@ -28,7 +28,7 @@ fi
 ################################################################################
 
 gpuci_logger "Get conda file output locations"
-export CUXFILTER_FILE=`conda build conda/recipes/cuxfilter --python=$PYTHON --output`
+export CUXFILTER_FILE=`conda build conda/recipes/cuxfilter --python=$PYTHON_VER --output`
 
 ################################################################################
 # UPLOAD - Conda packages

@@ -66,7 +66,7 @@ conda config --set ssl_verify False
 ################################################################################
 
 echo "Building cuxfilter"
-gpuci_conda_retry build conda/recipes/cuxfilter --python=$PYTHON
+gpuci_conda_retry build conda/recipes/cuxfilter --python=$PYTHON_VER
 
 ################################################################################
 # UPLOAD - Conda packages
