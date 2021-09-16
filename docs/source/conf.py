@@ -27,9 +27,9 @@ author = 'NVIDIA'
 # built documents.
 #
 # The short X.Y version.
-version = '21.10'
+version = '21.12'
 # The full version, including alpha/beta/rc tags
-release = '21.10.00'
+release = '21.12.00'
 
 nbsphinx_allow_errors = True
 # -- General configuration ---------------------------------------------------
