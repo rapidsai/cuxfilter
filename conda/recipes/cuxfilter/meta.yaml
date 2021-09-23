@@ -43,11 +43,11 @@ requirements:
     - jupyter-server-proxy
     - pydeck >=0.3, <=0.5.0
 
-test:
-  requires:
-    - cudatoolkit {{ cuda_version }}.*
-  commands:
-    - python -c "import cuxfilter"
+test:                                   # [linux64]
+  requires:                             # [linux64]
+    - cudatoolkit {{ cuda_version }}.*  # [linux64]
+  commands:                             # [linux64]
+    - python -c "import cuxfilter"      # [linux64]
 
 about:
   home: http://rapids.ai/
