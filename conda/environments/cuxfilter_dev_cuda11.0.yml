@@ -22,6 +22,7 @@ dependencies:
 - pandoc=<2.0.0
 - bokeh>=2.3.2,<2.4
 - panel>=0.10.3
+- pyppeteer>=0.2.6
 - cudatoolkit=11.0
 - nodejs
 - recommonmark
