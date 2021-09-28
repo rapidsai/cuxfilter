@@ -5,7 +5,7 @@ import datashader as ds
 import numpy as np
 import cudf
 from holoviews.element.tiles import tile_sources
-from holoviews.operation.datashader import datashade, dynspread, rasterize
+from holoviews.operation.datashader import dynspread, rasterize
 from bokeh.models import (
     LinearColorMapper,
     LogColorMapper,
@@ -128,7 +128,8 @@ class InteractiveDatashader(param.Parameterized):
 
     def __init__(self, **params):
         """
-        initialize InteractiveDatashader object, and set a listener on self.data
+        initialize InteractiveDatashader object, and set a listener on
+        self.data
         """
         super(InteractiveDatashader, self).__init__(**params)
         self.tiles = (
