@@ -199,8 +199,6 @@ class DashBoard:
         self._sidebar = dict()
         self._data_tiles = dict()
         self._query_str_dict = dict()
-        if data_size_widget:
-            sidebar.insert(0, data_size_indicator())
 
         # check if charts and sidebar lists contain cuxfilter.charts with
         # duplicate names
@@ -212,16 +210,23 @@ class DashBoard:
         # and resolution constraints
         # process all main dashboard charts
         for chart in charts:
-            self._charts[chart.name] = chart
             chart.initiate_chart(self)
             chart._initialized = True
+            self._charts[chart.name] = chart
 
         # process all sidebar widgets
         for chart in sidebar:
             if chart.is_widget:
-                self._sidebar[chart.name] = chart
                 chart.initiate_chart(self)
                 chart._initialized = True
+                self._sidebar[chart.name] = chart
+
+        # add data_size_indicator to sidebar if data_size_widget=True
+        if data_size_widget:
+            chart = data_size_indicator()
+            chart.initiate_chart(self)
+            chart._initialized = True
+            self._sidebar[chart.name] = chart
 
         self.title = title
         self._dashboard = layout()
