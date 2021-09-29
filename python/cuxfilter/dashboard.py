@@ -214,19 +214,19 @@ class DashBoard:
             chart._initialized = True
             self._charts[chart.name] = chart
 
-        # process all sidebar widgets
-        for chart in sidebar:
-            if chart.is_widget:
-                chart.initiate_chart(self)
-                chart._initialized = True
-                self._sidebar[chart.name] = chart
-
         # add data_size_indicator to sidebar if data_size_widget=True
         if data_size_widget:
             chart = data_size_indicator()
             chart.initiate_chart(self)
             chart._initialized = True
             self._sidebar[chart.name] = chart
+
+        # process all sidebar widgets
+        for chart in sidebar:
+            if chart.is_widget:
+                chart.initiate_chart(self)
+                chart._initialized = True
+                self._sidebar[chart.name] = chart
 
         self.title = title
         self._dashboard = layout()
