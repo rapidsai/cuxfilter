@@ -33,7 +33,7 @@ class BaseGraph(BaseChart):
         chart_type = self.chart_type if self.chart_type else "chart"
         return (
             f"{self.node_x}_{self.node_y}_{self.node_id}_"
-            f"{self.node_aggregate_fn}_{chart_type}"
+            f"{self.node_aggregate_fn}_{chart_type}_{self.title}"
         )
 
     @property

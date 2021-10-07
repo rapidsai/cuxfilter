@@ -34,13 +34,13 @@ class TestCoreNonAggregateChart:
         assert bnac.max_value == 0.0
         assert bnac.x_label_map == {}
         assert bnac.y_label_map == {}
+        assert bnac.title == ""
 
         # test chart name setter
         bnac.x = "x"
         bnac.y = "y"
         bnac.chart_type = "test_chart_type"
-
-        assert bnac.name == "x_y_test_chart_type"
+        assert bnac.name == "x_y_count_test_chart_type_"
 
         # BaseNonAggregateChart variables
         assert bnac.use_data_tiles is False
@@ -190,7 +190,13 @@ class TestCoreNonAggregateChart:
             dashboard._query_str_dict, dashboard._query_local_variables_dict
         )
 
-        assert dashboard._query_str_dict["x_y_test"] == query
+        bnac_key = (
+            f"{bnac.x}_{bnac.y}"
+            f"{'_' + bnac.aggregate_col if bnac.aggregate_col else ''}"
+            f"_{bnac.aggregate_fn}_{bnac.chart_type}_{bnac.title}"
+        )
+
+        assert dashboard._query_str_dict[bnac_key] == query
         for key in local_dict:
             assert (
                 dashboard._query_local_variables_dict[key] == local_dict[key]

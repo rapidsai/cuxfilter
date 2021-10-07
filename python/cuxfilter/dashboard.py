@@ -7,6 +7,7 @@ from panel.io.server import get_server
 from bokeh.embed import server_document
 import os
 import urllib
+import warnings
 
 from .charts.core import BaseChart, BaseWidget, ViewDataFrame
 from .charts.constants import (
@@ -22,6 +23,7 @@ from .assets import screengrab, get_open_port
 from .themes import light
 from IPython.core.display import Image, display
 from IPython.display import publish_display_data
+from collections import Counter
 
 _server_info = (
     "<b>Running server:</b>"
@@ -94,6 +96,24 @@ def _create_app(
         metadata={EXEC_MIME: {"server_id": server_id}},
     )
     return server
+
+
+class DuplicateChartsWarning(Warning):
+    ...
+
+
+def _check_if_duplicates(charts):
+    _charts = [i.name for i in charts]
+    dups = [k for k, v in Counter(_charts).items() if v > 1]
+    if len(dups) > 0:
+        warnings.warn(
+            (
+                f"{dups} \n Only unique chart names "
+                "are supported, please provide a unique title parameter to "
+                "each chart"
+            ),
+            DuplicateChartsWarning,
+        )
 
 
 class DashBoard:
@@ -179,24 +199,34 @@ class DashBoard:
         self._sidebar = dict()
         self._data_tiles = dict()
         self._query_str_dict = dict()
-        if data_size_widget:
-            sidebar.insert(0, data_size_indicator())
+
+        # check if charts and sidebar lists contain cuxfilter.charts with
+        # duplicate names
+        _check_if_duplicates(charts)
+        _check_if_duplicates(sidebar)
 
         # widgets can be places both in sidebar area AND chart area
         # but charts cannot be placed in the sidebar area due to size
         # and resolution constraints
         # process all main dashboard charts
         for chart in charts:
-            self._charts[chart.name] = chart
             chart.initiate_chart(self)
             chart._initialized = True
+            self._charts[chart.name] = chart
+
+        # add data_size_indicator to sidebar if data_size_widget=True
+        if data_size_widget:
+            chart = data_size_indicator()
+            chart.initiate_chart(self)
+            chart._initialized = True
+            self._sidebar[chart.name] = chart
 
         # process all sidebar widgets
         for chart in sidebar:
             if chart.is_widget:
-                self._sidebar[chart.name] = chart
                 chart.initiate_chart(self)
                 chart._initialized = True
+                self._sidebar[chart.name] = chart
 
         self.title = title
         self._dashboard = layout()

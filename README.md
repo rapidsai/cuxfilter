@@ -143,15 +143,15 @@ Please see the [Demo Docker Repository](https://hub.docker.com/r/rapidsai/rapids
 
 cuxfilter can be installed with conda ([miniconda](https://conda.io/miniconda.html), or the full [Anaconda distribution](https://www.anaconda.com/download)) from the `rapidsai` channel:
 
-For `cuxfilter version == 21.08.18` :
+For `cuxfilter version == 21.10` :
 ```bash
 # for CUDA 11.0
 conda install -c rapidsai -c nvidia -c numba -c conda-forge \
-    cuxfilter=21.08 python=3.7 cudatoolkit=11.0
+    cuxfilter=21.10 python=3.7 cudatoolkit=11.0
 
 # or, for CUDA 11.2
 conda install -c rapidsai -c nvidia -c numba -c conda-forge \
-    cuxfilter=21.08 python=3.7 cudatoolkit=11.2
+    cuxfilter=21.10 python=3.7 cudatoolkit=11.2
 
 ```
 
@@ -196,10 +196,6 @@ conda install -c conda-forge jupyterlab
 jupyter labextension install @pyviz/jupyterlab_pyviz
 jupyter labextension install jupyterlab_bokeh
 ```
-
-**Pyppeteer package not found**
-
-Due to a [CVE](https://github.com/pyppeteer/pyppeteer/issues/275#issuecomment-882838194) that affects our CI containers, pyppeteer is no longer packaged in 21.06 until the issues are resolved. To use the `dashboard.preview()` feature, pyppeteer can be installed via pip (`pip install -U git+https://github.com/pyppeteer/pyppeteer@dev`).
 
 ## Download Datasets
 

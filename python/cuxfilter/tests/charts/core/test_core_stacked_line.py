@@ -127,8 +127,12 @@ class TestBaseStackedLine:
         bsl.compute_query_dict(
             dashboard._query_str_dict, dashboard._query_local_variables_dict
         )
-
-        assert dashboard._query_str_dict["x_y_stacked_lines"] == query
+        assert (
+            dashboard._query_str_dict[
+                f"x_{'_'.join(['y'])}_stacked_lines_{bsl.title}"
+            ]
+            == query
+        )
         for key in local_dict:
             assert (
                 dashboard._query_local_variables_dict[key] == local_dict[key]

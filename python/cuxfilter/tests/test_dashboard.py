@@ -14,6 +14,7 @@ class TestDashBoard:
     )
     cux_df = cuxfilter.DataFrame.from_dataframe(df)
     dashboard = cux_df.dashboard(charts=[], title="test_title")
+    _datasize_title = "_datasize_indicator_Datapoints Selected"
 
     def test_variables(self):
         assert self.dashboard._cuxfilter_df.data.equals(self.df)
@@ -23,7 +24,8 @@ class TestDashBoard:
             == cuxfilter.layouts.single_feature
         )
         assert self.dashboard._theme == cuxfilter.themes.light
-        assert list(self.dashboard._sidebar.keys()) == ["_datasize_indicator"]
+
+        assert list(self.dashboard._sidebar.keys()) == [self._datasize_title]
         assert self.dashboard._data_tiles == {}
         assert self.dashboard._query_str_dict == {}
         assert self.dashboard._active_view is None
@@ -37,9 +39,9 @@ class TestDashBoard:
             dashboard.add_charts(charts=[bac])
 
         assert list(dashboard._charts.keys()) == [
-            "key_count_chart_1",
-            "key_count_chart_2",
-            "key_count_chart_3",
+            f"key_count_chart_1_{bac.title}",
+            f"key_count_chart_2_{bac.title}",
+            f"key_count_chart_3_{bac.title}",
         ]
 
     def test_add_sidebar(self):
@@ -58,11 +60,11 @@ class TestDashBoard:
 
         assert len(dashboard._charts) == 0
         assert len(dashboard._sidebar) == 1
-        assert list(dashboard._sidebar.keys()) == ["_datasize_indicator"]
+        assert list(dashboard._sidebar.keys()) == [self._datasize_title]
         assert len(dashboard1._charts) == 0
         assert len(dashboard1._sidebar) == 4
         assert list(dashboard1._sidebar.keys()) == [
-            "_datasize_indicator",
+            self._datasize_title,
             "test0_card",
             "test1_card",
             "test2_card",
@@ -137,8 +139,8 @@ class TestDashBoard:
         "active_view, passive_view, result",
         [
             (
-                "key_mean_line",
-                "val_count_bar",
+                "key_mean_line_custom_title",
+                "val_count_bar_custom_title",
                 pd.DataFrame(
                     {
                         0: {0: 1.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0},
@@ -149,7 +151,7 @@ class TestDashBoard:
                     }
                 ),
             ),
-            ("val_count_bar", "key_mean_line", None),
+            ("val_count_bar_custom_title", "key_mean_line_custom_title", None),
         ],
     )
     def test_calc_data_tiles(self, active_view, passive_view, result):
@@ -157,9 +159,10 @@ class TestDashBoard:
             {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
         )
         cux_df = cuxfilter.DataFrame.from_dataframe(df)
-        bac = bokeh.line("key", "val", aggregate_fn="mean")
+        title = "custom_title"
+        bac = bokeh.line("key", "val", aggregate_fn="mean", title=title)
         bac.use_data_tiles = False
-        bac1 = bokeh.bar("val")
+        bac1 = bokeh.bar("val", title=title)
         dashboard = cux_df.dashboard(
             charts=[bac, bac1],
             title="test_title",
@@ -228,7 +231,7 @@ class TestDashBoard:
         dashboard._calc_data_tiles(cumsum=False)
 
         bac1.source.data["top"] = np.array(prev_result)
-        dashboard._sidebar["_datasize_indicator"].reset_chart(len(old_indices))
+        dashboard._sidebar[self._datasize_title].reset_chart(len(old_indices))
         dashboard._query_datatiles_by_indices(
             old_indices=old_indices, new_indices=new_indices
         )
@@ -257,7 +260,7 @@ class TestDashBoard:
 
         assert dashboard._active_view == bac1
         assert dashboard._query_str_dict == {
-            "key_mean_line": "@key_min <= key <= @key_max"
+            f"key_mean_line_{bac.title}": "@key_min <= key <= @key_max"
         }
         assert dashboard._query_local_variables_dict == {
             "key_min": 1,

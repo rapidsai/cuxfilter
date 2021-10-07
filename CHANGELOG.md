@@ -1,4 +1,8 @@
-# cuXfilter 21.08.00 (4 Aug 2021)
+# cuXfilter 21.10.00 (Date TBD)
+
+Please see https://github.com/rapidsai/cuxfilter/releases/tag/v21.10.00a for the latest changes to this development branch.
+
+# cuXfilter 21.08.00 (Date TBD)
 
 ## 🐛 Bug Fixes
 

@@ -13,14 +13,15 @@ class TestBaseNumberChart:
         {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
     )
     cux_df = cuxfilter.DataFrame.from_dataframe(df)
+    _datasize_title = "_datasize_indicator_Datapoints Selected"
 
     def test_variables(self):
-        bnc = BaseNumberChart()
+        bnc = BaseNumberChart(title="custom_title")
 
         # BaseChart variables
         assert bnc.x is None
         assert bnc.expression is None
-        assert bnc.title is None
+        assert bnc.title == "custom_title"
         assert bnc.aggregate_fn == "count"
         assert bnc.format == "{value}"
         assert bnc.colors == []
@@ -29,7 +30,7 @@ class TestBaseNumberChart:
         assert bnc.use_data_tiles is True
         assert bnc._library_specific_params == {}
         assert bnc.is_datasize_indicator is True
-        assert bnc.name == "_number_chart_widget"
+        assert bnc.name == "_number_chart_widget_custom_title"
 
     @pytest.mark.parametrize(
         "x, expression, min_, max_",
@@ -67,8 +68,8 @@ class TestBaseNumberChart:
         dashboard = self.cux_df.dashboard(charts=[active_chart])
         dashboard._active_view = active_chart
         dashboard._calc_data_tiles()
-        bnc = dashboard._sidebar["_datasize_indicator"]
-        datatile = dashboard._data_tiles["_datasize_indicator"]
+        bnc = dashboard._sidebar[self._datasize_title]
+        datatile = dashboard._data_tiles[self._datasize_title]
         bnc.query_chart_by_range(active_chart, query_tuple, datatile)
 
         assert result == bnc.chart[0].value
@@ -84,10 +85,10 @@ class TestBaseNumberChart:
         dashboard = self.cux_df.dashboard(charts=[active_chart])
         dashboard._active_view = active_chart
         dashboard._calc_data_tiles(cumsum=False)
-        bnc = dashboard._sidebar["_datasize_indicator"]
+        bnc = dashboard._sidebar[self._datasize_title]
         bnc.reset_chart(prev_value)
 
-        datatile = dashboard._data_tiles["_datasize_indicator"]
+        datatile = dashboard._data_tiles[self._datasize_title]
         bnc.query_chart_by_indices(
             active_chart, old_indices, new_indices, datatile
         )
