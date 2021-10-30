@@ -4,8 +4,9 @@ import param
 import datashader as ds
 import numpy as np
 import cudf
+import cupy
 from holoviews.element.tiles import tile_sources
-from holoviews.operation.datashader import dynspread, rasterize
+from holoviews.operation.datashader import SpreadingOperation, rasterize
 from bokeh.models import (
     LinearColorMapper,
     LogColorMapper,
@@ -13,6 +14,7 @@ from bokeh.models import (
     ColorBar,
     BinnedTicker,
 )
+from datashader import transfer_functions as tf
 from ...constants import CUXF_DEFAULT_COLOR_PALETTE
 
 
@@ -58,12 +60,6 @@ ds.transfer_functions._mask_lookup["rect_vertical"] = _rect_vertical_mask
 ds.transfer_functions._mask_lookup["rect_horizontal"] = _rect_horizontal_mask
 ds.transfer_functions._mask_lookup["cross"] = _cross_mask
 
-dynspread.shape = param.ObjectSelector(
-    default="circle",
-    objects=["circle", "square", "rect_vertical", "rect_horizontal", "cross"],
-)
-
-
 _color_mapper = {
     "linear": LinearColorMapper,
     "log": LogColorMapper,
@@ -92,6 +88,57 @@ def _get_legend_title(aggregate_fn, aggregate_col):
         return aggregate_fn
     else:
         return aggregate_fn + " " + aggregate_col
+
+
+class dynspread(SpreadingOperation):
+    """
+    datashader has a pending change to support internally converting
+    cupy arrays to numpy(https://github.com/holoviz/datashader/pull/1015)
+
+    This class is a custom implmentation of
+    https://github.com/holoviz/holoviews/blob/master/holoviews/operation/datashader.py#L1660
+    to support the cupy array internal conversion until datashader merges the
+    changes
+    """
+
+    max_px = param.Integer(
+        default=3,
+        doc="""
+        Maximum number of pixels to spread on all sides.""",
+    )
+
+    threshold = param.Number(
+        default=0.5,
+        bounds=(0, 1),
+        doc="""
+        When spreading, determines how far to spread.
+        Spreading starts at 1 pixel, and stops when the fraction
+        of adjacent non-empty pixels reaches this threshold.
+        Higher values give more spreading, up to the max_px
+        allowed.""",
+    )
+    shape = param.ObjectSelector(
+        default="circle",
+        objects=[
+            "circle",
+            "square",
+            "rect_vertical",
+            "rect_horizontal",
+            "cross",
+        ],
+    )
+
+    def _apply_spreading(self, array):
+        if cupy and isinstance(array.data, cupy.ndarray):
+            # Convert img.data to numpy array before passing to nb.jit kernels
+            array.data = cupy.asnumpy(array.data)
+        return tf.dynspread(
+            array,
+            max_px=self.p.max_px,
+            threshold=self.p.threshold,
+            how=self.p.how,
+            shape=self.p.shape,
+        )
 
 
 class InteractiveDatashader(param.Parameterized):
@@ -251,7 +298,6 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
                 ],
             ),
             aggregator=self.aggregator,
-            *self.cmap,
         ).opts(
             cnorm=self.pixel_shade_type, **self.cmap, colorbar=True, nodata=0,
         )
@@ -261,10 +307,8 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
         return dmap
 
     def view(self):
-        dmap = self.get_chart()
-
         dmap = dynspread(
-            dmap,
+            self.get_chart(),
             threshold=self.spread_threshold,
             shape=self.point_shape,
             max_px=self.max_px,
