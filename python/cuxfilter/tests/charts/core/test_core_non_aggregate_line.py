@@ -79,7 +79,7 @@ class TestNonAggregateBaseLine:
         ],
     )
     def test_compute_query_dict(self, range, query, local_dict):
-        bb = BaseLine(x="key", y="val")
+        bb = BaseLine(x="key", y="val", title="custom_title")
         bb.chart_type = "non_aggregate_line"
         self.dashboard.add_charts([bb])
         bb.filter_widget.value = range
@@ -90,7 +90,9 @@ class TestNonAggregateBaseLine:
         )
 
         assert (
-            self.dashboard._query_str_dict["key_val_non_aggregate_line"]
+            self.dashboard._query_str_dict[
+                "key_val_non_aggregate_line_custom_title"
+            ]
             == query
         )
         for key in local_dict:

@@ -25,11 +25,12 @@ class TestBaseChart:
         assert bc.max_value == 0.0
         assert bc.x_label_map == {}
         assert bc.y_label_map == {}
+        assert bc.title == ""
 
         bc.x = "test_x"
         bc.chart_type = "test_chart_type"
 
-        assert bc.name == "test_x_test_chart_type"
+        assert bc.name == "test_x_test_chart_type_"
 
     def test_set_dimensions(self):
         bc = BaseChart()

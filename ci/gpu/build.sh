@@ -53,13 +53,13 @@ nvidia-smi
 gpuci_logger "Activate conda env"
 . /opt/conda/etc/profile.d/conda.sh
 conda activate rapids
-gpuci_conda_retry install -y \
+gpuci_mamba_retry install -y \
                "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
                "cugraph=$MINOR_VERSION.*" \
                "cuspatial=$MINOR_VERSION.*" \
                "dask-cudf=$MINOR_VERSION.*" "dask-cuda=$MINOR_VERSION.*" \
                "numba>=0.51.2" \
-               "bokeh>=2.3.2,<2.4" \
+               "bokeh>=2.3.2,<=2.4" \
                "rapids-build-env=$MINOR_VERSION.*" \
                "rapids-notebook-env=$MINOR_VERSION.*"
 

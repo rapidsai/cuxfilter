@@ -36,9 +36,11 @@ class BaseAggregateChart(BaseChart):
         # overwrite BaseChart name function to allow unique choropleths on
         # value x
         if self.chart_type is not None:
-            return f"{self.x}_{self.aggregate_fn}_{self.chart_type}"
+            return (
+                f"{self.x}_{self.aggregate_fn}_{self.chart_type}_{self.title}"
+            )
         else:
-            return f"{self.x}_{self.aggregate_fn}_chart"
+            return f"{self.x}_{self.aggregate_fn}_chart_{self.title}"
 
     @datatile_loaded_state.setter
     def datatile_loaded_state(self, state: bool):

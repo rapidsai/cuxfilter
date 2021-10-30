@@ -8,21 +8,22 @@ channels:
 - anaconda
 dependencies:
 - cupy>7.1.0,<10.0.0a0
-- cuspatial=21.08
+- cuspatial=21.12
 - python>=3.6,<3.8
-- cudf=21.08
+- cudf=21.12
 - dask>=2.12.0
 - distributed>=2.12.0
-- dask-cuda=21.08
-- dask-cudf=21.08
+- dask-cuda=21.12
+- dask-cudf=21.12
 - datashader>=0.11.1
 - numba>=0.51.2
 - geopandas >=0.9.0,<0.10.0a0
 - pyproj>=2.4, <=3.1
 - libwebp
 - pandoc=<2.0.0
-- bokeh>=2.3.2,<2.4
-- panel>=0.10.3
+- bokeh>=2.3.2,<=2.4
+- panel>=0.10.3,<=0.12.4
+- pyppeteer>=0.2.6
 - cudatoolkit=10.2
 - nodejs
 - recommonmark
@@ -35,7 +36,6 @@ dependencies:
 - nbsphinx
 - numpydoc
 - ipython
-- pyppeteer<=0.2.2
 - jupyterlab
 - flake8=3.8.3
 - black=19.10
