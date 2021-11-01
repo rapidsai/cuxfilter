@@ -21,7 +21,7 @@ def scatter(
     title="",
     timeout=100,
     legend=True,
-    legend_position="top_right",
+    legend_position="center",
     **library_specific_params,
 ):
     """
@@ -90,10 +90,9 @@ def scatter(
         Adds Bokeh.models.LinearColorMapper based legend if True,
         Note: legend currently only works with pixel_shade_type='linear'/'log'
 
-    legend_position: str, default top_right
+    legend_position: str, default center
         position of legend on the chart.
-        Valid places are: right, left, bottom, top, top_right, top_left,
-        bottom_left, bottom_right
+        Valid places are: above, below, left, right or center
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
@@ -161,7 +160,7 @@ def graph(
     title="",
     timeout=100,
     legend=True,
-    legend_position="top_right",
+    legend_position="center",
     **library_specific_params,
 ):
 
@@ -264,10 +263,9 @@ def graph(
         Adds Bokeh.models.LinearColorMapper based legend if True,
         Note: legend currently only works with pixel_shade_type='linear'/'log'
 
-    legend_position: str, default top_right
+    legend_position: str, default center
         position of legend on the chart.
-        Valid places are: right, left, bottom, top, top_right, top_left,
-        bottom_left, bottom_right
+        Valid places are: above, below, left, right or center
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
@@ -331,7 +329,7 @@ def heatmap(
     title="",
     timeout=100,
     legend=True,
-    legend_position="top_right",
+    legend_position="center",
     **library_specific_params,
 ):
     """
@@ -394,10 +392,9 @@ def heatmap(
     legend: bool, default True
         Adds Bokeh.models.LinearColorMapper based legend if True,
 
-    legend_position: str, default top_right
+    legend_position: str, default center
         position of legend on the chart.
-        Valid places are: right, left, bottom, top, top_right, top_left,
-        bottom_left, bottom_right
+        Valid places are: above, below, left, right or center
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
@@ -534,7 +531,7 @@ def stacked_lines(
     title="",
     timeout=100,
     legend=True,
-    legend_position="top_right",
+    legend_position="center",
     **library_specific_params,
 ):
     """
@@ -576,10 +573,9 @@ def stacked_lines(
         Adds Bokeh.models.LinearColorMapper based legend if True,
         Note: legend currently only works with pixel_shade_type='linear'/'log'
 
-    legend_position: str, default top_right
+    legend_position: str, default center
         position of legend on the chart.
-        Valid places are: right, left, bottom, top, top_right, top_left,
-        bottom_left, bottom_right
+        Valid places are: above, below, left, right or center
 
 
     **library_specific_params:
