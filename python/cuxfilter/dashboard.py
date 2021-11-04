@@ -541,28 +541,11 @@ class DashBoard:
 
         display(Image("temp.png"))
 
-    def app(
-        self,
-        notebook_url=DEFAULT_NOTEBOOK_URL,
-        port: int = 0,
-        service_proxy=None,
-    ):
+    def app(self):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
         ----------
-        url: str, optional
-            url of the notebook(including the port).
-            Can use localhost instead of ip if running locally
-
-        port: int, optional
-            Port number bokeh uses for it's two communication protocol.
-            Default is random open port. Recommended to set this value if
-            running jupyter remotely and only few ports are exposed.
-
-        service_proxy: str, optional, default None,
-            available options: jupyterhub
-
         Examples
         --------
 
@@ -580,7 +563,7 @@ class DashBoard:
         >>>     'key', 'val', data_points=5, add_interaction=False
         >>> )
         >>> d = cux_df.dashboard([line_chart_1])
-        >>> d.app(notebook_url='localhost:8888')
+        >>> d.app()
 
         """
         if self.server is not None:
@@ -588,23 +571,15 @@ class DashBoard:
                 self.stop()
             self._reinit_all_charts()
 
-        self._notebook_url = _get_host(notebook_url)
-        if port == 0:
-            port = get_open_port()
-
-        self.server = _create_app(
-            self._dashboard.generate_dashboard(
-                self.title,
-                self._charts,
-                self._sidebar,
-                self._theme,
-                self._layout_array,
-            ),
-            notebook_url=self._notebook_url,
-            port=port,
-            service_proxy=service_proxy,
-        )
         self._current_server_type = "app"
+
+        return self._dashboard.generate_dashboard(
+            self.title,
+            self._charts,
+            self._sidebar,
+            self._theme,
+            self._layout_array,
+        )
 
     def show(
         self,

@@ -1,8 +1,9 @@
 import re
 import numpy as np
 import panel as pn
+from panel.layout.gridstack import GridStack
 
-from .custom_react_template import ReactTemplate
+# from .custom_react_template import ReactTemplate
 
 
 def compute_position(arr, i, pos, offset):
@@ -29,7 +30,13 @@ class _LayoutBase:
     ):
         pn.config.sizing_mode = "stretch_both"
         self._layout_array = layout_array
-        tmpl = ReactTemplate(title=title, theme=theme, compact="both")
+        # tmpl = ReactTemplate(title=title, theme=theme, compact="both")
+        tmpl = GridStack(
+            allow_drag=False,
+            allow_resize=False,
+            sizing_mode="scale_both",
+            ncols=15,
+        )
         widgets = [x for x in sidebar.values() if x.is_widget]
         tmpl = self._process_widgets(widgets, tmpl)
         self._apply_themes(charts, theme)
@@ -43,21 +50,27 @@ class _LayoutBase:
                 chart.apply_theme(theme)
 
     def _process_widgets(self, widgets_list, tmpl):
+        x = pn.Row()
         for obj in widgets_list:
-            obj.chart.width = 280
-            obj.chart.sizing_mode = "scale_width"
-            tmpl.sidebar.append(obj.view())
+            # obj.chart.width = 280
+            obj.chart.sizing_mode = "stretch_width"
+            x.append(obj.view())
+        tmpl[:, 0:2] = x
         return tmpl
 
     def _process_grid_matrix(self, plots, tmpl):
         arr = np.array(self._layout_array)
+        gstack = GridStack(
+            allow_drag=False, allow_resize=False, sizing_mode="scale_both",
+        )
         if len(arr.shape) == 1:
             arr = np.array([arr])
         for i in range(arr.max()):
             if i < len(plots):
                 x0, y0 = compute_position(arr, i, 0, 0)
                 x1, y1 = compute_position(arr, i, -1, 1)
-                tmpl.main[x0:x1, y0:y1] = plots[i].view()
+                gstack[x0:x1, y0 : (y1 - 1)] = plots[i].view()
+        tmpl[:, 2:14] = gstack
 
     def _process_plots(self, plots, tmpl):
         raise NotImplementedError()
