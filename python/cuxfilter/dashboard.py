@@ -476,6 +476,7 @@ class DashBoard:
                 self._sidebar,
                 self._theme,
                 self._layout_array,
+                render_location="web-app",
             ),
             port=port,
             websocket_origin=websocket_origin,
@@ -541,7 +542,7 @@ class DashBoard:
 
         display(Image("temp.png"))
 
-    def app(self):
+    def app(self, sidebar_width=280):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
@@ -579,6 +580,8 @@ class DashBoard:
             self._sidebar,
             self._theme,
             self._layout_array,
+            "notebook",
+            sidebar_width,
         )
 
     def show(

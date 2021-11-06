@@ -244,12 +244,6 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
                     else self.y
                 ].max(),
             )
-        # self.legend_chart = _generate_legend(
-        #     self.pixel_shade_type,
-        #     self.color_palette,
-        #     _get_legend_title(self.aggregate_fn, self.aggregate_col),
-        #     self.clims,
-        # )
 
     def _compute_datashader_assets(self):
         self.aggregator = None
@@ -299,7 +293,13 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
             ),
             aggregator=self.aggregator,
         ).opts(
-            cnorm=self.pixel_shade_type, **self.cmap, colorbar=True, nodata=0,
+            cnorm=self.pixel_shade_type,
+            **self.cmap,
+            colorbar=True,
+            nodata=0,
+            colorbar_position=self.legend_position,
+            tools=self.tools,
+            active_tools=["wheel_zoom", "pan"],
         )
         if self.aggregate_fn != "count":
             dmap = dmap.opts(clim=self.clims)
@@ -312,7 +312,124 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
             threshold=self.spread_threshold,
             shape=self.point_shape,
             max_px=self.max_px,
-        ).opts(tools=self.tools, xaxis=None, yaxis=None, responsive=True,)
+        ).opts(xaxis=None, yaxis=None, responsive=True, tools=[])
+
+        return pn.pane.HoloViews(
+            self.tiles * dmap if self.tiles is not None else dmap,
+            sizing_mode="stretch_both",
+            height=self.height,
+        )
+
+
+class InteractiveDatashaderLine(InteractiveDatashader):
+    aggregate_col = param.String(allow_None=True)
+    aggregate_fn = param.String("count")
+    color = param.String()
+    tools = param.List(
+        default=[], doc="interactive tools to add to the chart",
+    )
+    color_palette = param.List()
+    point_shape = param.ObjectSelector(
+        default="circle",
+        objects=[
+            "circle",
+            "square",
+            "rect_vertical",
+            "rect_horizontal",
+            "cross",
+        ],
+    )
+    max_px = param.Integer(10)
+    clims = param.Tuple(default=(None, None))
+
+    def __init__(self, **params):
+        super(InteractiveDatashaderPoints, self).__init__(**params)
+        self._compute_datashader_assets()
+
+    def _compute_clims(self):
+        if not isinstance(
+            self.source_df[self.aggregate_col].dtype,
+            cudf.core.dtypes.CategoricalDtype,
+        ):
+            self.clims = (
+                self.source_df[
+                    self.aggregate_col
+                    if self.aggregate_col is not None
+                    else self.y
+                ].min(),
+                self.source_df[
+                    self.aggregate_col
+                    if self.aggregate_col is not None
+                    else self.y
+                ].max(),
+            )
+
+    def _compute_datashader_assets(self):
+        self.aggregator = None
+        self.cmap = {"cmap": self.color_palette}
+        if isinstance(
+            self.source_df[self.aggregate_col].dtype,
+            cudf.core.dtypes.CategoricalDtype,
+        ):
+            self.cmap = {
+                "color_key": {
+                    k: v
+                    for k, v in zip(
+                        list(
+                            self.source_df[
+                                self.aggregate_col
+                            ].cat.categories.to_pandas()
+                        ),
+                        self.color_palette,
+                    )
+                }
+            }
+
+        if self.aggregate_fn:
+            self.aggregator = getattr(ds, self.aggregate_fn)(
+                self.aggregate_col
+            )
+
+        self._compute_clims()
+
+    def update_points(self, data):
+        self.source_df = data
+        self._compute_clims()
+
+    @param.depends("source_df")
+    def points(self, **kwargs):
+        return hv.Scatter(self.source_df, kdims=[self.x], vdims=self.vdims)
+
+    def get_chart(self):
+        dmap = rasterize(
+            hv.DynamicMap(
+                self.points,
+                streams=[
+                    self.box_stream,
+                    self.lasso_stream,
+                    self.reset_stream,
+                ],
+            ),
+            aggregator=self.aggregator,
+        ).opts(
+            cnorm=self.pixel_shade_type,
+            **self.cmap,
+            colorbar=True,
+            nodata=0,
+            colorbar_position=self.legend_position,
+        )
+        if self.aggregate_fn != "count":
+            dmap = dmap.opts(clim=self.clims)
+
+        return dmap
+
+    def view(self):
+        dmap = dynspread(
+            self.get_chart(),
+            threshold=self.spread_threshold,
+            shape=self.point_shape,
+            max_px=self.max_px,
+        ).opts(tools=self.tools, xaxis=None, yaxis=None, responsive=True)
 
         return pn.pane.HoloViews(
             self.tiles * dmap if self.tiles is not None else dmap,
