@@ -9,6 +9,7 @@ from .custom_extensions import (
     CustomInspectTool,
     calc_connected_edges,
     InteractiveDatashaderPoints,
+    InteractiveDatashaderLine,
 )
 
 from distutils.version import LooseVersion
@@ -242,7 +243,7 @@ class Scatter(BaseScatter):
         if data is not None:
             if len(data) == 0:
                 data = cudf.DataFrame({k: cp.nan for k in data.columns})
-            self.chart.update_points(data)
+            self.chart.update_data(data)
 
     def add_selection_geometry_event(self, callback):
         """
@@ -734,41 +735,6 @@ class Line(BaseLine):
             self.x_range = dd.compute(*self.x_range)
             self.y_range = dd.compute(*self.y_range)
 
-    def generate_InteractiveImage_callback(self):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-
-        def viewInteractiveImage(
-            x_range, y_range, w, h, data_source, **kwargs
-        ):
-            dd = data_source[[self.x, self.y]]
-            dd[self.x] = self._to_xaxis_type(dd[self.x])
-            dd[self.y] = self._to_yaxis_type(dd[self.y])
-
-            x_range = self._to_xaxis_type(x_range)
-            y_range = self._to_yaxis_type(y_range)
-
-            cvs = ds.Canvas(
-                plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
-            )
-
-            agg = cvs.line(source=dd, x=self.x, y=self.y)
-
-            img = tf.shade(
-                agg, cmap=["white", self.color], how=self.pixel_shade_type
-            )
-            return img
-
-        return viewInteractiveImage
-
     def generate_chart(self):
         """
         Description:
@@ -786,50 +752,13 @@ class Line(BaseLine):
             else:
                 self.title = "Line plot for (" + self.x + "," + self.y + ")"
 
-        self.chart = figure(
-            toolbar_location="right",
-            tools="pan, wheel_zoom, reset",
-            active_scroll="wheel_zoom",
-            active_drag="pan",
-            x_range=self.x_range,
-            y_range=self.y_range,
-            width=self.width,
-            height=self.height,
+        self.chart = InteractiveDatashaderLine(
+            source_df=self.source,
+            x=self.x,
+            y=self.y,
+            color=self.color,
+            pixel_shade_type=self.pixel_shade_type,
         )
-
-        self.chart.add_tools(BoxSelectTool())
-        self.chart.axis.visible = True
-        if self.x_axis_tick_formatter:
-            self.chart.xaxis.formatter = self.x_axis_tick_formatter
-        if self.y_axis_tick_formatter:
-            self.chart.yaxis.formatter = self.y_axis_tick_formatter
-        self.chart.xgrid.grid_line_color = None
-        self.chart.ygrid.grid_line_color = None
-
-        self.interactive_image = InteractiveImage(
-            self.chart,
-            self.generate_InteractiveImage_callback(),
-            data_source=self.source,
-            timeout=self.timeout,
-            x_dtype=self.x_dtype,
-            y_dtype=self.y_dtype,
-        )
-
-    def update_dimensions(self, width=None, height=None):
-        """
-        Description:
-
-
-        Input:
-
-
-
-        Ouput:
-        """
-        if width is not None:
-            self.chart.plot_width = width
-        if height is not None:
-            self.chart.plot_height = height
 
     def reload_chart(self, data, patch_update=False):
         """
@@ -845,7 +774,23 @@ class Line(BaseLine):
         if data is not None:
             if len(data) == 0:
                 data = cudf.DataFrame({k: cp.nan for k in data.columns})
-            self.interactive_image.update_chart(data_source=data)
+            self.chart.update_data(data)
+
+    def update_dimensions(self, width=None, height=None):
+        """
+        Description:
+
+        -------------------------------------------
+        Input:
+
+        -------------------------------------------
+
+        Ouput:
+        """
+        if width is not None:
+            self.chart.width = width
+        if height is not None:
+            self.chart.height = height
 
     def add_selection_geometry_event(self, callback):
         """
@@ -867,7 +812,7 @@ class Line(BaseLine):
         """
         if not self.color_set:
             self.default_color = theme.chart_color
-            self.interactive_image.update_chart()
+            self.chart.color = theme.chart_color
 
 
 class StackedLines(BaseStackedLine):
