@@ -206,7 +206,9 @@ class BaseGraph(BaseChart):
         self.add_events(dashboard_cls)
 
     def view(self):
-        return chart_view(self.chart, width=self.width, title=self.title)
+        return chart_view(
+            self.chart.view(), width=self.width, title=self.title
+        )
 
     def calculate_source(self, cuxfilter_df):
         """
@@ -240,12 +242,173 @@ class BaseGraph(BaseChart):
             ]
         return nodes, edges
 
-    def get_selection_geometry_callback(self, dashboard_cls):
-        """
-        Description: generate callback for map selection event
-        """
+    # def get_selection_geometry_callback(self, dashboard_cls):
+    #     """
+    #     Description: generate callback for map selection event
+    #     """
 
-        def lasso_callback(xs, ys):
+    #     def lasso_callback(xs, ys):
+    #         # set box selected ranges to None
+    #         self.x_range, self.y_range = None, None
+    #         # convert datetime to int64 since, point_in_polygon does not
+    #         # support datetime
+    #         indices = cuspatial.point_in_polygon(
+    #             self._to_xaxis_type(self.nodes[self.node_x]),
+    #             self._to_yaxis_type(self.nodes[self.node_y]),
+    #             cudf.Series([0], index=["selection"]),
+    #             [0],
+    #             xs,
+    #             ys,
+    #         )
+    #         self.selected_indices = indices.selection
+    #         nodes = dashboard_cls._query(
+    #             dashboard_cls._generate_query_str(),
+    #             local_indices=indices.selection,
+    #         )
+    #         edges = None
+
+    #         if self.inspect_neighbors._active:
+    #             node_ids = nodes[self.node_id]
+    #             nodes, edges = self.query_graph(
+    #                 node_ids, self.nodes, self.edges
+    #             )
+
+    #         # reload all charts with new queried data (cudf.DataFrame only)
+    #         dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])
+
+    #         # reload graph chart separately as it has an extra edges argument
+    #         self.reload_chart(data=nodes, edges=edges)
+    #         del nodes, edges
+
+    #     def box_callback(xmin, xmax, ymin, ymax):
+    #         self.x_range = (xmin, xmax)
+    #         self.y_range = (ymin, ymax)
+    #         # set lasso selected indices to None
+    #         self.selected_indices = None
+
+    #         query = (
+    #             f"@{self.node_x}_min<={self.node_x}<=@{self.node_x}_max"
+    #             + f" and @{self.node_y}_min<={self.node_y}<=@{self.node_y}_max"
+    #         )
+    #         temp_str_dict = {
+    #             **dashboard_cls._query_str_dict,
+    #             **{self.name: query},
+    #         }
+    #         temp_local_dict = {
+    #             **dashboard_cls._query_local_variables_dict,
+    #             **{
+    #                 self.node_x + "_min": xmin,
+    #                 self.node_x + "_max": xmax,
+    #                 self.node_y + "_min": ymin,
+    #                 self.node_y + "_max": ymax,
+    #             },
+    #         }
+    #         nodes = dashboard_cls._query(
+    #             dashboard_cls._generate_query_str(temp_str_dict),
+    #             temp_local_dict,
+    #         )
+
+    #         edges = None
+
+    #         if self.inspect_neighbors._active:
+    #             node_ids = nodes[self.node_id]
+    #             nodes, edges = self.query_graph(
+    #                 node_ids, self.nodes, self.edges
+    #             )
+
+    #         # reload all charts with new queried data (cudf.DataFrame only)
+    #         dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])
+
+    #         # reload graph chart separately as it has an extra edges argument
+    #         self.reload_chart(data=nodes, edges=edges)
+    #         del nodes, edges
+
+    #     def selection_callback(event):
+    #         if dashboard_cls._active_view != self:
+    #             # reset previous active view and
+    #             # set current chart as active view
+    #             dashboard_cls._reset_current_view(new_active_view=self)
+    #             self.source = dashboard_cls._cuxfilter_df.data
+
+    #         if event.geometry["type"] == "rect":
+    #             xmin, xmax = self._xaxis_dt_transform(
+    #                 (event.geometry["x0"], event.geometry["x1"])
+    #             )
+    #             ymin, ymax = self._yaxis_dt_transform(
+    #                 (event.geometry["y0"], event.geometry["y1"])
+    #             )
+    #             box_callback(xmin, xmax, ymin, ymax)
+    #         elif event.geometry["type"] == "poly" and event.final:
+    #             # convert datetime to int64 since, point_in_polygon does not
+    #             # support datetime
+    #             xs = self._to_xaxis_type(event.geometry["x"])
+    #             ys = self._to_yaxis_type(event.geometry["y"])
+    #             lasso_callback(xs, ys)
+
+    #     return selection_callback
+
+    def get_box_select_callback(self, dashboard_cls):
+        def cb(bounds, x_selection, y_selection):
+            if dashboard_cls._active_view != self:
+                # reset previous active view and
+                # set current chart as active view
+                dashboard_cls._reset_current_view(new_active_view=self)
+                self.source = dashboard_cls._cuxfilter_df.data
+
+            self.x_range = self._xaxis_dt_transform(x_selection)
+            self.y_range = self._yaxis_dt_transform(y_selection)
+            # set lasso selected indices to None
+            self.selected_indices = None
+
+            query = (
+                f"@{self.node_x}_min<={self.node_x}<=@{self.node_x}_max"
+                + f" and @{self.node_y}_min<={self.node_y}<=@{self.node_y}_max"
+            )
+            temp_str_dict = {
+                **dashboard_cls._query_str_dict,
+                **{self.name: query},
+            }
+            temp_local_dict = {
+                **dashboard_cls._query_local_variables_dict,
+                **{
+                    self.node_x + "_min": self.x_range[0],
+                    self.node_x + "_max": self.x_range[1],
+                    self.node_y + "_min": self.y_range[0],
+                    self.node_y + "_max": self.y_range[1],
+                },
+            }
+            nodes = dashboard_cls._query(
+                dashboard_cls._generate_query_str(temp_str_dict),
+                temp_local_dict,
+            )
+
+            edges = None
+
+            if self.inspect_neighbors._active:
+                node_ids = nodes[self.node_id]
+                nodes, edges = self.query_graph(
+                    node_ids, self.nodes, self.edges
+                )
+
+            # reload all charts with new queried data (cudf.DataFrame only)
+            dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])
+            # reload graph chart separately as it has an extra edges argument
+            self.reload_chart(data=nodes, edges=edges)
+            del nodes, edges
+
+        return cb
+
+    def get_lasso_select_callback(self, dashboard_cls):
+        def cb(geometry):
+            if dashboard_cls._active_view != self:
+                # reset previous active view and
+                # set current chart as active view
+                dashboard_cls._reset_current_view(new_active_view=self)
+                self.source = dashboard_cls._cuxfilter_df.data
+
+            xs = self._to_xaxis_type(geometry[:, 0])
+            ys = self._to_yaxis_type(geometry[:, 1])
+
             # set box selected ranges to None
             self.x_range, self.y_range = None, None
             # convert datetime to int64 since, point_in_polygon does not
@@ -278,72 +441,7 @@ class BaseGraph(BaseChart):
             self.reload_chart(data=nodes, edges=edges)
             del nodes, edges
 
-        def box_callback(xmin, xmax, ymin, ymax):
-            self.x_range = (xmin, xmax)
-            self.y_range = (ymin, ymax)
-            # set lasso selected indices to None
-            self.selected_indices = None
-
-            query = (
-                f"@{self.node_x}_min<={self.node_x}<=@{self.node_x}_max"
-                + f" and @{self.node_y}_min<={self.node_y}<=@{self.node_y}_max"
-            )
-            temp_str_dict = {
-                **dashboard_cls._query_str_dict,
-                **{self.name: query},
-            }
-            temp_local_dict = {
-                **dashboard_cls._query_local_variables_dict,
-                **{
-                    self.node_x + "_min": xmin,
-                    self.node_x + "_max": xmax,
-                    self.node_y + "_min": ymin,
-                    self.node_y + "_max": ymax,
-                },
-            }
-            nodes = dashboard_cls._query(
-                dashboard_cls._generate_query_str(temp_str_dict),
-                temp_local_dict,
-            )
-
-            edges = None
-
-            if self.inspect_neighbors._active:
-                node_ids = nodes[self.node_id]
-                nodes, edges = self.query_graph(
-                    node_ids, self.nodes, self.edges
-                )
-
-            # reload all charts with new queried data (cudf.DataFrame only)
-            dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])
-
-            # reload graph chart separately as it has an extra edges argument
-            self.reload_chart(data=nodes, edges=edges)
-            del nodes, edges
-
-        def selection_callback(event):
-            if dashboard_cls._active_view != self:
-                # reset previous active view and
-                # set current chart as active view
-                dashboard_cls._reset_current_view(new_active_view=self)
-                self.source = dashboard_cls._cuxfilter_df.data
-
-            if event.geometry["type"] == "rect":
-                xmin, xmax = self._xaxis_dt_transform(
-                    (event.geometry["x0"], event.geometry["x1"])
-                )
-                ymin, ymax = self._yaxis_dt_transform(
-                    (event.geometry["y0"], event.geometry["y1"])
-                )
-                box_callback(xmin, xmax, ymin, ymax)
-            elif event.geometry["type"] == "poly" and event.final:
-                # convert datetime to int64 since, point_in_polygon does not
-                # support datetime
-                xs = self._to_xaxis_type(event.geometry["x"])
-                ys = self._to_yaxis_type(event.geometry["y"])
-                lasso_callback(xs, ys)
-
-        return selection_callback
+        return cb
 
     def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """
@@ -394,8 +492,11 @@ class BaseGraph(BaseChart):
         Ouput:
         """
         if self.add_interaction:
-            self.add_selection_geometry_event(
-                self.get_selection_geometry_callback(dashboard_cls)
+            self.chart.add_lasso_select_callback(
+                self.get_lasso_select_callback(dashboard_cls)
+            )
+            self.chart.add_box_select_callback(
+                self.get_box_select_callback(dashboard_cls)
             )
         if self.reset_event is not None:
             self.add_reset_event(dashboard_cls)
@@ -412,14 +513,13 @@ class BaseGraph(BaseChart):
         Ouput:
         """
 
-        def reset_callback(event):
+        def reset_callback(resetting):
             if dashboard_cls._active_view != self:
                 # reset previous active view and set current
                 # chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
-            self.x_range = None
-            self.y_range = None
             self.selected_indices = None
+            self.chart.reset_all_selections()
             dashboard_cls._query_str_dict.pop(self.name, None)
 
             nodes = dashboard_cls._query(dashboard_cls._generate_query_str())
@@ -429,7 +529,7 @@ class BaseGraph(BaseChart):
             del nodes
 
         # add callback to reset chart button
-        self.add_event(self.reset_event, reset_callback)
+        self.chart.add_reset_event(reset_callback)
 
     def _compute_source(self, query, local_dict, indices):
         result = self.nodes

@@ -281,21 +281,14 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
     def points(self, **kwargs):
         return hv.Scatter(self.source_df, kdims=[self.x], vdims=self.vdims)
 
-    def get_chart(self):
+    def get_chart(self, streams=[]):
         dmap = rasterize(
-            hv.DynamicMap(
-                self.points,
-                streams=[
-                    self.box_stream,
-                    self.lasso_stream,
-                    self.reset_stream,
-                ],
-            ),
+            hv.DynamicMap(self.points, streams=streams),
             aggregator=self.aggregator,
         ).opts(
             cnorm=self.pixel_shade_type,
             **self.cmap,
-            colorbar=True,
+            colorbar=self.legend,
             nodata=0,
             colorbar_position=self.legend_position,
             tools=self.tools,
@@ -308,7 +301,13 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
 
     def view(self):
         dmap = dynspread(
-            self.get_chart(),
+            self.get_chart(
+                streams=[
+                    self.box_stream,
+                    self.lasso_stream,
+                    self.reset_stream,
+                ]
+            ),
             threshold=self.spread_threshold,
             shape=self.point_shape,
             max_px=self.max_px,
@@ -323,12 +322,12 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
 
 class InteractiveDatashaderLine(InteractiveDatashader):
     color = param.String()
+    transparency = param.Number(0, bounds=(0, 1))
+
     tools = param.List(
-        default=[], doc="interactive tools to add to the chart",
+        default=["reset", "lasso_select", "wheel_zoom"],
+        doc="interactive tools to add to the chart",
     )
-    color_palette = param.List()
-    max_px = param.Integer(10)
-    clims = param.Tuple(default=(None, None))
 
     def __init__(self, **params):
         super(InteractiveDatashaderLine, self).__init__(**params)
@@ -340,25 +339,161 @@ class InteractiveDatashaderLine(InteractiveDatashader):
     def line(self, **kwargs):
         return hv.Curve(self.source_df, kdims=[self.x], vdims=[self.y])
 
-    def get_chart(self):
-        return rasterize(
-            hv.DynamicMap(
-                self.line,
+    def get_chart(self, streams=[]):
+        return rasterize(hv.DynamicMap(self.line, streams=streams),).opts(
+            cmap=[self.color]
+        )
+
+    def view(self):
+        dmap = dynspread(
+            self.get_chart(
                 streams=[
                     self.box_stream,
                     self.lasso_stream,
                     self.reset_stream,
-                ],
-            ),
-        ).opts(cmap=[self.color])
-
-    def view(self):
-        dmap = dynspread(self.get_chart(),).opts(
-            tools=self.tools, xaxis=None, yaxis=None, responsive=True
-        )
+                ]
+            )
+        ).opts(tools=self.tools, xaxis=None, yaxis=None, responsive=True)
 
         return pn.pane.HoloViews(
             self.tiles * dmap if self.tiles is not None else dmap,
             sizing_mode="stretch_both",
             height=self.height,
         )
+
+
+class InteractiveDatashaderGraph(param.Parameterized):
+    nodes_df = param.ClassSelector(
+        class_=cudf.DataFrame,
+        default=cudf.DataFrame(),
+        doc="nodes cuDF dataframe",
+    )
+    edges_df = param.ClassSelector(
+        class_=cudf.DataFrame,
+        default=cudf.DataFrame(),
+        doc="edges cuDF dataframe",
+    )
+    node_x = param.String("x")
+    node_y = param.String("y")
+    width = param.Integer(400)
+    height = param.Integer(400)
+    node_pixel_shade_type = param.String("linear")
+    node_spread_threshold = param.Number(
+        0, doc="threshold parameter passed to dynspread function"
+    )
+    tile_provider = param.String(None)
+    node_aggregate_col = param.String(allow_None=True)
+    node_aggregate_fn = param.String("count")
+    legend = param.Boolean(True, doc="whether to display legends or not")
+    legend_position = param.String("right", doc="position of legend")
+    node_cmap = param.Dict(default={"cmap": CUXF_DEFAULT_COLOR_PALETTE})
+    tools = param.List(
+        default=["reset", "lasso_select", "wheel_zoom"],
+        doc="interactive tools to add to the chart",
+    )
+    node_color_palette = param.List()
+    node_point_shape = param.ObjectSelector(
+        default="circle",
+        objects=[
+            "circle",
+            "square",
+            "rect_vertical",
+            "rect_horizontal",
+            "cross",
+        ],
+    )
+    node_max_px = param.Integer(10)
+    node_clims = param.Tuple(default=(None, None))
+    edge_color = param.String()
+    edge_source = param.String("src")
+    edge_target = param.String("dst")
+    edge_transparency = param.Number(0, bounds=(0, 1))
+    box_stream = param.ClassSelector(
+        class_=hv.streams.SelectionXY, default=hv.streams.SelectionXY()
+    )
+    lasso_stream = param.ClassSelector(
+        class_=hv.streams.Lasso, default=hv.streams.Lasso()
+    )
+    reset_stream = param.ClassSelector(
+        class_=hv.streams.PlotReset,
+        default=hv.streams.PlotReset(resetting=False),
+    )
+
+    def update_color_palette(self, value):
+        self.node_color_palette = value
+        self.nodes_chart.color_palette = value
+
+    def __init__(self, **params):
+        super(InteractiveDatashaderGraph, self).__init__(**params)
+        self.tiles = (
+            tile_sources[self.tile_provider]()
+            if (self.tile_provider is not None)
+            else self.tile_provider
+        )
+        self.nodes_chart = InteractiveDatashaderPoints(
+            source_df=self.nodes_df,
+            x=self.node_x,
+            y=self.node_y,
+            aggregate_col=self.node_aggregate_col,
+            aggregate_fn=self.node_aggregate_fn,
+            color_palette=self.node_color_palette,
+            pixel_shade_type=self.node_pixel_shade_type,
+            tile_provider=self.tile_provider,
+            legend=self.legend,
+            legend_position=self.legend_position,
+            spread_threshold=self.node_spread_threshold,
+            point_shape=self.node_point_shape,
+            max_px=self.node_max_px,
+        )
+
+        self.edges_chart = InteractiveDatashaderLine(
+            source_df=self.edges_df,
+            x=self.edge_source,
+            y=self.edge_target,
+            color=self.edge_color,
+            transparency=self.edge_transparency,
+        )
+
+    def update_data(self, nodes, edges=None):
+        self.nodes_chart.update_data(nodes)
+        if edges:
+            self.edges_chart.update_data(edges)
+
+    def view(self):
+        dmap_nodes = dynspread(
+            self.nodes_chart.get_chart(
+                streams=[
+                    self.box_stream,
+                    self.lasso_stream,
+                    self.reset_stream,
+                ]
+            ),
+            threshold=self.node_spread_threshold,
+            shape=self.node_point_shape,
+            max_px=self.node_max_px,
+        ).opts(xaxis=None, yaxis=None, responsive=True, tools=[])
+
+        dmap_edges = dynspread(self.edges_chart.get_chart()).opts(
+            tools=self.tools, xaxis=None, yaxis=None, responsive=True
+        )
+
+        return pn.pane.HoloViews(
+            self.tiles * dmap_edges * dmap_nodes
+            if self.tiles is not None
+            else dmap_edges * dmap_nodes,
+            sizing_mode="stretch_both",
+            height=self.height,
+        )
+
+    def add_box_select_callback(self, callback_fn):
+        self.box_stream = hv.streams.SelectionXY(subscribers=[callback_fn])
+
+    def add_lasso_select_callback(self, callback_fn):
+        self.lasso_stream = hv.streams.Lasso(subscribers=[callback_fn])
+
+    def reset_all_selections(self):
+        self.lasso_stream.reset()
+        self.box_stream.reset()
+
+    def add_reset_event(self, callback_fn):
+        self.reset_stream = hv.streams.PlotReset(subscribers=[callback_fn])

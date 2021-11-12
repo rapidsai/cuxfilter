@@ -10,6 +10,7 @@ from .custom_extensions import (
     calc_connected_edges,
     InteractiveDatashaderPoints,
     InteractiveDatashaderLine,
+    InteractiveDatashaderGraph,
 )
 
 from distutils.version import LooseVersion
@@ -297,6 +298,8 @@ class Graph(BaseGraph):
     constant_limit_edges = None
     color_bar = None
     legend_added = False
+    edges_chart = None
+    nodes_chart = None
 
     def compute_colors(self):
         if self.node_color_palette is None:
@@ -528,33 +531,33 @@ class Graph(BaseGraph):
         """
         if not self.title:
             self.title = "Graph"
-        self.x_range = (
-            self.x_range[0] - self.node_point_size,
-            self.x_range[1] + self.node_point_size,
-        )
-        self.y_range = (
-            self.y_range[0] - self.node_point_size,
-            self.y_range[1] + self.node_point_size,
-        )
-        self.chart = figure(
-            toolbar_location="right",
-            tools="pan, wheel_zoom, reset",
-            active_scroll="wheel_zoom",
-            active_drag="pan",
-            x_range=self.x_range,
-            y_range=self.y_range,
-            width=self.width,
-            height=self.height,
-        )
+        # self.x_range = (
+        #     self.x_range[0] - self.node_point_size,
+        #     self.x_range[1] + self.node_point_size,
+        # )
+        # self.y_range = (
+        #     self.y_range[0] - self.node_point_size,
+        #     self.y_range[1] + self.node_point_size,
+        # )
+        # self.chart = figure(
+        #     toolbar_location="right",
+        #     tools="pan, wheel_zoom, reset",
+        #     active_scroll="wheel_zoom",
+        #     active_drag="pan",
+        #     x_range=self.x_range,
+        #     y_range=self.y_range,
+        #     width=self.width,
+        #     height=self.height,
+        # )
 
-        self.tile_provider = _get_provider(self.tile_provider)
-        if self.tile_provider is not None:
-            self.chart.add_tile(self.tile_provider)
-            self.chart.axis.visible = False
-        # reset legend and color_bar
-        self.legend_added = False
-        self.color_bar = None
-        # loading icon from a url
+        # self.tile_provider = _get_provider(self.tile_provider)
+        # if self.tile_provider is not None:
+        #     self.chart.add_tile(self.tile_provider)
+        #     self.chart.axis.visible = False
+        # # reset legend and color_bar
+        # self.legend_added = False
+        # self.color_bar = None
+        # # loading icon from a url
         impath = (
             "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
             + "branch-0.15/python/cuxfilter/charts/datashader/icons/graph.png"
@@ -594,25 +597,43 @@ class Graph(BaseGraph):
 
         self.display_edges.on_change("_active", cb)
 
-        self.chart.add_tools(BoxSelectTool())
-        self.chart.add_tools(LassoSelectTool())
-        self.chart.add_tools(self.inspect_neighbors)
-        self.chart.add_tools(self.display_edges)
+        # self.chart.add_tools(BoxSelectTool())
+        # self.chart.add_tools(LassoSelectTool())
+        # self.chart.add_tools(self.inspect_neighbors)
+        # self.chart.add_tools(self.display_edges)
 
-        self.chart.xgrid.grid_line_color = None
-        self.chart.ygrid.grid_line_color = None
+        # self.chart.xgrid.grid_line_color = None
+        # self.chart.ygrid.grid_line_color = None
 
-        self.interactive_image = InteractiveImage(
-            self.chart,
-            self.generate_InteractiveImage_callback(),
-            data_source=self.nodes,
-            timeout=self.timeout,
-            x_dtype=self.x_dtype,
-            y_dtype=self.y_dtype,
+        # self.interactive_image = InteractiveImage(
+        #     self.chart,
+        #     self.generate_InteractiveImage_callback(),
+        #     data_source=self.nodes,
+        #     timeout=self.timeout,
+        #     x_dtype=self.x_dtype,
+        #     y_dtype=self.y_dtype,
+        # )
+
+        self.chart = InteractiveDatashaderGraph(
+            nodes_df=self.nodes,
+            edges_df=self.connected_edges,
+            node_x=self.node_x,
+            node_y=self.node_y,
+            node_aggregate_col=self.node_aggregate_col,
+            node_aggregate_fn=self.node_aggregate_fn,
+            node_color_palette=self.node_color_palette,
+            node_pixel_shade_type=self.node_pixel_shade_type,
+            tile_provider=self.tile_provider,
+            legend=self.legend,
+            legend_position=self.legend_position,
+            node_spread_threshold=self.node_pixel_density,
+            node_point_shape=self.node_point_shape,
+            node_max_px=self.node_point_size,
+            edge_source="x",
+            edge_target="y",
+            edge_color=self.edge_color_palette[0],
+            edge_transparency=self.edge_transparency,
         )
-
-        if self.legend_added is False:
-            self.render_legend()
 
     def update_dimensions(self, width=None, height=None):
         """
@@ -625,10 +646,7 @@ class Graph(BaseGraph):
 
         Ouput:
         """
-        if width is not None:
-            self.chart.plot_width = width
-        if height is not None:
-            self.chart.plot_height = height
+        pass
 
     def reload_chart(self, data, edges=None, patch_update=False):
         """
@@ -645,25 +663,26 @@ class Graph(BaseGraph):
             if len(data) == 0:
                 data = cudf.DataFrame({k: cp.nan for k in self.nodes.columns})
 
-            # update connected_edges value for datashaded edges
-            # if display edge toggle is active
-            if self.display_edges._active:
-                self.connected_edges = calc_connected_edges(
-                    data,
-                    self.edges if edges is None else edges,
-                    self.node_x,
-                    self.node_y,
-                    self.node_id,
-                    self.edge_source,
-                    self.edge_target,
-                    self.edge_aggregate_col,
-                    self.x_dtype,
-                    self.y_dtype,
-                    self.edge_render_type,
-                    self.curve_params,
-                )
+        # update connected_edges value for datashaded edges
+        # if display edge toggle is active
+        if self.display_edges._active:
+            self.connected_edges = calc_connected_edges(
+                data,
+                self.edges if edges is None else edges,
+                self.node_x,
+                self.node_y,
+                self.node_id,
+                self.edge_source,
+                self.edge_target,
+                self.edge_aggregate_col,
+                self.x_dtype,
+                self.y_dtype,
+                self.edge_render_type,
+                self.curve_params,
+            )
+            self.chart.update_data(data, self.connected_edges)
 
-            self.interactive_image.update_chart(data_source=data)
+        self.chart.update_data(data)
 
     def add_selection_geometry_event(self, callback):
         """
@@ -676,8 +695,7 @@ class Graph(BaseGraph):
 
         Ouput:
         """
-
-        self.add_event(events.SelectionGeometry, callback)
+        pass
 
     def apply_theme(self, theme):
         """
@@ -685,8 +703,7 @@ class Graph(BaseGraph):
         """
         if not self.colors_set:
             self.default_palette = theme.color_palette
-            self.render_legend()
-            self.interactive_image.update_chart()
+            self.chart.update_color_palette(theme.color_palette)
 
 
 class Line(BaseLine):

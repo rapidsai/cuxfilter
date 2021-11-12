@@ -4,4 +4,5 @@ from .graph_assets import calc_connected_edges
 from .holoviews_datashader import (
     InteractiveDatashaderPoints,
     InteractiveDatashaderLine,
+    InteractiveDatashaderGraph,
 )

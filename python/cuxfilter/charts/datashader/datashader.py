@@ -21,7 +21,7 @@ def scatter(
     title="",
     timeout=100,
     legend=True,
-    legend_position="center",
+    legend_position="top_right",
     **library_specific_params,
 ):
     """
@@ -92,7 +92,8 @@ def scatter(
 
     legend_position: str, default center
         position of legend on the chart.
-        Valid places are: above, below, left, right or center
+        Valid places are: right, left, bottom, top, top_right, top_left,
+                        bottom_left, bottom_right
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
@@ -160,7 +161,7 @@ def graph(
     title="",
     timeout=100,
     legend=True,
-    legend_position="center",
+    legend_position="top_right",
     **library_specific_params,
 ):
 
@@ -265,7 +266,8 @@ def graph(
 
     legend_position: str, default center
         position of legend on the chart.
-        Valid places are: above, below, left, right or center
+        Valid places are: right, left, bottom, top, top_right, top_left,
+                        bottom_left, bottom_right
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
@@ -329,7 +331,7 @@ def heatmap(
     title="",
     timeout=100,
     legend=True,
-    legend_position="center",
+    legend_position="top_right",
     **library_specific_params,
 ):
     """
@@ -394,7 +396,8 @@ def heatmap(
 
     legend_position: str, default center
         position of legend on the chart.
-        Valid places are: above, below, left, right or center
+        Valid places are: right, left, bottom, top, top_right, top_left,
+                        bottom_left, bottom_right
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
@@ -531,7 +534,7 @@ def stacked_lines(
     title="",
     timeout=100,
     legend=True,
-    legend_position="center",
+    legend_position="top_right",
     **library_specific_params,
 ):
     """
@@ -575,7 +578,8 @@ def stacked_lines(
 
     legend_position: str, default center
         position of legend on the chart.
-        Valid places are: above, below, left, right or center
+        Valid places are: right, left, bottom, top, top_right, top_left,
+                        bottom_left, bottom_right
 
 
     **library_specific_params:
