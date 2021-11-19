@@ -2,9 +2,22 @@
 
 Please see https://github.com/rapidsai/cuxfilter/releases/tag/v21.12.00a for the latest changes to this development branch.
 
-# cuXfilter 21.10.00 (Date TBD)
+# cuXfilter 21.10.00 (7 Oct 2021)
 
-Please see https://github.com/rapidsai/cuxfilter/releases/tag/v21.10.00a for the latest changes to this development branch.
+## 🐛 Bug Fixes
+
+- revert pyppeteer dependency changes ([#322](https://github.com/rapidsai/cuxfilter/pull/322)) [@AjayThorve](https://github.com/AjayThorve)
+- Fix/unique names ([#317](https://github.com/rapidsai/cuxfilter/pull/317)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 📖 Documentation
+
+- Branch 21.10 merge 21.08 ([#318](https://github.com/rapidsai/cuxfilter/pull/318)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- fix chart names being saved as incorrect keys prior to initialization ([#325](https://github.com/rapidsai/cuxfilter/pull/325)) [@AjayThorve](https://github.com/AjayThorve)
+- Skip imports tests on arm64 ([#320](https://github.com/rapidsai/cuxfilter/pull/320)) [@Ethyling](https://github.com/Ethyling)
+- ENH Replace gpuci_conda_retry with gpuci_mamba_retry ([#305](https://github.com/rapidsai/cuxfilter/pull/305)) [@dillon-cullinan](https://github.com/dillon-cullinan)
 
 # cuXfilter 21.08.00 (Date TBD)
 
