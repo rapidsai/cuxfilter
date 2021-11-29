@@ -14,8 +14,17 @@ from bokeh.models import (
     ColorBar,
     BinnedTicker,
 )
+from . import CustomInspectTool
 from datashader import transfer_functions as tf
 from ...constants import CUXF_DEFAULT_COLOR_PALETTE
+import requests
+from PIL import Image
+from io import BytesIO
+
+
+def load_image(url):
+    response = requests.get(url)
+    return Image.open(BytesIO(response.content))
 
 
 def _rect_vertical_mask(px):
@@ -454,6 +463,21 @@ class InteractiveDatashaderGraph(param.Parameterized):
             transparency=self.edge_transparency,
         )
 
+        impath = (
+            "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
+            + "branch-0.15/python/cuxfilter/charts/datashader/icons/graph.png"
+        )
+        self.inspect_neighbors = CustomInspectTool(
+            icon=load_image(impath),
+            _active=True,
+            tool_name="Inspect Neighboring Edges",
+        )
+
+        def cb(attr, old, new):
+            print(old, new)
+
+        self.inspect_neighbors.on_change("_active", cb)
+
     def update_data(self, nodes, edges=None):
         self.nodes_chart.update_data(nodes)
         if edges:
@@ -474,7 +498,10 @@ class InteractiveDatashaderGraph(param.Parameterized):
         ).opts(xaxis=None, yaxis=None, responsive=True, tools=[])
 
         dmap_edges = dynspread(self.edges_chart.get_chart()).opts(
-            tools=self.tools, xaxis=None, yaxis=None, responsive=True
+            tools=self.tools + [self.inspect_neighbors],
+            xaxis=None,
+            yaxis=None,
+            responsive=True,
         )
 
         return pn.pane.HoloViews(

@@ -580,7 +580,7 @@ class Graph(BaseGraph):
         def cb(attr, old, new):
             if new:
                 self.connected_edges = calc_connected_edges(
-                    self.interactive_image.kwargs["data_source"],
+                    self.chart.edges_df,
                     self.edges,
                     self.node_x,
                     self.node_y,
@@ -593,7 +593,7 @@ class Graph(BaseGraph):
                     self.edge_render_type,
                     self.curve_params,
                 )
-            self.interactive_image.update_chart()
+            self.chart.edges_chart.update_data(self.connected_edges)
 
         self.display_edges.on_change("_active", cb)
 
@@ -604,15 +604,6 @@ class Graph(BaseGraph):
 
         # self.chart.xgrid.grid_line_color = None
         # self.chart.ygrid.grid_line_color = None
-
-        # self.interactive_image = InteractiveImage(
-        #     self.chart,
-        #     self.generate_InteractiveImage_callback(),
-        #     data_source=self.nodes,
-        #     timeout=self.timeout,
-        #     x_dtype=self.x_dtype,
-        #     y_dtype=self.y_dtype,
-        # )
 
         self.chart = InteractiveDatashaderGraph(
             nodes_df=self.nodes,
