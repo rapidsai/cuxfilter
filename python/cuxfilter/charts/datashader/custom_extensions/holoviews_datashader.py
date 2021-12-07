@@ -300,8 +300,6 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
             colorbar=self.legend,
             nodata=0,
             colorbar_position=self.legend_position,
-            tools=self.tools,
-            active_tools=["wheel_zoom", "pan"],
         )
         if self.aggregate_fn != "count":
             dmap = dmap.opts(clim=self.clims)
@@ -320,7 +318,13 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
             threshold=self.spread_threshold,
             shape=self.point_shape,
             max_px=self.max_px,
-        ).opts(xaxis=None, yaxis=None, responsive=True, tools=[])
+        ).opts(
+            xaxis=None,
+            yaxis=None,
+            responsive=True,
+            tools=self.tools,
+            active_tools=["wheel_zoom", "pan"],
+        )
 
         return pn.pane.HoloViews(
             self.tiles * dmap if self.tiles is not None else dmap,
@@ -349,7 +353,7 @@ class InteractiveDatashaderLine(InteractiveDatashader):
         return hv.Curve(self.source_df, kdims=[self.x], vdims=[self.y])
 
     def get_chart(self, streams=[]):
-        return rasterize(hv.DynamicMap(self.line, streams=streams),).opts(
+        return rasterize(hv.DynamicMap(self.line, streams=streams)).opts(
             cmap=[self.color]
         )
 
@@ -362,7 +366,59 @@ class InteractiveDatashaderLine(InteractiveDatashader):
                     self.reset_stream,
                 ]
             )
-        ).opts(tools=self.tools, xaxis=None, yaxis=None, responsive=True)
+        ).opts(
+            xaxis=None,
+            yaxis=None,
+            responsive=True,
+            tools=self.tools,
+            active_tools=["wheel_zoom", "pan"],
+        )
+
+        return pn.pane.HoloViews(
+            self.tiles * dmap if self.tiles is not None else dmap,
+            sizing_mode="stretch_both",
+            height=self.height,
+        )
+
+    colors = param.List()
+    transparency = param.Number(0, bounds=(0, 1))
+
+    tools = param.List(
+        default=["reset", "lasso_select", "wheel_zoom"],
+        doc="interactive tools to add to the chart",
+    )
+
+    def __init__(self, **params):
+        super(InteractiveDatashaderLine, self).__init__(**params)
+
+    def update_data(self, data):
+        self.source_df = data
+
+    @param.depends("source_df")
+    def line(self, **kwargs):
+        return hv.Curve(self.source_df, kdims=[self.x], vdims=[self.y])
+
+    def get_chart(self, streams=[]):
+        return rasterize(hv.DynamicMap(self.line, streams=streams)).opts(
+            cmap=[self.color]
+        )
+
+    def view(self):
+        dmap = dynspread(
+            self.get_chart(
+                streams=[
+                    self.box_stream,
+                    self.lasso_stream,
+                    self.reset_stream,
+                ]
+            )
+        ).opts(
+            xaxis=None,
+            yaxis=None,
+            responsive=True,
+            tools=self.tools,
+            active_tools=["wheel_zoom", "pan"],
+        )
 
         return pn.pane.HoloViews(
             self.tiles * dmap if self.tiles is not None else dmap,
@@ -427,6 +483,18 @@ class InteractiveDatashaderGraph(param.Parameterized):
         class_=hv.streams.PlotReset,
         default=hv.streams.PlotReset(resetting=False),
     )
+    inspect_neighbors = param.ClassSelector(
+        class_=CustomInspectTool,
+        doc="tool to assign selection mechanism (inspect neighbors or default)",
+    )
+    display_edges = param.ClassSelector(
+        class_=CustomInspectTool,
+        doc="tool to select whether to display edges or not",
+    )
+    tools = param.List(
+        default=["pan", "box_select", "reset", "lasso_select", "wheel_zoom"],
+        doc="interactive tools to add to the chart",
+    )
 
     def update_color_palette(self, value):
         self.node_color_palette = value
@@ -463,27 +531,18 @@ class InteractiveDatashaderGraph(param.Parameterized):
             transparency=self.edge_transparency,
         )
 
-        impath = (
-            "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
-            + "branch-0.15/python/cuxfilter/charts/datashader/icons/graph.png"
-        )
-        self.inspect_neighbors = CustomInspectTool(
-            icon=load_image(impath),
-            _active=True,
-            tool_name="Inspect Neighboring Edges",
-        )
-
-        def cb(attr, old, new):
-            print(old, new)
-
-        self.inspect_neighbors.on_change("_active", cb)
-
-    def update_data(self, nodes, edges=None):
-        self.nodes_chart.update_data(nodes)
+    def update_data(self, nodes=None, edges=None):
+        if nodes:
+            self.nodes_chart.update_data(nodes)
         if edges:
             self.edges_chart.update_data(edges)
 
     def view(self):
+        def set_tools(plot, element):
+            if plot.state.toolbar.tools[-1] != self.display_edges:
+                plot.state.add_tools(self.inspect_neighbors)
+                plot.state.add_tools(self.display_edges)
+
         dmap_nodes = dynspread(
             self.nodes_chart.get_chart(
                 streams=[
@@ -495,19 +554,24 @@ class InteractiveDatashaderGraph(param.Parameterized):
             threshold=self.node_spread_threshold,
             shape=self.node_point_shape,
             max_px=self.node_max_px,
-        ).opts(xaxis=None, yaxis=None, responsive=True, tools=[])
-
-        dmap_edges = dynspread(self.edges_chart.get_chart()).opts(
-            tools=self.tools + [self.inspect_neighbors],
+        ).opts(
             xaxis=None,
             yaxis=None,
             responsive=True,
+            default_tools=[],
+            active_tools=["wheel_zoom", "pan"],
+            tools=self.tools,
+            hooks=[set_tools],
         )
 
+        dmap_edges = dynspread(
+            self.edges_chart.get_chart().opts(default_tools=[])
+        )
+
+        dmap_graph = dmap_edges * dmap_nodes
+
         return pn.pane.HoloViews(
-            self.tiles * dmap_edges * dmap_nodes
-            if self.tiles is not None
-            else dmap_edges * dmap_nodes,
+            self.tiles * dmap_graph if self.tiles is not None else dmap_graph,
             sizing_mode="stretch_both",
             height=self.height,
         )
