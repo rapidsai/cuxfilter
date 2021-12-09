@@ -143,15 +143,15 @@ Please see the [Demo Docker Repository](https://hub.docker.com/r/rapidsai/rapids
 
 cuxfilter can be installed with conda ([miniconda](https://conda.io/miniconda.html), or the full [Anaconda distribution](https://www.anaconda.com/download)) from the `rapidsai` channel:
 
-For `cuxfilter version == 21.10` :
+For `cuxfilter version == 21.12` :
 ```bash
 # for CUDA 11.0
 conda install -c rapidsai -c nvidia -c numba -c conda-forge \
-    cuxfilter=21.10 python=3.7 cudatoolkit=11.0
+    cuxfilter=21.12 python=3.7 cudatoolkit=11.0
 
 # or, for CUDA 11.2
 conda install -c rapidsai -c nvidia -c numba -c conda-forge \
-    cuxfilter=21.10 python=3.7 cudatoolkit=11.2
+    cuxfilter=21.12 python=3.7 cudatoolkit=11.2
 
 ```
 
