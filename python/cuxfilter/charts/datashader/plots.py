@@ -38,6 +38,7 @@ class Scatter(BaseScatter):
     Description:
     """
 
+    reset_event = events.Reset
     data_y_axis = "y"
     data_x_axis = "x"
 
@@ -122,6 +123,7 @@ class Graph(BaseGraph):
     Description:
     """
 
+    reset_event = events.Reset
     data_y_axis = "node_y"
     data_x_axis = "node_x"
 

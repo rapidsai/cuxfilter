@@ -384,14 +384,6 @@ class InteractiveDatashaderLine(InteractiveDatashader):
             height=self.height,
         )
 
-    colors = param.List()
-    transparency = param.Number(0, bounds=(0, 1))
-
-    tools = param.List(
-        default=["reset", "lasso_select", "wheel_zoom"],
-        doc="interactive tools to add to the chart",
-    )
-
 
 class InteractiveDatashaderMultiLine(InteractiveDatashader):
     colors = param.List(default=[])
@@ -399,8 +391,8 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
     line_dims = param.List(
         default=[],
         doc=(
-            "list of dimensions of lines to be rendered",
-            "against a common x-column",
+            "list of dimensions of lines to be rendered"
+            + "against a common x-column"
         ),
     )
     tools = param.List(
@@ -442,7 +434,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
             hv.DynamicMap(self.lines, streams=streams),
             aggregator=ds.count_cat("k"),
             color_key=self.colors,
-        ).opts(tools=None, default_tools=None)
+        ).opts(tools=None, default_tools=[])
 
     def view(self):
         dmap = dynspread(
@@ -451,7 +443,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
             responsive=True,
             tools=self.tools,
             active_tools=["xwheel_zoom", "pan"],
-            default_tools=None,
+            default_tools=[],
         )
 
         if self.legend:
@@ -595,14 +587,14 @@ class InteractiveDatashaderGraph(param.Parameterized):
             xaxis=None,
             yaxis=None,
             responsive=True,
-            default_tools=None,
+            default_tools=[],
             active_tools=["wheel_zoom", "pan"],
             tools=self.tools,
             hooks=[set_tools],
         )
 
         dmap_edges = dynspread(
-            self.edges_chart.get_chart().opts(default_tools=None)
+            self.edges_chart.get_chart().opts(default_tools=[])
         )
 
         dmap_graph = dmap_edges * dmap_nodes
