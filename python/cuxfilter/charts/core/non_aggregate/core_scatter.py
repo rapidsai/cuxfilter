@@ -84,7 +84,7 @@ class BaseScatter(BaseNonAggregate):
         self.x_range = x_range
         self.y_range = y_range
         self.add_interaction = add_interaction
-        self.aggregate_col = aggregate_col
+        self.aggregate_col = aggregate_col or y
         self._color_palette_input = color_palette
         self.aggregate_fn = aggregate_fn
         self.width = width

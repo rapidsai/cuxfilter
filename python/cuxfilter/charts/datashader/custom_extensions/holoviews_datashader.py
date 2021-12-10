@@ -304,6 +304,8 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
             colorbar=self.legend,
             nodata=0,
             colorbar_position=self.legend_position,
+            tools=[],
+            default_tools=[],
         )
         if self.aggregate_fn != "count":
             dmap = dmap.opts(clim=self.clims)
@@ -342,7 +344,7 @@ class InteractiveDatashaderLine(InteractiveDatashader):
     transparency = param.Number(0, bounds=(0, 1))
 
     tools = param.List(
-        default=["reset", "lasso_select", "wheel_zoom"],
+        default=["reset", "lasso_select", "wheel_zoom", "xbox_select"],
         doc="interactive tools to add to the chart",
     )
 
@@ -358,7 +360,7 @@ class InteractiveDatashaderLine(InteractiveDatashader):
 
     def get_chart(self, streams=[]):
         return rasterize(hv.DynamicMap(self.line, streams=streams)).opts(
-            cmap=[self.color]
+            cmap=[self.color], tools=[], default_tools=[]
         )
 
     def view(self):
@@ -371,8 +373,6 @@ class InteractiveDatashaderLine(InteractiveDatashader):
                 ]
             )
         ).opts(
-            xaxis=None,
-            yaxis=None,
             responsive=True,
             tools=self.tools,
             active_tools=["wheel_zoom", "pan"],
@@ -434,7 +434,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
             hv.DynamicMap(self.lines, streams=streams),
             aggregator=ds.count_cat("k"),
             color_key=self.colors,
-        ).opts(tools=None, default_tools=[])
+        ).opts(tools=[], default_tools=[])
 
     def view(self):
         dmap = dynspread(

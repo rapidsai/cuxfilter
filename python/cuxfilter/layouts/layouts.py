@@ -57,6 +57,7 @@ class _LayoutBase:
                 allow_resize=False,
                 sizing_mode="stretch_both",
             )
+            self._apply_themes(charts, theme)
             self._process_plots(plots, tmpl)
             tmpl = self._process_widgets_notebook(widgets, tmpl)
         else:
