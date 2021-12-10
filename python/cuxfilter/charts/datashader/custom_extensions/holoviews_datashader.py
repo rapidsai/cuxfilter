@@ -392,49 +392,16 @@ class InteractiveDatashaderLine(InteractiveDatashader):
         doc="interactive tools to add to the chart",
     )
 
-    def __init__(self, **params):
-        super(InteractiveDatashaderLine, self).__init__(**params)
-
-    def update_data(self, data):
-        self.source_df = data
-
-    @param.depends("source_df")
-    def line(self, **kwargs):
-        return hv.Curve(self.source_df, kdims=[self.x], vdims=[self.y])
-
-    def get_chart(self, streams=[]):
-        return rasterize(hv.DynamicMap(self.line, streams=streams)).opts(
-            cmap=[self.color]
-        )
-
-    def view(self):
-        dmap = dynspread(
-            self.get_chart(
-                streams=[
-                    self.box_stream,
-                    self.lasso_stream,
-                    self.reset_stream,
-                ]
-            )
-        ).opts(
-            responsive=True,
-            tools=self.tools,
-            active_tools=["wheel_zoom", "pan"],
-        )
-
-        return pn.pane.HoloViews(
-            self.tiles * dmap if self.tiles is not None else dmap,
-            sizing_mode="stretch_both",
-            height=self.height,
-        )
-
 
 class InteractiveDatashaderMultiLine(InteractiveDatashader):
     colors = param.List(default=[])
     transparency = param.Number(0, bounds=(0, 1))
     line_dims = param.List(
         default=[],
-        doc="list of dimensions of lines to be rendered against a common x-column",
+        doc=(
+            "list of dimensions of lines to be rendered",
+            "against a common x-column",
+        ),
     )
     tools = param.List(
         default=["reset", "wheel_zoom", "xwheel_zoom", "pan"],
@@ -479,7 +446,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
 
     def view(self):
         dmap = dynspread(
-            self.get_chart(streams=[self.box_stream, self.reset_stream,])
+            self.get_chart(streams=[self.box_stream, self.reset_stream])
         ).opts(
             responsive=True,
             tools=self.tools,
@@ -555,7 +522,7 @@ class InteractiveDatashaderGraph(param.Parameterized):
     )
     inspect_neighbors = param.ClassSelector(
         class_=CustomInspectTool,
-        doc="tool to assign selection mechanism (inspect neighbors or default)",
+        doc="tool to assign selection mechanism(inspect neighbors or default)",
     )
     display_edges = param.ClassSelector(
         class_=CustomInspectTool,

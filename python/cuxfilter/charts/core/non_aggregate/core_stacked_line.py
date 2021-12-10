@@ -109,7 +109,8 @@ class BaseStackedLine(BaseChart):
         self.stride = step_size
         if not isinstance(colors, (list, dict)):
             raise TypeError(
-                "colors must be either list of colors or dictionary of column to color mappings"
+                "colors must be either list of colors or"
+                + "dictionary of column to color mappings"
             )
         self._colors_input = colors
         self.stride_type = step_size_type

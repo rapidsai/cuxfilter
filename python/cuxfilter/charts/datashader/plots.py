@@ -5,7 +5,6 @@ from ..core.non_aggregate import (
     BaseGraph,
 )
 from .custom_extensions import (
-    InteractiveImage,
     CustomInspectTool,
     calc_connected_edges,
     InteractiveDatashaderPoints,
@@ -16,39 +15,17 @@ from .custom_extensions import (
 
 from distutils.version import LooseVersion
 import datashader as ds
-from datashader import transfer_functions as tf
 import dask_cudf
 import dask.dataframe as dd
-import numpy as np
 import cupy as cp
-import pandas as pd
-import bokeh
 import cudf
 import holoviews as hv
 from bokeh import events
-from bokeh.plotting import figure
-from bokeh.models import (
-    BoxSelectTool,
-    ColorBar,
-    LassoSelectTool,
-    LinearColorMapper,
-    LogColorMapper,
-    EqHistColorMapper,
-    BasicTicker,
-    FixedTicker,
-)
-from bokeh.tile_providers import get_provider
 from PIL import Image
 import requests
 from io import BytesIO
 
 ds_version = LooseVersion(ds.__version__)
-
-_color_mapper = {
-    "eq_hist": EqHistColorMapper,
-    "linear": LinearColorMapper,
-    "log": LogColorMapper,
-}
 
 
 def load_image(url):
@@ -56,110 +33,13 @@ def load_image(url):
     return Image.open(BytesIO(response.content))
 
 
-def _rect_vertical_mask(px):
-    """
-    Produce a vertical rectangle mask with truth
-    values in ``(2 * px + 1) * ((2 * px + 1)/2)``
-    """
-    px = int(px)
-    w = 2 * px + 1
-    zero_bool = np.zeros((w, px), dtype="bool")
-    x_bool = np.ones((w, w - px), dtype="bool")
-    return np.concatenate((x_bool, zero_bool), axis=1)
-
-
-def _rect_horizontal_mask(px):
-    """
-    Produce a horizontal rectangle mask with truth
-    values in ``((2 * px + 1)/2) * (2 * px + 1)``
-    """
-    px = int(px)
-    w = 2 * px + 1
-    zero_bool = np.zeros((px, w), dtype="bool")
-    x_bool = np.ones((w - px, w), dtype="bool")
-    return np.concatenate((x_bool, zero_bool), axis=0)
-
-
-def _compute_datashader_assets(
-    data, x, aggregate_col, aggregate_fn, color_palette
-):
-    aggregator = None
-    cmap = {"cmap": color_palette}
-
-    if isinstance(data[x].dtype, cudf.core.dtypes.CategoricalDtype):
-        if ds_version >= "0.11":
-            aggregator = ds.by(x, getattr(ds, aggregate_fn)(aggregate_col),)
-        else:
-            print("only count_cat supported by datashader <=0.10")
-            aggregator = ds.count_cat(x)
-        cmap = {
-            "color_key": {
-                k: v
-                for k, v in zip(list(data[x].cat.categories), color_palette,)
-            }
-        }
-    else:
-        if aggregate_fn:
-            aggregator = getattr(ds, aggregate_fn)(aggregate_col)
-    return aggregator, cmap
-
-
-def _get_provider(tile_provider):
-    if tile_provider is None:
-        return None
-    elif isinstance(tile_provider, str):
-        return get_provider(tile_provider)
-    elif isinstance(tile_provider, bokeh.models.tiles.WMTSTileSource):
-        return tile_provider
-    return None
-
-
-def _get_legend_title(aggregate_fn, aggregate_col):
-    if aggregate_fn == "count":
-        return aggregate_fn
-    else:
-        return aggregate_fn + " " + aggregate_col
-
-
-def _generate_legend(
-    pixel_shade_type,
-    color_palette,
-    legend_title,
-    constant_limit,
-    color_bar=None,
-    update=False,
-):
-    mapper = _color_mapper[pixel_shade_type](
-        palette=color_palette, low=constant_limit[0], high=constant_limit[1]
-    )
-    if update and color_bar:
-        color_bar.color_mapper = mapper
-        return color_bar
-
-    color_bar = ColorBar(
-        color_mapper=mapper,
-        location=(0, 0),
-        ticker=BasicTicker(desired_num_ticks=len(color_palette)),
-        title=legend_title,
-    )
-    return color_bar
-
-
-ds.transfer_functions._mask_lookup["rect_vertical"] = _rect_vertical_mask
-ds.transfer_functions._mask_lookup["rect_horizontal"] = _rect_horizontal_mask
-
-
 class Scatter(BaseScatter):
     """
     Description:
     """
 
-    reset_event = events.Reset
     data_y_axis = "y"
     data_x_axis = "x"
-    constant_limit = None
-    color_bar = None
-    legend_added = False
 
     def format_source_data(self, data):
         """
@@ -176,26 +56,6 @@ class Scatter(BaseScatter):
         Ouput:
         """
         self.source = data
-
-    def show_legend(self):
-        return self.legend and (
-            self.pixel_shade_type in list(_color_mapper.keys())
-        )
-
-    def render_legend(self):
-        if self.show_legend():
-            update = self.color_bar is not None
-            self.color_bar = _generate_legend(
-                self.pixel_shade_type,
-                self.color_palette,
-                _get_legend_title(self.aggregate_fn, self.aggregate_col),
-                self.constant_limit,
-                color_bar=self.color_bar,
-                update=update,
-            )
-            if (update and self.legend_added) is False:
-                self.chart.add_layout(self.color_bar, self.legend_position)
-                self.legend_added = True
 
     def generate_chart(self):
         """
@@ -248,19 +108,6 @@ class Scatter(BaseScatter):
                 data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.chart.update_data(data)
 
-    def add_selection_geometry_event(self, callback):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-        pass
-
     def apply_theme(self, theme):
         """
         apply thematic changes to the chart based on the theme
@@ -269,159 +116,14 @@ class Scatter(BaseScatter):
             self.chart.color_palette = theme.color_palette
             self.chart._compute_datashader_assets()
 
-    def update_dimensions(self, width=None, height=None):
-        """
-        Description:
-
-
-        Input:
-
-
-
-        Ouput:
-        """
-        if width is not None:
-            self.chart.width = width
-        if height is not None:
-            self.chart.height = height
-
 
 class Graph(BaseGraph):
     """
     Description:
     """
 
-    reset_event = events.Reset
     data_y_axis = "node_y"
     data_x_axis = "node_x"
-    image = None
-    constant_limit_nodes = None
-    constant_limit_edges = None
-    color_bar = None
-    legend_added = False
-    edges_chart = None
-    nodes_chart = None
-
-    def compute_colors(self):
-        if self.node_color_palette is None:
-            self.node_color_palette = bokeh.palettes.Purples9
-
-        BREAKS = np.linspace(
-            self.nodes[self.node_aggregate_col].min(),
-            self.nodes[self.node_aggregate_col].max(),
-            len(self.node_color_palette),
-        )
-
-        x = self.source.data[self.node_aggregate_col]
-        inds = pd.cut(x, BREAKS, labels=False, include_lowest=True)
-        colors = [self.node_color_palette[i] for i in inds]
-        self.source.data[self.node_aggregate_col] = colors
-
-    def show_legend(self):
-        """
-        return if legend=True and pixel_shade_type is ['linear', 'log']
-        """
-        return self.legend and (
-            self.node_pixel_shade_type in list(_color_mapper.keys())
-        )
-
-    def render_legend(self):
-        """
-        render legend
-        """
-        if self.show_legend():
-            update = self.color_bar is not None
-            self.color_bar = _generate_legend(
-                self.node_pixel_shade_type,
-                self.node_color_palette,
-                _get_legend_title(
-                    self.node_aggregate_fn, self.node_aggregate_col
-                ),
-                self.constant_limit_nodes,
-                color_bar=self.color_bar,
-                update=update,
-            )
-            if (update and self.legend_added) is False:
-                self.chart.add_layout(self.color_bar, self.legend_position)
-                self.legend_added = True
-
-    def nodes_plot(self, canvas, nodes, name=None):
-        """
-        plot nodes(scatter)
-        """
-        aggregator, cmap = _compute_datashader_assets(
-            nodes,
-            self.node_id,
-            self.node_aggregate_col,
-            self.node_aggregate_fn,
-            self.node_color_palette,
-        )
-
-        agg = canvas.points(
-            nodes.sort_index(), self.node_x, self.node_y, aggregator
-        )
-
-        if (
-            self.constant_limit_nodes is None
-            or self.node_aggregate_fn == "count"
-        ):
-            self.constant_limit_nodes = [
-                float(cp.nanmin(agg.data)),
-                float(cp.nanmax(agg.data)),
-            ]
-            self.render_legend()
-
-        span = {"span": self.constant_limit_nodes}
-        if self.node_pixel_shade_type == "eq_hist":
-            span = {}
-
-        return getattr(tf, self.node_pixel_spread)(
-            tf.shade(
-                agg, how=self.node_pixel_shade_type, name=name, **cmap, **span
-            ),
-            threshold=self.node_pixel_density,
-            max_px=self.node_point_size,
-            shape=self.node_point_shape,
-        )
-
-    def edges_plot(self, canvas, nodes, name=None):
-        """
-        plot edges(lines)
-        """
-        aggregator, cmap = _compute_datashader_assets(
-            self.connected_edges,
-            self.node_x,
-            self.edge_aggregate_col,
-            self.edge_aggregate_fn,
-            self.edge_color_palette,
-        )
-
-        agg = canvas.line(
-            self.connected_edges, self.node_x, self.node_y, aggregator
-        )
-
-        if (
-            self.constant_limit_edges is None
-            or self.edge_aggregate_fn == "count"
-        ):
-            self.constant_limit_edges = [
-                float(cp.nanmin(agg.data)),
-                float(cp.nanmax(agg.data)),
-            ]
-
-        span = {"span": self.constant_limit_nodes}
-
-        return getattr(tf, self.node_pixel_spread)(
-            tf.shade(
-                agg,
-                name=name,
-                how="linear",
-                alpha=255 - 255 * self.edge_transparency,
-                **cmap,
-                **span,
-            ),
-            max_px=1,
-        )
 
     def format_source_data(self, dataframe):
         """
@@ -459,65 +161,6 @@ class Graph(BaseGraph):
                 self.edge_render_type,
                 self.curve_params,
             )
-
-    def generate_InteractiveImage_callback(self):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-
-        def viewInteractiveImage(
-            x_range,
-            y_range,
-            w,
-            h,
-            data_source=self.nodes,
-            nodes_plot=self.nodes_plot,
-            edges_plot=self.edges_plot,
-            chart=self.chart,
-            **kwargs,
-        ):
-            dd = data_source[
-                [
-                    self.node_id,
-                    self.node_x,
-                    self.node_y,
-                    self.node_aggregate_col,
-                ]
-            ]
-            dd[self.node_x] = self._to_xaxis_type(dd[self.node_x])
-            dd[self.node_y] = self._to_yaxis_type(dd[self.node_y])
-
-            x_range = self._to_xaxis_type(x_range)
-            y_range = self._to_yaxis_type(y_range)
-
-            cvs = ds.Canvas(
-                plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
-            )
-            plot = None
-            if self.source is not None:
-                self.source.data = {
-                    self.node_x: [],
-                    self.node_y: [],
-                    self.node_aggregate_col: [],
-                    self.node_aggregate_col + "_color": [],
-                }
-            np = nodes_plot(cvs, dd)
-            if self.display_edges._active:
-                ep = edges_plot(cvs, dd)
-                plot = tf.stack(ep, np, how="over")
-            else:
-                plot = np
-
-            return plot
-
-        return viewInteractiveImage
 
     def generate_chart(self):
         """
@@ -585,19 +228,6 @@ class Graph(BaseGraph):
             display_edges=self.display_edges,
         )
 
-    def update_dimensions(self, width=None, height=None):
-        """
-        Description:
-
-
-        Input:
-
-
-
-        Ouput:
-        """
-        pass
-
     def reload_chart(self, data, edges=None, patch_update=False):
         """
         Description:
@@ -633,19 +263,6 @@ class Graph(BaseGraph):
             self.chart.update_data(data, self.connected_edges)
         else:
             self.chart.update_data(data)
-
-    def add_selection_geometry_event(self, callback):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-        pass
 
     def apply_theme(self, theme):
         """
@@ -743,35 +360,6 @@ class Line(BaseLine):
                 data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.chart.update_data(data)
 
-    def update_dimensions(self, width=None, height=None):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-        if width is not None:
-            self.chart.width = width
-        if height is not None:
-            self.chart.height = height
-
-    def add_selection_geometry_event(self, callback):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-        pass
-
     def apply_theme(self, theme):
         """
         apply thematic changes to the chart based on the theme
@@ -789,14 +377,12 @@ class StackedLines(BaseStackedLine):
     reset_event = events.Reset
     data_y_axis = "y"
     data_x_axis = "x"
-    use_data_tiles = False
-    color_bar = None
-    legend_added = False
 
-    def compute_legend(self):
+    def compute_legend(self, colors=None):
+        colors = colors or self.colors
         if self.legend:
             res = []
-            for i, val in enumerate(self.colors):
+            for i, val in enumerate(colors):
                 res.append((self.y[i], val))
             return hv.NdOverlay(
                 {
@@ -878,22 +464,6 @@ class StackedLines(BaseStackedLine):
             legend=self.compute_legend(),
         )
 
-    def update_dimensions(self, width=None, height=None):
-        """
-        Description:
-
-
-        Input:
-
-
-
-        Ouput:
-        """
-        if width is not None:
-            self.chart.plot_width = width
-        if height is not None:
-            self.chart.plot_height = height
-
     def reload_chart(self, data, patch_update=False):
         """
         Description:
@@ -910,25 +480,11 @@ class StackedLines(BaseStackedLine):
                 data = cudf.DataFrame({k: cp.nan for k in data.columns})
             self.chart.update_data(data)
 
-    def add_selection_geometry_event(self, callback):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-        pass
-
     def apply_theme(self, theme):
         """
         apply thematic changes to the chart based on the theme
         """
         if not self.colors_set:
             self.default_colors = [theme.chart_color]
-            self.interactive_image.update_chart()
-            self.legend_added = False
-            self.render_legend()
+            self.chart.legend = self.compute_legend(self.default_colors)
+            self.chart.colors = self.default_colors
