@@ -47,7 +47,7 @@ def to_datetime(dates):
     test_date = (
         dates[0] if isinstance(dates, (list, tuple, pd.Series)) else dates
     )
-    if not isinstance(test_date, datetime.datetime):
+    if not isinstance(test_date, (datetime.datetime, np.datetime64)):
         unit["unit"] = dt_unit[int(math.log10(date_to_int(test_date)))]
     return pd.to_datetime(dates, **unit)
 

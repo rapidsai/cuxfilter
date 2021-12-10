@@ -11,6 +11,7 @@ from .custom_extensions import (
     InteractiveDatashaderPoints,
     InteractiveDatashaderLine,
     InteractiveDatashaderGraph,
+    InteractiveDatashaderMultiLine,
 )
 
 from distutils.version import LooseVersion
@@ -23,6 +24,7 @@ import cupy as cp
 import pandas as pd
 import bokeh
 import cudf
+import holoviews as hv
 from bokeh import events
 from bokeh.plotting import figure
 from bokeh.models import (
@@ -257,8 +259,7 @@ class Scatter(BaseScatter):
 
         Ouput:
         """
-
-        self.add_event(events.SelectionGeometry, callback)
+        pass
 
     def apply_theme(self, theme):
         """
@@ -769,8 +770,7 @@ class Line(BaseLine):
 
         Ouput:
         """
-
-        self.add_event(events.SelectionGeometry, callback)
+        pass
 
     def apply_theme(self, theme):
         """
@@ -793,26 +793,23 @@ class StackedLines(BaseStackedLine):
     color_bar = None
     legend_added = False
 
-    def render_legend(self):
+    def compute_legend(self):
         if self.legend:
-            mapper = LinearColorMapper(
-                palette=self.colors, low=1, high=len(self.y)
-            )
-            self.color_bar = ColorBar(
-                color_mapper=mapper,
-                location=(0, 0),
-                ticker=FixedTicker(ticks=list(range(1, len(self.y) + 1))),
-                major_label_overrides=dict(
-                    zip(list(range(1, len(self.y) + 1)), self.y)
-                ),
-                major_label_text_baseline="top",
-                major_label_text_align="left",
-                major_tick_in=0,
-                major_tick_out=0,
-            )
-            if self.legend_added is False:
-                self.chart.add_layout(self.color_bar, self.legend_position)
-                self.legend_added = True
+            res = []
+            for i, val in enumerate(self.colors):
+                res.append((self.y[i], val))
+            return hv.NdOverlay(
+                {
+                    k: hv.Curve(
+                        self.source.head(1),
+                        label=str(k),
+                        kdims=[self.x],
+                        vdims=[self.y[0]],
+                    ).opts(color=v)
+                    for k, v in res
+                }
+            ).opts(legend_position=self.legend_position)
+        return None
 
     def calculate_source(self, data):
         """
@@ -859,41 +856,6 @@ class StackedLines(BaseStackedLine):
             self.x_range = dd.compute(*self.x_range)
             self.y_range = dd.compute(*self.y_range)
 
-    def generate_InteractiveImage_callback(self):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-
-        def viewInteractiveImage(
-            x_range, y_range, w, h, data_source, **kwargs
-        ):
-            dd = data_source[[self.x] + self.y]
-            dd[self.x] = self._to_xaxis_type(dd[self.x])
-            for _y in self.y:
-                dd[_y] = self._to_yaxis_type(dd[_y])
-
-            x_range = self._to_xaxis_type(x_range)
-            y_range = self._to_yaxis_type(y_range)
-
-            cvs = ds.Canvas(
-                plot_width=w, plot_height=h, x_range=x_range, y_range=y_range
-            )
-            aggs = dict((_y, cvs.line(dd, x=self.x, y=_y)) for _y in self.y)
-            imgs = [
-                tf.shade(aggs[_y], cmap=["white", color])
-                for _y, color in zip(self.y, self.colors)
-            ]
-            return tf.stack(*imgs)
-
-        return viewInteractiveImage
-
     def generate_chart(self):
         """
         Description:
@@ -908,42 +870,13 @@ class StackedLines(BaseStackedLine):
         if not self.title:
             self.title = "Stacked Line plots on x-axis: " + self.x
 
-        self.chart = figure(
-            toolbar_location="right",
-            tools="pan, wheel_zoom, reset",
-            active_scroll="wheel_zoom",
-            active_drag="pan",
-            x_range=self.x_range,
-            y_range=self.y_range,
-            width=self.width,
-            height=self.height,
-            **self.library_specific_params,
+        self.chart = InteractiveDatashaderMultiLine(
+            source_df=self.source,
+            x=self.x,
+            line_dims=self.y,
+            colors=self.colors,
+            legend=self.compute_legend(),
         )
-
-        self.chart.add_tools(BoxSelectTool(dimensions="width"))
-        # reset legend and color_bar
-        self.legend_added = False
-        self.color_bar = None
-
-        self.chart.xgrid.grid_line_color = None
-        self.chart.ygrid.grid_line_color = None
-
-        if self.x_axis_tick_formatter:
-            self.chart.xaxis.formatter = self.x_axis_tick_formatter
-        if self.y_axis_tick_formatter:
-            self.chart.yaxis.formatter = self.y_axis_tick_formatter
-
-        self.interactive_image = InteractiveImage(
-            self.chart,
-            self.generate_InteractiveImage_callback(),
-            data_source=self.source,
-            timeout=self.timeout,
-            x_dtype=self.x_dtype,
-            y_dtype=self.y_dtype,
-        )
-
-        if self.legend_added is False:
-            self.render_legend()
 
     def update_dimensions(self, width=None, height=None):
         """
@@ -975,7 +908,7 @@ class StackedLines(BaseStackedLine):
         if data is not None:
             if len(data) == 0:
                 data = cudf.DataFrame({k: cp.nan for k in data.columns})
-            self.interactive_image.update_chart(data_source=data)
+            self.chart.update_data(data)
 
     def add_selection_geometry_event(self, callback):
         """
@@ -988,8 +921,7 @@ class StackedLines(BaseStackedLine):
 
         Ouput:
         """
-
-        self.add_event(events.SelectionGeometry, callback)
+        pass
 
     def apply_theme(self, theme):
         """

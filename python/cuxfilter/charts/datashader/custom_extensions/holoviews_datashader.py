@@ -6,7 +6,11 @@ import numpy as np
 import cudf
 import cupy
 from holoviews.element.tiles import tile_sources
-from holoviews.operation.datashader import SpreadingOperation, rasterize
+from holoviews.operation.datashader import (
+    SpreadingOperation,
+    datashade,
+    rasterize,
+)
 from bokeh.models import (
     LinearColorMapper,
     LogColorMapper,
@@ -413,12 +417,78 @@ class InteractiveDatashaderLine(InteractiveDatashader):
                 ]
             )
         ).opts(
-            xaxis=None,
-            yaxis=None,
             responsive=True,
             tools=self.tools,
             active_tools=["wheel_zoom", "pan"],
         )
+
+        return pn.pane.HoloViews(
+            self.tiles * dmap if self.tiles is not None else dmap,
+            sizing_mode="stretch_both",
+            height=self.height,
+        )
+
+
+class InteractiveDatashaderMultiLine(InteractiveDatashader):
+    colors = param.List(default=[])
+    transparency = param.Number(0, bounds=(0, 1))
+    line_dims = param.List(
+        default=[],
+        doc="list of dimensions of lines to be rendered against a common x-column",
+    )
+    tools = param.List(
+        default=["reset", "wheel_zoom", "xwheel_zoom", "pan"],
+        doc="interactive tools to add to the chart",
+    )
+    legend = param.ClassSelector(
+        class_=hv.NdOverlay,
+        doc="legend to be added on top of the multi-line chart",
+        default=None,
+    )
+    box_stream = param.ClassSelector(
+        class_=hv.streams.BoundsX, default=hv.streams.BoundsX()
+    )
+
+    def __init__(self, **params):
+        super(InteractiveDatashaderMultiLine, self).__init__(**params)
+
+    def update_data(self, data):
+        self.source_df = data
+
+    def add_box_select_callback(self, callback_fn):
+        self.box_stream = hv.streams.BoundsX(subscribers=[callback_fn])
+
+    @param.depends("source_df")
+    def lines(self, **kwargs):
+        return hv.NdOverlay(
+            {
+                _y: hv.Curve(
+                    self.source_df[[self.x, _y]].rename(columns={_y: "y"})
+                )
+                for i, _y in enumerate(self.line_dims)
+            },
+            kdims="k",
+        )
+
+    def get_chart(self, streams=[]):
+        return datashade(
+            hv.DynamicMap(self.lines, streams=streams),
+            aggregator=ds.count_cat("k"),
+            color_key=self.colors,
+        ).opts(tools=None, default_tools=None)
+
+    def view(self):
+        dmap = dynspread(
+            self.get_chart(streams=[self.box_stream, self.reset_stream,])
+        ).opts(
+            responsive=True,
+            tools=self.tools,
+            active_tools=["xwheel_zoom", "pan"],
+            default_tools=None,
+        )
+
+        if self.legend:
+            dmap *= self.legend
 
         return pn.pane.HoloViews(
             self.tiles * dmap if self.tiles is not None else dmap,
@@ -558,14 +628,14 @@ class InteractiveDatashaderGraph(param.Parameterized):
             xaxis=None,
             yaxis=None,
             responsive=True,
-            default_tools=[],
+            default_tools=None,
             active_tools=["wheel_zoom", "pan"],
             tools=self.tools,
             hooks=[set_tools],
         )
 
         dmap_edges = dynspread(
-            self.edges_chart.get_chart().opts(default_tools=[])
+            self.edges_chart.get_chart().opts(default_tools=None)
         )
 
         dmap_graph = dmap_edges * dmap_nodes
