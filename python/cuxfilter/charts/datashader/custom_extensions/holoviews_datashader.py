@@ -219,7 +219,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
     legend_position = param.String("right", doc="position of legend")
     cmap = param.Dict(default={"cmap": CUXF_DEFAULT_COLOR_PALETTE})
     tools = param.List(
-        default=["reset", "lasso_select", "wheel_zoom"],
+        default=["pan", "reset", "lasso_select", "wheel_zoom"],
         doc="interactive tools to add to the chart",
     )
     color_palette = param.List()
@@ -344,7 +344,7 @@ class InteractiveDatashaderLine(InteractiveDatashader):
     transparency = param.Number(0, bounds=(0, 1))
 
     tools = param.List(
-        default=["reset", "lasso_select", "wheel_zoom", "xbox_select"],
+        default=["pan", "reset", "lasso_select", "wheel_zoom", "xbox_select"],
         doc="interactive tools to add to the chart",
     )
 
@@ -396,7 +396,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         ),
     )
     tools = param.List(
-        default=["reset", "wheel_zoom", "xwheel_zoom", "pan"],
+        default=["pan", "reset", "wheel_zoom", "xwheel_zoom"],
         doc="interactive tools to add to the chart",
     )
     legend = param.ClassSelector(
@@ -482,7 +482,7 @@ class InteractiveDatashaderGraph(param.Parameterized):
     legend_position = param.String("right", doc="position of legend")
     node_cmap = param.Dict(default={"cmap": CUXF_DEFAULT_COLOR_PALETTE})
     tools = param.List(
-        default=["reset", "lasso_select", "wheel_zoom"],
+        default=["pan", "reset", "lasso_select", "wheel_zoom"],
         doc="interactive tools to add to the chart",
     )
     node_color_palette = param.List()
