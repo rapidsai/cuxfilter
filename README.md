@@ -68,6 +68,10 @@ chart4 = cuxfilter.charts.bar('MONTH')
 
 #declare dashboard
 d = cux_df.dashboard([chart1, chart3, chart4], sidebar=[chart2], layout=cuxfilter.layouts.feature_and_double_base, title='Auto Accident Dataset')
+
+# run the dashboard within the notebook cell
+# d.app()
+
 #run the dashboard as a webapp:
 d.show('jupyter-notebook/lab-url')
 ```
@@ -99,6 +103,9 @@ chart1 = cuxfilter.charts.drop_down('dti')
 
 #declare dashboard
 d = cux_df.dashboard([chart0, chart2],sidebar=[chart3, chart1], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Mortgage Dashboard')
+
+# run the dashboard within the notebook cell
+# d.app()
 
 #run the dashboard as a webapp:
 d.show('jupyter-notebook/lab-url')
