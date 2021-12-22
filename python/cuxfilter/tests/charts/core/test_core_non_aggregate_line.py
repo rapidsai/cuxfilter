@@ -1,14 +1,13 @@
 import pytest
 import cudf
-import panel as pn
 import mock
 from bokeh.events import ButtonClick
 
 import cuxfilter
 from cuxfilter.charts.core.non_aggregate.core_line import BaseLine
 from cuxfilter.layouts import chart_view
-from cuxfilter.charts.datashader.custom_extensions.holoviews_datashader import (
-    InteractiveDatashader,
+from cuxfilter.charts.datashader.custom_extensions import (
+    holoviews_datashader as hv,
 )
 
 
@@ -64,7 +63,7 @@ class TestNonAggregateBaseLine:
     def test_compute_query_dict(self, x_range, y_range, query, local_dict):
         bl = BaseLine(x="x", y="y", title="custom_title")
         bl.chart_type = "non_aggregate_line"
-        bl.chart = InteractiveDatashader()
+        bl.chart = hv.InteractiveDatashader()
         bl.x_range = x_range
         bl.y_range = y_range
 
@@ -92,7 +91,7 @@ class TestNonAggregateBaseLine:
     )
     def test_add_events(self, event, result):
         bl = BaseLine(x="key", y="val")
-        bl.chart = InteractiveDatashader()
+        bl.chart = hv.InteractiveDatashader()
         self.result = None
 
         def test_func(cls):
@@ -107,7 +106,7 @@ class TestNonAggregateBaseLine:
 
     def test_add_reset_event(self):
         bl = BaseLine(x="key", y="val")
-        bl.chart = InteractiveDatashader()
+        bl.chart = hv.InteractiveDatashader()
         self.result = None
 
         def test_func(event, callback):

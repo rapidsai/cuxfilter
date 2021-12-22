@@ -5,8 +5,8 @@ import mock
 from cuxfilter.charts.core.non_aggregate.core_stacked_line import (
     BaseStackedLine,
 )
-from cuxfilter.charts.datashader.custom_extensions.holoviews_datashader import (
-    InteractiveDatashader,
+from cuxfilter.charts.datashader.custom_extensions import (
+    holoviews_datashader as hv,
 )
 from cuxfilter.layouts import chart_view
 import cuxfilter
@@ -54,7 +54,7 @@ class TestBaseStackedLine:
 
     def test_initiate_chart(self):
         bsl = BaseStackedLine(x="key", y=["val"])
-        bsl.chart = InteractiveDatashader()
+        bsl.chart = hv.InteractiveDatashader()
         bsl.initiate_chart(self.dashboard)
 
         assert bsl.x_range == (0, 4)
@@ -70,7 +70,7 @@ class TestBaseStackedLine:
 
     def test_calculate_source(self):
         bsl = BaseStackedLine(x="key", y=["val"])
-        bsl.chart = InteractiveDatashader()
+        bsl.chart = hv.InteractiveDatashader()
         bsl.initiate_chart(self.dashboard)
         self.result = None
 
@@ -144,7 +144,7 @@ class TestBaseStackedLine:
     )
     def test_add_events(self, add_interaction, reset_event, event_1):
         bsl = BaseStackedLine("a", ["b"])
-        bsl.chart = InteractiveDatashader()
+        bsl.chart = hv.InteractiveDatashader()
         bsl.add_interaction = add_interaction
         bsl.reset_event = reset_event
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
@@ -165,7 +165,7 @@ class TestBaseStackedLine:
     def test_add_reset_event(self):
         bsl = BaseStackedLine("a", ["b"])
         bsl.chart_type = "stacked_lines"
-        bsl.chart = InteractiveDatashader()
+        bsl.chart = hv.InteractiveDatashader()
         bsl.x_range = (0, 2)
         bsl.y_range = (3, 5)
 

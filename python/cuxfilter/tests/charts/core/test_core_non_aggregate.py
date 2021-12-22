@@ -3,8 +3,8 @@ import cudf
 import mock
 import numpy as np
 
-from cuxfilter.charts.datashader.custom_extensions.holoviews_datashader import (
-    InteractiveDatashader,
+from cuxfilter.charts.datashader.custom_extensions import (
+    holoviews_datashader as hv,
 )
 from cuxfilter.charts.core.non_aggregate.core_non_aggregate import (
     BaseNonAggregate,
@@ -215,7 +215,7 @@ class TestCoreNonAggregateChart:
         bnac = BaseNonAggregate()
         bnac.add_interaction = add_interaction
         bnac.reset_event = reset_event
-        bnac.chart = InteractiveDatashader()
+        bnac.chart = hv.InteractiveDatashader()
 
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
@@ -243,7 +243,7 @@ class TestCoreNonAggregateChart:
         bnac.x = "a"
         bnac.x_range = (0, 2)
         bnac.y_range = (3, 5)
-        bnac.chart = InteractiveDatashader()
+        bnac.chart = hv.InteractiveDatashader()
 
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
