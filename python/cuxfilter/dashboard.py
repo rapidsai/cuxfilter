@@ -402,7 +402,10 @@ class DashBoard:
         >>> line_chart_2 = bokeh.bar(
         >>>     'val', 'key', data_points=5, add_interaction=False
         >>> )
-        >>> d = cux_df.dashboard([line_chart_1, line_chart_2])
+        >>> d = cux_df.dashboard(
+        >>>    [line_chart_1, line_chart_2],
+        >>>    layout=cuxfilter.layouts.double_feature
+        >>> )
         >>> d.app() #or d.show()
         displays dashboard
         do some visual querying/ crossfiltering
@@ -526,7 +529,10 @@ class DashBoard:
         >>> line_chart_2 = bokeh.bar(
         >>>     'val', 'key', data_points=5, add_interaction=False
         >>> )
-        >>> d = cux_df.dashboard([line_chart_1, line_chart_2])
+        >>> d = cux_df.dashboard(
+        >>>    [line_chart_1, line_chart_2],
+        >>>    layout=cuxfilter.layouts.double_feature
+        >>> )
         >>> await d.preview()
         displays charts in the dashboard
         """

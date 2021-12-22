@@ -48,8 +48,8 @@ requirements:
 test:                                   # [linux64]
   requires:                             # [linux64]
     - cudatoolkit {{ cuda_version }}.*  # [linux64]
-  commands:                             # [linux64]
-    - python -c "import cuxfilter"      # [linux64]
+  imports:                              # [linux64]
+    - cuxfilter                         # [linux64]
 
 about:
   home: http://rapids.ai/

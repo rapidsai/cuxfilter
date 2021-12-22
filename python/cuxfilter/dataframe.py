@@ -44,9 +44,13 @@ class DataFrame:
         Read dataframe as an arrow file from disk
 
         >>> import cuxfilter
-        >>> cux_df = cuxfilter.DataFrame.from_arrow(
-            './location/of/dataframe.arrow'
-            )
+        >>> import pyarrow as pa
+
+        >>> # create a temporary arrow table
+        >>> arrowTable = pa.Table.from_arrays([['foo', 'bar']], names=['name'])
+
+        >>> # read arrow table, can also ready .arrow file paths directly
+        >>> cux_df = cuxfilter.DataFrame.from_arrow(df)
 
         """
         if isinstance(dataframe_location, str):
@@ -116,7 +120,7 @@ class DataFrame:
         >>>     }
         >>> )
         >>> G = cugraph.Graph()
-        >>> G.from_cudf_edgelist(edges)
+        >>> G.from_cudf_edgelist(edges, destination='target')
         >>> cux_df = cuxfilter.DataFrame.load_graph((G.nodes(), G.edges()))
 
         load graph from (nodes, edges)
