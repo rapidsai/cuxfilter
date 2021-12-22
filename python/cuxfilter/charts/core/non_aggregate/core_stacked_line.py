@@ -178,7 +178,6 @@ class BaseStackedLine(BaseChart):
                 # set current chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
                 self.source = dashboard_cls._cuxfilter_df.data
-            self.test_val = boundsx
             self.x_range = self._xaxis_dt_transform(boundsx)
 
             query = f"@{self.x}_min<={self.x}<=@{self.x}_max"

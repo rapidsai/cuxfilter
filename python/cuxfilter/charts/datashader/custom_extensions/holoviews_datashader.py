@@ -11,13 +11,6 @@ from holoviews.operation.datashader import (
     datashade,
     rasterize,
 )
-from bokeh.models import (
-    LinearColorMapper,
-    LogColorMapper,
-    BasicTicker,
-    ColorBar,
-    BinnedTicker,
-)
 from . import CustomInspectTool
 from datashader import transfer_functions as tf
 from ...constants import CUXF_DEFAULT_COLOR_PALETTE
@@ -72,35 +65,6 @@ def _cross_mask(px):
 ds.transfer_functions._mask_lookup["rect_vertical"] = _rect_vertical_mask
 ds.transfer_functions._mask_lookup["rect_horizontal"] = _rect_horizontal_mask
 ds.transfer_functions._mask_lookup["cross"] = _cross_mask
-
-_color_mapper = {
-    "linear": LinearColorMapper,
-    "log": LogColorMapper,
-}
-
-
-def _generate_legend(
-    pixel_shade_type, color_palette, legend_title, constant_limit,
-):
-    mapper = _color_mapper[pixel_shade_type](
-        palette=color_palette, low=constant_limit[0], high=constant_limit[1]
-    )
-    color_bar = ColorBar(
-        color_mapper=mapper,
-        location=(0, 0),
-        ticker=BasicTicker(desired_num_ticks=len(color_palette))
-        if pixel_shade_type != "eq_hist"
-        else BinnedTicker(mapper=mapper, num_major_ticks=len(color_palette)),
-        title=legend_title,
-    )
-    return color_bar
-
-
-def _get_legend_title(aggregate_fn, aggregate_col):
-    if aggregate_fn == "count":
-        return aggregate_fn
-    else:
-        return aggregate_fn + " " + aggregate_col
 
 
 class dynspread(SpreadingOperation):
