@@ -1,8 +1,12 @@
 import pytest
 import cudf
+import mock
 
 from cuxfilter.charts.core.non_aggregate.core_stacked_line import (
     BaseStackedLine,
+)
+from cuxfilter.charts.datashader.custom_extensions.holoviews_datashader import (
+    InteractiveDatashader,
 )
 from cuxfilter.layouts import chart_view
 import cuxfilter
@@ -50,6 +54,7 @@ class TestBaseStackedLine:
 
     def test_initiate_chart(self):
         bsl = BaseStackedLine(x="key", y=["val"])
+        bsl.chart = InteractiveDatashader()
         bsl.initiate_chart(self.dashboard)
 
         assert bsl.x_range == (0, 4)
@@ -58,13 +63,14 @@ class TestBaseStackedLine:
     @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
     def test_view(self, chart, _chart):
         bsl = BaseStackedLine(x="key", y=["val"])
-        bsl.chart = chart
+        bsl.chart = mock.Mock(**{"view.return_value": chart})
         bsl.width = 400
 
         assert str(bsl.view()) == str(chart_view(_chart, width=bsl.width))
 
     def test_calculate_source(self):
         bsl = BaseStackedLine(x="key", y=["val"])
+        bsl.chart = InteractiveDatashader()
         bsl.initiate_chart(self.dashboard)
         self.result = None
 
@@ -77,14 +83,7 @@ class TestBaseStackedLine:
 
     def test_get_selection_geometry_callback(self):
         bsl = BaseStackedLine(x="key", y=["val"])
-
-        assert (
-            bsl.get_selection_geometry_callback(self.dashboard).__name__
-            == "selection_callback"
-        )
-        assert callable(
-            type(bsl.get_selection_geometry_callback(self.dashboard))
-        )
+        assert callable(type(bsl.get_box_select_callback(self.dashboard)))
 
     def test_box_selection_callback(self):
         bsl = BaseStackedLine("a", ["b"])
@@ -101,11 +100,8 @@ class TestBaseStackedLine:
         )
         dashboard._active_view = bsl
 
-        class evt:
-            geometry = dict(x0=1, x1=2, y0=3, y1=4, type="rect")
-
-        t = bsl.get_selection_geometry_callback(dashboard)
-        t(evt)
+        t = bsl.get_box_select_callback(dashboard)
+        t(boundsx=(1, 2))
         self.result.equals(df.query("1<=a<=2"))
 
     @pytest.mark.parametrize(
@@ -139,15 +135,16 @@ class TestBaseStackedLine:
             )
 
     @pytest.mark.parametrize(
-        "add_interaction, reset_event, event_1, event_2",
+        "add_interaction, reset_event, event_1",
         [
-            (True, None, "selection_callback", None),
-            (True, "test_event", "selection_callback", "reset_callback"),
-            (False, "test_event", None, "reset_callback"),
+            (True, None, "cb"),
+            (True, "test_event", "cb"),
+            (False, "test_event", None),
         ],
     )
-    def test_add_events(self, add_interaction, reset_event, event_1, event_2):
+    def test_add_events(self, add_interaction, reset_event, event_1):
         bsl = BaseStackedLine("a", ["b"])
+        bsl.chart = InteractiveDatashader()
         bsl.add_interaction = add_interaction
         bsl.reset_event = reset_event
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
@@ -160,19 +157,15 @@ class TestBaseStackedLine:
         def t_func(fn):
             self.event_1 = fn.__name__
 
-        def t_func1(event, fn):
-            self.event_2 = fn.__name__
-
-        bsl.add_selection_geometry_event = t_func
-        bsl.add_event = t_func1
+        bsl.chart.add_box_select_callback = t_func
         bsl.add_events(dashboard)
 
         assert self.event_1 == event_1
-        assert self.event_2 == event_2
 
     def test_add_reset_event(self):
         bsl = BaseStackedLine("a", ["b"])
         bsl.chart_type = "stacked_lines"
+        bsl.chart = InteractiveDatashader()
         bsl.x_range = (0, 2)
         bsl.y_range = (3, 5)
 
@@ -189,8 +182,10 @@ class TestBaseStackedLine:
 
         bsl.add_reset_event(dashboard)
 
-        assert bsl.x_range is None
-        assert bsl.y_range is None
+        assert (
+            f"x_{'_'.join(['y'])}_stacked_lines_{bsl.title}"
+            not in dashboard._query_str_dict
+        )
 
     def test_query_chart_by_range(self):
         bsl = BaseStackedLine("a", ["b"])

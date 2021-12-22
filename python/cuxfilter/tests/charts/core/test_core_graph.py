@@ -1,8 +1,12 @@
 import pytest
 import cudf
 import mock
+import numpy as np
 
 from cuxfilter.charts.core.non_aggregate.core_graph import BaseGraph
+from cuxfilter.charts.datashader.custom_extensions.holoviews_datashader import (
+    InteractiveDatashader,
+)
 from cuxfilter.dashboard import DashBoard
 from cuxfilter.charts.datashader.custom_extensions import CustomInspectTool
 from cuxfilter import DataFrame
@@ -46,10 +50,13 @@ class TestCoreGraph:
     @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
     def test_view(self, chart, _chart):
         bg = BaseGraph()
-        bg.chart = chart
+        bg.chart = mock.Mock(**{"view.return_value": chart})
         bg.width = 400
+        bg.title = "test"
 
-        assert str(bg.view()) == str(chart_view(_chart, width=bg.width))
+        assert str(bg.view()) == str(
+            chart_view(_chart, width=bg.width, title=bg.title)
+        )
 
     def test_get_selection_geometry_callback(self):
         bg = BaseGraph()
@@ -57,11 +64,8 @@ class TestCoreGraph:
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
-        assert (
-            bg.get_selection_geometry_callback(dashboard).__name__
-            == "selection_callback"
-        )
-        assert callable(type(bg.get_selection_geometry_callback(dashboard)))
+        assert callable(type(bg.get_box_select_callback(dashboard)))
+        assert callable(type(bg.get_lasso_select_callback(dashboard)))
 
     @pytest.mark.parametrize(
         "inspect_neighbors, result",
@@ -106,13 +110,15 @@ class TestCoreGraph:
         dashboard._active_view = bg
 
         class evt:
-            geometry = dict(x0=1, x1=3, y0=0, y1=1, type="rect")
+            bounds = (1, 3, 0, 1)
+            x_selection = (1, 3)
+            y_selection = (0, 1)
 
-        t = bg.get_selection_geometry_callback(dashboard)
-        t(evt)
+        t = bg.get_box_select_callback(dashboard)
+        t(evt.bounds, evt.x_selection, evt.y_selection)
         assert self.result.equals(result)
 
-    def test_lasso_election_callback(self):
+    def test_lasso_selection_callback(self):
         nodes = cudf.DataFrame(
             {"vertex": [0, 1, 2, 3], "x": [0, 1, 1, 2], "y": [0, 1, 2, 0]}
         )
@@ -132,17 +138,14 @@ class TestCoreGraph:
 
         bg.reload_chart = t_function
 
-        class evt:
-            geometry = dict(x=[1, 1, 2], y=[1, 2, 1], type="poly")
-            final = True
+        geometry = np.array([[1, 1, 2], [1, 2, 1]])
 
-        t = bg.get_selection_geometry_callback(dashboard)
+        t = bg.get_lasso_select_callback(dashboard)
         with mock.patch("cuspatial.point_in_polygon") as pip:
-
             pip.return_value = cudf.DataFrame(
                 {"selection": [True, False, True, False]}
             )
-            t(evt)
+            t(geometry)
             assert pip.called
 
     @pytest.mark.parametrize(
@@ -174,7 +177,6 @@ class TestCoreGraph:
         bg.compute_query_dict(
             dashboard._query_str_dict, dashboard._query_local_variables_dict
         )
-        print(dashboard._query_str_dict)
         assert (
             dashboard._query_str_dict[f"x_y_vertex_count_test_{bg.title}"]
             == query
@@ -187,15 +189,16 @@ class TestCoreGraph:
     @pytest.mark.parametrize(
         "add_interaction, reset_event, event_1, event_2",
         [
-            (True, None, "selection_callback", None),
-            (True, "test_event", "selection_callback", "reset_callback"),
-            (False, "test_event", None, "reset_callback"),
+            (True, None, "cb", "cb"),
+            (True, "test_event", "cb", "cb"),
+            (False, "test_event", None, None),
         ],
     )
     def test_add_events(self, add_interaction, reset_event, event_1, event_2):
         bg = BaseGraph()
         bg.add_interaction = add_interaction
         bg.reset_event = reset_event
+        bg.chart = InteractiveDatashader()
 
         df = cudf.DataFrame({"x": [1, 2, 2], "y": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
@@ -206,11 +209,11 @@ class TestCoreGraph:
         def t_func(fn):
             self.event_1 = fn.__name__
 
-        def t_func1(event, fn):
+        def t_func1(fn):
             self.event_2 = fn.__name__
 
-        bg.add_selection_geometry_event = t_func
-        bg.add_event = t_func1
+        bg.chart.add_box_select_callback = t_func
+        bg.chart.add_lasso_select_callback = t_func1
 
         bg.add_events(dashboard)
 
@@ -224,6 +227,7 @@ class TestCoreGraph:
         bg.x = "a"
         bg.x_range = (0, 2)
         bg.y_range = (3, 5)
+        bg.chart = InteractiveDatashader()
 
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
@@ -239,8 +243,7 @@ class TestCoreGraph:
         bg.reload_chart = reload_fn
         bg.add_reset_event(dashboard)
 
-        assert bg.x_range is None
-        assert bg.y_range is None
+        assert bg.selected_indices is None
 
     def test_query_chart_by_range(self):
         bg = BaseGraph()
