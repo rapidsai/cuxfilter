@@ -70,7 +70,7 @@ def scatter(
 
     tile_provider: str, default None
         Underlying map type.See
-        https://docs.bokeh.org/en/latest/docs/reference/tile_providers.htm
+        https://holoviews.org/reference/elements/bokeh/Tiles.html
 
     width: int,  default 800
 
@@ -244,7 +244,7 @@ def graph(
 
     tile_provider: str, default None
         Underlying map type.See
-        https://docs.bokeh.org/en/latest/docs/reference/tile_providers.html
+        https://holoviews.org/reference/elements/bokeh/Tiles.html
 
     width: int,  default 800
 
