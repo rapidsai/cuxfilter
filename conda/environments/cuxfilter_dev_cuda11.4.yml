@@ -24,7 +24,7 @@ dependencies:
 - bokeh>=2.3.2,<=2.4
 - panel>=0.10.3,<=0.12.4
 - pyppeteer>=0.2.6
-- cudatoolkit=10.2
+- cudatoolkit=11.4
 - nodejs
 - recommonmark
 - pytest
