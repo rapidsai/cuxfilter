@@ -13,7 +13,7 @@ from .custom_extensions import (
     InteractiveDatashaderMultiLine,
 )
 
-from distutils.version import LooseVersion
+from packaging.version import Version
 import datashader as ds
 import dask_cudf
 import dask.dataframe as dd
@@ -25,7 +25,7 @@ from PIL import Image
 import requests
 from io import BytesIO
 
-ds_version = LooseVersion(ds.__version__)
+ds_version = Version(ds.__version__)
 
 
 def load_image(url):
