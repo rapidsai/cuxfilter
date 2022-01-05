@@ -3,8 +3,7 @@
 {% set version = environ.get('GIT_DESCRIBE_TAG', '0.0.0.dev').lstrip('v') + environ.get('VERSION_SUFFIX', '') %}
 {% set minor_version =  version.split('.')[0] + '.' + version.split('.')[1] %}
 {% set py_version=environ.get('CONDA_PY', 36) %}
-{% set cuda_version='.'.join(environ.get('CUDA', 'unknown').split('.')[:2]) %}
-{% set cuda_major=cuda_version.split('.')[0] %}
+{% set cuda_version='.'.join(environ.get('CUDA', '10.1').split('.')[:2]) %}
 
 package:
   name: cuxfilter
@@ -15,7 +14,7 @@ source:
 
 build:
   number: {{ GIT_DESCRIBE_NUMBER }}
-  string: cuda_{{ cuda_major }}_py{{ py_version }}_{{ GIT_DESCRIBE_HASH }}_{{ GIT_DESCRIBE_NUMBER }}
+  string: py{{ py_version }}_{{ GIT_DESCRIBE_HASH }}_{{ GIT_DESCRIBE_NUMBER }}
   script_env:
     - VERSION_SUFFIX
     - CC
@@ -32,8 +31,7 @@ requirements:
     - cuspatial {{ minor_version }}
     - dask-cudf {{ minor_version }}
     - dask-cuda {{ minor_version }}
-    - datashader >0.11.1, <=0.13
-    - holoviews >1.14.1, <=1.14.6
+    - datashader >=0.11.1, <0.12
     - numba >=0.51.2
     - cupy >=7.8.0,<10.0.0a0
     - panel >=0.10.3,<=0.12.4
