@@ -3,6 +3,7 @@ channels:
 - rapidsai
 - rapidsai-nightly
 - nvidia
+- pyviz
 - conda-forge
 - anaconda
 dependencies:
