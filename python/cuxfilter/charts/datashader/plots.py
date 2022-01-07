@@ -10,7 +10,7 @@ from .custom_extensions import (
     calc_connected_edges,
 )
 
-from distutils.version import LooseVersion
+from packaging.version import Version
 import datashader as ds
 from datashader import transfer_functions as tf
 import dask_cudf
@@ -36,7 +36,7 @@ from PIL import Image
 import requests
 from io import BytesIO
 
-ds_version = LooseVersion(ds.__version__)
+ds_version = Version(ds.__version__)
 
 _color_mapper = {"linear": LinearColorMapper, "log": LogColorMapper}
 
@@ -77,7 +77,7 @@ def _compute_datashader_assets(
     cmap = {"cmap": color_palette}
 
     if isinstance(data[x].dtype, cudf.core.dtypes.CategoricalDtype):
-        if ds_version >= "0.11":
+        if ds_version >= Version("0.11"):
             aggregator = ds.by(x, getattr(ds, aggregate_fn)(aggregate_col),)
         else:
             print("only count_cat supported by datashader <=0.10")

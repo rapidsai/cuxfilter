@@ -1,4 +1,4 @@
-# name: cudf_dev11.0
+# name: cudf_dev10.0
 channels:
 - rapidsai
 - rapidsai-nightly
@@ -23,7 +23,7 @@ dependencies:
 - bokeh>=2.3.2,<=2.4
 - panel>=0.10.3,<=0.12.4
 - pyppeteer>=0.2.6
-- cudatoolkit=11.0
+- cudatoolkit=11.2
 - nodejs
 - recommonmark
 - pytest
@@ -38,9 +38,9 @@ dependencies:
 - jupyterlab
 - flake8=3.8.3
 - black=19.10
-- pip
 - pydeck>=0.3, <=0.5.0
 - packaging
+- pip
 - pip:
   - sphinx-markdown-tables
   - jupyter-server-proxy

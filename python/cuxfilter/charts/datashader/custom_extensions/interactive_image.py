@@ -1,16 +1,14 @@
 from __future__ import absolute_import
 
-from distutils.version import LooseVersion
-
+from packaging.version import Version
 import bokeh
-import uuid
-
 from bokeh.document import Document
 from bokeh.models import ColumnDataSource, CustomJS, Slider
+import uuid
 
-bokeh_version = LooseVersion(bokeh.__version__)
+bokeh_version = Version(bokeh.__version__)
 
-if bokeh_version > "0.12.9":
+if bokeh_version > Version("0.12.9"):
     from bokeh.embed.notebook import notebook_content
 else:
     from bokeh.embed import notebook_div
