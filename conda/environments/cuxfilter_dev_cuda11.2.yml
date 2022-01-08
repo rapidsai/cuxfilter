@@ -3,6 +3,7 @@ channels:
 - rapidsai
 - rapidsai-nightly
 - nvidia
+- pyviz
 - conda-forge
 - anaconda
 dependencies:
@@ -45,3 +46,4 @@ dependencies:
 - pip:
   - sphinx-markdown-tables
   - jupyter-server-proxy
+  - pyviz-comms

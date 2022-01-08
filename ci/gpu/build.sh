@@ -58,14 +58,14 @@ gpuci_mamba_retry install -y \
                "cugraph=$MINOR_VERSION.*" \
                "cuspatial=$MINOR_VERSION.*" \
                "dask-cudf=$MINOR_VERSION.*" "dask-cuda=$MINOR_VERSION.*" \
-               "numba>=0.51.2" \
+               "numba>=0.54" \
                "bokeh>=2.3.2,<=2.4" \
                "rapids-build-env=$MINOR_VERSION.*" \
                "rapids-notebook-env=$MINOR_VERSION.*"
 
 # https://docs.rapids.ai/maintainers/depmgmt/ 
-# conda remove --force rapids-build-env rapids-notebook-env
-# conda install "your-pkg=1.0.0"
+conda remove --force rapids-build-env rapids-notebook-env
+conda install -y "holoviews>1.14.1, <=1.14.6" "datashader>0.12, <=0.13"
 
 gpuci_logger "Check versions"
 python --version

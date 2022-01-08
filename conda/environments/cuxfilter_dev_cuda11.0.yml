@@ -46,3 +46,4 @@ dependencies:
 - pip:
   - sphinx-markdown-tables
   - jupyter-server-proxy
+  - pyviz-comms
