@@ -64,7 +64,9 @@ class BaseNonAggregate(BaseChart):
 
     def view(self):
         return chart_view(
-            self.chart, width=self.width, title=self.title
+            self.chart,
+            width=self.width,
+            title=self.title
             # self.chart.view(), width=self.width, title=self.title
         )
 
@@ -222,6 +224,7 @@ class BaseNonAggregate(BaseChart):
             )
             self.reload_chart(temp_data, False)
             del temp_data
+
         return cb
 
     def get_lasso_select_callback(self, dashboard_cls):

@@ -1,5 +1,3 @@
-from bokeh import tile_providers
-from holoviews.operation.datashader import aggregate
 from ..core.non_aggregate import (
     BaseScatter,
     BaseLine,
@@ -10,7 +8,7 @@ from .custom_extensions import (
     InteractiveImage,
     CustomInspectTool,
     calc_connected_edges,
-    InteractiveDatashaderPoints
+    # InteractiveDatashaderPoints,
 )
 
 from distutils.version import LooseVersion

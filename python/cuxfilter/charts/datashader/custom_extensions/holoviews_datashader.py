@@ -20,7 +20,8 @@ class InteractiveDatashaderPoints(param.Parameterized):
     source_df = param.ClassSelector(
         class_=cudf.DataFrame,
         default=cudf.DataFrame(),
-        doc="source cuDF dataframe")
+        doc="source cuDF dataframe",
+    )
     points = hv.Scatter(data=[])
     x = param.String("x")
     y = param.String("y")
@@ -30,12 +31,16 @@ class InteractiveDatashaderPoints(param.Parameterized):
     cmap = param.Dict()
     default_tools = param.List(
         default=["reset", "save", "hover", "lasso_select", "wheel_zoom"],
-        doc="interactive tools to add to the chart")
+        doc="interactive tools to add to the chart",
+    )
     width = param.Integer(default=400, doc="width of the chart")
     height = param.Integer(default=400, doc="height of the chart")
     color_palette = param.List()
     streams = [
-        hv.streams.SelectionXY(), hv.streams.Lasso(), hv.streams.PlotReset()]
+        hv.streams.SelectionXY(),
+        hv.streams.Lasso(),
+        hv.streams.PlotReset(),
+    ]
     tile_provider = param.String(None)
 
     def _compute_datashader_assets(self):
@@ -45,19 +50,22 @@ class InteractiveDatashaderPoints(param.Parameterized):
             self.source_df[self.x].dtype, cudf.core.dtypes.CategoricalDtype
         ):
             self.aggregator = ds.by(
-                self.x, getattr(ds, self.aggregate_fn)(self.aggregate_col))
+                self.x, getattr(ds, self.aggregate_fn)(self.aggregate_col)
+            )
             self.cmap = {
                 "color_key": {
                     k: v
-                    for k, v in zip(list(
-                        self.source_df[self.x].cat.categories),
-                        self.color_palette)
+                    for k, v in zip(
+                        list(self.source_df[self.x].cat.categories),
+                        self.color_palette,
+                    )
                 }
             }
         else:
             if self.aggregate_fn:
                 self.aggregator = getattr(ds, self.aggregate_fn)(
-                    self.aggregate_col)
+                    self.aggregate_col
+                )
 
     def __init__(self, **params):
         """
@@ -67,7 +75,11 @@ class InteractiveDatashaderPoints(param.Parameterized):
         self.points = hv.Scatter(
             self.source_df, kdims=[self.x], vdims=[self.y, self.aggregate_col]
         )
-        self.tiles = tile_sources[self.tile_provider]() if (self.tile_provider is not None) else self.tile_provider
+        self.tiles = (
+            tile_sources[self.tile_provider]()
+            if (self.tile_provider is not None)
+            else self.tile_provider
+        )
         self._compute_datashader_assets()
 
     def update_points(self, data):
@@ -87,16 +99,16 @@ class InteractiveDatashaderPoints(param.Parameterized):
 
     def view(self):
         agg = datashade(
-            self.points, cnorm=self.pixel_shade_type,
+            self.points,
+            cnorm=self.pixel_shade_type,
             aggregator=self.aggregator,
-            **self.cmap
-        ).opts(
-            default_tools=self.default_tools)
+            **self.cmap,
+        ).opts(default_tools=self.default_tools)
         return pn.pane.HoloViews(
             self.tiles * agg if self.tiles is not None else agg,
             width=self.width,
             height=self.height,
-            )
+        )
 
     def add_reset_event(self, callback_fn):
         reset = hv.streams.PlotReset()
