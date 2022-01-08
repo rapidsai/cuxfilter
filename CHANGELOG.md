@@ -1,6 +1,40 @@
+# cuXfilter 22.02.00 (Date TBD)
+
+Please see https://github.com/rapidsai/cuxfilter/releases/tag/v22.02.00a for the latest changes to this development branch.
+
+# cuXfilter 21.12.00 (Date TBD)
+
+Please see https://github.com/rapidsai/cuxfilter/releases/tag/v21.12.00a for the latest changes to this development branch.
+
+# cuXfilter 21.10.00 (7 Oct 2021)
+
+## 🐛 Bug Fixes
+
+- revert pyppeteer dependency changes ([#322](https://github.com/rapidsai/cuxfilter/pull/322)) [@AjayThorve](https://github.com/AjayThorve)
+- Fix/unique names ([#317](https://github.com/rapidsai/cuxfilter/pull/317)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 📖 Documentation
+
+- Branch 21.10 merge 21.08 ([#318](https://github.com/rapidsai/cuxfilter/pull/318)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- fix chart names being saved as incorrect keys prior to initialization ([#325](https://github.com/rapidsai/cuxfilter/pull/325)) [@AjayThorve](https://github.com/AjayThorve)
+- Skip imports tests on arm64 ([#320](https://github.com/rapidsai/cuxfilter/pull/320)) [@Ethyling](https://github.com/Ethyling)
+- ENH Replace gpuci_conda_retry with gpuci_mamba_retry ([#305](https://github.com/rapidsai/cuxfilter/pull/305)) [@dillon-cullinan](https://github.com/dillon-cullinan)
+
 # cuXfilter 21.08.00 (Date TBD)
 
-Please see https://github.com/rapidsai/cuxfilter/releases/tag/v21.08.00a for the latest changes to this development branch.
+## 🐛 Bug Fixes
+
+- Fix/follow up to #303 ([#304](https://github.com/rapidsai/cuxfilter/pull/304)) [@AjayThorve](https://github.com/AjayThorve)
+- update pyproj version ([#302](https://github.com/rapidsai/cuxfilter/pull/302)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- Fix/update bokeh version ([#303](https://github.com/rapidsai/cuxfilter/pull/303)) [@AjayThorve](https://github.com/AjayThorve)
+- Fix `21.08` forward-merge conflicts ([#301](https://github.com/rapidsai/cuxfilter/pull/301)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Fix merge conflicts ([#290](https://github.com/rapidsai/cuxfilter/pull/290)) [@ajschmidt8](https://github.com/ajschmidt8)
 
 # cuXfilter 21.06.00 (9 Jun 2021)
 

@@ -122,7 +122,10 @@ class TestBaseAggregateChart:
             self.dashboard._query_local_variables_dict,
         )
 
-        assert self.dashboard._query_str_dict["key_count_bar"] == query
+        assert (
+            self.dashboard._query_str_dict[f"key_count_bar_{bb.title}"]
+            == query
+        )
         for key in local_dict:
             assert (
                 self.dashboard._query_local_variables_dict[key]

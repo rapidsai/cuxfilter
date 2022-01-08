@@ -36,11 +36,12 @@ class BaseChart:
     _initialized = False
     # widget=False can only be rendered the main layout
     is_widget = False
+    title = ""
 
     @property
     def name(self):
         chart_type = self.chart_type if self.chart_type else "chart"
-        return f"{self.x}_{chart_type}"
+        return f"{self.x}_{chart_type}_{self.title}"
 
     @property
     def width(self):

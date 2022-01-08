@@ -11,7 +11,7 @@ from .custom_extensions import (
     # InteractiveDatashaderPoints,
 )
 
-from distutils.version import LooseVersion
+from packaging.version import Version
 import datashader as ds
 from datashader import transfer_functions as tf
 import dask_cudf
@@ -37,7 +37,7 @@ from PIL import Image
 import requests
 from io import BytesIO
 
-ds_version = LooseVersion(ds.__version__)
+ds_version = Version(ds.__version__)
 
 _color_mapper = {"linear": LinearColorMapper, "log": LogColorMapper}
 
@@ -78,7 +78,7 @@ def _compute_datashader_assets(
     cmap = {"cmap": color_palette}
 
     if isinstance(data[x].dtype, cudf.core.dtypes.CategoricalDtype):
-        if ds_version >= "0.11":
+        if ds_version >= Version("0.11"):
             aggregator = ds.by(x, getattr(ds, aggregate_fn)(aggregate_col),)
         else:
             print("only count_cat supported by datashader <=0.10")
@@ -260,7 +260,7 @@ class Scatter(BaseScatter):
 
         Ouput:
         """
-        if len(self.title) == 0:
+        if not self.title:
             self.title = (
                 "Scatter plot for "
                 + self.aggregate_col
@@ -523,7 +523,7 @@ class Graph(BaseGraph):
 
         Ouput:
         """
-        if isinstance(dataframe, cudf.core.DataFrame):
+        if isinstance(dataframe, cudf.DataFrame):
             self.nodes = dataframe
         else:
             self.nodes = dataframe.data
@@ -616,7 +616,7 @@ class Graph(BaseGraph):
 
         Ouput:
         """
-        if len(self.title) == 0:
+        if not self.title:
             self.title = "Graph"
         self.x_range = (
             self.x_range[0] - self.node_point_size,
@@ -871,7 +871,7 @@ class Line(BaseLine):
 
         Ouput:
         """
-        if len(self.title) == 0:
+        if not self.title:
             if self.x == self.y:
                 self.title = "Line plot for " + self.x
             else:
@@ -1085,7 +1085,7 @@ class StackedLines(BaseStackedLine):
 
         Ouput:
         """
-        if len(self.title) == 0:
+        if not self.title:
             self.title = "Stacked Line plots on x-axis: " + self.x
 
         self.chart = figure(

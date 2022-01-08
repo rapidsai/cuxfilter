@@ -23,6 +23,12 @@ class BaseLine(BaseNonAggregate):
             return self._color_input
         return self.default_color
 
+    @property
+    def name(self):
+        # overwrite BaseChart name function to allow unique chart on value x
+        chart_type = self.chart_type if self.chart_type else "chart"
+        return f"{self.x}_{self.y}_{chart_type}_{self.title}"
+
     def __init__(
         self,
         x,

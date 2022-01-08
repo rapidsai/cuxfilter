@@ -29,7 +29,12 @@ class BaseNonAggregate(BaseChart):
     def name(self):
         # overwrite BaseChart name function to allow unique chart on value x
         chart_type = self.chart_type if self.chart_type else "chart"
-        return f"{self.x}_{self.y}_{chart_type}"
+        return (
+            f"{self.x}_{self.y}"
+            f"{'_'+self.aggregate_col if self.aggregate_col else ''}"
+            f"{'_'+self.aggregate_fn if self.aggregate_fn else ''}"
+            f"_{chart_type}_{self.title}"
+        )
 
     def initiate_chart(self, dashboard_cls):
         """
