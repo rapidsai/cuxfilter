@@ -18,9 +18,7 @@ opts = dict(
 
 class InteractiveDatashaderPoints(param.Parameterized):
     source_df = param.ClassSelector(
-        class_=cudf.DataFrame,
-        default=cudf.DataFrame(),
-        doc="source cuDF dataframe",
+        class_=cudf.DataFrame, doc="source cuDF dataframe",
     )
     points = hv.Scatter(data=[])
     x = param.String("x")
