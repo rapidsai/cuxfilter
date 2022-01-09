@@ -120,9 +120,7 @@ class dynspread(SpreadingOperation):
 
 class InteractiveDatashader(param.Parameterized):
     source_df = param.ClassSelector(
-        class_=cudf.DataFrame,
-        default=cudf.DataFrame(),
-        doc="source cuDF dataframe",
+        class_=cudf.DataFrame, doc="source cuDF dataframe",
     )
     x = param.String("x")
     y = param.String("y")
@@ -422,14 +420,10 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
 
 class InteractiveDatashaderGraph(param.Parameterized):
     nodes_df = param.ClassSelector(
-        class_=cudf.DataFrame,
-        default=cudf.DataFrame(),
-        doc="nodes cuDF dataframe",
+        class_=cudf.DataFrame, doc="nodes cuDF dataframe",
     )
     edges_df = param.ClassSelector(
-        class_=cudf.DataFrame,
-        default=cudf.DataFrame(),
-        doc="edges cuDF dataframe",
+        class_=cudf.DataFrame, doc="edges cuDF dataframe",
     )
     node_x = param.String("x")
     node_y = param.String("y")
