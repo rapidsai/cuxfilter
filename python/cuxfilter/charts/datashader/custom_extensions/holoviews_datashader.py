@@ -208,16 +208,8 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
             cudf.core.dtypes.CategoricalDtype,
         ):
             self.clims = (
-                self.source_df[
-                    self.aggregate_col
-                    if self.aggregate_col is not None
-                    else self.y
-                ].min(),
-                self.source_df[
-                    self.aggregate_col
-                    if self.aggregate_col is not None
-                    else self.y
-                ].max(),
+                self.source_df[self.aggregate_col].min(),
+                self.source_df[self.aggregate_col].max(),
             )
 
     def _compute_datashader_assets(self):
