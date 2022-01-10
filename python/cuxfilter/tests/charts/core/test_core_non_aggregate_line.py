@@ -63,6 +63,7 @@ class TestNonAggregateBaseLine:
     def test_compute_query_dict(self, x_range, y_range, query, local_dict):
         bl = BaseLine(x="x", y="y", title="custom_title")
         bl.chart_type = "non_aggregate_line"
+        bl.box_selected_range = local_dict
         bl.chart = hv.InteractiveDatashader()
         bl.x_range = x_range
         bl.y_range = y_range

@@ -116,6 +116,7 @@ class TestBaseStackedLine:
         bsl.chart_type = "stacked_lines"
         bsl.x_range = x_range
         bsl.y_range = y_range
+        bsl.box_selected_range = local_dict
         df = cudf.DataFrame({"x": [1, 2, 2], "y": [3, 4, 5]})
         dashboard = cuxfilter.dashboard.DashBoard(
             dataframe=cuxfilter.DataFrame.from_dataframe(df)

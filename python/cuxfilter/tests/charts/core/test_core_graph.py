@@ -168,6 +168,7 @@ class TestCoreGraph:
     def test_compute_query_dict(self, x_range, y_range, query, local_dict):
         bg = BaseGraph()
         bg.chart_type = "test"
+        bg.box_selected_range = local_dict
         bg.x_range = x_range
         bg.y_range = y_range
 

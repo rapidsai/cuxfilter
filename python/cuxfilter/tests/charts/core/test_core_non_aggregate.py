@@ -181,6 +181,7 @@ class TestCoreNonAggregateChart:
         bnac.chart_type = "test"
         bnac.x = "x"
         bnac.y = "y"
+        bnac.box_selected_range = local_dict
         bnac.x_range = x_range
         bnac.y_range = y_range
 
