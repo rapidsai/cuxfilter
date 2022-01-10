@@ -118,15 +118,10 @@ class dynspread(SpreadingOperation):
         )
 
 
-class InteractiveDatashader(param.Parameterized):
-    source_df = param.ClassSelector(
-        class_=cudf.DataFrame, doc="source cuDF dataframe",
-    )
-    x = param.String("x")
-    y = param.String("y")
+class InteractiveDatashaderBase(param.Parameterized):
     width = param.Integer(400)
     height = param.Integer(400)
-    pixel_shade_type = param.String("linear")
+    tile_provider = param.String(None)
     box_stream = param.ClassSelector(
         class_=hv.streams.SelectionXY, default=hv.streams.SelectionXY()
     )
@@ -137,28 +132,27 @@ class InteractiveDatashader(param.Parameterized):
         class_=hv.streams.PlotReset,
         default=hv.streams.PlotReset(resetting=False),
     )
-    spread_threshold = param.Number(
-        0, doc="threshold parameter passed to dynspread function"
+    tools = param.List(
+        default=["pan", "box_select", "reset", "lasso_select", "wheel_zoom"],
+        doc="interactive tools to add to the chart",
     )
-    tile_provider = param.String(None)
+
+    def __init__(self, **params):
+        """
+        initialize InteractiveDatashaderBase object
+        """
+        super(InteractiveDatashaderBase, self).__init__(**params)
+        self.tiles = (
+            tile_sources[self.tile_provider]()
+            if (self.tile_provider is not None)
+            else self.tile_provider
+        )
 
     @property
     def vdims(self):
         if self.aggregate_col is None:
             return [self.y]
         return [self.y, self.aggregate_col]
-
-    def __init__(self, **params):
-        """
-        initialize InteractiveDatashader object, and set a listener on
-        self.data
-        """
-        super(InteractiveDatashader, self).__init__(**params)
-        self.tiles = (
-            tile_sources[self.tile_provider]()
-            if (self.tile_provider is not None)
-            else self.tile_provider
-        )
 
     def add_box_select_callback(self, callback_fn):
         self.box_stream = hv.streams.SelectionXY(subscribers=[callback_fn])
@@ -172,6 +166,18 @@ class InteractiveDatashader(param.Parameterized):
 
     def add_reset_event(self, callback_fn):
         self.reset_stream = hv.streams.PlotReset(subscribers=[callback_fn])
+
+
+class InteractiveDatashader(InteractiveDatashaderBase):
+    source_df = param.ClassSelector(
+        class_=cudf.DataFrame, doc="source cuDF dataframe",
+    )
+    x = param.String("x")
+    y = param.String("y")
+    pixel_shade_type = param.String("linear")
+    spread_threshold = param.Number(
+        0, doc="threshold parameter passed to dynspread function"
+    )
 
 
 class InteractiveDatashaderPoints(InteractiveDatashader):
@@ -246,7 +252,9 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
 
     @param.depends("source_df")
     def points(self, **kwargs):
-        return hv.Scatter(self.source_df, kdims=[self.x], vdims=self.vdims)
+        return hv.Scatter(
+            self.source_df, kdims=[self.x], vdims=self.vdims,
+        ).opts(tools=[], default_tools=[])
 
     def get_chart(self, streams=[]):
         dmap = rasterize(
@@ -410,7 +418,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         )
 
 
-class InteractiveDatashaderGraph(param.Parameterized):
+class InteractiveDatashaderGraph(InteractiveDatashaderBase):
     nodes_df = param.ClassSelector(
         class_=cudf.DataFrame, doc="nodes cuDF dataframe",
     )
@@ -419,8 +427,6 @@ class InteractiveDatashaderGraph(param.Parameterized):
     )
     node_x = param.String("x")
     node_y = param.String("y")
-    width = param.Integer(400)
-    height = param.Integer(400)
     node_pixel_shade_type = param.String("linear")
     node_spread_threshold = param.Number(
         0, doc="threshold parameter passed to dynspread function"
@@ -452,16 +458,6 @@ class InteractiveDatashaderGraph(param.Parameterized):
     edge_source = param.String("src")
     edge_target = param.String("dst")
     edge_transparency = param.Number(0, bounds=(0, 1))
-    box_stream = param.ClassSelector(
-        class_=hv.streams.SelectionXY, default=hv.streams.SelectionXY()
-    )
-    lasso_stream = param.ClassSelector(
-        class_=hv.streams.Lasso, default=hv.streams.Lasso()
-    )
-    reset_stream = param.ClassSelector(
-        class_=hv.streams.PlotReset,
-        default=hv.streams.PlotReset(resetting=False),
-    )
     inspect_neighbors = param.ClassSelector(
         class_=CustomInspectTool,
         doc="tool to assign selection mechanism(inspect neighbors or default)",
@@ -469,10 +465,6 @@ class InteractiveDatashaderGraph(param.Parameterized):
     display_edges = param.ClassSelector(
         class_=CustomInspectTool,
         doc="tool to select whether to display edges or not",
-    )
-    tools = param.List(
-        default=["pan", "box_select", "reset", "lasso_select", "wheel_zoom"],
-        doc="interactive tools to add to the chart",
     )
 
     def update_color_palette(self, value):
@@ -554,16 +546,3 @@ class InteractiveDatashaderGraph(param.Parameterized):
             sizing_mode="stretch_both",
             height=self.height,
         )
-
-    def add_box_select_callback(self, callback_fn):
-        self.box_stream = hv.streams.SelectionXY(subscribers=[callback_fn])
-
-    def add_lasso_select_callback(self, callback_fn):
-        self.lasso_stream = hv.streams.Lasso(subscribers=[callback_fn])
-
-    def reset_all_selections(self):
-        self.lasso_stream.reset()
-        self.box_stream.reset()
-
-    def add_reset_event(self, callback_fn):
-        self.reset_stream = hv.streams.PlotReset(subscribers=[callback_fn])
