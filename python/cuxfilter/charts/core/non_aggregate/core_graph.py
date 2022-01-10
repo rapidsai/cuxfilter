@@ -20,6 +20,7 @@ class BaseGraph(BaseChart):
     x_range: Tuple = None
     y_range: Tuple = None
     selected_indices: cudf.Series = None
+    box_selected_range = None
     use_data_tiles = False
     default_palette = CUXF_DEFAULT_COLOR_PALETTE
 
@@ -259,14 +260,15 @@ class BaseGraph(BaseChart):
                 **dashboard_cls._query_str_dict,
                 **{self.name: query},
             }
+            self.box_selected_range = {
+                self.node_x + "_min": self.x_range[0],
+                self.node_x + "_max": self.x_range[1],
+                self.node_y + "_min": self.y_range[0],
+                self.node_y + "_max": self.y_range[1],
+            }
             temp_local_dict = {
                 **dashboard_cls._query_local_variables_dict,
-                **{
-                    self.node_x + "_min": self.x_range[0],
-                    self.node_x + "_max": self.x_range[1],
-                    self.node_y + "_min": self.y_range[0],
-                    self.node_y + "_max": self.y_range[1],
-                },
+                **self.box_selected_range,
             }
             nodes = dashboard_cls._query(
                 dashboard_cls._generate_query_str(temp_str_dict),
@@ -345,7 +347,7 @@ class BaseGraph(BaseChart):
 
         Ouput:
         """
-        if self.x_range is not None and self.y_range is not None:
+        if self.box_selected_range:
             query_str_dict[self.name] = (
                 f"@{self.node_x}_min<={self.node_x}<=@{self.node_x}_max"
                 + f" and @{self.node_y}_min<={self.node_y}<=@{self.node_y}_max"
@@ -410,6 +412,7 @@ class BaseGraph(BaseChart):
                 # chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
             self.selected_indices = None
+            self.box_selected_range = None
             self.chart.reset_all_selections()
             dashboard_cls._query_str_dict.pop(self.name, None)
 

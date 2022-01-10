@@ -22,6 +22,7 @@ class BaseNonAggregate(BaseChart):
     x_range: Tuple = None
     y_range: Tuple = None
     selected_indices: cudf.Series = None
+    box_selected_range = None
     aggregate_col = None
     use_data_tiles = False
 
@@ -109,14 +110,15 @@ class BaseNonAggregate(BaseChart):
                 **dashboard_cls._query_str_dict,
                 **{self.name: query},
             }
+            self.box_selected_range = {
+                self.x + "_min": self.x_range[0],
+                self.x + "_max": self.x_range[1],
+                self.y + "_min": self.y_range[0],
+                self.y + "_max": self.y_range[1],
+            }
             temp_local_dict = {
                 **dashboard_cls._query_local_variables_dict,
-                **{
-                    self.x + "_min": self.x_range[0],
-                    self.x + "_max": self.x_range[1],
-                    self.y + "_min": self.y_range[0],
-                    self.y + "_max": self.y_range[1],
-                },
+                **self.box_selected_range,
             }
 
             temp_data = dashboard_cls._query(
@@ -183,7 +185,7 @@ class BaseNonAggregate(BaseChart):
 
         Ouput:
         """
-        if self.x_range is not None and self.y_range is not None:
+        if self.box_selected_range:
             query_str_dict[self.name] = (
                 f"@{self.x}_min<={self.x}<=@{self.x}_max"
                 + f" and @{self.y}_min<={self.y}<=@{self.y}_max"
@@ -248,6 +250,7 @@ class BaseNonAggregate(BaseChart):
                 # chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
             self.selected_indices = None
+            self.box_selected_range = None
             self.chart.reset_all_selections()
             dashboard_cls._query_str_dict.pop(self.name, None)
             dashboard_cls._reload_charts()
