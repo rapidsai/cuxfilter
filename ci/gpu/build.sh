@@ -64,8 +64,8 @@ gpuci_mamba_retry install -y \
                "rapids-notebook-env=$MINOR_VERSION.*"
 
 # https://docs.rapids.ai/maintainers/depmgmt/ 
-conda remove --force rapids-build-env rapids-notebook-env
-conda install -y "holoviews>1.14.1, <=1.14.6" "datashader>0.12, <=0.13"
+# conda remove --force rapids-build-env rapids-notebook-env
+# conda install "your-pkg=1.0.0"
 
 gpuci_logger "Check versions"
 python --version
