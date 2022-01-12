@@ -2,9 +2,11 @@
 
 Please see https://github.com/rapidsai/cuxfilter/releases/tag/v22.02.00a for the latest changes to this development branch.
 
-# cuXfilter 21.12.00 (Date TBD)
+# cuXfilter 21.12.00 (9 Dec 2021)
 
-Please see https://github.com/rapidsai/cuxfilter/releases/tag/v21.12.00a for the latest changes to this development branch.
+## 📖 Documentation
+
+- update docstrings examples to fix #328 ([#329](https://github.com/rapidsai/cuxfilter/pull/329)) [@AjayThorve](https://github.com/AjayThorve)
 
 # cuXfilter 21.10.00 (7 Oct 2021)
 
