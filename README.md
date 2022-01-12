@@ -42,7 +42,7 @@ The original version (0.2) of cuxfilter, most known for the backend powering the
 
 ## Usage
 
-### Example 1
+### Example 1 [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/Mortgage_example.ipynb)
 
 ```python
 import cuxfilter
@@ -73,12 +73,15 @@ d = cux_df.dashboard([chart1, chart3, chart4], sidebar=[chart2], layout=cuxfilte
 # d.app()
 
 #run the dashboard as a webapp:
-d.show('jupyter-notebook/lab-url')
+# d.show('jupyter-notebook/lab-url')
+
+#run the dashboard within the notebook cell
+d.app()
+
 ```
 ![output dashboard](./docs/_images/demo.gif)
 
-### Example 2
-
+### Example 2 [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/auto_accidents_example.ipynb)
 
 ```python
 import cuxfilter
@@ -108,7 +111,10 @@ d = cux_df.dashboard([chart0, chart2],sidebar=[chart3, chart1], layout=cuxfilter
 # d.app()
 
 #run the dashboard as a webapp:
-d.show('jupyter-notebook/lab-url')
+# d.show('jupyter-notebook/lab-url')
+
+#run the dashboard within the notebook cell
+d.app()
 ```
 ![output dashboard](./docs/_images/demo2.gif)
 
@@ -152,25 +158,25 @@ cuxfilter can be installed with conda ([miniconda](https://conda.io/miniconda.ht
 
 For `cuxfilter version == 22.02` :
 ```bash
-# for CUDA 10.1
+# for CUDA 11.0
 conda install -c rapidsai -c nvidia -c numba -c conda-forge \
-    cuxfilter=22.02 python=3.7 cudatoolkit=10.1
+    cuxfilter=22.02 python=3.7 cudatoolkit=11.0
 
-# or, for CUDA 10.2
+# or, for CUDA 11.2
 conda install -c rapidsai -c nvidia -c numba -c conda-forge \
-    cuxfilter=22.02 python=3.7 cudatoolkit=10.2
+    cuxfilter=22.02 python=3.7 cudatoolkit=11.2
 
 ```
 
 For the nightly version of `cuxfilter` :
 ```bash
-# for CUDA 10.1
+# for CUDA 11.0
 conda install -c rapidsai-nightly -c nvidia -c numba -c conda-forge \
-    cuxfilter python=3.7 cudatoolkit=10.1
+    cuxfilter python=3.7 cudatoolkit=11.0
 
-# or, for CUDA 10.2
+# or, for CUDA 11.2
 conda install -c rapidsai-nightly -c nvidia -c numba -c conda-forge \
-    cuxfilter python=3.7 cudatoolkit=10.2
+    cuxfilter python=3.7 cudatoolkit=11.2
 ```
 
 Note: cuxfilter is supported only on Linux, and with Python versions 3.7 and later.
