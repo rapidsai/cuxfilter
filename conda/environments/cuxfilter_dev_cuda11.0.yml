@@ -3,6 +3,7 @@ channels:
 - rapidsai
 - rapidsai-nightly
 - nvidia
+- pyviz
 - conda-forge
 - anaconda
 dependencies:
@@ -14,8 +15,9 @@ dependencies:
 - distributed>=2.12.0
 - dask-cuda=22.02
 - dask-cudf=22.02
-- datashader>=0.11.1
-- numba>=0.51.2
+- datashader>0.12, <=0.13
+- holoviews>1.14.1, <=1.14.6
+- numba>=0.54
 - geopandas >=0.9.0,<0.10.0a0
 - pyproj>=2.4, <=3.1
 - libwebp
@@ -38,9 +40,10 @@ dependencies:
 - jupyterlab
 - flake8=3.8.3
 - black=19.10
-- pip
 - pydeck>=0.3, <=0.5.0
 - packaging
+- pip
 - pip:
   - sphinx-markdown-tables
   - jupyter-server-proxy
+  - pyviz-comms

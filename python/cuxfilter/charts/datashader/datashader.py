@@ -10,7 +10,7 @@ def scatter(
     color_palette=None,
     aggregate_col=None,
     aggregate_fn="count",
-    point_size=1,
+    point_size=15,
     point_shape="circle",
     pixel_shade_type="eq_hist",
     pixel_density=0.5,
@@ -21,7 +21,7 @@ def scatter(
     title="",
     timeout=100,
     legend=True,
-    legend_position="center",
+    legend_position="top_right",
     **library_specific_params,
 ):
     """
@@ -70,7 +70,7 @@ def scatter(
 
     tile_provider: str, default None
         Underlying map type.See
-        https://docs.bokeh.org/en/latest/docs/reference/tile_providers.htm
+        https://holoviews.org/reference/elements/bokeh/Tiles.html
 
     width: int,  default 800
 
@@ -90,9 +90,10 @@ def scatter(
         Adds Bokeh.models.LinearColorMapper based legend if True,
         Note: legend currently only works with pixel_shade_type='linear'/'log'
 
-    legend_position: str, default 'center'
+    legend_position: str, default center
         position of legend on the chart.
-        Valid places are: ‘left’, ‘right’, ‘above’, ‘below’, ‘center’
+        Valid places are: right, left, bottom, top, top_right, top_left,
+                        bottom_left, bottom_right
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
@@ -146,7 +147,7 @@ def graph(
     edge_aggregate_fn="count",
     node_color_palette=None,
     edge_color_palette=["#000000"],
-    node_point_size=8,
+    node_point_size=15,
     node_point_shape="circle",
     node_pixel_shade_type="eq_hist",
     node_pixel_density=0.8,
@@ -160,7 +161,7 @@ def graph(
     title="",
     timeout=100,
     legend=True,
-    legend_position="center",
+    legend_position="top_right",
     **library_specific_params,
 ):
 
@@ -243,7 +244,7 @@ def graph(
 
     tile_provider: str, default None
         Underlying map type.See
-        https://docs.bokeh.org/en/latest/docs/reference/tile_providers.html
+        https://holoviews.org/reference/elements/bokeh/Tiles.html
 
     width: int,  default 800
 
@@ -263,9 +264,10 @@ def graph(
         Adds Bokeh.models.LinearColorMapper based legend if True,
         Note: legend currently only works with pixel_shade_type='linear'/'log'
 
-    legend_position: str, default 'center'
+    legend_position: str, default center
         position of legend on the chart.
-        Valid places are: ‘left’, ‘right’, ‘above’, ‘below’, ‘center’
+        Valid places are: right, left, bottom, top, top_right, top_left,
+                        bottom_left, bottom_right
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
@@ -322,14 +324,14 @@ def heatmap(
     color_palette=None,
     aggregate_col=None,
     aggregate_fn="mean",
-    point_size=10,
+    point_size=15,
     point_shape="rect_vertical",
     width=800,
     height=400,
     title="",
     timeout=100,
     legend=True,
-    legend_position="center",
+    legend_position="top_right",
     **library_specific_params,
 ):
     """
@@ -392,9 +394,10 @@ def heatmap(
     legend: bool, default True
         Adds Bokeh.models.LinearColorMapper based legend if True,
 
-    legend_position: str, default 'center'
+    legend_position: str, default center
         position of legend on the chart.
-        Valid places are: ‘left’, ‘right’, ‘above’, ‘below’, ‘center’
+        Valid places are: right, left, bottom, top, top_right, top_left,
+                        bottom_left, bottom_right
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to the
@@ -531,7 +534,7 @@ def stacked_lines(
     title="",
     timeout=100,
     legend=True,
-    legend_position="center",
+    legend_position="top_right",
     **library_specific_params,
 ):
     """
@@ -573,9 +576,10 @@ def stacked_lines(
         Adds Bokeh.models.LinearColorMapper based legend if True,
         Note: legend currently only works with pixel_shade_type='linear'/'log'
 
-    legend_position: str, default 'center'
+    legend_position: str, default center
         position of legend on the chart.
-        Valid places are: ‘left’, ‘right’, ‘above’, ‘below’, ‘center’
+        Valid places are: right, left, bottom, top, top_right, top_left,
+                        bottom_left, bottom_right
 
 
     **library_specific_params:

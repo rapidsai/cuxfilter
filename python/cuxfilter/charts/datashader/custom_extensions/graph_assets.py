@@ -317,6 +317,8 @@ def calc_connected_edges(
         suffixes=("_src", "_dst"),
     ).reset_index(drop=True)
 
+    result = cudf.DataFrame()
+
     if connected_edges_df.shape[0] > 1:
         # shape=1 when the dataset has src == dst edges
         if edge_render_type == "direct":
@@ -332,8 +334,6 @@ def calc_connected_edges(
                 connected_edge_columns,
                 curve_params.copy(),
             )
-    else:
-        result = cudf.DataFrame()
 
     if result.shape[0] == 0:
         result = cudf.DataFrame({k: cp.nan for k in ["x", "y"]})

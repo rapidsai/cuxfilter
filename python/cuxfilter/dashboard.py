@@ -8,6 +8,9 @@ from bokeh.embed import server_document
 import os
 import urllib
 import warnings
+from IPython.core.display import Image, display
+from IPython.display import publish_display_data
+from collections import Counter
 
 from .charts.core import BaseChart, BaseWidget, ViewDataFrame
 from .charts.constants import (
@@ -21,9 +24,6 @@ from .layouts import single_feature
 from .charts.panel_widgets import data_size_indicator
 from .assets import screengrab, get_open_port
 from .themes import light
-from IPython.core.display import Image, display
-from IPython.display import publish_display_data
-from collections import Counter
 
 _server_info = (
     "<b>Running server:</b>"
@@ -191,7 +191,7 @@ class DashBoard:
         theme=light,
         title="Dashboard",
         data_size_widget=True,
-        warnings=False,
+        show_warnings=False,
         layout_array=None,
     ):
         self._cuxfilter_df = dataframe
@@ -233,8 +233,12 @@ class DashBoard:
         self._theme = theme
         self._layout_array = layout_array
         # handle dashboard warnings
-        if not warnings:
+        if not show_warnings:
             u.log.disabled = True
+            warnings.filterwarnings("ignore")
+        else:
+            u.log.disabled = False
+            warnings.filterwarnings("default")
 
     @property
     def charts(self):
@@ -479,6 +483,7 @@ class DashBoard:
                 self._sidebar,
                 self._theme,
                 self._layout_array,
+                render_location="web-app",
             ),
             port=port,
             websocket_origin=websocket_origin,
@@ -547,28 +552,11 @@ class DashBoard:
 
         display(Image("temp.png"))
 
-    def app(
-        self,
-        notebook_url=DEFAULT_NOTEBOOK_URL,
-        port: int = 0,
-        service_proxy=None,
-    ):
+    def app(self, sidebar_width=280):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
         ----------
-        url: str, optional
-            url of the notebook(including the port).
-            Can use localhost instead of ip if running locally
-
-        port: int, optional
-            Port number bokeh uses for it's two communication protocol.
-            Default is random open port. Recommended to set this value if
-            running jupyter remotely and only few ports are exposed.
-
-        service_proxy: str, optional, default None,
-            available options: jupyterhub
-
         Examples
         --------
 
@@ -586,7 +574,7 @@ class DashBoard:
         >>>     'key', 'val', data_points=5, add_interaction=False
         >>> )
         >>> d = cux_df.dashboard([line_chart_1])
-        >>> d.app(notebook_url='localhost:8888')
+        >>> d.app()
 
         """
         if self.server is not None:
@@ -594,23 +582,17 @@ class DashBoard:
                 self.stop()
             self._reinit_all_charts()
 
-        self._notebook_url = _get_host(notebook_url)
-        if port == 0:
-            port = get_open_port()
-
-        self.server = _create_app(
-            self._dashboard.generate_dashboard(
-                self.title,
-                self._charts,
-                self._sidebar,
-                self._theme,
-                self._layout_array,
-            ),
-            notebook_url=self._notebook_url,
-            port=port,
-            service_proxy=service_proxy,
-        )
         self._current_server_type = "app"
+
+        return self._dashboard.generate_dashboard(
+            self.title,
+            self._charts,
+            self._sidebar,
+            self._theme,
+            self._layout_array,
+            "notebook",
+            sidebar_width,
+        )
 
     def show(
         self,
