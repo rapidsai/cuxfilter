@@ -42,8 +42,10 @@ The original version (0.2) of cuxfilter, most known for the backend powering the
 
 ## Usage
 
-### Example 1 [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/auto_accidents_example.ipynb)
-
+### Example 1 
+[![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/auto_accidents_example.ipynb) [<img src="https://img.shields.io/badge/-Setup Studio Lab Environment-gray.svg">](./notebooks/README.md#amazon-sagemaker-studio-lab)
+    
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/auto_accidents_example.ipynb) [<img src="https://img.shields.io/badge/-Setup Colab Environment-gray.svg">](./notebooks/README.md#google-colab)
 
 ```python
 import cuxfilter
@@ -79,7 +81,10 @@ d.app()
 ```
 ![output dashboard](./docs/_images/demo.gif)
 
-### Example 2 [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/Mortgage_example.ipynb)
+### Example 2 
+[![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/Mortgage_example.ipynb) [<img src="https://img.shields.io/badge/-Setup Studio Lab Environment-gray.svg">](./notebooks/README.md#amazon-sagemaker-studio-lab)
+    
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/Mortgage_example.ipynb) [<img src="https://img.shields.io/badge/-Setup Colab Environment-gray.svg">](./notebooks/README.md#google-colab)
 
 ```python
 import cuxfilter
@@ -154,25 +159,17 @@ cuxfilter can be installed with conda ([miniconda](https://conda.io/miniconda.ht
 
 For `cuxfilter version == 22.02` :
 ```bash
-# for CUDA 11.0
+# for CUDA 11.5
 conda install -c rapidsai -c nvidia -c numba -c conda-forge \
-    cuxfilter=22.02 python=3.7 cudatoolkit=11.0
-
-# or, for CUDA 11.2
-conda install -c rapidsai -c nvidia -c numba -c conda-forge \
-    cuxfilter=22.02 python=3.7 cudatoolkit=11.2
+    cuxfilter=22.02 python=3.7 cudatoolkit=11.5
 
 ```
 
 For the nightly version of `cuxfilter` :
 ```bash
-# for CUDA 11.0
+# for CUDA 11.5
 conda install -c rapidsai-nightly -c nvidia -c numba -c conda-forge \
-    cuxfilter python=3.7 cudatoolkit=11.0
-
-# or, for CUDA 11.2
-conda install -c rapidsai-nightly -c nvidia -c numba -c conda-forge \
-    cuxfilter python=3.7 cudatoolkit=11.2
+    cuxfilter python=3.7 cudatoolkit=11.5
 ```
 
 Note: cuxfilter is supported only on Linux, and with Python versions 3.7 and later.
@@ -240,7 +237,6 @@ Currently supported layout templates and example code can be found on the [layou
 | panel_widgets  | range_slider, date_range_slider, float_slider, int_slider, drop_down, multi_select, card, number  |
 | custom    | view_dataframe |
 | pydeck    | choropleth(3d and 2d)   |
-
 
 ## Contributing Developers Guide
 
