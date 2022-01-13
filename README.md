@@ -213,6 +213,8 @@ The notebooks inside `python/notebooks` already have a check function which veri
 
 While in the directory you want the datasets to be saved, execute the following
 
+> Note: Auto Accidents dataset has corrupted coordinate data from the years 2012-2014
+
 ```bash
 #go the the environment where cuxfilter is installed. Skip if in a docker container
 source activate test_env
