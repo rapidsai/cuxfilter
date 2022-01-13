@@ -65,7 +65,7 @@ Once installed, you should see a card in the launcher for that environment and k
 - Free access to GPUs
 - Easy sharing
 
-To launch cuxfilter notebooks on the colab environment, you need to follow the the RAPIDS installation instructions guide by clicking [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1rY7Ln6rEE1pOlfSHCYOVaqt8OvDO35J0#forceEdit=true&offline=true&sandboxMode=true). Once the RAPIDS libraries are installed, you can run the cuxfilter notebooks:
+To launch cuxfilter notebooks on the colab environment, you need to follow the the RAPIDS installation instructions guide by clicking [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1rY7Ln6rEE1pOlfSHCYOVaqt8OvDO35J0#forceEdit=true&offline=true&sandboxMode=true). Once the RAPIDS libraries are installed, you can run the cuxfilter notebooks.
 
 > Note: Unlike Studio Lab, environment storage is not persistent and each notebook needs a separate RAPIDS installation every time you start a new session.
 
