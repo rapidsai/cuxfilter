@@ -1,6 +1,6 @@
 # Example notebooks
 
-These are example notebooks to showcase cuxfilter. Related Datasets can be download using the link below:
+These are example notebooks to showcase cuxfilter.
 
 ## TRY CUXFILTER NOTEBOOKS ONLINE
 
@@ -50,7 +50,6 @@ Once installed, you should see a card in the launcher for that environment and k
 
 <div class="alert alert-info"> <b>Note:</b> It may take about one minute for the new environment to appear as a kernel option.</div>
 
-</br>
 
 ### Google Colab
 
@@ -66,8 +65,9 @@ To launch cuxfilter notebooks on the colab environment, you need to follow the t
 > Copy the installation notebook cells to the top of the cuxfilter notebooks and install RAPIDS before executing the cuxfilter code.
 
 
-</br></br>
-## Datasets
+</br>
+
+## Download Datasets
 - [Mortgage dataset](https://docs.rapids.ai/datasets/mortgage-viz-data)
 
 - [Nyc taxi dataset](https://drive.google.com/file/d/1mTvl66VLzHwQJPcgnGBdmZTNEdNp1tYo/view?usp=sharing)
