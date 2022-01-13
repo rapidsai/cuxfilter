@@ -42,7 +42,8 @@ The original version (0.2) of cuxfilter, most known for the backend powering the
 
 ## Usage
 
-### Example 1 [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/Mortgage_example.ipynb)
+### Example 1 [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/auto_accidents_example.ipynb)
+
 
 ```python
 import cuxfilter
@@ -78,7 +79,7 @@ d.app()
 ```
 ![output dashboard](./docs/_images/demo.gif)
 
-### Example 2 [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/auto_accidents_example.ipynb)
+### Example 2 [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/Mortgage_example.ipynb)
 
 ```python
 import cuxfilter
