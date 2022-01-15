@@ -28,7 +28,7 @@ These are example notebooks to showcase cuxfilter.
 ## Setup Remote Environments
 ### Amazon Sagemaker Studio Lab
 
-[Amazon SageMaker Studio Lab](https://studiolab.sagemaker.aws/faq) is a free online web application for learning and experimenting with data science and machine learning using Jupyter notebooks and is free to use.
+[Amazon SageMaker Studio Lab](https://studiolab.sagemaker.aws/faq) is a free ML development environment that provides the compute, storage (up to 15GB), and security —all at no cost (currently). This includes GPU notebook instances.
 
 Once you have registered with your email address, simply sign in to your account, start a CPU or GPU runtime, and open your project - all in your browser.
 
@@ -39,12 +39,13 @@ conda install ipykernel
 
 # for stable rapids version
 conda install -c rapidsai -c nvidia -c numba -c conda-forge \
-    cuxfilter python=3.7 cudatoolkit=11.5
+    cuxfilter=22.02 python=3.7 cudatoolkit=11.5
 
 # for nightly rapids version
 conda install -c rapidsai-nightly -c nvidia -c numba -c conda-forge \
     cuxfilter python=3.7 cudatoolkit=11.5
 ```
+> Above are sample install snippets for cuxfilter, see the [Get RAPIDS version picker](https://rapids.ai/start.html) for installing the latest `cuxfilter` version.
 
 Once installed, you should see a card in the launcher for that environment and kernel after about a minute.
 
