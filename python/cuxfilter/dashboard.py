@@ -317,13 +317,12 @@ class DashBoard:
         self._query_str_dict = dict()
 
         for chart in self.charts.values():
-            if chart.is_widget and chart.chart_type == "datasize_indicator":
-                # reinitialize data_size_indicator chart
-                chart = data_size_indicator()
-            elif not chart.is_widget:
-                chart.source = None
             chart.initiate_chart(self)
             chart._initialized = True
+            if chart.is_widget:
+                self._sidebar[chart.name] = chart
+            else:
+                self._charts[chart.name] = chart
 
     def _compute_df(self, query, local_dict, indices):
         """
@@ -577,11 +576,7 @@ class DashBoard:
         >>> d.app()
 
         """
-        if self.server is not None:
-            if self.server._started:
-                self.stop()
-            self._reinit_all_charts()
-
+        self._reinit_all_charts()
         self._current_server_type = "app"
 
         return self._dashboard.generate_dashboard(
