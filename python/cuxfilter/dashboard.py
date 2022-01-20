@@ -319,10 +319,6 @@ class DashBoard:
         for chart in self.charts.values():
             chart.initiate_chart(self)
             chart._initialized = True
-            if chart.is_widget:
-                self._sidebar[chart.name] = chart
-            else:
-                self._charts[chart.name] = chart
 
     def _compute_df(self, query, local_dict, indices):
         """
