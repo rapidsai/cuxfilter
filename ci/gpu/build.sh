@@ -69,10 +69,13 @@ conda list --show-channel-urls
 # BUILD - Build cuxfilter
 ################################################################################
 
+# TODO: Move boa install to gpuci/rapidsai
+gpuci_mamba_retry install boa
+
 gpuci_logger "Build and install cuxfilter"
 cd "${WORKSPACE}"
 CONDA_BLD_DIR="${WORKSPACE}/.conda-bld"
-gpuci_conda_retry build  --croot "${CONDA_BLD_DIR}" conda/recipes/cuxfilter --python=$PYTHON
+gpuci_conda_retry mambabuild  --croot "${CONDA_BLD_DIR}" conda/recipes/cuxfilter --python=$PYTHON
 gpuci_mamba_retry install -c "${CONDA_BLD_DIR}" cuxfilter
 
 ################################################################################
