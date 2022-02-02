@@ -1,6 +1,19 @@
-# cuXfilter 22.02.00 (Date TBD)
+# cuXfilter 22.02.00 (2 Feb 2022)
 
-Please see https://github.com/rapidsai/cuxfilter/releases/tag/v22.02.00a for the latest changes to this development branch.
+## 🐛 Bug Fixes
+
+- fix einit function ([#345](https://github.com/rapidsai/cuxfilter/pull/345)) [@AjayThove](https://github.com/AjayThove)
+
+## 📖 Documentation
+
+- Documentation &amp; Notebook updates ([#341](https://github.com/rapidsai/cuxfilter/pull/341)) [@AjayThove](https://github.com/AjayThove)
+- Mege banch-21.12 into banch-22.02 ([#340](https://github.com/rapidsai/cuxfilter/pull/340)) [@AjayThove](https://github.com/AjayThove)
+- Fix/emove custom extensions ([#324](https://github.com/rapidsai/cuxfilter/pull/324)) [@AjayThove](https://github.com/AjayThove)
+
+## 🛠️ Impovements
+
+- eplace distutils.vesion class with packaging.vesion.Vesion ([#338](https://github.com/rapidsai/cuxfilter/pull/338)) [@AjayThove](https://github.com/AjayThove)
+- Fix impots tests syntax ([#336](https://github.com/rapidsai/cuxfilter/pull/336)) [@Ethyling](https://github.com/Ethyling)
 
 # cuXfilter 21.12.00 (9 Dec 2021)
 
