@@ -23,6 +23,7 @@ class BaseStackedLine(BaseChart):
     y: list = []
     colors: list = []
     default_colors = ["#8735fb"]
+    box_selected_range = None
 
     @property
     def y_dtype(self):
@@ -107,8 +108,11 @@ class BaseStackedLine(BaseChart):
         self.data_points = data_points
         self.add_interaction = add_interaction
         self.stride = step_size
-        if not isinstance(colors, list):
-            raise TypeError("colors must be a list of colors")
+        if not isinstance(colors, (list, dict)):
+            raise TypeError(
+                "colors must be either list of colors or"
+                + "dictionary of column to color mappings"
+            )
         self._colors_input = colors
         self.stride_type = step_size_type
         self.title = title
@@ -151,7 +155,9 @@ class BaseStackedLine(BaseChart):
         self.add_events(dashboard_cls)
 
     def view(self):
-        return chart_view(self.chart, width=self.width, title=self.title)
+        return chart_view(
+            self.chart.view(), width=self.width, title=self.title
+        )
 
     def calculate_source(self, data):
         """
@@ -166,39 +172,27 @@ class BaseStackedLine(BaseChart):
         """
         self.format_source_data(data)
 
-    def get_selection_geometry_callback(self, dashboard_cls):
-        """
-        Description: generate callback for stacked line
-            selection event (only along x-axis)
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-
-        """
-
-        def selection_callback(event):
-            xmin, xmax = self._xaxis_dt_transform(
-                (event.geometry["x0"], event.geometry["x1"])
-            )
+    def get_box_select_callback(self, dashboard_cls):
+        def cb(boundsx):
             if dashboard_cls._active_view != self:
                 # reset previous active view and
                 # set current chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
                 self.source = dashboard_cls._cuxfilter_df.data
-
-            self.x_range = (xmin, xmax)
+            self.x_range = self._xaxis_dt_transform(boundsx)
 
             query = f"@{self.x}_min<={self.x}<=@{self.x}_max"
             temp_str_dict = {
                 **dashboard_cls._query_str_dict,
                 **{self.name: query},
             }
+            self.box_selected_range = {
+                self.x + "_min": self.x_range[0],
+                self.x + "_max": self.x_range[1],
+            }
             temp_local_dict = {
                 **dashboard_cls._query_local_variables_dict,
-                **{self.x + "_min": xmin, self.x + "_max": xmax},
+                **self.box_selected_range,
             }
 
             temp_data = dashboard_cls._query(
@@ -213,7 +207,7 @@ class BaseStackedLine(BaseChart):
             # self.reload_chart(temp_data, False)
             del temp_data
 
-        return selection_callback
+        return cb
 
     def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """
@@ -226,7 +220,7 @@ class BaseStackedLine(BaseChart):
 
         Ouput:
         """
-        if self.x_range is not None and self.y_range is not None:
+        if self.box_selected_range:
             query_str_dict[
                 self.name
             ] = f"@{self.x}_min<={self.x}<=@{self.x}_max"
@@ -252,8 +246,8 @@ class BaseStackedLine(BaseChart):
         Ouput:
         """
         if self.add_interaction:
-            self.add_selection_geometry_event(
-                self.get_selection_geometry_callback(dashboard_cls)
+            self.chart.add_box_select_callback(
+                self.get_box_select_callback(dashboard_cls)
             )
         if self.reset_event is not None:
             self.add_reset_event(dashboard_cls)
@@ -270,19 +264,19 @@ class BaseStackedLine(BaseChart):
         Ouput:
         """
 
-        def reset_callback(event):
+        def reset_callback(resetting):
             if dashboard_cls._active_view != self:
                 # reset previous active view and
                 # set current chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
                 self.source = dashboard_cls._cuxfilter_df.data
-            self.x_range = None
-            self.y_range = None
+            self.box_selected_range = None
+            self.chart.reset_all_selections()
             dashboard_cls._query_str_dict.pop(self.name, None)
             dashboard_cls._reload_charts()
 
         # add callback to reset chart button
-        self.add_event(self.reset_event, reset_callback)
+        self.chart.add_reset_event(reset_callback)
 
     def query_chart_by_range(
         self,

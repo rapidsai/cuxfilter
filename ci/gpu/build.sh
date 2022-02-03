@@ -58,7 +58,7 @@ gpuci_mamba_retry install -y \
                "cugraph=$MINOR_VERSION.*" \
                "cuspatial=$MINOR_VERSION.*" \
                "dask-cudf=$MINOR_VERSION.*" "dask-cuda=$MINOR_VERSION.*" \
-               "numba>=0.51.2" \
+               "numba>=0.54" \
                "bokeh>=2.3.2,<=2.4" \
                "rapids-build-env=$MINOR_VERSION.*" \
                "rapids-notebook-env=$MINOR_VERSION.*"

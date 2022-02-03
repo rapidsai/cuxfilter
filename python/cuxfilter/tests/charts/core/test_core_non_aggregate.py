@@ -1,7 +1,11 @@
 import pytest
 import cudf
 import mock
+import numpy as np
 
+from cuxfilter.charts.datashader.custom_extensions import (
+    holoviews_datashader as hv,
+)
 from cuxfilter.charts.core.non_aggregate.core_non_aggregate import (
     BaseNonAggregate,
 )
@@ -63,7 +67,7 @@ class TestCoreNonAggregateChart:
     @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
     def test_view(self, chart, _chart):
         bnac = BaseNonAggregate()
-        bnac.chart = chart
+        bnac.chart = mock.Mock(**{"view.return_value": chart})
         bnac.width = 400
         bnac.title = "test_title"
 
@@ -77,11 +81,8 @@ class TestCoreNonAggregateChart:
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
-        assert (
-            bnac.get_selection_geometry_callback(dashboard).__name__
-            == "selection_callback"
-        )
-        assert callable(type(bnac.get_selection_geometry_callback(dashboard)))
+        assert callable(type(bnac.get_box_select_callback(dashboard)))
+        assert callable(type(bnac.get_lasso_select_callback(dashboard)))
 
     def test_box_selection_callback(self):
         bnac = BaseNonAggregate()
@@ -100,10 +101,12 @@ class TestCoreNonAggregateChart:
         dashboard._active_view = bnac
 
         class evt:
-            geometry = dict(x0=1, x1=2, y0=3, y1=4, type="rect")
+            bounds = (1, 2, 3, 4)
+            x_selection = (1, 2)
+            y_selection = (3, 4)
 
-        t = bnac.get_selection_geometry_callback(dashboard)
-        t(evt)
+        t = bnac.get_box_select_callback(dashboard)
+        t(evt.bounds, evt.x_selection, evt.y_selection)
         assert self.result.equals(df.query("1<=a<=2 and 3<=b<=4"))
 
     def test_lasso_election_callback(self):
@@ -119,17 +122,15 @@ class TestCoreNonAggregateChart:
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
-        class evt:
-            geometry = dict(x=[1, 1, 2], y=[1, 2, 1], type="poly")
-            final = True
+        geometry = np.array([[1, 1, 2], [1, 2, 1]])
 
-        t = bnac.get_selection_geometry_callback(dashboard)
+        t = bnac.get_lasso_select_callback(dashboard)
         with mock.patch("cuspatial.point_in_polygon") as pip:
 
             pip.return_value = cudf.DataFrame(
                 {"selection": [True, False, True]}
             )
-            t(evt)
+            t(geometry)
             assert pip.called
 
     @pytest.mark.parametrize(
@@ -180,6 +181,7 @@ class TestCoreNonAggregateChart:
         bnac.chart_type = "test"
         bnac.x = "x"
         bnac.y = "y"
+        bnac.box_selected_range = local_dict
         bnac.x_range = x_range
         bnac.y_range = y_range
 
@@ -205,15 +207,16 @@ class TestCoreNonAggregateChart:
     @pytest.mark.parametrize(
         "add_interaction, reset_event, event_1, event_2",
         [
-            (True, None, "selection_callback", None),
-            (True, "test_event", "selection_callback", "reset_callback"),
-            (False, "test_event", None, "reset_callback"),
+            (True, None, "cb", "cb"),
+            (True, "test_event", "cb", "cb"),
+            (False, "test_event", None, None),
         ],
     )
     def test_add_events(self, add_interaction, reset_event, event_1, event_2):
         bnac = BaseNonAggregate()
         bnac.add_interaction = add_interaction
         bnac.reset_event = reset_event
+        bnac.chart = hv.InteractiveDatashader()
 
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
@@ -224,11 +227,11 @@ class TestCoreNonAggregateChart:
         def t_func(fn):
             self.event_1 = fn.__name__
 
-        def t_func1(event, fn):
+        def t_func1(fn):
             self.event_2 = fn.__name__
 
-        bnac.add_selection_geometry_event = t_func
-        bnac.add_event = t_func1
+        bnac.chart.add_box_select_callback = t_func
+        bnac.chart.add_lasso_select_callback = t_func1
 
         bnac.add_events(dashboard)
 
@@ -241,6 +244,7 @@ class TestCoreNonAggregateChart:
         bnac.x = "a"
         bnac.x_range = (0, 2)
         bnac.y_range = (3, 5)
+        bnac.chart = hv.InteractiveDatashader()
 
         df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
@@ -253,8 +257,7 @@ class TestCoreNonAggregateChart:
 
         bnac.add_reset_event(dashboard)
 
-        assert bnac.x_range is None
-        assert bnac.y_range is None
+        assert bnac.selected_indices is None
 
     def test_query_chart_by_range(self):
         bnac = BaseNonAggregate()

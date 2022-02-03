@@ -22,6 +22,7 @@ class BaseNonAggregate(BaseChart):
     x_range: Tuple = None
     y_range: Tuple = None
     selected_indices: cudf.Series = None
+    box_selected_range = None
     aggregate_col = None
     use_data_tiles = False
 
@@ -68,7 +69,12 @@ class BaseNonAggregate(BaseChart):
         self.add_events(dashboard_cls)
 
     def view(self):
-        return chart_view(self.chart, width=self.width, title=self.title)
+        return chart_view(
+            self.chart.view(), width=self.width, title=self.title,
+        )
+
+    def update_dimensions(self, **kwargs):
+        pass
 
     def calculate_source(self, data):
         """
@@ -83,19 +89,63 @@ class BaseNonAggregate(BaseChart):
         """
         self.format_source_data(data)
 
-    def get_selection_geometry_callback(self, dashboard_cls):
-        """
-        Description: generate callback for map selection event
-        -------------------------------------------
-        Input:
+    def get_box_select_callback(self, dashboard_cls):
+        def cb(bounds, x_selection, y_selection):
+            if dashboard_cls._active_view != self:
+                # reset previous active view and
+                # set current chart as active view
+                dashboard_cls._reset_current_view(new_active_view=self)
+                self.source = dashboard_cls._cuxfilter_df.data
 
-        -------------------------------------------
+            self.x_range = self._xaxis_dt_transform(x_selection)
+            self.y_range = self._yaxis_dt_transform(y_selection)
+            # set lasso selected indices to None
+            self.selected_indices = None
 
-        Ouput:
+            query = (
+                f"@{self.x}_min<={self.x}<=@{self.x}_max"
+                + f" and @{self.y}_min<={self.y}<=@{self.y}_max"
+            )
+            temp_str_dict = {
+                **dashboard_cls._query_str_dict,
+                **{self.name: query},
+            }
+            self.box_selected_range = {
+                self.x + "_min": self.x_range[0],
+                self.x + "_max": self.x_range[1],
+                self.y + "_min": self.y_range[0],
+                self.y + "_max": self.y_range[1],
+            }
+            temp_local_dict = {
+                **dashboard_cls._query_local_variables_dict,
+                **self.box_selected_range,
+            }
 
-        """
+            temp_data = dashboard_cls._query(
+                dashboard_cls._generate_query_str(temp_str_dict),
+                temp_local_dict,
+            )
 
-        def lasso_callback(xs, ys):
+            # reload all charts with new queried data (cudf.DataFrame only)
+            dashboard_cls._reload_charts(
+                data=temp_data, ignore_cols=[self.name]
+            )
+            self.reload_chart(temp_data, False)
+            del temp_data
+
+        return cb
+
+    def get_lasso_select_callback(self, dashboard_cls):
+        def cb(geometry):
+            if dashboard_cls._active_view != self:
+                # reset previous active view and
+                # set current chart as active view
+                dashboard_cls._reset_current_view(new_active_view=self)
+                self.source = dashboard_cls._cuxfilter_df.data
+
+            xs = self._to_xaxis_type(geometry[:, 0])
+            ys = self._to_yaxis_type(geometry[:, 1])
+
             # set box selected ranges to None
             self.x_range, self.y_range = None, None
             # convert datetime to int64 since, point_in_polygon does not
@@ -122,66 +172,7 @@ class BaseNonAggregate(BaseChart):
             del temp_data
             del indices
 
-        def box_callback(xmin, xmax, ymin, ymax):
-            self.x_range = (xmin, xmax)
-            self.y_range = (ymin, ymax)
-            # set lasso selected indices to None
-            self.selected_indices = None
-
-            query = (
-                f"@{self.x}_min<={self.x}<=@{self.x}_max"
-                + f" and @{self.y}_min<={self.y}<=@{self.y}_max"
-            )
-            temp_str_dict = {
-                **dashboard_cls._query_str_dict,
-                **{self.name: query},
-            }
-            temp_local_dict = {
-                **dashboard_cls._query_local_variables_dict,
-                **{
-                    self.x + "_min": xmin,
-                    self.x + "_max": xmax,
-                    self.y + "_min": ymin,
-                    self.y + "_max": ymax,
-                },
-            }
-
-            temp_data = dashboard_cls._query(
-                dashboard_cls._generate_query_str(temp_str_dict),
-                temp_local_dict,
-            )
-
-            # reload all charts with new queried data (cudf.DataFrame only)
-            dashboard_cls._reload_charts(
-                data=temp_data, ignore_cols=[self.name]
-            )
-            self.reload_chart(temp_data, False)
-            del temp_data
-
-        def selection_callback(event):
-            self.test_event = event
-            if dashboard_cls._active_view != self:
-                # reset previous active view and
-                # set current chart as active view
-                dashboard_cls._reset_current_view(new_active_view=self)
-                self.source = dashboard_cls._cuxfilter_df.data
-
-            if event.geometry["type"] == "rect":
-                xmin, xmax = self._xaxis_dt_transform(
-                    (event.geometry["x0"], event.geometry["x1"])
-                )
-                ymin, ymax = self._yaxis_dt_transform(
-                    (event.geometry["y0"], event.geometry["y1"])
-                )
-                box_callback(xmin, xmax, ymin, ymax)
-            elif event.geometry["type"] == "poly" and event.final:
-                # convert datetime to int64 since, point_in_polygon does not
-                # support datetime
-                xs = self._to_xaxis_type(event.geometry["x"])
-                ys = self._to_yaxis_type(event.geometry["y"])
-                lasso_callback(xs, ys)
-
-        return selection_callback
+        return cb
 
     def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """
@@ -194,7 +185,7 @@ class BaseNonAggregate(BaseChart):
 
         Ouput:
         """
-        if self.x_range is not None and self.y_range is not None:
+        if self.box_selected_range:
             query_str_dict[self.name] = (
                 f"@{self.x}_min<={self.x}<=@{self.x}_max"
                 + f" and @{self.y}_min<={self.y}<=@{self.y}_max"
@@ -232,8 +223,11 @@ class BaseNonAggregate(BaseChart):
         Ouput:
         """
         if self.add_interaction:
-            self.add_selection_geometry_event(
-                self.get_selection_geometry_callback(dashboard_cls)
+            self.chart.add_lasso_select_callback(
+                self.get_lasso_select_callback(dashboard_cls)
+            )
+            self.chart.add_box_select_callback(
+                self.get_box_select_callback(dashboard_cls)
             )
         if self.reset_event is not None:
             self.add_reset_event(dashboard_cls)
@@ -249,20 +243,20 @@ class BaseNonAggregate(BaseChart):
 
         Ouput:
         """
-
-        def reset_callback(event):
+        # def reset_callback():
+        def reset_callback(resetting):
             if dashboard_cls._active_view != self:
                 # reset previous active view and set current
                 # chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
-            self.x_range = None
-            self.y_range = None
             self.selected_indices = None
+            self.box_selected_range = None
+            self.chart.reset_all_selections()
             dashboard_cls._query_str_dict.pop(self.name, None)
             dashboard_cls._reload_charts()
 
         # add callback to reset chart button
-        self.add_event(self.reset_event, reset_callback)
+        self.chart.add_reset_event(reset_callback)
 
     def _compute_source(self, query, local_dict, indices):
         result = self.source
