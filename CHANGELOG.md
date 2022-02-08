@@ -2,18 +2,20 @@
 
 ## 🐛 Bug Fixes
 
-- fix einit function ([#345](https://github.com/rapidsai/cuxfilter/pull/345)) [@AjayThove](https://github.com/AjayThove)
+- fix reinit function ([#345](https://github.com/rapidsai/cuxfilter/pull/345)) [@AjayThorve](https://github.com/AjayThorve)
 
 ## 📖 Documentation
 
-- Documentation &amp; Notebook updates ([#341](https://github.com/rapidsai/cuxfilter/pull/341)) [@AjayThove](https://github.com/AjayThove)
-- Mege banch-21.12 into banch-22.02 ([#340](https://github.com/rapidsai/cuxfilter/pull/340)) [@AjayThove](https://github.com/AjayThove)
-- Fix/emove custom extensions ([#324](https://github.com/rapidsai/cuxfilter/pull/324)) [@AjayThove](https://github.com/AjayThove)
+- Documentation &amp; Notebook updates ([#341](https://github.com/rapidsai/cuxfilter/pull/341)) [@AjayThorve](https://github.com/AjayThorve)
+- Merge branch-21.12 into branch-22.02 ([#340](https://github.com/rapidsai/cuxfilter/pull/340)) [@AjayThorve](https://github.com/AjayThorve)
+- Fix/remove custom extensions ([#324](https://github.com/rapidsai/cuxfilter/pull/324)) [@AjayThorve](https://github.com/AjayThorve)
 
-## 🛠️ Impovements
+## 🛠️ Improvements
 
-- eplace distutils.vesion class with packaging.vesion.Vesion ([#338](https://github.com/rapidsai/cuxfilter/pull/338)) [@AjayThove](https://github.com/AjayThove)
-- Fix impots tests syntax ([#336](https://github.com/rapidsai/cuxfilter/pull/336)) [@Ethyling](https://github.com/Ethyling)
+- adds layouts to in-notebook dashboards (via d.app())  similar to standalone web apps ([#324](https://github.com/rapidsai/cuxfilter/pull/324)) [@AjayThorve ](https://github.com/AjayThorve )
+- enabled google colab and amazon sagemaker studio support for in-notebook dashboards ([#324](https://github.com/rapidsai/cuxfilter/pull/324)) [@AjayThorve ](https://github.com/AjayThorve )
+- replace distutils.version class with packaging.version.Version ([#338](https://github.com/rapidsai/cuxfilter/pull/338)) [@AjayThorve](https://github.com/AjayThorve)
+- Fix imports tests syntax ([#336](https://github.com/rapidsai/cuxfilter/pull/336)) [@Ethyling](https://github.com/Ethyling)
 
 # cuXfilter 21.12.00 (9 Dec 2021)
 
