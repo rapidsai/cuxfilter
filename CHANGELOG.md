@@ -2,9 +2,24 @@
 
 Please see https://github.com/rapidsai/cuxfilter/releases/tag/v22.04.00a for the latest changes to this development branch.
 
-# cuXfilter 22.02.00 (Date TBD)
+# cuXfilter 22.02.00 (2 Feb 2022)
 
-Please see https://github.com/rapidsai/cuxfilter/releases/tag/v22.02.00a for the latest changes to this development branch.
+## 🐛 Bug Fixes
+
+- fix reinit function ([#345](https://github.com/rapidsai/cuxfilter/pull/345)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 📖 Documentation
+
+- Documentation &amp; Notebook updates ([#341](https://github.com/rapidsai/cuxfilter/pull/341)) [@AjayThorve](https://github.com/AjayThorve)
+- Merge branch-21.12 into branch-22.02 ([#340](https://github.com/rapidsai/cuxfilter/pull/340)) [@AjayThorve](https://github.com/AjayThorve)
+- Fix/remove custom extensions ([#324](https://github.com/rapidsai/cuxfilter/pull/324)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- adds layouts to in-notebook dashboards (via d.app())  similar to standalone web apps ([#324](https://github.com/rapidsai/cuxfilter/pull/324)) [@AjayThorve ](https://github.com/AjayThorve )
+- enabled google colab and amazon sagemaker studio support for in-notebook dashboards ([#324](https://github.com/rapidsai/cuxfilter/pull/324)) [@AjayThorve ](https://github.com/AjayThorve )
+- replace distutils.version class with packaging.version.Version ([#338](https://github.com/rapidsai/cuxfilter/pull/338)) [@AjayThorve](https://github.com/AjayThorve)
+- Fix imports tests syntax ([#336](https://github.com/rapidsai/cuxfilter/pull/336)) [@Ethyling](https://github.com/Ethyling)
 
 # cuXfilter 21.12.00 (9 Dec 2021)
 
