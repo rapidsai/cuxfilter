@@ -37,7 +37,7 @@ requirements:
     - cupy >=7.8.0,<10.0.0a0
     - panel >=0.10.3,<=0.12.4
     - pyppeteer>=0.2.6
-    - bokeh >=2.3.2,<=2.4
+    - bokeh>=2.4.2,<=2.5
     - pyproj >=2.4, <=3.1
     - geopandas >=0.9.0,<0.10.0a0
     - nodejs >=12,<15
