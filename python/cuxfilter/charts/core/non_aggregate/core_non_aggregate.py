@@ -149,24 +149,20 @@ class BaseNonAggregate(BaseChart):
             self.x_range, self.y_range = None, None
             # convert datetime to int64 since, point_in_polygon does not
             # support datetime
+            args = (
+                self._to_xaxis_type(self.source[self.x]),
+                self._to_yaxis_type(self.source[self.y]),
+                cudf.Series([0], index=["selection"]),
+                [0],
+                xs,
+                ys,
+            )
             if isinstance(self.source, dask_cudf.DataFrame):
                 indices = dask.delayed(cuspatial.point_in_polygon)(
-                    self._to_xaxis_type(self.source[self.x]),
-                    self._to_yaxis_type(self.source[self.y]),
-                    cudf.Series([0], index=["selection"]),
-                    [0],
-                    xs,
-                    ys,
+                    *args
                 ).compute()
             else:
-                indices = cuspatial.point_in_polygon(
-                    self._to_xaxis_type(self.source[self.x]),
-                    self._to_yaxis_type(self.source[self.y]),
-                    cudf.Series([0], index=["selection"]),
-                    [0],
-                    xs,
-                    ys,
-                )
+                indices = cuspatial.point_in_polygon(*args)
             self.selected_indices = indices.selection
             temp_data = dashboard_cls._query(
                 dashboard_cls._generate_query_str(),
