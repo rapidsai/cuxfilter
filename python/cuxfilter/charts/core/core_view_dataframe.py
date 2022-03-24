@@ -176,7 +176,7 @@ class ViewDataFrame:
         if indices is not None:
             data = data[indices]
         if len(query) > 0:
-            data = data.query(query, local_dict)
+            data = data.query(expr=query, local_dict=local_dict)
 
         return data
 

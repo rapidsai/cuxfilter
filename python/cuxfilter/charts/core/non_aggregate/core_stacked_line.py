@@ -304,7 +304,7 @@ class BaseStackedLine(BaseChart):
         if len(query) > 0:
             final_query += f" and {query}"
         self.reload_chart(
-            self.source.query(final_query, local_dict), False,
+            self.source.query(expr=final_query, local_dict=local_dict), False,
         )
 
     def query_chart_by_indices(
@@ -346,7 +346,7 @@ class BaseStackedLine(BaseChart):
                 final_query += f" and {query}"
 
         self.reload_chart(
-            self.source.query(final_query, local_dict)
+            self.source.query(expr=final_query, local_dict=local_dict)
             if len(final_query) > 0
             else self.source,
             False,

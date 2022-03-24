@@ -329,7 +329,7 @@ class DashBoard:
         if indices is not None:
             result = result[indices]
         if len(query) > 0:
-            result = result.query(query, local_dict)
+            result = result.query(expr=query, local_dict=local_dict)
 
         return result
 

@@ -2,6 +2,7 @@ from typing import Tuple
 import cudf
 import cuspatial
 import dask_cudf
+import dask
 import dask.dataframe as dd
 
 from ..core_chart import BaseChart
@@ -59,9 +60,7 @@ class BaseNonAggregate(BaseChart):
                 dashboard_cls._cuxfilter_df.data[self.y].min(),
                 dashboard_cls._cuxfilter_df.data[self.y].max(),
             )
-        if isinstance(
-            dashboard_cls._cuxfilter_df.data, dask_cudf.core.DataFrame
-        ):
+        if isinstance(dashboard_cls._cuxfilter_df.data, dask_cudf.DataFrame):
             self.x_range = dd.compute(*self.x_range)
             self.y_range = dd.compute(*self.y_range)
         self.calculate_source(dashboard_cls._cuxfilter_df.data)
@@ -150,14 +149,24 @@ class BaseNonAggregate(BaseChart):
             self.x_range, self.y_range = None, None
             # convert datetime to int64 since, point_in_polygon does not
             # support datetime
-            indices = cuspatial.point_in_polygon(
-                self._to_xaxis_type(self.source[self.x]),
-                self._to_yaxis_type(self.source[self.y]),
-                cudf.Series([0], index=["selection"]),
-                [0],
-                xs,
-                ys,
-            )
+            if isinstance(self.source, dask_cudf.DataFrame):
+                indices = dask.delayed(cuspatial.point_in_polygon)(
+                    self._to_xaxis_type(self.source[self.x]),
+                    self._to_yaxis_type(self.source[self.y]),
+                    cudf.Series([0], index=["selection"]),
+                    [0],
+                    xs,
+                    ys,
+                ).compute()
+            else:
+                indices = cuspatial.point_in_polygon(
+                    self._to_xaxis_type(self.source[self.x]),
+                    self._to_yaxis_type(self.source[self.y]),
+                    cudf.Series([0], index=["selection"]),
+                    [0],
+                    xs,
+                    ys,
+                )
             self.selected_indices = indices.selection
             temp_data = dashboard_cls._query(
                 dashboard_cls._generate_query_str(),
@@ -263,7 +272,7 @@ class BaseNonAggregate(BaseChart):
         if indices is not None:
             result = result[indices]
         if len(query) > 0:
-            result = result.query(query, local_dict)
+            result = result.query(expr=query, local_dict=local_dict)
 
         return result
 
