@@ -392,7 +392,7 @@ class BaseAggregateChart(BaseChart):
                 )
 
         # add callback to reset chart button
-        self.add_event(self.reset_event, reset_callback)
+        self.chart.on_event(self.reset_event, reset_callback)
 
     def query_chart_by_range(self, active_chart, query_tuple, datatile):
         """
