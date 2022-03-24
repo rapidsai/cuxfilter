@@ -19,6 +19,7 @@ def datetime_dask_fix(min, max):
     dask_cudf.series -> min, max compute operations,
     whereas cudf equivalent returns a numpy.datetime64[ns] objects.
 
-    This function converts the timestamps to numpy.datetime64 objects for consistency
+    This function converts the timestamps to numpy.datetime64 objects for
+    consistency.
     """
     return (min.to_datetime64(), max.to_datetime64())
