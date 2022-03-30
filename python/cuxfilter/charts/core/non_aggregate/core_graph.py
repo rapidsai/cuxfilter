@@ -156,15 +156,21 @@ class BaseGraph(BaseChart):
 
     @property
     def x_dtype(self):
-        if isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
+        if isinstance(self.nodes, (cudf.DataFrame, dask_cudf.DataFrame)):
             return self.nodes[self.node_x].dtype
         return None
 
     @property
     def y_dtype(self):
-        if isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
+        if isinstance(self.nodes, (cudf.DataFrame, dask_cudf.DataFrame)):
             return self.nodes[self.node_y].dtype
         return None
+
+    @property
+    def df_type(self):
+        if type(self.nodes) == type(self.edges):
+            return type(self.nodes)
+        raise TypeError("nodes and edges must be of the same type")
 
     def initiate_chart(self, dashboard_cls):
         """

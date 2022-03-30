@@ -1,7 +1,10 @@
 import cupy as cp
 import cudf
+import dask_cudf
+import dask
 from numba import cuda
 from math import sqrt, ceil
+
 
 from ....assets import datetime as dt
 
@@ -277,8 +280,8 @@ def calc_connected_edges(
 ):
     """
     calculate directly connected edges
-    nodes: cudf.DataFrame
-    edges: cudf.DataFrame
+    nodes: cudf.DataFrame/dask_cudf.DataFrame
+    edges: cudf.DataFrame/dask_cudf.DataFrame
     edge_type: direct/curved
     """
     edges_columns = [
@@ -319,12 +322,22 @@ def calc_connected_edges(
 
     result = cudf.DataFrame()
 
-    if connected_edges_df.shape[0] > 1:
+    def get_df_size(df):
+        if isinstance(df, dask_cudf.DataFrame):
+            return df.shape[0].compute()
+        return df.shape[0]
+
+    if get_df_size(connected_edges_df) > 1:
         # shape=1 when the dataset has src == dst edges
         if edge_render_type == "direct":
-            result = directly_connect_edges(
-                connected_edges_df[connected_edge_columns]
-            )
+            if isinstance(edges, dask_cudf.DataFrame):
+                result = dask_cudf.from_delayed(dask.delayed(directly_connect_edges)(
+                    connected_edges_df[connected_edge_columns]
+                )).persist()
+            else:
+                result = directly_connect_edges(
+                    connected_edges_df[connected_edge_columns]
+                )
 
         elif edge_render_type == "curved":
             result = curved_connect_edges(
@@ -335,7 +348,7 @@ def calc_connected_edges(
                 curve_params.copy(),
             )
 
-    if result.shape[0] == 0:
+    if get_df_size(result) == 0:
         result = cudf.DataFrame({k: cp.nan for k in ["x", "y"]})
         if edge_aggregate_col is not None:
             result[edge_aggregate_col] = cp.nan
