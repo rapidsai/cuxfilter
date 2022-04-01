@@ -158,9 +158,10 @@ class BaseNonAggregate(BaseChart):
                 ys,
             )
             if isinstance(self.source, dask_cudf.DataFrame):
-                indices = dask.delayed(cuspatial.point_in_polygon)(
-                    *args
-                ).compute()
+                indices = dask_cudf.from_delayed(
+                    dask.delayed(cuspatial.point_in_polygon)(*args),
+                    divisions="sorted",
+                )
             else:
                 indices = cuspatial.point_in_polygon(*args)
             self.selected_indices = indices.selection

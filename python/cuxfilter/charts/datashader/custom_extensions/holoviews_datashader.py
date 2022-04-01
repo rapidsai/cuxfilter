@@ -470,6 +470,12 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
         doc="tool to select whether to display edges or not",
     )
 
+    @property
+    def df_type(self):
+        if type(self.nodes_df) == type(self.edges_df):
+            return type(self.nodes_df)
+        raise TypeError("nodes and edges must be of the same type")
+
     def update_color_palette(self, value):
         self.node_color_palette = value
         self.nodes_chart.color_palette = value
@@ -506,14 +512,16 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
         )
 
     def update_data(self, nodes=None, edges=None):
-        if nodes:
+        if nodes is not None:
             self.nodes_chart.update_data(nodes)
-        if edges:
+        if edges is not None:
             self.edges_chart.update_data(edges)
 
     def view(self):
         def set_tools(plot, element):
             if plot.state.toolbar.tools[-1] != self.display_edges:
+                # if self.df_type != dask_cudf.DataFrame:
+                #     # no interactions(yet) with dask_cudf backed graph charts
                 plot.state.add_tools(self.inspect_neighbors)
                 plot.state.add_tools(self.display_edges)
 
@@ -549,3 +557,23 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
             sizing_mode="stretch_both",
             height=self.height,
         )
+
+    # def add_box_select_callback(self, callback_fn):
+    #     if self.df_type != dask_cudf.DataFrame:
+    #         # no interactions(yet) with dask_cudf backed graph charts
+    #         super().add_box_select_callback(callback_fn)
+
+    # def add_lasso_select_callback(self, callback_fn):
+    #     if self.df_type != dask_cudf.DataFrame:
+    #         # no interactions(yet) with dask_cudf backed graph charts
+    #         super().add_lasso_select_callback(callback_fn)
+
+    # def reset_all_selections(self):
+    #     if self.df_type != dask_cudf.DataFrame:
+    #         # no interactions(yet) with dask_cudf backed graph charts
+    #         super().reset_all_selections()
+
+    # def add_reset_event(self, callback_fn):
+    #     if self.df_type != dask_cudf.DataFrame:
+    #         # no interactions(yet) with dask_cudf backed graph charts
+    #         super().add_reset_event(callback_fn)

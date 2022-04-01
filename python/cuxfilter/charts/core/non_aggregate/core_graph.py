@@ -1,8 +1,9 @@
 from typing import Tuple
-import dask_cudf
 import cudf
 import cuspatial
 import dask.dataframe as dd
+import dask_cudf
+import dask
 
 from ..core_chart import BaseChart
 from ....layouts import chart_view
@@ -42,6 +43,27 @@ class BaseGraph(BaseChart):
         if self.colors_set:
             return list(self._node_color_palette_input)
         return self.default_palette
+
+    @property
+    def edge_columns(self):
+        if self.edge_aggregate_col:
+            return [
+                self.edge_source,
+                self.edge_target,
+                self.edge_aggregate_col,
+            ]
+        return [self.edge_source, self.edge_target]
+
+    @property
+    def node_columns(self):
+        if self.node_aggregate_col:
+            return [
+                self.node_id,
+                self.node_x,
+                self.node_y,
+                self.node_aggregate_col,
+            ]
+        return [self.node_id, self.node_x, self.node_y]
 
     def __init__(
         self,
@@ -226,24 +248,36 @@ class BaseGraph(BaseChart):
         """
         self.format_source_data(cuxfilter_df)
 
+    @property
+    def concat(self):
+        if self.df_type == dask_cudf.DataFrame:
+            return dask_cudf.concat
+        return cudf.concat
+
     def query_graph(self, node_ids, nodes, edges):
-        edges_ = edges.loc[
-            cudf.logical_or(
-                edges[self.edge_source].isin(node_ids),
-                edges[self.edge_target].isin(node_ids),
-            ).values
-        ]
-        if edges_.shape[0] == 0:
-            nodes = nodes.loc[nodes[self.node_id].isin(node_ids).values]
-        else:
-            edges = edges_
-            nodes = nodes.loc[
-                cudf.logical_or(
-                    nodes[self.node_id].isin(edges[self.edge_source]),
-                    nodes[self.node_id].isin(edges[self.edge_target]),
-                ).values
+        edges_ = self.concat(
+            [
+                node_ids.merge(
+                    edges, left_on=self.node_id, right_on=self.edge_source
+                ),
+                node_ids.merge(
+                    edges, left_on=self.node_id, right_on=self.edge_target
+                ),
             ]
-        return nodes, edges
+        )[self.edge_columns]
+
+        nodes_ = self.concat(
+            [
+                nodes.merge(
+                    edges_, left_on=self.node_id, right_on=self.edge_source,
+                ),
+                nodes.merge(
+                    edges_, left_on=self.node_id, right_on=self.edge_target,
+                ),
+            ]
+        )[self.node_columns].drop_duplicates()
+
+        return nodes_, edges_
 
     def get_box_select_callback(self, dashboard_cls):
         def cb(bounds, x_selection, y_selection):
@@ -276,6 +310,10 @@ class BaseGraph(BaseChart):
                 **dashboard_cls._query_local_variables_dict,
                 **self.box_selected_range,
             }
+            print(
+                dashboard_cls._generate_query_str(temp_str_dict),
+                temp_local_dict,
+            )
             nodes = dashboard_cls._query(
                 dashboard_cls._generate_query_str(temp_str_dict),
                 temp_local_dict,
@@ -284,10 +322,8 @@ class BaseGraph(BaseChart):
             edges = None
 
             if self.inspect_neighbors._active:
-                node_ids = nodes[self.node_id]
-                nodes, edges = self.query_graph(
-                    node_ids, self.nodes, self.edges
-                )
+                # node_ids = nodes[self.node_id]
+                nodes, edges = self.query_graph(nodes, self.nodes, self.edges)
 
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])
@@ -310,9 +346,8 @@ class BaseGraph(BaseChart):
 
             # set box selected ranges to None
             self.x_range, self.y_range = None, None
-            # convert datetime to int64 since, point_in_polygon does not
-            # support datetime
-            indices = cuspatial.point_in_polygon(
+
+            args = (
                 self._to_xaxis_type(self.nodes[self.node_x]),
                 self._to_yaxis_type(self.nodes[self.node_y]),
                 cudf.Series([0], index=["selection"]),
@@ -320,6 +355,15 @@ class BaseGraph(BaseChart):
                 xs,
                 ys,
             )
+            # convert datetime to int64 since, point_in_polygon does not
+            # support datetime
+            if isinstance(self.source, dask_cudf.DataFrame):
+                indices = dask_cudf.from_delayed(
+                    dask.delayed(cuspatial.point_in_polygon)(*args),
+                    divisions=self.nodes.divisions,
+                ).persist()
+            else:
+                indices = cuspatial.point_in_polygon(*args)
             self.selected_indices = indices.selection
             nodes = dashboard_cls._query(
                 dashboard_cls._generate_query_str(),
@@ -328,10 +372,8 @@ class BaseGraph(BaseChart):
             edges = None
 
             if self.inspect_neighbors._active:
-                node_ids = nodes[self.node_id]
-                nodes, edges = self.query_graph(
-                    node_ids, self.nodes, self.edges
-                )
+                # node_ids = nodes[self.node_id]
+                nodes, edges = self.query_graph(nodes, self.nodes, self.edges)
 
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts(data=nodes, ignore_cols=[self.name])

@@ -1,8 +1,8 @@
 from typing import Dict, Type, Union
 import bokeh.embed.util as u
 import cudf
+import dask_cudf
 import panel as pn
-import uuid
 from panel.io.server import get_server
 from bokeh.embed import server_document
 import os
@@ -63,39 +63,6 @@ def _create_dashboard_url(notebook_url: str, port: int, service_proxy=None):
     user_url = urllib.parse.urljoin(notebook_url, service_url_path)
     full_url = urllib.parse.urljoin(user_url, proxy_url_path)
     return full_url
-
-
-def _create_app(
-    panel_obj, notebook_url=DEFAULT_NOTEBOOK_URL, port=0, service_proxy=None,
-):
-    """
-    Displays a bokeh server app inline in the notebook.
-    Arguments
-    ---------
-    notebook_url: str, optional
-        URL to the notebook server
-    port: int (optional, default=0)
-        Allows specifying a specific port
-    """
-    dashboard_url = _create_dashboard_url(notebook_url, port, service_proxy)
-
-    server_id = uuid.uuid4().hex
-    server = get_server(
-        panel=panel_obj,
-        port=port,
-        websocket_origin=notebook_url.netloc,
-        start=True,
-        show=False,
-        server_id=server_id,
-    )
-
-    script = server_document(dashboard_url, resources=None)
-
-    publish_display_data(
-        {HTML_MIME: script, EXEC_MIME: ""},
-        metadata={EXEC_MIME: {"server_id": server_id}},
-    )
-    return server
 
 
 class DuplicateChartsWarning(Warning):
@@ -175,7 +142,7 @@ class DashBoard:
         selected_indices = {
             key: value
             for (key, value) in self._query_str_dict.items()
-            if type(value) == cudf.Series
+            if type(value) in [cudf.Series, dask_cudf.Series]
         }
         if len(selected_indices) > 0:
             result = cudf.DataFrame(selected_indices).fillna(False).all(axis=1)
@@ -326,7 +293,14 @@ class DashBoard:
         If both are not provided, return the original dataframe.
         """
         result = self._cuxfilter_df.data
+        self.test_index = indices
         if indices is not None:
+            if isinstance(indices, dask_cudf.Series):
+                if indices.divisions != result.divisions:
+                    result = result.set_index(
+                        indices.index.to_series(),
+                        npartitions=result.npartitions,
+                    )
             result = result[indices]
         if len(query) > 0:
             result = result.query(expr=query, local_dict=local_dict)
