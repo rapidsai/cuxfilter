@@ -195,8 +195,8 @@ def curved_connect_edges(
     # Make sure no control points are added for rows with source==destination
     fin_df_ = fin_df_.query(edge_source + "!=" + edge_target)
     compute_curves[cuda_args(fin_df_.shape[0])](
-        fin_df_[connected_edge_columns].as_gpu_matrix(),
-        fin_df_[["ctrl_point_x", "ctrl_point_y"]].as_gpu_matrix(),
+        fin_df_[connected_edge_columns].to_cupy(),
+        fin_df_[["ctrl_point_x", "ctrl_point_y"]].to_cupy(),
         result,
         steps,
     )
@@ -246,7 +246,7 @@ def directly_connect_edges(edges):
     result = cp.zeros(
         shape=(edges.shape[0], edges.shape[1] - 2, 3), dtype=cp.float32
     )
-    connect_edges[cuda_args(edges.shape[0])](edges.as_gpu_matrix(), result)
+    connect_edges[cuda_args(edges.shape[0])](edges.to_cupy(), result)
     if edges.shape[1] == 5:
         return cudf.DataFrame(
             {

@@ -106,10 +106,10 @@ def calc_1d_data_tile(
 
     result = np.zeros(shape=(min_s, max_s)).astype(np.float64)[0]
 
-    groupby_result_array_index = groupby_result.index.to_array().astype(int)
+    groupby_result_array_index = groupby_result.index.values_host.astype(int)
     groupby_result_array = groupby_result[
         groupby_result.columns[-1]
-    ].to_array()
+    ].values_host
 
     del groupby_result
 
@@ -200,7 +200,7 @@ def calc_data_tile(
 
     for groupby_result in groupby_results:
         list_of_indices = list(
-            np.unique(groupby_result[check_list[-1]].to_array().astype(int))
+            np.unique(groupby_result[check_list[-1]].values_host.astype(int))
         )
         groupby_as_ndarray = cuda.to_device(
             groupby_result.to_pandas().values.astype(float)

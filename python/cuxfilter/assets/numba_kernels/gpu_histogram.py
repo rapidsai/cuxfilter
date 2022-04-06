@@ -41,7 +41,10 @@ def calc_value_counts(
                 .sort_index()
             )
 
-    return ((val_count.index.to_array(), val_count.to_array()), len(val_count))
+    return (
+        (val_count.index.values_host, val_count.values_host),
+        len(val_count),
+    )
 
 
 def calc_groupby(chart: Type[BaseChart], data, agg=None):

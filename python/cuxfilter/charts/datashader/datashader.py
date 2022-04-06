@@ -90,7 +90,7 @@ def scatter(
         Adds Bokeh.models.LinearColorMapper based legend if True,
         Note: legend currently only works with pixel_shade_type='linear'/'log'
 
-    legend_position: str, default center
+    legend_position: str, default top_right
         position of legend on the chart.
         Valid places are: right, left, bottom, top, top_right, top_left,
                         bottom_left, bottom_right
@@ -264,7 +264,7 @@ def graph(
         Adds Bokeh.models.LinearColorMapper based legend if True,
         Note: legend currently only works with pixel_shade_type='linear'/'log'
 
-    legend_position: str, default center
+    legend_position: str, default top_right
         position of legend on the chart.
         Valid places are: right, left, bottom, top, top_right, top_left,
                         bottom_left, bottom_right
@@ -394,7 +394,7 @@ def heatmap(
     legend: bool, default True
         Adds Bokeh.models.LinearColorMapper based legend if True,
 
-    legend_position: str, default center
+    legend_position: str, default top_right
         position of legend on the chart.
         Valid places are: right, left, bottom, top, top_right, top_left,
                         bottom_left, bottom_right
@@ -576,7 +576,7 @@ def stacked_lines(
         Adds Bokeh.models.LinearColorMapper based legend if True,
         Note: legend currently only works with pixel_shade_type='linear'/'log'
 
-    legend_position: str, default center
+    legend_position: str, default top_right
         position of legend on the chart.
         Valid places are: right, left, bottom, top, top_right, top_left,
                         bottom_left, bottom_right
