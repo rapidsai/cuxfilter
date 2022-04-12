@@ -84,18 +84,3 @@ class TestBaseChart:
         assert bc.format_source_data(source_dict={}, patch_update=True) == -1
         assert bc.apply_mappers() == -1
         assert bc.get_source_y_axis() == []
-
-    def test_add_event(self):
-        bc = BaseChart()
-
-        from bokeh.events import ButtonClick
-        from bokeh.models import Button
-
-        def callback(event):
-            # Python:Click
-            pass
-
-        bc.chart = Button()
-        bc.add_event(ButtonClick, callback)
-
-        assert ButtonClick.event_name in bc.chart.subscribed_events
