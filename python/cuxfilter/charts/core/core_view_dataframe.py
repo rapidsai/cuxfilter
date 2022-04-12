@@ -5,6 +5,7 @@ import dask_cudf
 
 from .core_chart import BaseChart
 from ...layouts import chart_view
+from ...assets import cudf_utils
 
 css = """
 .dataframe table{
@@ -173,12 +174,7 @@ class ViewDataFrame:
         Compute source dataframe based on the values query and indices.
         If both are not provided, return the original dataframe.
         """
-        if indices is not None:
-            data = data[indices]
-        if len(query) > 0:
-            data = data.query(expr=query, local_dict=local_dict)
-
-        return data
+        return cudf_utils.query_df(data, query, local_dict, indices)
 
     def query_chart_by_range(
         self,

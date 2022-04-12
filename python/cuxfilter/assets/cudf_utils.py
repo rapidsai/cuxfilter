@@ -23,3 +23,33 @@ def datetime_dask_fix(min, max):
     consistency.
     """
     return (min.to_datetime64(), max.to_datetime64())
+
+
+def cull_empty_partitions(df):
+    ll = list(df.map_partitions(len).compute())
+    df_delayed = df.to_delayed()
+    df_delayed_new = list()
+    pempty = None
+    for ix, n in enumerate(ll):
+        if 0 == n:
+            pempty = df.get_partition(ix)
+        else:
+            df_delayed_new.append(df_delayed[ix])
+    if pempty is not None:
+        df = dd.from_delayed(df_delayed_new, meta=pempty)
+    return df
+
+
+def query_df(df, query, local_dict, indices=None):
+    # filter the source data with current queries: indices and query strs
+    result = df if indices is None else df[indices]
+
+    if len(query) > 0:
+        result = result.query(expr=query, local_dict=local_dict)
+
+    # cull any empty partitions, since dask_cudf dataframe filtering
+    # may result in one
+    if isinstance(df, dask_cudf.DataFrame):
+        result = cull_empty_partitions(result)
+
+    return result

@@ -1,5 +1,6 @@
 import cupy as cp
 import cudf
+from cuxfilter.assets import cudf_utils
 import dask_cudf
 import dask
 from numba import cuda
@@ -264,6 +265,22 @@ def directly_connect_edges(edges):
         ).fillna(cp.nan)
 
 
+def partition_map(df):
+    df["x"] = cp.NAN
+    df["y"] = cp.NAN
+    return cudf.concat(
+        [
+            df[["x_src", "y_src"]].rename(
+                columns={"x_src": "x", "y_src": "y"}
+            ),
+            df[["x_dst", "y_dst"]].rename(
+                columns={"x_dst": "x", "y_dst": "y"}
+            ),
+            df[["x", "y"]],
+        ]
+    ).sort_index()
+
+
 def calc_connected_edges(
     nodes,
     edges,
@@ -331,15 +348,23 @@ def calc_connected_edges(
         # shape=1 when the dataset has src == dst edges
         if edge_render_type == "direct":
             if isinstance(edges, dask_cudf.DataFrame):
-                result = dask_cudf.from_delayed(dask.delayed(directly_connect_edges)(
+                result = (
                     connected_edges_df[connected_edge_columns]
-                )).persist()
+                    .map_partitions(partition_map)
+                    .persist()
+                )
+
+                result = cudf_utils.cull_empty_partitions(result)
             else:
                 result = directly_connect_edges(
                     connected_edges_df[connected_edge_columns]
                 )
 
         elif edge_render_type == "curved":
+            if isinstance(edges, dask_cudf.DataFrame):
+                raise NotImplementedError(
+                    "curved edges not implemented for dask_cudf Dataframes"
+                )
             result = curved_connect_edges(
                 connected_edges_df,
                 edge_source,

@@ -2,6 +2,7 @@ from typing import Dict, Type, Union
 import bokeh.embed.util as u
 import cudf
 import dask_cudf
+import dask.dataframe as dd
 import panel as pn
 from panel.io.server import get_server
 from bokeh.embed import server_document
@@ -22,7 +23,7 @@ from .charts.constants import (
 from .datatile import DataTile
 from .layouts import single_feature
 from .charts.panel_widgets import data_size_indicator
-from .assets import screengrab, get_open_port
+from .assets import screengrab, get_open_port, cudf_utils
 from .themes import light
 
 _server_info = (
@@ -287,36 +288,20 @@ class DashBoard:
             chart.initiate_chart(self)
             chart._initialized = True
 
-    def _compute_df(self, query, local_dict, indices):
-        """
-        Compute source dataframe based on the values query and indices.
-        If both are not provided, return the original dataframe.
-        """
-        result = self._cuxfilter_df.data
-        self.test_index = indices
-        if indices is not None:
-            if isinstance(indices, dask_cudf.Series):
-                if indices.divisions != result.divisions:
-                    result = result.set_index(
-                        indices.index.to_series(),
-                        npartitions=result.npartitions,
-                    )
-            result = result[indices]
-        if len(query) > 0:
-            result = result.query(expr=query, local_dict=local_dict)
-
-        return result
-
     def _query(self, query_str, local_dict=None, local_indices=None):
         """
         Query the cudf.DataFrame, inplace or create a copy based on the
         value of inplace.
         """
-        local_dict = local_dict or self._query_local_variables_dict
+        if local_dict is None:
+            local_dict = self._query_local_variables_dict
         if local_indices is None:
             local_indices = self.queried_indices
 
-        return self._compute_df(query_str, local_dict, local_indices)
+        # filter the source data with current queries: indices and query strs
+        return cudf_utils.query_df(
+            self._cuxfilter_df.data, query_str, local_dict, local_indices,
+        )
 
     def _generate_query_str(self, query_dict=None, ignore_chart=""):
         """

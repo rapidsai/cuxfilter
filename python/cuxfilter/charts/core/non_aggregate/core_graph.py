@@ -3,11 +3,17 @@ import cudf
 import cuspatial
 import dask.dataframe as dd
 import dask_cudf
-import dask
 
 from ..core_chart import BaseChart
 from ....layouts import chart_view
 from ...constants import CUXF_DEFAULT_COLOR_PALETTE
+from ....assets import cudf_utils
+
+
+def point_in_polygon(df, x, y, xs, ys):
+    return cuspatial.point_in_polygon(
+        df[x], df[y], cudf.Series([0], index=["selection"]), [0], xs, ys,
+    )
 
 
 class BaseGraph(BaseChart):
@@ -206,7 +212,7 @@ class BaseGraph(BaseChart):
         Ouput:
 
         """
-        self.source = dashboard_cls._cuxfilter_df.data
+        self.nodes = dashboard_cls._cuxfilter_df.data
 
         if dashboard_cls._cuxfilter_df.edges is None:
             raise ValueError("Edges dataframe not provided")
@@ -285,7 +291,7 @@ class BaseGraph(BaseChart):
                 # reset previous active view and
                 # set current chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
-                self.source = dashboard_cls._cuxfilter_df.data
+                self.nodes = dashboard_cls._cuxfilter_df.data
 
             self.x_range = self._xaxis_dt_transform(x_selection)
             self.y_range = self._yaxis_dt_transform(y_selection)
@@ -310,10 +316,6 @@ class BaseGraph(BaseChart):
                 **dashboard_cls._query_local_variables_dict,
                 **self.box_selected_range,
             }
-            print(
-                dashboard_cls._generate_query_str(temp_str_dict),
-                temp_local_dict,
-            )
             nodes = dashboard_cls._query(
                 dashboard_cls._generate_query_str(temp_str_dict),
                 temp_local_dict,
@@ -339,7 +341,7 @@ class BaseGraph(BaseChart):
                 # reset previous active view and
                 # set current chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
-                self.source = dashboard_cls._cuxfilter_df.data
+                self.nodes = dashboard_cls._cuxfilter_df.data
 
             xs = self._to_xaxis_type(geometry[:, 0])
             ys = self._to_yaxis_type(geometry[:, 1])
@@ -348,26 +350,23 @@ class BaseGraph(BaseChart):
             self.x_range, self.y_range = None, None
 
             args = (
-                self._to_xaxis_type(self.nodes[self.node_x]),
-                self._to_yaxis_type(self.nodes[self.node_y]),
-                cudf.Series([0], index=["selection"]),
-                [0],
+                self.node_x,
+                self.node_y,
                 xs,
                 ys,
             )
             # convert datetime to int64 since, point_in_polygon does not
             # support datetime
-            if isinstance(self.source, dask_cudf.DataFrame):
-                indices = dask_cudf.from_delayed(
-                    dask.delayed(cuspatial.point_in_polygon)(*args),
-                    divisions=self.nodes.divisions,
+            if isinstance(self.nodes, dask_cudf.DataFrame):
+                self.selected_indices = self.nodes.map_partitions(
+                    point_in_polygon, *args
                 ).persist()
             else:
-                indices = cuspatial.point_in_polygon(*args)
-            self.selected_indices = indices.selection
+                self.selected_indices = point_in_polygon(self.nodes, *args)
+
             nodes = dashboard_cls._query(
                 dashboard_cls._generate_query_str(),
-                local_indices=indices.selection,
+                local_indices=self.selected_indices.selection,
             )
             edges = None
 
@@ -474,13 +473,7 @@ class BaseGraph(BaseChart):
         self.chart.add_reset_event(reset_callback)
 
     def _compute_source(self, query, local_dict, indices):
-        result = self.nodes
-        if indices is not None:
-            result = result[indices]
-        if len(query) > 0:
-            result = result.query(expr=query, local_dict=local_dict)
-
-        return result
+        return cudf_utils.query_df(self.nodes, query, local_dict, indices)
 
     def query_chart_by_range(
         self,

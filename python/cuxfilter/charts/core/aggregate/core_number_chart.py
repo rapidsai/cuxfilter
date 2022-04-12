@@ -1,6 +1,8 @@
 import numpy as np
+
 from ..core_chart import BaseChart
 from ....layouts import chart_view
+from ....assets import cudf_utils
 
 
 class BaseNumberChart(BaseChart):
@@ -101,13 +103,7 @@ class BaseNumberChart(BaseChart):
         Compute source dataframe based on the values query and indices.
         If both are not provided, return the original dataframe.
         """
-        result = self.source
-        if indices is not None:
-            result = result[indices]
-        if len(query) > 0:
-            result = result.query(expr=query, local_dict=local_dict)
-
-        return result
+        return cudf_utils.query_df(self.source, query, local_dict, indices)
 
     def query_chart_by_range(
         self,

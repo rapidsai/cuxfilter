@@ -2,11 +2,22 @@ from typing import Tuple
 import cudf
 import cuspatial
 import dask_cudf
-import dask
 import dask.dataframe as dd
 
 from ..core_chart import BaseChart
 from ....layouts import chart_view
+from ....assets import cudf_utils
+
+
+def point_in_polygon(df, x, y, xs, ys, format_x, format_y):
+    return cuspatial.point_in_polygon(
+        format_x(df[x]),
+        format_y(df[y]),
+        cudf.Series([0], index=["selection"]),
+        [0],
+        xs,
+        ys,
+    )
 
 
 class BaseNonAggregate(BaseChart):
@@ -150,24 +161,23 @@ class BaseNonAggregate(BaseChart):
             # convert datetime to int64 since, point_in_polygon does not
             # support datetime
             args = (
-                self._to_xaxis_type(self.source[self.x]),
-                self._to_yaxis_type(self.source[self.y]),
-                cudf.Series([0], index=["selection"]),
-                [0],
+                self.node_x,
+                self.node_y,
                 xs,
                 ys,
+                self._to_xaxis_type,
+                self._to_yaxis_type,
             )
-            if isinstance(self.source, dask_cudf.DataFrame):
-                indices = dask_cudf.from_delayed(
-                    dask.delayed(cuspatial.point_in_polygon)(*args),
-                    divisions="sorted",
-                )
+            if isinstance(self.nodes, dask_cudf.DataFrame):
+                self.selected_indices = self.nodes.map_partitions(
+                    point_in_polygon, *args,
+                ).persist()
             else:
-                indices = cuspatial.point_in_polygon(*args)
-            self.selected_indices = indices.selection
+                self.selected_indices = point_in_polygon(self.nodes, *args)
+
             temp_data = dashboard_cls._query(
                 dashboard_cls._generate_query_str(),
-                local_indices=indices.selection,
+                local_indices=self.selected_indices.selection,
             )
 
             # reload all charts with new queried data (cudf.DataFrame only)
@@ -176,7 +186,6 @@ class BaseNonAggregate(BaseChart):
             )
             self.reload_chart(temp_data, False)
             del temp_data
-            del indices
 
         return cb
 
@@ -265,13 +274,7 @@ class BaseNonAggregate(BaseChart):
         self.chart.add_reset_event(reset_callback)
 
     def _compute_source(self, query, local_dict, indices):
-        result = self.source
-        if indices is not None:
-            result = result[indices]
-        if len(query) > 0:
-            result = result.query(expr=query, local_dict=local_dict)
-
-        return result
+        return cudf_utils.query_df(self.source, query, local_dict, indices)
 
     def query_chart_by_range(
         self,
