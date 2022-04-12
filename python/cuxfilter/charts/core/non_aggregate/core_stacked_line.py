@@ -302,6 +302,7 @@ class BaseStackedLine(BaseChart):
         """
         min_val, max_val = query_tuple
         final_query = f"@min_val<={active_chart.x}<=@max_val"
+        local_dict.update({"min_val": min_val, "max_val": max_val})
         if len(query) > 0:
             final_query += f" and {query}"
         self.reload_chart(
