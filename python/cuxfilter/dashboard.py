@@ -26,14 +26,6 @@ from .charts.panel_widgets import data_size_indicator
 from .assets import screengrab, get_open_port, cudf_utils
 from .themes import light
 
-_server_info = (
-    "<b>Running server:</b>"
-    '<a target="_blank" href="https://localhost:{port}">'
-    "https://localhost:{port}</a>"
-)
-EXEC_MIME = "application/vnd.holoviews_exec.v0+json"
-HTML_MIME = "text/html"
-
 DEFAULT_NOTEBOOK_URL = "http://localhost:8888"
 
 CUXF_BASE_CHARTS = (BaseChart, BaseWidget, ViewDataFrame)

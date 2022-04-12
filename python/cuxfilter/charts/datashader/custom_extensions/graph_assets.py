@@ -247,36 +247,17 @@ def directly_connect_edges(edges):
         ...
     ) as the input to datashader.line
     """
-    result = cp.zeros(
-        shape=(edges.shape[0], edges.shape[1] - 2, 3), dtype=cp.float32
-    )
-    connect_edges[cuda_args(edges.shape[0])](edges.to_cupy(), result)
-    if edges.shape[1] == 5:
-        return cudf.DataFrame(
-            {
-                "x": result[:, 0].flatten(),
-                "y": result[:, 1].flatten(),
-                edges.columns[-1]: result[:, 2].flatten(),
-            }
-        ).fillna(cp.nan)
-    else:
-        return cudf.DataFrame(
-            {"x": result[:, 0].flatten(), "y": result[:, 1].flatten()}
-        ).fillna(cp.nan)
-
-
-def partition_map(df):
-    df["x"] = cp.NAN
-    df["y"] = cp.NAN
+    edges["x"] = cp.NAN
+    edges["y"] = cp.NAN
     return cudf.concat(
         [
-            df[["x_src", "y_src"]].rename(
+            edges[["x_src", "y_src"]].rename(
                 columns={"x_src": "x", "y_src": "y"}
             ),
-            df[["x_dst", "y_dst"]].rename(
+            edges[["x_dst", "y_dst"]].rename(
                 columns={"x_dst": "x", "y_dst": "y"}
             ),
-            df[["x", "y"]],
+            edges[["x", "y"]],
         ]
     ).sort_index()
 
@@ -350,7 +331,7 @@ def calc_connected_edges(
             if isinstance(edges, dask_cudf.DataFrame):
                 result = (
                     connected_edges_df[connected_edge_columns]
-                    .map_partitions(partition_map)
+                    .map_partitions(directly_connect_edges)
                     .persist()
                 )
 
