@@ -109,7 +109,7 @@ class TestCoreNonAggregateChart:
         t(evt.bounds, evt.x_selection, evt.y_selection)
         assert self.result.equals(df.query("1<=a<=2 and 3<=b<=4"))
 
-    def test_lasso_election_callback(self):
+    def test_lasso_selection_callback(self):
         bnac = BaseNonAggregate()
         bnac.x = "a"
         bnac.y = "b"

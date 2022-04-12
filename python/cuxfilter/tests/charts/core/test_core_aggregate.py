@@ -156,7 +156,10 @@ class TestBaseAggregateChart:
         def test_func(event, callback):
             self.result = callback
 
-        bb.add_event = test_func
+        class chart:
+            on_event = test_func
+
+        bb.chart = chart
         # test the following function behavior
         bb.add_reset_event(self.dashboard)
         assert self.result.__name__ == "reset_callback"

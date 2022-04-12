@@ -1,6 +1,6 @@
 import pytest
 import cudf
-import numpy as np
+import cupy as cp
 from cuxfilter.charts.datashader.custom_extensions import graph_assets
 
 pytest
@@ -22,20 +22,20 @@ class TestGraphAssets:
                 "direct",
                 cudf.DataFrame(
                     {
-                        "x": np.array(
-                            [1.0, 0.0, np.nan, 1.0, 1.0, np.nan],
-                            dtype=np.float32,
+                        "x": cudf.Series(
+                            [1.0, 0.0, cp.NAN, 1.0, 1.0, cp.NAN],
+                            dtype=nodes.x.dtype,
                         ),
-                        "y": np.array(
-                            [1.0, 0.0, np.nan, 1.0, 1.0, np.nan],
-                            dtype=np.float32,
+                        "y": cudf.Series(
+                            [1.0, 0.0, cp.NAN, 1.0, 1.0, cp.NAN],
+                            dtype=nodes.y.dtype,
                         ),
-                        "color": np.array(
-                            [10.0, 10.0, np.nan, 11.0, 11.0, np.nan],
-                            dtype=np.float32,
+                        "color": cudf.Series(
+                            [10.0, 10.0, cp.NAN, 11.0, 11.0, cp.NAN],
+                            dtype=edges.color.dtype,
                         ),
                     }
-                ).fillna(np.nan),
+                ),
             )
         ],
     )
@@ -52,7 +52,7 @@ class TestGraphAssets:
             "target",
             edge_aggregate_col=edge_aggregate_col,
             edge_render_type=edge_render_type,
-            node_x_dtype=np.float32,
-            node_y_dtype=np.float32,
-        )
+            node_x_dtype=cp.float32,
+            node_y_dtype=cp.float32,
+        ).reset_index(drop=True)
         assert res.to_pandas().equals(result.to_pandas())
