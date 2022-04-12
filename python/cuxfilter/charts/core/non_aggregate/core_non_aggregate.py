@@ -167,20 +167,20 @@ class BaseNonAggregate(BaseChart):
             # convert datetime to int64 since, point_in_polygon does not
             # support datetime
             args = (
-                self.node_x,
-                self.node_y,
+                self.x,
+                self.y,
                 xs,
                 ys,
                 self._to_xaxis_type,
                 self._to_yaxis_type,
             )
-            if isinstance(self.nodes, dask_cudf.DataFrame):
-                self.selected_indices = self.nodes.map_partitions(
+            if isinstance(self.source, dask_cudf.DataFrame):
+                self.selected_indices = self.source.map_partitions(
                     point_in_polygon,
                     *args,
                 ).persist()
             else:
-                self.selected_indices = point_in_polygon(self.nodes, *args)
+                self.selected_indices = point_in_polygon(self.source, *args)
 
             temp_data = dashboard_cls._query(
                 dashboard_cls._generate_query_str(),
