@@ -151,7 +151,8 @@ class BaseNumberChart(BaseChart):
                     datatile_result = datatile.loc[datatile_index_max].values
                 else:
                     datatile_result = getattr(
-                        datatile.loc[:datatile_index_max], self.aggregate_fn,
+                        datatile.loc[:datatile_index_max],
+                        self.aggregate_fn,
                     )(axis=0, skipna=True)[0]
             else:
                 if self.aggregate_fn in ["count", "sum"]:
@@ -224,7 +225,10 @@ class BaseNumberChart(BaseChart):
         return datatile_result
 
     def query_chart_by_indices_for_agg(
-        self, active_chart, new_indices, datatile,
+        self,
+        active_chart,
+        new_indices,
+        datatile,
     ):
         """
         Description: query_chart by indices when
@@ -304,7 +308,11 @@ class BaseNumberChart(BaseChart):
                 )
             else:
                 datatile_result = self.query_chart_by_indices_for_agg(
-                    active_chart, new_indices, datatile, calc_new, remove_old,
+                    active_chart,
+                    new_indices,
+                    datatile,
+                    calc_new,
+                    remove_old,
                 )
             self.reset_chart(datatile_result)
         else:
@@ -326,5 +334,6 @@ class BaseNumberChart(BaseChart):
                     final_query += f" and {query}"
 
             self.reload_chart(
-                self._compute_source(final_query, local_dict, indices), True,
+                self._compute_source(final_query, local_dict, indices),
+                True,
             )

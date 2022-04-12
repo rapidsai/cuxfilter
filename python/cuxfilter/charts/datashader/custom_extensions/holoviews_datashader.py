@@ -254,7 +254,9 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
     @param.depends("source_df")
     def points(self, **kwargs):
         return hv.Scatter(
-            self.source_df, kdims=[self.x], vdims=self.vdims,
+            self.source_df,
+            kdims=[self.x],
+            vdims=self.vdims,
         ).opts(tools=[], default_tools=[])
 
     def get_chart(self, streams=[]):

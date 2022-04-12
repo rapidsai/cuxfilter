@@ -107,8 +107,18 @@ class TestBaseStackedLine:
     @pytest.mark.parametrize(
         "x_range, y_range, query, local_dict",
         [
-            ((1, 2), (3, 4), "@x_min<=x<=@x_max", {"x_min": 1, "x_max": 2},),
-            ((0, 2), (3, 5), "@x_min<=x<=@x_max", {"x_min": 0, "x_max": 2},),
+            (
+                (1, 2),
+                (3, 4),
+                "@x_min<=x<=@x_max",
+                {"x_min": 1, "x_max": 2},
+            ),
+            (
+                (0, 2),
+                (3, 5),
+                "@x_min<=x<=@x_max",
+                {"x_min": 0, "x_max": 2},
+            ),
         ],
     )
     def test_compute_query_dict(self, x_range, y_range, query, local_dict):

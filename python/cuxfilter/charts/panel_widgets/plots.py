@@ -666,7 +666,9 @@ class DataSizeIndicator(BaseNumberChart):
                 css_classes=["indicator"],
             ),
             pn.indicators.Progress(
-                name="Progress", value=100, sizing_mode="stretch_width",
+                name="Progress",
+                value=100,
+                sizing_mode="stretch_width",
             ),
         )
 

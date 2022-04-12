@@ -292,7 +292,10 @@ class DashBoard:
 
         # filter the source data with current queries: indices and query strs
         return cudf_utils.query_df(
-            self._cuxfilter_df.data, query_str, local_dict, local_indices,
+            self._cuxfilter_df.data,
+            query_str,
+            local_dict,
+            local_indices,
         )
 
     def _generate_query_str(self, query_dict=None, ignore_chart=""):
@@ -655,7 +658,10 @@ class DashBoard:
         for chart in self.charts.values():
             if chart.use_data_tiles and (self._active_view != chart):
                 self._data_tiles[chart.name] = DataTile(
-                    self._active_view, chart, dtype="pandas", cumsum=cumsum,
+                    self._active_view,
+                    chart,
+                    dtype="pandas",
+                    cumsum=cumsum,
                 ).calc_data_tile(self._query(query).copy())
 
         self._active_view.datatile_loaded_state = True

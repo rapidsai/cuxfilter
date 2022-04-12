@@ -305,7 +305,8 @@ class BaseStackedLine(BaseChart):
         if len(query) > 0:
             final_query += f" and {query}"
         self.reload_chart(
-            cudf_utils.query_df(self.source, final_query, local_dict), False,
+            cudf_utils.query_df(self.source, final_query, local_dict),
+            False,
         )
 
     def query_chart_by_indices(

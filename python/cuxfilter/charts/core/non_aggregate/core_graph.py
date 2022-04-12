@@ -12,7 +12,12 @@ from ....assets import cudf_utils
 
 def point_in_polygon(df, x, y, xs, ys):
     return cuspatial.point_in_polygon(
-        df[x], df[y], cudf.Series([0], index=["selection"]), [0], xs, ys,
+        df[x],
+        df[y],
+        cudf.Series([0], index=["selection"]),
+        [0],
+        xs,
+        ys,
     )
 
 
@@ -275,10 +280,14 @@ class BaseGraph(BaseChart):
         nodes_ = self.concat(
             [
                 nodes.merge(
-                    edges_, left_on=self.node_id, right_on=self.edge_source,
+                    edges_,
+                    left_on=self.node_id,
+                    right_on=self.edge_source,
                 ),
                 nodes.merge(
-                    edges_, left_on=self.node_id, right_on=self.edge_target,
+                    edges_,
+                    left_on=self.node_id,
+                    right_on=self.edge_target,
                 ),
             ]
         )[self.node_columns].drop_duplicates()

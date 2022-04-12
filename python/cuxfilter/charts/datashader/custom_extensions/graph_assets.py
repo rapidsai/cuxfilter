@@ -147,13 +147,13 @@ def control_point_compute_kernel(
         midp_y = (y_src[i] + y_dst[i]) * 0.5
         diff_x = x_dst[i] - x_src[i]
         diff_y = y_dst[i] - y_src[i]
-        normalized_x = diff_x / sqrt(float(diff_x ** 2 + diff_y ** 2))
-        normalized_y = diff_y / sqrt(float(diff_x ** 2 + diff_y ** 2))
+        normalized_x = diff_x / sqrt(float(diff_x**2 + diff_y**2))
+        normalized_y = diff_y / sqrt(float(diff_x**2 + diff_y**2))
 
         unit_x = -1 * normalized_y
         unit_y = normalized_x
 
-        maxBundleSize = sqrt(float((diff_x ** 2 + diff_y ** 2))) * 0.15
+        maxBundleSize = sqrt(float((diff_x**2 + diff_y**2))) * 0.15
         direction = (1 - bcount % 2.0) + (-1) * bcount % 2.0
         size = (maxBundleSize / strokeWidth) * (eindex / bcount)
         if maxBundleSize < bcount * strokeWidth * 2.0:

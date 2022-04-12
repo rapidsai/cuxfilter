@@ -80,7 +80,9 @@ class BaseNonAggregate(BaseChart):
 
     def view(self):
         return chart_view(
-            self.chart.view(), width=self.width, title=self.title,
+            self.chart.view(),
+            width=self.width,
+            title=self.title,
         )
 
     def update_dimensions(self, **kwargs):
@@ -174,7 +176,8 @@ class BaseNonAggregate(BaseChart):
             )
             if isinstance(self.nodes, dask_cudf.DataFrame):
                 self.selected_indices = self.nodes.map_partitions(
-                    point_in_polygon, *args,
+                    point_in_polygon,
+                    *args,
                 ).persist()
             else:
                 self.selected_indices = point_in_polygon(self.nodes, *args)
@@ -315,7 +318,8 @@ class BaseNonAggregate(BaseChart):
         if len(query) > 0:
             final_query += " and " + query
         self.reload_chart(
-            self._compute_source(final_query, local_dict, indices), False,
+            self._compute_source(final_query, local_dict, indices),
+            False,
         )
 
     def query_chart_by_indices(
@@ -366,7 +370,8 @@ class BaseNonAggregate(BaseChart):
                 final_query += f" and {query}"
 
         self.reload_chart(
-            self._compute_source(final_query, local_dict, indices), False,
+            self._compute_source(final_query, local_dict, indices),
+            False,
         )
 
     def add_selection_geometry_event(self, callback):
