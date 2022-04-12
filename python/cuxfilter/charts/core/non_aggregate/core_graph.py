@@ -347,7 +347,11 @@ class BaseGraph(BaseChart):
             ys = self._to_yaxis_type(geometry[:, 1])
 
             # set box selected ranges to None
-            self.x_range, self.y_range = None, None
+            self.x_range, self.y_range, self.box_selected_range = (
+                None,
+                None,
+                None,
+            )
 
             args = (
                 self.node_x,
