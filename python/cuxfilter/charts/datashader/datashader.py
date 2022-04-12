@@ -101,8 +101,8 @@ def scatter(
 
     Returns
     -------
-    A cudashader scatter plot.
-    Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
+    A cudashader scatter plot of type:
+        cuxfilter.charts.datashader.custom_extensions.InteractiveDatashaderPoints
     """
     plot = plots.Scatter(
         x,
@@ -275,8 +275,8 @@ def graph(
 
     Returns
     -------
-    A cudashader graph plot.
-    Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
+    A cudashader graph plot of type:
+        cuxfilter.charts.datashader.custom_extensions.InteractiveDatashaderGraph
     """
     plot = plots.Graph(
         node_x,
@@ -405,8 +405,8 @@ def heatmap(
 
     Returns
     -------
-    A cudashader heatmap (scatter object).
-    Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
+    A cudashader heatmap (scatter object) of type:
+        cuxfilter.charts.datashader.custom_extensions.InteractiveDatashaderPoints
     """
     plot = plots.Scatter(
         x,
@@ -499,8 +499,8 @@ def line(
 
     Returns
     -------
-    A cudashader scatter plot.
-    Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
+    A cudashader scatter plot of type:
+        cuxfilter.charts.datashader.custom_extensions.InteractiveDatashaderLine
     """
     plot = plots.Line(
         x,
@@ -588,8 +588,8 @@ def stacked_lines(
 
     Returns
     -------
-    A cudashader stacked_lines plot.
-    Type cuxfilter.charts.datashader.custom_extensions.InteractiveImage
+    A cudashader stacked_lines plot of type:
+        cuxfilter.charts.datashader.custom_extensions.InteractiveDatashaderMultiLine
     """
     if not isinstance(y, list) or len(y) == 0:
         raise ValueError("y must be a list of atleast one column name")

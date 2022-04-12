@@ -201,7 +201,7 @@ class BaseGraph(BaseChart):
 
     @property
     def df_type(self):
-        if type(self.nodes) == type(self.edges):
+        if type(self.nodes) == type(self.edges):  # noqa: E721
             return type(self.nodes)
         raise TypeError("nodes and edges must be of the same type")
 

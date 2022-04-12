@@ -2,7 +2,6 @@ from typing import Dict, Type, Union
 import bokeh.embed.util as u
 import cudf
 import dask_cudf
-import dask.dataframe as dd
 import panel as pn
 from panel.io.server import get_server
 from bokeh.embed import server_document
@@ -10,7 +9,6 @@ import os
 import urllib
 import warnings
 from IPython.core.display import Image, display
-from IPython.display import publish_display_data
 from collections import Counter
 
 from .charts.core import BaseChart, BaseWidget, ViewDataFrame

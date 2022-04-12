@@ -2,10 +2,8 @@ import cupy as cp
 import cudf
 from cuxfilter.assets import cudf_utils
 import dask_cudf
-import dask
 from numba import cuda
 from math import sqrt, ceil
-
 
 from ....assets import datetime as dt
 

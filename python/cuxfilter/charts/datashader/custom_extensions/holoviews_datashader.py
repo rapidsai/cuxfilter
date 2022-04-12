@@ -474,7 +474,7 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
 
     @property
     def df_type(self):
-        if type(self.nodes_df) == type(self.edges_df):
+        if type(self.nodes_df) == type(self.edges_df):  # noqa: E721
             return type(self.nodes_df)
         raise TypeError("nodes and edges must be of the same type")
 
