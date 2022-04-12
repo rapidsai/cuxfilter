@@ -332,7 +332,8 @@ def calc_connected_edges(
                     .map_partitions(directly_connect_edges)
                     .persist()
                 )
-
+                # cull any empty partitions, since dask_cudf dataframe
+                # filtering may result in one
                 result = cudf_utils.cull_empty_partitions(result)
             else:
                 result = directly_connect_edges(
