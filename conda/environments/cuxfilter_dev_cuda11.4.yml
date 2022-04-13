@@ -39,7 +39,7 @@ dependencies:
 - ipython
 - jupyterlab
 - flake8=3.8.3
-- black=23.3.0
+- black=22.3.0
 - pydeck>=0.3, <=0.5.0
 - packaging
 - pip
