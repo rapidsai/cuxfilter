@@ -8,7 +8,7 @@ from bokeh.embed import server_document
 import os
 import urllib
 import warnings
-from IPython.core.display import Image, display
+from IPython.display import Image, display
 from collections import Counter
 
 from .charts.core import BaseChart, BaseWidget, ViewDataFrame
@@ -399,8 +399,8 @@ class DashBoard:
         cls = "#### cuxfilter " + type(self).__name__
         spacer = "\n    "
         objs = [
-            "[%s] %s" % (name, obj.__repr__())
-            for name, obj in template_obj._render_items.items()
+            "[%d] %s" % (i, obj.__repr__(1))
+            for i, obj in enumerate(template_obj)
         ]
         template = "{cls}{spacer}{spacer}{objs}"
         return template.format(
