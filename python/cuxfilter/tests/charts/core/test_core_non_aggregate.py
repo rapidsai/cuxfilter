@@ -1,5 +1,6 @@
 import pytest
 import cudf
+import dask_cudf
 import mock
 import numpy as np
 
@@ -12,6 +13,8 @@ from cuxfilter.charts.core.non_aggregate.core_non_aggregate import (
 from cuxfilter.dashboard import DashBoard
 from cuxfilter import DataFrame
 from cuxfilter.layouts import chart_view
+
+from ..utils import df_equals, df_types, initialize_df
 
 
 class TestCoreNonAggregateChart:
@@ -75,16 +78,18 @@ class TestCoreNonAggregateChart:
             chart_view(_chart, width=bnac.width, title=bnac.title)
         )
 
-    def test_get_selection_geometry_callback(self):
+    @pytest.mark.parametrize("df_type", df_types)
+    def test_get_selection_geometry_callback(self, df_type):
         bnac = BaseNonAggregate()
 
-        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
+        df = initialize_df(df_type, {"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         assert callable(type(bnac.get_box_select_callback(dashboard)))
         assert callable(type(bnac.get_lasso_select_callback(dashboard)))
 
-    def test_box_selection_callback(self):
+    @pytest.mark.parametrize("df_type", df_types)
+    def test_box_selection_callback(self, df_type):
         bnac = BaseNonAggregate()
         bnac.x = "a"
         bnac.y = "b"
@@ -95,7 +100,7 @@ class TestCoreNonAggregateChart:
             self.result = data
 
         bnac.reload_chart = t_function
-        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
+        df = initialize_df(df_type, {"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         dashboard._active_view = bnac
@@ -107,9 +112,10 @@ class TestCoreNonAggregateChart:
 
         t = bnac.get_box_select_callback(dashboard)
         t(evt.bounds, evt.x_selection, evt.y_selection)
-        assert self.result.equals(df.query("1<=a<=2 and 3<=b<=4"))
+        assert df_equals(self.result, df.query("1<=a<=2 and 3<=b<=4"))
 
-    def test_lasso_selection_callback(self):
+    @pytest.mark.parametrize("df_type", df_types)
+    def test_lasso_selection_callback(self, df_type):
         bnac = BaseNonAggregate()
         bnac.x = "a"
         bnac.y = "b"
@@ -119,19 +125,24 @@ class TestCoreNonAggregateChart:
             self.result = data
 
         bnac.reload_chart = t_function
-        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
+        df = initialize_df(df_type, {"a": [0, 1, 1, 2], "b": [0, 1, 2, 0]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         geometry = np.array([[1, 1, 2], [1, 2, 1]])
 
         t = bnac.get_lasso_select_callback(dashboard)
         with mock.patch("cuspatial.point_in_polygon") as pip:
-
-            pip.return_value = cudf.DataFrame(
-                {"selection": [True, False, True]}
-            )
+            if isinstance(df, dask_cudf.DataFrame):
+                # point in polygon is called per partition,
+                # in this case 2 partitions of length 2 each
+                pip.return_value = cudf.DataFrame({"selection": [True, False]})
+            else:
+                pip.return_value = cudf.DataFrame(
+                    {"selection": [True, False, True, False]}
+                )
             t(geometry)
             assert pip.called
+            assert isinstance(self.result, df_type)
 
     @pytest.mark.parametrize(
         "data, _data",
@@ -140,6 +151,18 @@ class TestCoreNonAggregateChart:
             (
                 cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]}),
                 cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]}),
+            ),
+            (
+                initialize_df(dask_cudf.DataFrame, {}),
+                initialize_df(dask_cudf.DataFrame, {}),
+            ),
+            (
+                initialize_df(
+                    dask_cudf.DataFrame, {"a": [1, 2, 2], "b": [3, 4, 5]}
+                ),
+                initialize_df(
+                    dask_cudf.DataFrame, {"a": [1, 2, 2], "b": [3, 4, 5]}
+                ),
             ),
         ],
     )
@@ -157,8 +180,9 @@ class TestCoreNonAggregateChart:
         bnac.format_source_data = t_function
 
         bnac.calculate_source(data)
-        assert self.result.equals(_data)
+        assert df_equals(self.result, _data)
 
+    @pytest.mark.parametrize("df_type", df_types)
     @pytest.mark.parametrize(
         "x_range, y_range, query, local_dict",
         [
@@ -176,7 +200,9 @@ class TestCoreNonAggregateChart:
             ),
         ],
     )
-    def test_compute_query_dict(self, x_range, y_range, query, local_dict):
+    def test_compute_query_dict(
+        self, df_type, x_range, y_range, query, local_dict
+    ):
         bnac = BaseNonAggregate()
         bnac.chart_type = "test"
         bnac.x = "x"
@@ -185,7 +211,7 @@ class TestCoreNonAggregateChart:
         bnac.x_range = x_range
         bnac.y_range = y_range
 
-        df = cudf.DataFrame({"x": [1, 2, 2], "y": [3, 4, 5]})
+        df = initialize_df(df_type, {"x": [1, 2, 2], "y": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         bnac.compute_query_dict(
@@ -204,6 +230,7 @@ class TestCoreNonAggregateChart:
                 dashboard._query_local_variables_dict[key] == local_dict[key]
             )
 
+    @pytest.mark.parametrize("df_type", df_types)
     @pytest.mark.parametrize(
         "add_interaction, reset_event, event_1, event_2",
         [
@@ -212,13 +239,15 @@ class TestCoreNonAggregateChart:
             (False, "test_event", None, None),
         ],
     )
-    def test_add_events(self, add_interaction, reset_event, event_1, event_2):
+    def test_add_events(
+        self, df_type, add_interaction, reset_event, event_1, event_2
+    ):
         bnac = BaseNonAggregate()
         bnac.add_interaction = add_interaction
         bnac.reset_event = reset_event
         bnac.chart = hv.InteractiveDatashader()
 
-        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
+        df = initialize_df(df_type, {"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         self.event_1 = None
@@ -238,7 +267,8 @@ class TestCoreNonAggregateChart:
         assert self.event_1 == event_1
         assert self.event_2 == event_2
 
-    def test_add_reset_event(self):
+    @pytest.mark.parametrize("df_type", df_types)
+    def test_add_reset_event(self, df_type):
         bnac = BaseNonAggregate()
         bnac.chart_type = "test"
         bnac.x = "a"
@@ -246,7 +276,7 @@ class TestCoreNonAggregateChart:
         bnac.y_range = (3, 5)
         bnac.chart = hv.InteractiveDatashader()
 
-        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
+        df = initialize_df(df_type, {"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
         dashboard._active_view = bnac
 
@@ -254,12 +284,12 @@ class TestCoreNonAggregateChart:
             fn("event")
 
         bnac.add_event = t_func1
-
         bnac.add_reset_event(dashboard)
 
         assert bnac.selected_indices is None
 
-    def test_query_chart_by_range(self):
+    @pytest.mark.parametrize("df_type", df_types)
+    def test_query_chart_by_range(self, df_type):
         bnac = BaseNonAggregate()
         bnac.chart_type = "test"
         bnac.x = "a"
@@ -270,7 +300,7 @@ class TestCoreNonAggregateChart:
 
         query_tuple = (4, 5)
 
-        df = cudf.DataFrame({"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
+        df = initialize_df(df_type, {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
         bnac.source = df
 
         self.result = None
@@ -287,19 +317,22 @@ class TestCoreNonAggregateChart:
         bnac.query_chart_by_range(
             active_chart=bnac_1, query_tuple=query_tuple, datatile=None
         )
-
-        assert self.result.to_string() == "   a  b\n1  2  4\n2  3  5"
+        assert df_equals(
+            self.result,
+            initialize_df(df_type, {"a": [2, 3], "b": [4, 5]}, [1, 2]),
+        )
         assert self.patch_update is False
 
+    @pytest.mark.parametrize("df_type", df_types)
     @pytest.mark.parametrize(
-        "new_indices, result",
+        "new_indices, result, index",
         [
-            ([4, 5], "   a  b\n1  2  4\n2  3  5"),
-            ([], "   a  b\n0  1  3\n1  2  4\n2  3  5\n3  4  6"),
-            ([3], "   a  b\n0  1  3"),
+            ([4, 5], {"a": [2, 3], "b": [4, 5]}, [1, 2]),
+            ([], {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]}, [0, 1, 2, 3]),
+            ([3], {"a": [1], "b": [3]}, [0]),
         ],
     )
-    def test_query_chart_by_indices(self, new_indices, result):
+    def test_query_chart_by_indices(self, df_type, new_indices, result, index):
         bnac = BaseNonAggregate()
         bnac.chart_type = "test"
         bnac.x = "a"
@@ -310,7 +343,7 @@ class TestCoreNonAggregateChart:
 
         new_indices = new_indices
 
-        df = cudf.DataFrame({"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
+        df = initialize_df(df_type, {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
         bnac.source = df
 
         self.result = None
@@ -330,6 +363,7 @@ class TestCoreNonAggregateChart:
             new_indices=new_indices,
             datatile=None,
         )
+        result = initialize_df(df_type, result, index)
 
-        assert self.result.to_string() == result
+        assert df_equals(self.result, result)
         assert self.patch_update is False
