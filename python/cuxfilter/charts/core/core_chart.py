@@ -1,12 +1,9 @@
-import functools
 import cudf
 import dask_cudf
 import logging
 import panel as pn
 from bokeh.models import ColumnDataSource
 from panel.config import panel_extension
-from panel.io import state
-from panel.util import edit_readonly
 from typing import Dict
 
 from ...assets import datetime as dt
@@ -195,20 +192,6 @@ class BaseChart:
 
     def view(self):
         return self.chart
-
-    def add_event(self, event, callback):
-        def release_state():
-            with edit_readonly(state):
-                state.busy = False
-
-        def callback_busy_state(event):
-            with edit_readonly(state):
-                state.busy = True
-            cb = functools.partial(callback, event)
-            self.chart.document.add_next_tick_callback(cb)
-            self.chart.document.add_next_tick_callback(release_state)
-
-        self.chart.on_event(event, callback_busy_state)
 
     def update_dimensions(self, width=None, height=None):
         print("base calc source function, to over-ridden by delegated classes")

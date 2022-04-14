@@ -1,15 +1,14 @@
 from typing import Dict, Type, Union
 import bokeh.embed.util as u
 import cudf
+import dask_cudf
 import panel as pn
-import uuid
 from panel.io.server import get_server
 from bokeh.embed import server_document
 import os
 import urllib
 import warnings
-from IPython.core.display import Image, display
-from IPython.display import publish_display_data
+from IPython.display import Image, display
 from collections import Counter
 
 from .charts.core import BaseChart, BaseWidget, ViewDataFrame
@@ -22,16 +21,8 @@ from .charts.constants import (
 from .datatile import DataTile
 from .layouts import single_feature
 from .charts.panel_widgets import data_size_indicator
-from .assets import screengrab, get_open_port
+from .assets import screengrab, get_open_port, cudf_utils
 from .themes import light
-
-_server_info = (
-    "<b>Running server:</b>"
-    '<a target="_blank" href="https://localhost:{port}">'
-    "https://localhost:{port}</a>"
-)
-EXEC_MIME = "application/vnd.holoviews_exec.v0+json"
-HTML_MIME = "text/html"
 
 DEFAULT_NOTEBOOK_URL = "http://localhost:8888"
 
@@ -63,39 +54,6 @@ def _create_dashboard_url(notebook_url: str, port: int, service_proxy=None):
     user_url = urllib.parse.urljoin(notebook_url, service_url_path)
     full_url = urllib.parse.urljoin(user_url, proxy_url_path)
     return full_url
-
-
-def _create_app(
-    panel_obj, notebook_url=DEFAULT_NOTEBOOK_URL, port=0, service_proxy=None,
-):
-    """
-    Displays a bokeh server app inline in the notebook.
-    Arguments
-    ---------
-    notebook_url: str, optional
-        URL to the notebook server
-    port: int (optional, default=0)
-        Allows specifying a specific port
-    """
-    dashboard_url = _create_dashboard_url(notebook_url, port, service_proxy)
-
-    server_id = uuid.uuid4().hex
-    server = get_server(
-        panel=panel_obj,
-        port=port,
-        websocket_origin=notebook_url.netloc,
-        start=True,
-        show=False,
-        server_id=server_id,
-    )
-
-    script = server_document(dashboard_url, resources=None)
-
-    publish_display_data(
-        {HTML_MIME: script, EXEC_MIME: ""},
-        metadata={EXEC_MIME: {"server_id": server_id}},
-    )
-    return server
 
 
 class DuplicateChartsWarning(Warning):
@@ -175,7 +133,7 @@ class DashBoard:
         selected_indices = {
             key: value
             for (key, value) in self._query_str_dict.items()
-            if type(value) == cudf.Series
+            if type(value) in [cudf.Series, dask_cudf.Series]
         }
         if len(selected_indices) > 0:
             result = cudf.DataFrame(selected_indices).fillna(False).all(axis=1)
@@ -320,29 +278,23 @@ class DashBoard:
             chart.initiate_chart(self)
             chart._initialized = True
 
-    def _compute_df(self, query, local_dict, indices):
-        """
-        Compute source dataframe based on the values query and indices.
-        If both are not provided, return the original dataframe.
-        """
-        result = self._cuxfilter_df.data
-        if indices is not None:
-            result = result[indices]
-        if len(query) > 0:
-            result = result.query(query, local_dict)
-
-        return result
-
     def _query(self, query_str, local_dict=None, local_indices=None):
         """
         Query the cudf.DataFrame, inplace or create a copy based on the
         value of inplace.
         """
-        local_dict = local_dict or self._query_local_variables_dict
+        if local_dict is None:
+            local_dict = self._query_local_variables_dict
         if local_indices is None:
             local_indices = self.queried_indices
 
-        return self._compute_df(query_str, local_dict, local_indices)
+        # filter the source data with current queries: indices and query strs
+        return cudf_utils.query_df(
+            self._cuxfilter_df.data,
+            query_str,
+            local_dict,
+            local_indices,
+        )
 
     def _generate_query_str(self, query_dict=None, ignore_chart=""):
         """
@@ -447,8 +399,8 @@ class DashBoard:
         cls = "#### cuxfilter " + type(self).__name__
         spacer = "\n    "
         objs = [
-            "[%s] %s" % (name, obj.__repr__())
-            for name, obj in template_obj._render_items.items()
+            "[%d] %s" % (i, obj.__repr__(1))
+            for i, obj in enumerate(template_obj)
         ]
         template = "{cls}{spacer}{spacer}{objs}"
         return template.format(
@@ -704,7 +656,10 @@ class DashBoard:
         for chart in self.charts.values():
             if chart.use_data_tiles and (self._active_view != chart):
                 self._data_tiles[chart.name] = DataTile(
-                    self._active_view, chart, dtype="pandas", cumsum=cumsum,
+                    self._active_view,
+                    chart,
+                    dtype="pandas",
+                    cumsum=cumsum,
                 ).calc_data_tile(self._query(query).copy())
 
         self._active_view.datatile_loaded_state = True

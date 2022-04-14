@@ -1,25 +1,22 @@
 import pytest
-import cudf
-
 from cuxfilter import charts
 from cuxfilter import DataFrame
 from cuxfilter.charts.deckgl.bindings import PanelDeck
 
-pytest
+from ..utils import initialize_df, df_types
+
+df_args = {
+    "states": [float(i + 30) for i in range(10)],
+    "val": [float(i + 10) for i in range(10)],
+    "val_t": [float(i + 100) for i in range(10)],
+}
+dfs = [initialize_df(type, df_args) for type in df_types]
+cux_dfs = [DataFrame.from_dataframe(df) for df in dfs]
 
 
 class TestDeckGL:
-    def test_init(self):
-        cux_df = DataFrame.from_dataframe(
-            cudf.DataFrame(
-                {
-                    "states": [float(i + 30) for i in range(10)],
-                    "val": [float(i + 10) for i in range(10)],
-                    "val_t": [float(i + 100) for i in range(10)],
-                }
-            )
-        )
-
+    @pytest.mark.parametrize("cux_df", cux_dfs)
+    def test_init(self, cux_df):
         choropleth3d_chart = charts.choropleth(
             x="states",
             color_column="val",

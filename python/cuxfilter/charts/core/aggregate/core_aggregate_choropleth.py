@@ -304,7 +304,7 @@ class BaseChoropleth(BaseChart):
             dashboard_cls._reload_charts()
 
         # add callback to reset chart button
-        self.add_event(self.reset_event, reset_callback)
+        self.chart.on_event(self.reset_event, reset_callback)
 
     def get_selected_indices(self):
         """

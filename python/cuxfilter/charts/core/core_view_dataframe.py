@@ -5,6 +5,7 @@ import dask_cudf
 
 from .core_chart import BaseChart
 from ...layouts import chart_view
+from ...assets import cudf_utils
 
 css = """
 .dataframe table{
@@ -77,11 +78,10 @@ class ViewDataFrame:
             self.update_dimensions(height=value)
 
     def initiate_chart(self, dashboard_cls):
-        if isinstance(
-            dashboard_cls._cuxfilter_df.data, dask_cudf.core.DataFrame
-        ):
+        data = dashboard_cls._cuxfilter_df.data
+        if isinstance(data, dask_cudf.core.DataFrame):
             if self.force_computation:
-                self.generate_chart(dashboard_cls._cuxfilter_df.data.compute())
+                self.generate_chart(data.compute())
             else:
                 print(
                     "displaying only 1st partitions top 1000 rows for ",
@@ -91,10 +91,14 @@ class ViewDataFrame:
                     "Warning - would slow the dashboard down significantly",
                 )
                 self.generate_chart(
-                    dashboard_cls._cuxfilter_df.data.head(1000)
+                    data.head(
+                        1000,
+                        npartitions=data.npartitions,
+                        compute=True,
+                    )
                 )
         else:
-            self.generate_chart(dashboard_cls._cuxfilter_df.data)
+            self.generate_chart(data)
 
     def _format_data(self, data):
         if self.drop_duplicates:
@@ -150,7 +154,9 @@ class ViewDataFrame:
                 )
             else:
                 self.chart[0].object = self._format_data(
-                    data[self.columns].head(1000)
+                    data[self.columns].head(
+                        1000, npartitions=data.npartitions, compute=True
+                    )
                 )
         else:
             self.chart[0].object = self._format_data(data[self.columns])
@@ -173,12 +179,7 @@ class ViewDataFrame:
         Compute source dataframe based on the values query and indices.
         If both are not provided, return the original dataframe.
         """
-        if indices is not None:
-            data = data[indices]
-        if len(query) > 0:
-            data = data.query(query, local_dict)
-
-        return data
+        return cudf_utils.query_df(data, query, local_dict, indices)
 
     def query_chart_by_range(
         self,

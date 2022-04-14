@@ -6,6 +6,18 @@ import dask.dataframe as dd
 
 from ..core_chart import BaseChart
 from ....layouts import chart_view
+from ....assets import cudf_utils
+
+
+def point_in_polygon(df, x, y, xs, ys, format_x, format_y):
+    return cuspatial.point_in_polygon(
+        format_x(df[x]),
+        format_y(df[y]),
+        cudf.Series([0], index=["selection"]),
+        [0],
+        xs,
+        ys,
+    )
 
 
 class BaseNonAggregate(BaseChart):
@@ -59,9 +71,7 @@ class BaseNonAggregate(BaseChart):
                 dashboard_cls._cuxfilter_df.data[self.y].min(),
                 dashboard_cls._cuxfilter_df.data[self.y].max(),
             )
-        if isinstance(
-            dashboard_cls._cuxfilter_df.data, dask_cudf.core.DataFrame
-        ):
+        if isinstance(dashboard_cls._cuxfilter_df.data, dask_cudf.DataFrame):
             self.x_range = dd.compute(*self.x_range)
             self.y_range = dd.compute(*self.y_range)
         self.calculate_source(dashboard_cls._cuxfilter_df.data)
@@ -70,7 +80,9 @@ class BaseNonAggregate(BaseChart):
 
     def view(self):
         return chart_view(
-            self.chart.view(), width=self.width, title=self.title,
+            self.chart.view(),
+            width=self.width,
+            title=self.title,
         )
 
     def update_dimensions(self, **kwargs):
@@ -147,21 +159,32 @@ class BaseNonAggregate(BaseChart):
             ys = self._to_yaxis_type(geometry[:, 1])
 
             # set box selected ranges to None
-            self.x_range, self.y_range = None, None
+            self.x_range, self.y_range, self.box_selected_range = (
+                None,
+                None,
+                None,
+            )
             # convert datetime to int64 since, point_in_polygon does not
             # support datetime
-            indices = cuspatial.point_in_polygon(
-                self._to_xaxis_type(self.source[self.x]),
-                self._to_yaxis_type(self.source[self.y]),
-                cudf.Series([0], index=["selection"]),
-                [0],
+            args = (
+                self.x,
+                self.y,
                 xs,
                 ys,
+                self._to_xaxis_type,
+                self._to_yaxis_type,
             )
-            self.selected_indices = indices.selection
+            if isinstance(self.source, dask_cudf.DataFrame):
+                self.selected_indices = self.source.map_partitions(
+                    point_in_polygon,
+                    *args,
+                ).persist()
+            else:
+                self.selected_indices = point_in_polygon(self.source, *args)
+
             temp_data = dashboard_cls._query(
                 dashboard_cls._generate_query_str(),
-                local_indices=indices.selection,
+                local_indices=self.selected_indices.selection,
             )
 
             # reload all charts with new queried data (cudf.DataFrame only)
@@ -170,7 +193,6 @@ class BaseNonAggregate(BaseChart):
             )
             self.reload_chart(temp_data, False)
             del temp_data
-            del indices
 
         return cb
 
@@ -259,13 +281,7 @@ class BaseNonAggregate(BaseChart):
         self.chart.add_reset_event(reset_callback)
 
     def _compute_source(self, query, local_dict, indices):
-        result = self.source
-        if indices is not None:
-            result = result[indices]
-        if len(query) > 0:
-            result = result.query(query, local_dict)
-
-        return result
+        return cudf_utils.query_df(self.source, query, local_dict, indices)
 
     def query_chart_by_range(
         self,
@@ -302,7 +318,8 @@ class BaseNonAggregate(BaseChart):
         if len(query) > 0:
             final_query += " and " + query
         self.reload_chart(
-            self._compute_source(final_query, local_dict, indices), False,
+            self._compute_source(final_query, local_dict, indices),
+            False,
         )
 
     def query_chart_by_indices(
@@ -353,7 +370,8 @@ class BaseNonAggregate(BaseChart):
                 final_query += f" and {query}"
 
         self.reload_chart(
-            self._compute_source(final_query, local_dict, indices), False,
+            self._compute_source(final_query, local_dict, indices),
+            False,
         )
 
     def add_selection_geometry_event(self, callback):

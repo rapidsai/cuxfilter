@@ -1,5 +1,4 @@
 import pytest
-import cudf
 import mock
 from bokeh.events import ButtonClick
 
@@ -10,15 +9,18 @@ from cuxfilter.charts.datashader.custom_extensions import (
     holoviews_datashader as hv,
 )
 
+from ..utils import initialize_df, df_types
+
+df_args = {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
+dfs = [initialize_df(type, df_args) for type in df_types]
+cux_dfs = [cuxfilter.DataFrame.from_dataframe(df) for df in dfs]
+# create cudf and dask_cudf backed cuxfilter dataframes
+dashboards = [
+    cux_df.dashboard(charts=[], title="test_title") for cux_df in cux_dfs
+]
+
 
 class TestNonAggregateBaseLine:
-
-    df = cudf.DataFrame(
-        {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
-    )
-    cux_df = cuxfilter.DataFrame.from_dataframe(df)
-    dashboard = cux_df.dashboard(charts=[], title="test_title")
-
     def test_variables(self):
         bl = BaseLine(x="test_x", y="test_y", color="#8735fb")
         assert bl.x == "test_x"
@@ -43,6 +45,7 @@ class TestNonAggregateBaseLine:
 
         assert str(bl.view()) == str(chart_view(_chart, width=bl.width))
 
+    @pytest.mark.parametrize("dashboard", dashboards)
     @pytest.mark.parametrize(
         "x_range, y_range, query, local_dict",
         [
@@ -60,7 +63,9 @@ class TestNonAggregateBaseLine:
             ),
         ],
     )
-    def test_compute_query_dict(self, x_range, y_range, query, local_dict):
+    def test_compute_query_dict(
+        self, dashboard, x_range, y_range, query, local_dict
+    ):
         bl = BaseLine(x="x", y="y", title="custom_title")
         bl.chart_type = "non_aggregate_line"
         bl.box_selected_range = local_dict
@@ -68,29 +73,27 @@ class TestNonAggregateBaseLine:
         bl.x_range = x_range
         bl.y_range = y_range
 
-        self.dashboard.add_charts([bl])
+        dashboard.add_charts([bl])
         # test the following function behavior
         bl.compute_query_dict(
-            self.dashboard._query_str_dict,
-            self.dashboard._query_local_variables_dict,
+            dashboard._query_str_dict,
+            dashboard._query_local_variables_dict,
         )
 
         assert (
-            self.dashboard._query_str_dict[
-                "x_y_non_aggregate_line_custom_title"
-            ]
+            dashboard._query_str_dict["x_y_non_aggregate_line_custom_title"]
             == query
         )
         for key in local_dict:
             assert (
-                self.dashboard._query_local_variables_dict[key]
-                == local_dict[key]
+                dashboard._query_local_variables_dict[key] == local_dict[key]
             )
 
+    @pytest.mark.parametrize("dashboard", dashboards)
     @pytest.mark.parametrize(
         "event, result", [(None, None), (ButtonClick, "func_Called")]
     )
-    def test_add_events(self, event, result):
+    def test_add_events(self, dashboard, event, result):
         bl = BaseLine(x="key", y="val")
         bl.chart = hv.InteractiveDatashader()
         self.result = None
@@ -101,11 +104,12 @@ class TestNonAggregateBaseLine:
         bl.add_reset_event = test_func
         bl.reset_event = event
         # test the following function behavior
-        bl.add_events(self.dashboard)
+        bl.add_events(dashboard)
 
         assert self.result == result
 
-    def test_add_reset_event(self):
+    @pytest.mark.parametrize("dashboard", dashboards)
+    def test_add_reset_event(self, dashboard):
         bl = BaseLine(x="key", y="val")
         bl.chart = hv.InteractiveDatashader()
         self.result = None
@@ -115,5 +119,5 @@ class TestNonAggregateBaseLine:
 
         bl.add_event = test_func
         # test the following function behavior
-        bl.add_reset_event(self.dashboard)
+        bl.add_reset_event(dashboard)
         assert bl.selected_indices is None

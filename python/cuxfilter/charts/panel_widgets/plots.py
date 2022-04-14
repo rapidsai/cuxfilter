@@ -622,6 +622,11 @@ class DataSizeIndicator(BaseNumberChart):
     pn.config.raw_css = pn.config.raw_css + [css]
     title = "Datapoints Selected"
 
+    def get_df_size(self, df):
+        if isinstance(df, dask_cudf.DataFrame):
+            return df.shape[0].compute()
+        return df.shape[0]
+
     def calculate_source(self, data, patch_update=False):
         """
         calculate source
@@ -631,7 +636,7 @@ class DataSizeIndicator(BaseNumberChart):
             data: cudf.DataFrame
             patch_update: bool, default False
         """
-        source_dict = {"X": list([1]), "Y": list([len(data)])}
+        source_dict = {"X": list([1]), "Y": list([self.get_df_size(data)])}
 
         if patch_update:
             self.chart[0].value = int(source_dict["Y"][0])
@@ -661,7 +666,9 @@ class DataSizeIndicator(BaseNumberChart):
                 css_classes=["indicator"],
             ),
             pn.indicators.Progress(
-                name="Progress", value=100, sizing_mode="stretch_width",
+                name="Progress",
+                value=100,
+                sizing_mode="stretch_width",
             ),
         )
 

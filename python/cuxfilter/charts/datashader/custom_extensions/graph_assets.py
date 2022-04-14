@@ -1,5 +1,7 @@
 import cupy as cp
 import cudf
+from cuxfilter.assets import cudf_utils
+import dask_cudf
 from numba import cuda
 from math import sqrt, ceil
 
@@ -143,13 +145,13 @@ def control_point_compute_kernel(
         midp_y = (y_src[i] + y_dst[i]) * 0.5
         diff_x = x_dst[i] - x_src[i]
         diff_y = y_dst[i] - y_src[i]
-        normalized_x = diff_x / sqrt(float(diff_x ** 2 + diff_y ** 2))
-        normalized_y = diff_y / sqrt(float(diff_x ** 2 + diff_y ** 2))
+        normalized_x = diff_x / sqrt(float(diff_x**2 + diff_y**2))
+        normalized_y = diff_y / sqrt(float(diff_x**2 + diff_y**2))
 
         unit_x = -1 * normalized_y
         unit_y = normalized_x
 
-        maxBundleSize = sqrt(float((diff_x ** 2 + diff_y ** 2))) * 0.15
+        maxBundleSize = sqrt(float((diff_x**2 + diff_y**2))) * 0.15
         direction = (1 - bcount % 2.0) + (-1) * bcount % 2.0
         size = (maxBundleSize / strokeWidth) * (eindex / bcount)
         if maxBundleSize < bcount * strokeWidth * 2.0:
@@ -232,9 +234,12 @@ def connect_edges(edges, result):
             result[i, 2, 2] = cp.nan
 
 
-def directly_connect_edges(edges):
+def directly_connect_edges(edges, x, y, edge_aggregate_col=None):
     """
     edges: cudf DataFrame(x_src, y_src, x_dst, y_dst)
+    x: str, node x-coordinate column name
+    y: str, node y-coordinate column name
+    edge_aggregate_col: str, edge aggregate column name, if any
 
     returns a cudf DataFrame of the form (
         row1 -> x_src, y_src
@@ -243,22 +248,25 @@ def directly_connect_edges(edges):
         ...
     ) as the input to datashader.line
     """
-    result = cp.zeros(
-        shape=(edges.shape[0], edges.shape[1] - 2, 3), dtype=cp.float32
-    )
-    connect_edges[cuda_args(edges.shape[0])](edges.to_cupy(), result)
-    if edges.shape[1] == 5:
-        return cudf.DataFrame(
-            {
-                "x": result[:, 0].flatten(),
-                "y": result[:, 1].flatten(),
-                edges.columns[-1]: result[:, 2].flatten(),
-            }
-        ).fillna(cp.nan)
-    else:
-        return cudf.DataFrame(
-            {"x": result[:, 0].flatten(), "y": result[:, 1].flatten()}
-        ).fillna(cp.nan)
+    # dask.distributed throws a not supported error when cudf.NA is used
+    edges[x] = cp.NAN
+    edges[y] = cp.NAN
+
+    src_columns = [f"{x}_src", f"{y}_src"]
+    dst_columns = [f"{x}_dst", f"{y}_dst"]
+    if edge_aggregate_col:
+        src_columns.append(edge_aggregate_col)
+        dst_columns.append(edge_aggregate_col)
+
+    # realign each src -> target row, as 3 rows:
+    #   [[x_src, y_src], [x_dst, y_dst], [nan, nan]]
+    return cudf.concat(
+        [
+            edges[src_columns].rename(columns={f"{x}_src": x, f"{y}_src": y}),
+            edges[dst_columns].rename(columns={f"{x}_dst": x, f"{y}_dst": y}),
+            edges[[x, y]],
+        ]
+    ).sort_index()
 
 
 def calc_connected_edges(
@@ -277,8 +285,8 @@ def calc_connected_edges(
 ):
     """
     calculate directly connected edges
-    nodes: cudf.DataFrame
-    edges: cudf.DataFrame
+    nodes: cudf.DataFrame/dask_cudf.DataFrame
+    edges: cudf.DataFrame/dask_cudf.DataFrame
     edge_type: direct/curved
     """
     edges_columns = [
@@ -319,14 +327,41 @@ def calc_connected_edges(
 
     result = cudf.DataFrame()
 
-    if connected_edges_df.shape[0] > 1:
+    def get_df_size(df):
+        if isinstance(df, dask_cudf.DataFrame):
+            return df.shape[0].compute()
+        return df.shape[0]
+
+    if get_df_size(connected_edges_df) > 1:
         # shape=1 when the dataset has src == dst edges
         if edge_render_type == "direct":
-            result = directly_connect_edges(
-                connected_edges_df[connected_edge_columns]
-            )
+            if isinstance(edges, dask_cudf.DataFrame):
+                result = (
+                    connected_edges_df[connected_edge_columns]
+                    .map_partitions(
+                        directly_connect_edges,
+                        node_x,
+                        node_y,
+                        edge_aggregate_col,
+                    )
+                    .persist()
+                )
+                # cull any empty partitions, since dask_cudf dataframe
+                # filtering may result in one
+                result = cudf_utils.cull_empty_partitions(result)
+            else:
+                result = directly_connect_edges(
+                    connected_edges_df[connected_edge_columns],
+                    node_x,
+                    node_y,
+                    edge_aggregate_col,
+                )
 
         elif edge_render_type == "curved":
+            if isinstance(edges, dask_cudf.DataFrame):
+                raise NotImplementedError(
+                    "curved edges not implemented for dask_cudf Dataframes"
+                )
             result = curved_connect_edges(
                 connected_edges_df,
                 edge_source,
@@ -335,7 +370,7 @@ def calc_connected_edges(
                 curve_params.copy(),
             )
 
-    if result.shape[0] == 0:
+    if get_df_size(result) == 0:
         result = cudf.DataFrame({k: cp.nan for k in ["x", "y"]})
         if edge_aggregate_col is not None:
             result[edge_aggregate_col] = cp.nan

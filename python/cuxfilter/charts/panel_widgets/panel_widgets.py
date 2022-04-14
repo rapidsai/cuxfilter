@@ -60,7 +60,11 @@ def range_slider(
 
 
 def date_range_slider(
-    x, width=400, height=20, data_points=None, **params,
+    x,
+    width=400,
+    height=20,
+    data_points=None,
+    **params,
 ):
     """
 

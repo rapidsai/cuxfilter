@@ -4,6 +4,7 @@ from typing import Tuple
 
 from ..core_chart import BaseChart
 from ....layouts import chart_view
+from ....assets import cudf_utils
 
 
 class BaseStackedLine(BaseChart):
@@ -301,10 +302,12 @@ class BaseStackedLine(BaseChart):
         """
         min_val, max_val = query_tuple
         final_query = f"@min_val<={active_chart.x}<=@max_val"
+        local_dict.update({"min_val": min_val, "max_val": max_val})
         if len(query) > 0:
             final_query += f" and {query}"
         self.reload_chart(
-            self.source.query(final_query, local_dict), False,
+            cudf_utils.query_df(self.source, final_query, local_dict),
+            False,
         )
 
     def query_chart_by_indices(
@@ -346,7 +349,7 @@ class BaseStackedLine(BaseChart):
                 final_query += f" and {query}"
 
         self.reload_chart(
-            self.source.query(final_query, local_dict)
+            cudf_utils.query_df(self.source, final_query, local_dict)
             if len(final_query) > 0
             else self.source,
             False,
