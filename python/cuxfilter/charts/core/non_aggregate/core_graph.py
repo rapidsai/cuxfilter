@@ -371,9 +371,20 @@ class BaseGraph(BaseChart):
             # convert datetime to int64 since, point_in_polygon does not
             # support datetime
             if isinstance(self.nodes, dask_cudf.DataFrame):
-                self.selected_indices = self.nodes.map_partitions(
-                    point_in_polygon, *args
-                ).persist()
+                self.selected_indices = (
+                    self.nodes.assign(
+                        **{
+                            self.node_x: self._to_xaxis_type(
+                                self.nodes[self.node_x]
+                            ),
+                            self.node_y: self._to_yaxis_type(
+                                self.nodes[self.node_y]
+                            ),
+                        }
+                    )
+                    .map_partitions(point_in_polygon, *args)
+                    .persist()
+                )
             else:
                 self.selected_indices = point_in_polygon(self.nodes, *args)
 
