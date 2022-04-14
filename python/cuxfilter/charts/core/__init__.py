@@ -36,6 +36,8 @@ def view_dataframe(
     A view dataframe object.
     Type cuxfilter.charts.core_view_dataframe.ViewDataFrame
     """
-    plot = ViewDataFrame(columns, width, height, force_computation)
+    plot = ViewDataFrame(
+        columns, drop_duplicates, width, height, force_computation
+    )
     plot.chart_type = "view_dataframe"
     return plot
