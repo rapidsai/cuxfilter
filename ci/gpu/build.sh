@@ -1,5 +1,5 @@
 #!/bin/bash
-# COPYRIGHT (c) 2020, NVIDIA CORPORATION.
+# COPYRIGHT (c) 2020-2002, NVIDIA CORPORATION.
 ##############################################
 # cuXfilter GPU build and test script for CI #
 ##############################################
@@ -24,6 +24,8 @@ export HOME="$WORKSPACE"
 cd "$WORKSPACE"
 export GIT_DESCRIBE_TAG=`git describe --tags`
 export MINOR_VERSION=`echo $GIT_DESCRIBE_TAG | grep -o -E '([0-9]+\.[0-9]+)'`
+unset GIT_DESCRIBE_TAG
+
 # Set `LIBCUDF_KERNEL_CACHE_PATH` environment variable to $HOME/.jitify-cache because
 # it's local to the container's virtual file system, and not shared with other CI jobs
 # like `/tmp` is.
@@ -53,37 +55,28 @@ nvidia-smi
 gpuci_logger "Activate conda env"
 . /opt/conda/etc/profile.d/conda.sh
 conda activate rapids
-gpuci_mamba_retry install -y \
-               "cudf=$MINOR_VERSION.*" "cudatoolkit=$CUDA_REL" \
-               "cugraph=$MINOR_VERSION.*" \
-               "cuspatial=$MINOR_VERSION.*" \
-               "dask-cudf=$MINOR_VERSION.*" "dask-cuda=$MINOR_VERSION.*" \
-               "numba>=0.54" \
-               "bokeh>=2.4.2,<=2.5" \
-               "rapids-build-env=$MINOR_VERSION.*" \
-               "rapids-notebook-env=$MINOR_VERSION.*"
-
-# https://docs.rapids.ai/maintainers/depmgmt/ 
-# conda remove --force rapids-build-env rapids-notebook-env
-# conda install "your-pkg=1.0.0"
 
 gpuci_logger "Check versions"
 python --version
 $CC --version
 $CXX --version
+
 conda info
 conda config --show-sources
 conda list --show-channel-urls
 
 ################################################################################
-# BUILD - Build cuxfilter from source
+# BUILD - Build cuxfilter
 ################################################################################
 
-gpuci_logger "Build cuxfilter"
-"$WORKSPACE/build.sh" clean cuxfilter
+gpuci_logger "Build and install cuxfilter"
+cd "${WORKSPACE}"
+CONDA_BLD_DIR="${WORKSPACE}/.conda-bld"
+gpuci_conda_retry build  --croot "${CONDA_BLD_DIR}" conda/recipes/cuxfilter --python=$PYTHON
+gpuci_mamba_retry install -c "${CONDA_BLD_DIR}" cuxfilter
 
 ################################################################################
-# TEST - Run pytest 
+# TEST - Run pytest
 ################################################################################
 
 set +e -Eo pipefail
@@ -93,6 +86,9 @@ trap "EXITCODE=1" ERR
 if hasArg --skip-tests; then
     gpuci_logger "Skipping Tests"
 else
+    gpuci_logger "Install tests dependencies"
+    gpuci_mamba_retry install "cugraph=${MINOR_VERSION}.*"
+
     gpuci_logger "Check GPU usage"
     nvidia-smi
 
