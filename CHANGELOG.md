@@ -2,9 +2,22 @@
 
 Please see https://github.com/rapidsai/cuxfilter/releases/tag/v22.06.00a for the latest changes to this development branch.
 
-# cuXfilter 22.04.00 (Date TBD)
+# cuXfilter 22.04.00 (6 Apr 2022)
 
-Please see https://github.com/rapidsai/cuxfilter/releases/tag/v22.04.00a for the latest changes to this development branch.
+## 🐛 Bug Fixes
+
+- update panel version ([#361](https://github.com/rapidsai/cuxfilter/pull/361)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 📖 Documentation
+
+- Fix/examples ([#353](https://github.com/rapidsai/cuxfilter/pull/353)) [@AjayThorve](https://github.com/AjayThorve)
+- Fix deprecated code changes of `cudf` ([#348](https://github.com/rapidsai/cuxfilter/pull/348)) [@galipremsagar](https://github.com/galipremsagar)
+
+## 🛠️ Improvements
+
+- Temporarily disable new `ops-bot` functionality ([#357](https://github.com/rapidsai/cuxfilter/pull/357)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Update `bokeh` version ([#355](https://github.com/rapidsai/cuxfilter/pull/355)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Add `.github/ops-bot.yaml` config file ([#352](https://github.com/rapidsai/cuxfilter/pull/352)) [@ajschmidt8](https://github.com/ajschmidt8)
 
 # cuXfilter 22.02.00 (2 Feb 2022)
 
