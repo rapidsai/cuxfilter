@@ -1,6 +1,5 @@
 import panel as pn
 import param
-import pydeck as pdk
 
 css = """
 .multi-select{
@@ -52,50 +51,26 @@ class PanelDeck(param.Parameterized):
         """
         html_str = ""
         tooltip_columns = (
-            list(
-                set(self.data.columns)
-                - set(["index", "coordinates"] + list(self.colors.columns))
-            )
+            self.data.columns
             if len(self.tooltip_include_cols) == 0
             else self.tooltip_include_cols
         )
 
         for i in tooltip_columns:
             html_str += f"<b> {i} </b>: {{{i}}} <br>"
-        return html_str
+        return {"html": html_str}
 
     def __init__(self, **params):
         """
         initialize pydeck object, and set a listener on self.data
         """
         super(PanelDeck, self).__init__(**params)
-        self._view_state = pdk.ViewState(
-            **self.spec["initialViewState"], bearing=0.45
-        )
-        self._layers = pdk.Layer(
-            "PolygonLayer", data=self.data, **self.spec["layers"][0]
-        )
-        self._tooltip = {"html": self.get_tooltip_html()}
-        self._deck = pdk.Deck(
-            mapbox_key=self.spec["mapboxApiAccessToken"],
-            views=[
-                pdk.View(
-                    type="MapView",
-                    controller=True,
-                    height="100%",
-                    width="100%",
-                )
-            ],
-            layers=[self._layers],
-            initial_view_state=self._view_state,
-            tooltip=self._tooltip,
-        )
-        if self.spec["map_style"]:
-            self._deck.map_style = self.spec["map_style"]
+        self.spec["layers"][0]["data"] = self.data
         self.pane = pn.pane.DeckGL(
-            self._deck,
+            self.spec,
             sizing_mode=self.sizing_mode,
             height=self.height,
+            tooltips={self.spec["layers"][0]["id"]: self.get_tooltip_html()},
             css_classes=["deck-chart"],
         )
         self.param.watch(self._update, ["data"])
@@ -137,20 +112,22 @@ class PanelDeck(param.Parameterized):
                     set(self.data.index) - self.indices, self.colors.columns
                 ] = self.default_color
             self.data[self.colors.columns] = temp_colors
-        self._layers.data = self.data
-        self.pane.param.trigger("object")
+        self._update_layer_data(self.data)
         self.callback(
             self.data[self.x].loc[old_indices].tolist(),
             self.data[self.x].loc[list(self.indices)].tolist(),
         )
+
+    def _update_layer_data(self, data):
+        self.pane.object["layers"][0]["data"] = data
+        self.pane.param.trigger("object")
 
     def _update(self, event):
         """
         trigger deck_gl pane when layer data is updated
         """
         if event.name == "data":
-            self._layers.data = self.data
-        self.pane.param.trigger("object")
+            self._update_layer_data(self.data)
 
     def view(self):
         """
