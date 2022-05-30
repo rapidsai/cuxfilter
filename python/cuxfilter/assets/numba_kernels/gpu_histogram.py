@@ -65,13 +65,11 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
             groupby_res = getattr(
                 temp_df.groupby(by=[chart.x], sort=True), chart.aggregate_fn
             )()
-            groupby_res = groupby_res.reset_index().compute().to_pandas()
+            groupby_res = groupby_res.reset_index().compute()
         else:
-            groupby_res = (
-                temp_df.groupby(by=[chart.x], sort=True, as_index=False)
-                .agg({chart.y: chart.aggregate_fn})
-                .to_pandas()
-            )
+            groupby_res = temp_df.groupby(
+                by=[chart.x], sort=True, as_index=False
+            ).agg({chart.y: chart.aggregate_fn})
     else:
         for key, agg_fn in agg.items():
             temp_df[key] = data[key]
@@ -90,18 +88,16 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
                     )
                 del groupby_res_temp
                 gc.collect()
-            groupby_res = groupby_res.to_pandas()
+            groupby_res = groupby_res
         else:
-            groupby_res = (
-                temp_df.groupby(by=[chart.x], sort=True, as_index=False)
-                .agg(agg)
-                .to_pandas()
-            )
+            groupby_res = temp_df.groupby(
+                by=[chart.x], sort=True, as_index=False
+            ).agg(agg)
 
     del temp_df
     gc.collect()
 
-    return groupby_res.to_numpy().transpose()
+    return groupby_res
 
 
 def aggregated_column_unique(chart: Type[BaseChart], data):

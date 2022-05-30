@@ -84,7 +84,9 @@ def test_calc_groupby(aggregate_fn, result):
 
     bc.aggregate_fn = aggregate_fn
 
-    assert np.array_equal(gpu_histogram.calc_groupby(bc, df), result)
+    assert np.array_equal(
+        gpu_histogram.calc_groupby(bc, df).to_numpy().transponse(), result
+    )
 
 
 @pytest.mark.parametrize(
@@ -104,7 +106,10 @@ def test_calc_groupby_for_nulls(x, y, aggregate_fn, result):
     bc.max_value = df[x].max()
     bc.aggregate_fn = aggregate_fn
     assert np.allclose(
-        gpu_histogram.calc_groupby(bc, df).astype(np.float32),
+        gpu_histogram.calc_groupby(bc, df)
+        .to_numpy()
+        .transpose()
+        .astype(np.float32),
         result.astype(np.float32),
         equal_nan=True,
     )

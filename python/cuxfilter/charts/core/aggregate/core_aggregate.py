@@ -249,7 +249,7 @@ class BaseAggregateChart(BaseChart):
                 )
         else:
             self.aggregate_fn = "mean"
-            df = calc_groupby(self, data)
+            df = calc_groupby(self, data).to_numpy().transpose()
             if self.data_points is None:
                 self.data_points = len(df[0])
 
