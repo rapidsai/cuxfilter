@@ -212,11 +212,6 @@ class Choropleth(BaseChoropleth):
         data:  list()
             update self.data_y_axis in self.source
         """
-        # if len(data) == 0:
-        #     self.source = self.source_backup
-        #     self.compute_colors()
-        #     self.chart.data = self.source
-        # el
         if column is not None:
             self.source[column] = data
             if column == self.color_column:
