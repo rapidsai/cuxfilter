@@ -14,15 +14,16 @@ Using cuxfilter with Dask-cudf is a very seamless experience, and passing in a `
 
 ## Use cases
 
-### 1. Massive scale interactive scatter-plot rendering
+### Massive scale interactive scatter-plot rendering
 
 Single GPU performance on a `Nvidia Quadro GV100(32GB)`:
 
 | 3 * Float32 Columns |      |        |      |                           |
 |------------------------------------|------|--------|------|---------------------------|
 | Points                             | 1M   | 50M    | 100M | 500M                      |
+| Dashboard generation Time         | 0.07-0.1 seconds            | 0.07-0.1 seconds             | 0.1-0.2 seconds            | 2-3 seconds             |
 | Memory                             | ~1GB | ~3.5GB | ~7GB | ~ 20GB (spikes upto 28GB) |
-|                                    |      |        |      |                           |
+| Performance                       | <0.3s interaction time  | <0.3s interaction time   | <0.3s interaction time   | <0.5s interaction time    |
 
 Multi-GPU performance on a DGX machine with `8 * Nvidia Quadro GV100(32GB)`:
 
