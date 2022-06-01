@@ -22,7 +22,7 @@ def scatter(
     timeout=100,
     legend=True,
     legend_position="top_right",
-    transparent_unselected_data=True,
+    unselected_alpha=0.2,
     **library_specific_params,
 ):
     """
@@ -96,7 +96,7 @@ def scatter(
         Valid places are: right, left, bottom, top, top_right, top_left,
                         bottom_left, bottom_right
 
-    transparent_unselected_data: bool, default True
+    unselected_alpha: float [0, 1], default 0.2
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2)
 
@@ -130,7 +130,7 @@ def scatter(
         timeout=timeout,
         legend=legend,
         legend_position=legend_position,
-        transparent_unselected_data=transparent_unselected_data,
+        unselected_alpha=unselected_alpha,
         **library_specific_params,
     )
 
@@ -168,7 +168,7 @@ def graph(
     timeout=100,
     legend=True,
     legend_position="top_right",
-    transparent_unselected_data=True,
+    unselected_alpha=0.2,
     **library_specific_params,
 ):
 
@@ -276,7 +276,7 @@ def graph(
         Valid places are: right, left, bottom, top, top_right, top_left,
                         bottom_left, bottom_right
 
-    transparent_unselected_data: bool, default True
+    unselected_alpha: float [0, 1], default 0.2
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2) (nodes only)
 
@@ -319,7 +319,7 @@ def graph(
         timeout,
         legend=legend,
         legend_position=legend_position,
-        transparent_unselected_data=transparent_unselected_data,
+        unselected_alpha=unselected_alpha,
         **library_specific_params,
     )
 
@@ -344,7 +344,7 @@ def heatmap(
     timeout=100,
     legend=True,
     legend_position="top_right",
-    transparent_unselected_data=True,
+    unselected_alpha=0.2,
     **library_specific_params,
 ):
     """
@@ -412,7 +412,7 @@ def heatmap(
         Valid places are: right, left, bottom, top, top_right, top_left,
                         bottom_left, bottom_right
 
-    transparent_unselected_data: bool, default True
+    unselected_alpha: float [0, 1], default 0.2
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2)
 
@@ -446,7 +446,7 @@ def heatmap(
         timeout=timeout,
         legend=legend,
         legend_position=legend_position,
-        transparent_unselected_data=transparent_unselected_data,
+        unselected_alpha=unselected_alpha,
         **library_specific_params,
     )
     plot.chart_type = "heatmap"
@@ -466,7 +466,7 @@ def line(
     height=400,
     title="",
     timeout=100,
-    transparent_unselected_data=True,
+    unselected_alpha=0.2,
     **library_specific_params,
 ):
     """
@@ -512,7 +512,7 @@ def line(
         reported completion. Increase for very long running
         callbacks and if zooming feels laggy.
 
-    transparent_unselected_data: bool, default True
+    unselected_alpha: float [0, 1], default 0.2
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2)
 
@@ -538,7 +538,7 @@ def line(
         height,
         title,
         timeout,
-        transparent_unselected_data=transparent_unselected_data,
+        unselected_alpha=unselected_alpha,
         **library_specific_params,
     )
     plot.chart_type = "non_aggregate_line"
@@ -559,7 +559,7 @@ def stacked_lines(
     timeout=100,
     legend=True,
     legend_position="top_right",
-    transparent_unselected_data=True,
+    unselected_alpha=0.2,
     **library_specific_params,
 ):
     """
@@ -606,7 +606,7 @@ def stacked_lines(
         Valid places are: right, left, bottom, top, top_right, top_left,
                         bottom_left, bottom_right
 
-    transparent_unselected_data: bool, default True
+    unselected_alpha: float [0, 1], default 0.2
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2)
 
@@ -635,7 +635,7 @@ def stacked_lines(
         timeout,
         legend=legend,
         legend_position=legend_position,
-        transparent_unselected_data=transparent_unselected_data,
+        unselected_alpha=unselected_alpha,
         **library_specific_params,
     )
     plot.chart_type = "stacked_lines"

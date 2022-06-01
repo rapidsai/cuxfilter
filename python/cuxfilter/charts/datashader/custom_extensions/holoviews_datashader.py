@@ -139,8 +139,9 @@ class InteractiveDatashaderBase(param.Parameterized):
         default=["pan", "box_select", "reset", "lasso_select", "wheel_zoom"],
         doc="interactive tools to add to the chart",
     )
-    transparent_unselected_data = param.Boolean(
-        True,
+    unselected_alpha = param.Number(
+        0.2,
+        bounds=(0, 1),
         doc=(
             "display unselected data as the same color palette but transparent"
         ),
@@ -271,7 +272,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
                 cnorm=self.pixel_shade_type,
                 **self.cmap,
                 nodata=0,
-                alpha=0.2,
+                alpha=self.unselected_alpha,
                 tools=[],
                 default_tools=[],
             ),
@@ -319,7 +320,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
             active_tools=["wheel_zoom", "pan"],
         )
 
-        if self.transparent_unselected_data:
+        if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
         return pn.pane.HoloViews(
@@ -353,7 +354,10 @@ class InteractiveDatashaderLine(InteractiveDatashader):
     def get_base_chart(self):
         return dynspread(
             rasterize(self.line()).opts(
-                cmap=[self.color], alpha=0.2, tools=[], default_tools=[]
+                cmap=[self.color],
+                alpha=self.unselected_alpha,
+                tools=[],
+                default_tools=[],
             )
         ).opts(
             responsive=True,
@@ -383,7 +387,7 @@ class InteractiveDatashaderLine(InteractiveDatashader):
             default_tools=[],
         )
 
-        if self.transparent_unselected_data:
+        if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
         return pn.pane.HoloViews(
@@ -443,7 +447,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
                 self.lines(),
                 aggregator=ds.count_cat("k"),
                 color_key=self.colors,
-            ).opts(alpha=0.2, tools=[], default_tools=[])
+            ).opts(alpha=self.unselected_alpha, tools=[], default_tools=[])
         )
 
     def get_chart(self, streams=[]):
@@ -466,7 +470,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         if self.legend:
             dmap *= self.legend
 
-        if self.transparent_unselected_data:
+        if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
         return pn.pane.HoloViews(
@@ -609,7 +613,7 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
 
         dmap_graph = dmap_edges * dmap_nodes
 
-        if self.transparent_unselected_data:
+        if self.unselected_alpha > 0:
             dmap_graph *= self.nodes_chart.get_base_chart()
 
         return pn.pane.HoloViews(

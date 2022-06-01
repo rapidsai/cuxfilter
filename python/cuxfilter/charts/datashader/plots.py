@@ -91,7 +91,7 @@ class Scatter(BaseScatter):
             spread_threshold=self.pixel_density,
             point_shape=self.point_shape,
             max_px=self.point_size,
-            transparent_unselected_data=self.transparent_unselected_data,
+            unselected_alpha=self.unselected_alpha,
         )
 
     def reload_chart(self, data=None, patch_update=False):
@@ -229,7 +229,7 @@ class Graph(BaseGraph):
             edge_transparency=self.edge_transparency,
             inspect_neighbors=self.inspect_neighbors,
             display_edges=self.display_edges,
-            transparent_unselected_data=self.transparent_unselected_data,
+            unselected_alpha=self.unselected_alpha,
         )
 
     def reload_chart(self, data, edges=None, patch_update=False):
@@ -346,7 +346,7 @@ class Line(BaseLine):
             y=self.y,
             color=self.color,
             pixel_shade_type=self.pixel_shade_type,
-            transparent_unselected_data=self.transparent_unselected_data,
+            unselected_alpha=self.unselected_alpha,
         )
 
     def reload_chart(self, data, patch_update=False):
@@ -467,7 +467,7 @@ class StackedLines(BaseStackedLine):
             line_dims=self.y,
             colors=self.colors,
             legend=self.compute_legend(),
-            transparent_unselected_data=self.transparent_unselected_data,
+            unselected_alpha=self.unselected_alpha,
         )
 
     def reload_chart(self, data, patch_update=False):

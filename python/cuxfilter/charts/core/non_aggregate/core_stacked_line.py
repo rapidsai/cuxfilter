@@ -72,7 +72,7 @@ class BaseStackedLine(BaseChart):
         legend_position="center",
         x_axis_tick_formatter=None,
         y_axis_tick_formatter=None,
-        transparent_unselected_data=True,
+        unselected_alpha=0.2,
         **library_specific_params,
     ):
         """
@@ -123,7 +123,7 @@ class BaseStackedLine(BaseChart):
         self.legend_position = legend_position
         self.x_axis_tick_formatter = x_axis_tick_formatter
         self.y_axis_tick_formatter = y_axis_tick_formatter
-        self.transparent_unselected_data = transparent_unselected_data
+        self.unselected_alpha = unselected_alpha
         self.library_specific_params = library_specific_params
         self.width = width
         self.height = height

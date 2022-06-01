@@ -62,7 +62,7 @@ gtc_demo_red_blue_palette = [ "#3182bd", "#6baed6", "#7b8ed8", "#e26798", "#ff00
 
 #declare charts
 chart1 = cuxfilter.charts.scatter(x='dropoff_x', y='dropoff_y', aggregate_col='DAY_WEEK', aggregate_fn='mean',
-                                color_palette=gtc_demo_red_blue_palette, tile_provider='CartoLight',
+                                color_palette=gtc_demo_red_blue_palette, tile_provider='CartoLight', unselected_alpha=0.2,
                                 pixel_shade_type='linear')
 chart2 = cuxfilter.charts.multi_select('YEAR')
 chart3 = cuxfilter.charts.bar('DAY_WEEK', x_label_map=label_map)
