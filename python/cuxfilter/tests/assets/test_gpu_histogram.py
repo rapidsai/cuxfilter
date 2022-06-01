@@ -85,7 +85,7 @@ def test_calc_groupby(aggregate_fn, result):
     bc.aggregate_fn = aggregate_fn
 
     assert np.array_equal(
-        gpu_histogram.calc_groupby(bc, df).to_numpy().transponse(), result
+        gpu_histogram.calc_groupby(bc, df).to_numpy().transpose(), result
     )
 
 
@@ -107,6 +107,7 @@ def test_calc_groupby_for_nulls(x, y, aggregate_fn, result):
     bc.aggregate_fn = aggregate_fn
     assert np.allclose(
         gpu_histogram.calc_groupby(bc, df)
+        .to_pandas()
         .to_numpy()
         .transpose()
         .astype(np.float32),
