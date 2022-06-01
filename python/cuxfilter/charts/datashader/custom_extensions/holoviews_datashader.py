@@ -141,7 +141,9 @@ class InteractiveDatashaderBase(param.Parameterized):
     )
     transparent_unselected_data = param.Boolean(
         True,
-        doc="display unselected data as the same color palette but transparent",
+        doc=(
+            "display unselected data as the same color palette but transparent"
+        ),
     )
 
     def __init__(self, **params):
