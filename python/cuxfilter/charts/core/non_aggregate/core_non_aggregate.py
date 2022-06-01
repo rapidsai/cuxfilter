@@ -9,10 +9,10 @@ from ....layouts import chart_view
 from ....assets import cudf_utils
 
 
-def point_in_polygon(df, x, y, xs, ys, format_x, format_y):
+def point_in_polygon(df, x, y, xs, ys):
     return cuspatial.point_in_polygon(
-        format_x(df[x]),
-        format_y(df[y]),
+        df[x],
+        df[y],
         cudf.Series([0], index=["selection"]),
         [0],
         xs,
@@ -171,14 +171,22 @@ class BaseNonAggregate(BaseChart):
                 self.y,
                 xs,
                 ys,
-                self._to_xaxis_type,
-                self._to_yaxis_type,
             )
+
             if isinstance(self.source, dask_cudf.DataFrame):
-                self.selected_indices = self.source.map_partitions(
-                    point_in_polygon,
-                    *args,
-                ).persist()
+                self.selected_indices = (
+                    self.source.assign(
+                        **{
+                            self.x: self._to_xaxis_type(self.source[self.x]),
+                            self.y: self._to_yaxis_type(self.source[self.y]),
+                        }
+                    )
+                    .map_partitions(
+                        point_in_polygon,
+                        *args,
+                    )
+                    .persist()
+                )
             else:
                 self.selected_indices = point_in_polygon(self.source, *args)
 

@@ -40,6 +40,7 @@ class BaseLine(BaseNonAggregate):
         timeout=100,
         x_axis_tick_formatter=None,
         y_axis_tick_formatter=None,
+        unselected_alpha=0.2,
         **library_specific_params,
     ):
         """
@@ -82,6 +83,7 @@ class BaseLine(BaseNonAggregate):
         self.timeout = timeout
         self.x_axis_tick_formatter = x_axis_tick_formatter
         self.y_axis_tick_formatter = y_axis_tick_formatter
+        self.unselected_alpha = unselected_alpha
         self.library_specific_params = library_specific_params
         self.width = width
         self.height = height

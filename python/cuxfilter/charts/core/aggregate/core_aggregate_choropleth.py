@@ -166,20 +166,6 @@ class BaseChoropleth(BaseChart):
             self.chart.view(), width=self.width, title=self.title
         )
 
-    def _compute_array_all_bins(
-        self, source_x, source_y, update_data_x, update_data_y
-    ):
-        """
-        source_x: current_source_x, np.array()
-        source_y: current_source_y, np.array()
-        update_data_x: updated_data_x, np.array()
-        update_data_y: updated_data_x, np.array()
-        """
-        result_array = np.zeros(shape=source_x.shape)
-        indices = [np.where(x_ == source_x)[0][0] for x_ in update_data_x]
-        np.put(result_array, indices, update_data_y)
-        return result_array
-
     def calculate_source(self, data, patch_update=False):
         """
         Description:
@@ -191,41 +177,9 @@ class BaseChoropleth(BaseChart):
 
         Ouput:
         """
-        df = calc_groupby(self, data, agg=self.aggregate_dict)
-
-        dict_temp = {
-            self.x: df[0],
-            self.color_column: df[1],
-        }
-        if self.elevation_column is not None:
-            dict_temp[self.elevation_column] = df[2]
-
-        if patch_update and len(dict_temp[self.x]) < len(
-            self.source.data[self.x]
-        ):
-            # if not all X axis bins are provided, filling bins not updated
-            # with zeros
-            color_axis_data = self._compute_array_all_bins(
-                self.source.data[self.x],
-                self.source.data[self.color_column],
-                dict_temp[self.x],
-                dict_temp[self.color_column],
-            )
-
-            dict_temp[self.color_column] = color_axis_data
-
-            if self.elevation_column is not None:
-                elevation_axis_data = self._compute_array_all_bins(
-                    self.source.data[self.x],
-                    self.source.data[self.elevation_column],
-                    dict_temp[self.x],
-                    dict_temp[self.elevation_column],
-                )
-                dict_temp[self.elevation_column] = elevation_axis_data
-
-            dict_temp[self.x] = self.source.data[self.x]
-
-        self.format_source_data(dict_temp, patch_update)
+        self.format_source_data(
+            calc_groupby(self, data, agg=self.aggregate_dict), patch_update
+        )
 
     def get_selection_callback(self, dashboard_cls):
         """
@@ -360,7 +314,7 @@ class BaseChoropleth(BaseChart):
                 round((max_val - active_chart.min_value) / active_chart.stride)
             )
             datatile_indices = (
-                (self.source.data[self.x] - self.min_value) / self.stride
+                (self.source[self.x] - self.min_value) / self.stride
             ).astype(int)
 
             if key == self.color_column:
@@ -465,7 +419,7 @@ class BaseChoropleth(BaseChart):
         Ouput:
         """
         datatile_indices = (
-            (self.source.data[self.x] - self.min_value) / self.stride
+            (self.source[self.x] - self.min_value) / self.stride
         ).astype(int)
         if len(new_indices) == 0 or new_indices == [""]:
             datatile_sum_0 = np.array(
@@ -518,7 +472,7 @@ class BaseChoropleth(BaseChart):
         Ouput:
         """
         datatile_indices = (
-            (self.source.data[self.x] - self.min_value) / self.stride
+            (self.source[self.x] - self.min_value) / self.stride
         ).astype(int)
         if len(new_indices) == 0 or new_indices == [""]:
             datatile_result = np.array(
@@ -531,9 +485,9 @@ class BaseChoropleth(BaseChart):
             datatile_result = np.zeros(shape=(len_y_axis,), dtype=np.float64)
         else:
             len_y_axis = datatile[0].loc[datatile_indices].shape[0]
-            datatile_result = np.array(
-                self.source.data[key], dtype=np.float64
-            )[:len_y_axis]
+            datatile_result = np.array(self.source[key], dtype=np.float64)[
+                :len_y_axis
+            ]
 
         for index in calc_new:
             index = int(
@@ -570,7 +524,7 @@ class BaseChoropleth(BaseChart):
         Ouput:
         """
         datatile_indices = (
-            (self.source.data[self.x] - self.min_value) / self.stride
+            (self.source[self.x] - self.min_value) / self.stride
         ).astype(int)
 
         if len(new_indices) == 0 or new_indices == [""]:
