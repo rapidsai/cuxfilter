@@ -130,8 +130,8 @@ def scatter(
         timeout=timeout,
         legend=legend,
         legend_position=legend_position,
-        transparent_unselected_data=transparent_unselected_data
-        ** library_specific_params,
+        transparent_unselected_data=transparent_unselected_data,
+        **library_specific_params,
     )
 
     plot.chart_type = "scatter"
