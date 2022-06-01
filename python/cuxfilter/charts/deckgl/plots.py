@@ -57,8 +57,8 @@ class Choropleth(BaseChoropleth):
             self.geo_color_palette = bokeh.palettes.Purples9
 
         min, max = (
-            self.source[self.color_column].min(),
-            self.source[self.color_column].max(),
+            self.source[self.color_column].min(skipna=True),
+            self.source[self.color_column].max(skipna=True),
         )
 
         # set default nan_color
@@ -71,7 +71,7 @@ class Choropleth(BaseChoropleth):
             ) + [255]
             color_ids = self.source[self.color_column] == min
             self.source.loc[color_ids, self.rgba_columns] = default_color
-        else:
+        elif not all(np.isnan([min, max])):
             BREAKS = np.linspace(
                 min,
                 max,
@@ -84,9 +84,23 @@ class Choropleth(BaseChoropleth):
                 },
                 np.nan: list(ImageColor.getrgb(self.nan_color)) + [50],
             }
+
             idx = self.source.index
-            if self.chart and len(self.chart.indices) > 0:
-                idx = self.chart.indices.intersection(idx.values)
+            if self.chart:
+                # set base colors for current state if chart exists
+                inds = pd.cut(
+                    self.source[self.color_column],
+                    BREAKS,
+                    labels=False,
+                    include_lowest=True,
+                )
+                self.chart.colors.loc[:, self.rgba_columns] = inds.map(
+                    color_map
+                ).tolist()
+                if len(self.chart.indices) > 0:
+                    # highlight selected indices only
+                    idx = self.chart.indices.intersection(idx)
+
             inds = pd.cut(
                 self.source.loc[idx, self.color_column],
                 BREAKS,
@@ -108,16 +122,26 @@ class Choropleth(BaseChoropleth):
 
         returns a pandas.DataFrame merged with geojson polygon coordinates
         """
-        self.source = (
+        source_temp = (
             data.to_pandas()
             .merge(self.geo_mapper, on=self.x, how="left")
             .dropna(subset=["coordinates"])
             .reset_index(drop=True)
         )
-        self.compute_colors()
         if patch_update is False:
-            self.source_backup = data
+            self.source = source_temp
+            self.compute_colors()
         else:
+            self.source.loc[
+                :, [self.color_column, self.elevation_column]
+            ] = np.nan
+            self.source.loc[
+                self.source[self.x].isin(source_temp[self.x]),
+                [self.color_column, self.elevation_column],
+            ] = source_temp[[self.color_column, self.elevation_column]].values
+            self.compute_colors()
+
+        if self.chart:
             self.chart.data = self.source
 
     def get_mean(self, x):
@@ -188,9 +212,12 @@ class Choropleth(BaseChoropleth):
         data:  list()
             update self.data_y_axis in self.source
         """
-        if column is None:
-            self.format_source_data(self.source_backup, patch_update=True)
-        else:
+        # if len(data) == 0:
+        #     self.source = self.source_backup
+        #     self.compute_colors()
+        #     self.chart.data = self.source
+        # el
+        if column is not None:
             self.source[column] = data
             if column == self.color_column:
                 self.compute_colors()
@@ -229,7 +256,8 @@ class Choropleth(BaseChoropleth):
         if self.no_colors_set:
             self.geo_color_palette = theme.color_palette
             self.compute_colors()
-            self.chart.colors = self.source[self.rgba_columns]
+            if self.chart:
+                self.chart.colors = self.source[self.rgba_columns]
         if self.map_style is None:
             if self.mapbox_api_key is None:
                 self.chart.spec["mapStyle"] = theme.map_style_without_token

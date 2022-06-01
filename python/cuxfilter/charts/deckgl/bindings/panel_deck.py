@@ -45,6 +45,10 @@ class PanelDeck(param.Parameterized):
         [], doc="list of columns to include in tooltip"
     )
 
+    @property
+    def valid_indices(self):
+        return self.indices.intersection(self.data.index)
+
     def get_tooltip_html(self):
         """
         get tooltip info from dataframe columns, if not already present
@@ -62,7 +66,7 @@ class PanelDeck(param.Parameterized):
 
     def __init__(self, **params):
         """
-        initialize pydeck object, and set a listener on self.data
+        initialize deck html object, and set a listener on self.data
         """
         super(PanelDeck, self).__init__(**params)
         self.spec["layers"][0]["data"] = self.data
@@ -79,7 +83,7 @@ class PanelDeck(param.Parameterized):
         """
         returns a list of currently selected column_x values as a list
         """
-        return self.data[self.x].loc[self.indices].tolist()
+        return self.data[self.x].loc[self.valid_indices].tolist()
 
     @pn.depends("pane.click_state")
     def click_event(self):
@@ -89,10 +93,10 @@ class PanelDeck(param.Parameterized):
         unselected indices to default_color
         """
         index = self.pane.click_state.get("index", -1)
-        old_indices = list(self.indices)
+        old_indices = self.valid_indices
         if index == -1:
             index = slice(0, 0)
-            self.indices = set()
+            self.indices.clear()
             self.data[self.colors.columns] = self.colors
         else:
             if self.multi_select:
@@ -115,7 +119,7 @@ class PanelDeck(param.Parameterized):
         self._update_layer_data(self.data)
         self.callback(
             self.data[self.x].loc[old_indices].tolist(),
-            self.data[self.x].loc[list(self.indices)].tolist(),
+            self.data[self.x].loc[self.valid_indices].tolist(),
         )
 
     def _update_layer_data(self, data):
