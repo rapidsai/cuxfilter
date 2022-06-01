@@ -139,6 +139,13 @@ class InteractiveDatashaderBase(param.Parameterized):
         default=["pan", "box_select", "reset", "lasso_select", "wheel_zoom"],
         doc="interactive tools to add to the chart",
     )
+    unselected_alpha = param.Number(
+        0.2,
+        bounds=(0, 1),
+        doc=(
+            "display unselected data as the same color palette but transparent"
+        ),
+    )
 
     def __init__(self, **params):
         """
@@ -259,6 +266,21 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
             vdims=self.vdims,
         ).opts(tools=[], default_tools=[])
 
+    def get_base_chart(self):
+        return dynspread(
+            rasterize(self.points()).opts(
+                cnorm=self.pixel_shade_type,
+                **self.cmap,
+                nodata=0,
+                alpha=self.unselected_alpha,
+                tools=[],
+                default_tools=[],
+            ),
+            threshold=self.spread_threshold,
+            shape=self.point_shape,
+            max_px=self.max_px,
+        )
+
     def get_chart(self, streams=[]):
         dmap = rasterize(
             hv.DynamicMap(self.points, streams=streams),
@@ -268,6 +290,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
             **self.cmap,
             colorbar=self.legend,
             nodata=0,
+            alpha=1,
             colorbar_position=self.legend_position,
             tools=[],
             default_tools=[],
@@ -297,6 +320,9 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
             active_tools=["wheel_zoom", "pan"],
         )
 
+        if self.unselected_alpha > 0:
+            dmap *= self.get_base_chart()
+
         return pn.pane.HoloViews(
             self.tiles * dmap if self.tiles is not None else dmap,
             sizing_mode="stretch_both",
@@ -321,7 +347,24 @@ class InteractiveDatashaderLine(InteractiveDatashader):
 
     @param.depends("source_df")
     def line(self, **kwargs):
-        return hv.Curve(self.source_df, kdims=[self.x], vdims=[self.y])
+        return hv.Curve(self.source_df, kdims=[self.x], vdims=[self.y]).opts(
+            tools=[], default_tools=[]
+        )
+
+    def get_base_chart(self):
+        return dynspread(
+            rasterize(self.line()).opts(
+                cmap=[self.color],
+                alpha=self.unselected_alpha,
+                tools=[],
+                default_tools=[],
+            )
+        ).opts(
+            responsive=True,
+            tools=self.tools,
+            active_tools=["wheel_zoom", "pan"],
+            default_tools=[],
+        )
 
     def get_chart(self, streams=[]):
         return rasterize(hv.DynamicMap(self.line, streams=streams)).opts(
@@ -341,7 +384,11 @@ class InteractiveDatashaderLine(InteractiveDatashader):
             responsive=True,
             tools=self.tools,
             active_tools=["wheel_zoom", "pan"],
+            default_tools=[],
         )
+
+        if self.unselected_alpha > 0:
+            dmap *= self.get_base_chart()
 
         return pn.pane.HoloViews(
             self.tiles * dmap if self.tiles is not None else dmap,
@@ -394,6 +441,15 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
             kdims="k",
         )
 
+    def get_base_chart(self):
+        return dynspread(
+            datashade(
+                self.lines(),
+                aggregator=ds.count_cat("k"),
+                color_key=self.colors,
+            ).opts(alpha=self.unselected_alpha, tools=[], default_tools=[])
+        )
+
     def get_chart(self, streams=[]):
         return datashade(
             hv.DynamicMap(self.lines, streams=streams),
@@ -413,6 +469,9 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
 
         if self.legend:
             dmap *= self.legend
+
+        if self.unselected_alpha > 0:
+            dmap *= self.get_base_chart()
 
         return pn.pane.HoloViews(
             self.tiles * dmap if self.tiles is not None else dmap,
@@ -554,28 +613,11 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
 
         dmap_graph = dmap_edges * dmap_nodes
 
+        if self.unselected_alpha > 0:
+            dmap_graph *= self.nodes_chart.get_base_chart()
+
         return pn.pane.HoloViews(
             self.tiles * dmap_graph if self.tiles is not None else dmap_graph,
             sizing_mode="stretch_both",
             height=self.height,
         )
-
-    # def add_box_select_callback(self, callback_fn):
-    #     if self.df_type != dask_cudf.DataFrame:
-    #         # no interactions(yet) with dask_cudf backed graph charts
-    #         super().add_box_select_callback(callback_fn)
-
-    # def add_lasso_select_callback(self, callback_fn):
-    #     if self.df_type != dask_cudf.DataFrame:
-    #         # no interactions(yet) with dask_cudf backed graph charts
-    #         super().add_lasso_select_callback(callback_fn)
-
-    # def reset_all_selections(self):
-    #     if self.df_type != dask_cudf.DataFrame:
-    #         # no interactions(yet) with dask_cudf backed graph charts
-    #         super().reset_all_selections()
-
-    # def add_reset_event(self, callback_fn):
-    #     if self.df_type != dask_cudf.DataFrame:
-    #         # no interactions(yet) with dask_cudf backed graph charts
-    #         super().add_reset_event(callback_fn)
