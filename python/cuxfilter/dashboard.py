@@ -130,13 +130,22 @@ class DashBoard:
         Returns None if no index columns are present.
         """
         result = None
+        df_module = (
+            cudf
+            if isinstance(self._cuxfilter_df.data, cudf.DataFrame)
+            else dask_cudf
+        )
         selected_indices = {
             key: value
             for (key, value) in self._query_str_dict.items()
-            if type(value) in [cudf.Series, dask_cudf.Series]
+            if type(value) in [cudf.DataFrame, dask_cudf.DataFrame]
         }
         if len(selected_indices) > 0:
-            result = cudf.DataFrame(selected_indices).fillna(False).all(axis=1)
+            result = (
+                df_module.concat(list(selected_indices.values()))
+                .fillna(False)
+                .all(axis=1)
+            )
 
         return result
 

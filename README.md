@@ -2,15 +2,15 @@
 
 [![Build Status](https://gpuci.gpuopenanalytics.com/job/rapidsai/job/gpuci/job/cuxfilter/job/branches/job/cuxfilter-branch-pipeline/badge/icon)](https://gpuci.gpuopenanalytics.com/job/rapidsai/job/gpuci/job/cuxfilter/job/branches/job/cuxfilter-branch-pipeline/)
 
-cuxfilter ( ku-cross-filter ) is a [RAPIDS](https://github.com/rapidsai) framework to connect web visualizations to GPU accelerated crossfiltering. Inspired by the javascript version of the [original]( https://github.com/crossfilter/crossfilter), it enables interactive and super fast multi-dimensional filtering of 100 million+ row tabular datasets via [cuDF](https://github.com/rapidsai/cudf). 
-
+cuxfilter ( ku-cross-filter ) is a [RAPIDS](https://github.com/rapidsai) framework to connect web visualizations to GPU accelerated crossfiltering. Inspired by the javascript version of the [original]( https://github.com/crossfilter/crossfilter), it enables interactive and super fast multi-dimensional filtering of 100 million+ row tabular datasets via [cuDF](https://github.com/rapidsai/cudf).
 
 ## RAPIDS Viz
-cuxfilter is one of the core projects of the “RAPIDS viz” team. Taking the axiom that “a slider is worth a thousand queries” from @lmeyerov to heart, we want to enable fast exploratory data analytics through an easier-to-use pythonic notebook interface. 
+
+cuxfilter is one of the core projects of the “RAPIDS viz” team. Taking the axiom that “a slider is worth a thousand queries” from @lmeyerov to heart, we want to enable fast exploratory data analytics through an easier-to-use pythonic notebook interface.
 
 As there are many fantastic visualization libraries available for the web, our general principle is not to create our own viz library, but to enhance others with faster acceleration, larger datasets, and better dev UX. **Basically, we want to take the headache out of interconnecting multiple charts to a GPU backend, so you can get to visually exploring data faster.**
 
-By the way, cuxfilter is best used to interact with large (1 million+) tabular datasets. GPU’s are fast, but accessing that speedup requires some architecture overhead that isn’t worthwhile for small datasets. 
+By the way, cuxfilter is best used to interact with large (1 million+) tabular datasets. GPU’s are fast, but accessing that speedup requires some architecture overhead that isn’t worthwhile for small datasets.
 
 For more detailed requirements, see below.
 
@@ -22,7 +22,7 @@ The current version of cuxfilter leverages jupyter notebook and bokeh server to 
 
 ### What is cuDataTiles?
 
-cuxfilter implements cuDataTiles, a GPU accelerated version of data tiles based on the work of [Falcon](https://github.com/uwdata/falcon). When starting to interact with specific charts in a cuxfilter dashboard, values for the other charts are precomputed to allow for fast slider scrubbing without having to recalculate values. 
+cuxfilter implements cuDataTiles, a GPU accelerated version of data tiles based on the work of [Falcon](https://github.com/uwdata/falcon). When starting to interact with specific charts in a cuxfilter dashboard, values for the other charts are precomputed to allow for fast slider scrubbing without having to recalculate values.
 
 ### Open Source Projects
 
@@ -34,17 +34,16 @@ cuxfilter wouldn’t be possible without using these great open source projects:
 - [Falcon](https://github.com/uwdata/falcon)
 - [Jupyter](https://jupyter.org/about)
 
-
 ### Where is the original cuxfilter and Mortgage Viz Demo?
 
 The original version (0.2) of cuxfilter, most known for the backend powering the Mortgage Viz Demo, has been moved into the [`GTC-2018-mortgage-visualization branch`](https://github.com/rapidsai/cuxfilter/tree/GTC-2018-mortgage-visualization) branch. As it has a much more complicated backend and javascript API, we’ve decided to focus more on the streamlined notebook focused version here.
 
-
 ## Usage
 
-### Example 1 
+### Example 1
+
 [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/auto_accidents_example.ipynb) [<img src="https://img.shields.io/badge/-Setup Studio Lab Environment-gray.svg">](./notebooks/README.md#amazon-sagemaker-studio-lab)
-    
+
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/auto_accidents_example.ipynb) [<img src="https://img.shields.io/badge/-Setup Colab Environment-gray.svg">](./notebooks/README.md#google-colab)
 
 ```python
@@ -63,7 +62,7 @@ gtc_demo_red_blue_palette = [ "#3182bd", "#6baed6", "#7b8ed8", "#e26798", "#ff00
 
 #declare charts
 chart1 = cuxfilter.charts.scatter(x='dropoff_x', y='dropoff_y', aggregate_col='DAY_WEEK', aggregate_fn='mean',
-                                color_palette=gtc_demo_red_blue_palette, tile_provider='CARTODBPOSITRON',
+                                color_palette=gtc_demo_red_blue_palette, tile_provider='CartoLight', unselected_alpha=0.2,
                                 pixel_shade_type='linear')
 chart2 = cuxfilter.charts.multi_select('YEAR')
 chart3 = cuxfilter.charts.bar('DAY_WEEK', x_label_map=label_map)
@@ -79,11 +78,13 @@ d = cux_df.dashboard([chart1, chart3, chart4], sidebar=[chart2], layout=cuxfilte
 d.app()
 
 ```
+
 ![output dashboard](./docs/_images/demo.gif)
 
-### Example 2 
+### Example 2
+
 [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/Mortgage_example.ipynb) [<img src="https://img.shields.io/badge/-Setup Studio Lab Environment-gray.svg">](./notebooks/README.md#amazon-sagemaker-studio-lab)
-    
+
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rapidsai/cuxfilter/blob/branch-22.02/notebooks/Mortgage_example.ipynb) [<img src="https://img.shields.io/badge/-Setup Colab Environment-gray.svg">](./notebooks/README.md#google-colab)
 
 ```python
@@ -117,15 +118,14 @@ d = cux_df.dashboard([chart0, chart2],sidebar=[chart3, chart1], layout=cuxfilter
 d.show('jupyter-notebook/lab-url')
 
 ```
-![output dashboard](./docs/_images/demo2.gif)
 
+![output dashboard](./docs/_images/demo2.gif)
 
 ## Documentation
 
 Full documentation can be found [on the RAPIDS docs page](https://docs.rapids.ai/api/cuxfilter/stable/).
 
 Troubleshooting help can be found [on our troubleshooting page](https://docs.rapids.ai/api/cuxfilter/stable/installation.html#troubleshooting).
-
 
 ## General Dependencies
 
@@ -146,18 +146,18 @@ Please see the [Demo Docker Repository](https://hub.docker.com/r/rapidsai/rapids
 
 ## Installation
 
-
 ### CUDA/GPU requirements
 
-* CUDA 10.1+
-* NVIDIA driver 418.39+
-* Pascal architecture or better (Compute Capability >=6.0)
+- CUDA 10.1+
+- NVIDIA driver 418.39+
+- Pascal architecture or better (Compute Capability >=6.0)
 
 ### Conda
 
 cuxfilter can be installed with conda ([miniconda](https://conda.io/miniconda.html), or the full [Anaconda distribution](https://www.anaconda.com/download)) from the `rapidsai` channel:
 
 For `cuxfilter version == 22.08` :
+
 ```bash
 # for CUDA 11.5
 conda install -c rapidsai -c nvidia -c numba -c conda-forge \
@@ -166,6 +166,7 @@ conda install -c rapidsai -c nvidia -c numba -c conda-forge \
 ```
 
 For the nightly version of `cuxfilter` :
+
 ```bash
 # for CUDA 11.5
 conda install -c rapidsai-nightly -c nvidia -c numba -c conda-forge \
@@ -174,13 +175,11 @@ conda install -c rapidsai-nightly -c nvidia -c numba -c conda-forge \
 
 Note: cuxfilter is supported only on Linux, and with Python versions 3.7 and later.
 
-See the [Get RAPIDS version picker](https://rapids.ai/start.html) for more OS and version info. 
-
+See the [Get RAPIDS version picker](https://rapids.ai/start.html) for more OS and version info.
 
 ### Build/Install from Source
+
 See [build instructions](CONTRIBUTING.md#setting-up-your-build-environment).
-
-
 
 ## Troubleshooting
 
@@ -232,6 +231,7 @@ python -c "from cuxfilter.sampledata import datasets_check; datasets_check(base_
 Currently supported layout templates and example code can be found on the [layouts page](https://rapidsai.github.io/cuxfilter/layouts/Layouts.html).
 
 ### Currently Supported Charts
+
 | Library  | Chart type |
 | ------------- | ------------- |
 | bokeh  | bar, line  |
@@ -249,4 +249,5 @@ You can see the examples to implement viz libraries in the bokeh and cudatashade
 For more details, check out the [contributing guide](./CONTRIBUTING.md).
 
 ## Future Work
+
 cuxfilter development is in early stages and on going. See what we are planning next on the [projects page](https://github.com/rapidsai/cuxfilter/projects).

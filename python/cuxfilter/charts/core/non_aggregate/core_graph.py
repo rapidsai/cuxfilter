@@ -109,6 +109,7 @@ class BaseGraph(BaseChart):
         legend_position="center",
         x_axis_tick_formatter=None,
         y_axis_tick_formatter=None,
+        unselected_alpha=0.2,
         **library_specific_params,
     ):
         """
@@ -147,6 +148,7 @@ class BaseGraph(BaseChart):
             legend_position
             x_axis_tick_formatter
             y_axis_tick_formatter
+            unselected_alpha
             **library_specific_params
         -------------------------------------------
 
@@ -185,6 +187,7 @@ class BaseGraph(BaseChart):
         self.legend_position = legend_position
         self.x_axis_tick_formatter = x_axis_tick_formatter
         self.y_axis_tick_formatter = y_axis_tick_formatter
+        self.unselected_alpha = unselected_alpha
         self.library_specific_params = library_specific_params
 
     @property
@@ -371,9 +374,20 @@ class BaseGraph(BaseChart):
             # convert datetime to int64 since, point_in_polygon does not
             # support datetime
             if isinstance(self.nodes, dask_cudf.DataFrame):
-                self.selected_indices = self.nodes.map_partitions(
-                    point_in_polygon, *args
-                ).persist()
+                self.selected_indices = (
+                    self.nodes.assign(
+                        **{
+                            self.node_x: self._to_xaxis_type(
+                                self.nodes[self.node_x]
+                            ),
+                            self.node_y: self._to_yaxis_type(
+                                self.nodes[self.node_y]
+                            ),
+                        }
+                    )
+                    .map_partitions(point_in_polygon, *args)
+                    .persist()
+                )
             else:
                 self.selected_indices = point_in_polygon(self.nodes, *args)
 
