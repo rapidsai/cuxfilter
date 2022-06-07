@@ -1,6 +1,24 @@
-# cuXfilter 22.06.00 (Date TBD)
+# cuXfilter 22.06.00 (7 Jun 2022)
 
-Please see https://github.com/rapidsai/cuxfilter/releases/tag/v22.06.00a for the latest changes to this development branch.
+## 🔗 Links
+
+- [Development Branch](https://github.com/rapidsai/cuxfilter/tree/branch-22.06)
+- [Compare with `main` branch](https://github.com/rapidsai/cuxfilter/compare/main...branch-22.06)
+
+
+## 🐛 Bug Fixes
+
+- Fixed native support for dask_cudf dataframes. Seamless integration results in a dask_cudf.DataFrame working as a drop-in replacement for a cudf.DataFrame([#359, #366](https://github.com/rapidsai/cuxfilter/pull/359, #366)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- added `unseleced_alpha` parameter to all datashader charts, displays unselected data as transparent (default alpha=0.2) ([#366](https://github.com/rapidsai/cuxfilter/pull/366))
+- added binary data transfer support for choropleth charts, which results in a much smoother experience interacting with the choropleth charts ([#366](https://github.com/rapidsai/cuxfilter/pull/366))
+- Simplify conda recipe ([#373](https://github.com/rapidsai/cuxfilter/pull/373)) [@Ethyling](https://github.com/Ethyling)
+- Forward-merge branch-22.04 to branch-22.06 ([#370](https://github.com/rapidsai/cuxfilter/pull/370)) [@Ethyling](https://github.com/Ethyling)
+- Use conda to build python packages during GPU tests ([#368](https://github.com/rapidsai/cuxfilter/pull/368)) [@Ethyling](https://github.com/Ethyling)
+- Use conda compilers ([#351](https://github.com/rapidsai/cuxfilter/pull/351)) [@Ethyling](https://github.com/Ethyling)
+- Build packages using mambabuild ([#347](https://github.com/rapidsai/cuxfilter/pull/347)) [@Ethyling](https://github.com/Ethyling)
 
 # cuXfilter 22.04.00 (6 Apr 2022)
 
