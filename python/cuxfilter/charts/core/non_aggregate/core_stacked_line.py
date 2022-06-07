@@ -4,6 +4,7 @@ from typing import Tuple
 
 from ..core_chart import BaseChart
 from ....layouts import chart_view
+from ....assets import cudf_utils
 
 
 class BaseStackedLine(BaseChart):
@@ -71,6 +72,7 @@ class BaseStackedLine(BaseChart):
         legend_position="center",
         x_axis_tick_formatter=None,
         y_axis_tick_formatter=None,
+        unselected_alpha=0.2,
         **library_specific_params,
     ):
         """
@@ -121,6 +123,7 @@ class BaseStackedLine(BaseChart):
         self.legend_position = legend_position
         self.x_axis_tick_formatter = x_axis_tick_formatter
         self.y_axis_tick_formatter = y_axis_tick_formatter
+        self.unselected_alpha = unselected_alpha
         self.library_specific_params = library_specific_params
         self.width = width
         self.height = height
@@ -301,10 +304,12 @@ class BaseStackedLine(BaseChart):
         """
         min_val, max_val = query_tuple
         final_query = f"@min_val<={active_chart.x}<=@max_val"
+        local_dict.update({"min_val": min_val, "max_val": max_val})
         if len(query) > 0:
             final_query += f" and {query}"
         self.reload_chart(
-            self.source.query(final_query, local_dict), False,
+            cudf_utils.query_df(self.source, final_query, local_dict),
+            False,
         )
 
     def query_chart_by_indices(
@@ -346,7 +351,7 @@ class BaseStackedLine(BaseChart):
                 final_query += f" and {query}"
 
         self.reload_chart(
-            self.source.query(final_query, local_dict)
+            cudf_utils.query_df(self.source, final_query, local_dict)
             if len(final_query) > 0
             else self.source,
             False,

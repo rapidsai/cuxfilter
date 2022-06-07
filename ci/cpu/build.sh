@@ -1,5 +1,5 @@
 #!/bin/bash
-# COPYRIGHT (c) 2020, NVIDIA CORPORATION.
+# COPYRIGHT (c) 2020-2022, NVIDIA CORPORATION.
 ######################################
 # cuXfilter CPU conda build script for CI #
 ######################################
@@ -61,12 +61,15 @@ conda list --show-channel-urls
 # FIX Added to deal with Anancoda SSL verification issues during conda builds
 conda config --set ssl_verify False
 
+# FIXME: Remove
+gpuci_mamba_retry install -c conda-forge boa
+
 ################################################################################
 # BUILD - Conda package builds
 ################################################################################
 
 echo "Building cuxfilter"
-gpuci_conda_retry build conda/recipes/cuxfilter --python=$PYTHON
+gpuci_conda_retry mambabuild conda/recipes/cuxfilter --python=$PYTHON
 
 ################################################################################
 # UPLOAD - Conda packages

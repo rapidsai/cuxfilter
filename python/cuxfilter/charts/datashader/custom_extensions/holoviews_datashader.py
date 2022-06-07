@@ -1,19 +1,22 @@
-import holoviews as hv
-import panel as pn
-import param
-import datashader as ds
-import numpy as np
 import cudf
 import cupy
+import dask_cudf
+import datashader as ds
+import holoviews as hv
 from holoviews.element.tiles import tile_sources
 from holoviews.operation.datashader import (
     SpreadingOperation,
     datashade,
     rasterize,
 )
+import numpy as np
+import panel as pn
+import param
+
 from . import CustomInspectTool
 from datashader import transfer_functions as tf
 from ...constants import CUXF_DEFAULT_COLOR_PALETTE
+from ....assets.cudf_utils import get_min_max
 import requests
 from PIL import Image
 from io import BytesIO
@@ -136,6 +139,13 @@ class InteractiveDatashaderBase(param.Parameterized):
         default=["pan", "box_select", "reset", "lasso_select", "wheel_zoom"],
         doc="interactive tools to add to the chart",
     )
+    unselected_alpha = param.Number(
+        0.2,
+        bounds=(0, 1),
+        doc=(
+            "display unselected data as the same color palette but transparent"
+        ),
+    )
 
     def __init__(self, **params):
         """
@@ -170,7 +180,8 @@ class InteractiveDatashaderBase(param.Parameterized):
 
 class InteractiveDatashader(InteractiveDatashaderBase):
     source_df = param.ClassSelector(
-        class_=cudf.DataFrame, doc="source cuDF dataframe",
+        class_=(cudf.DataFrame, dask_cudf.DataFrame),
+        doc="source cuDF/dask_cuDF dataframe",
     )
     x = param.String("x")
     y = param.String("y")
@@ -213,10 +224,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
             self.source_df[self.aggregate_col].dtype,
             cudf.core.dtypes.CategoricalDtype,
         ):
-            self.clims = (
-                self.source_df[self.aggregate_col].min(),
-                self.source_df[self.aggregate_col].max(),
-            )
+            self.clims = get_min_max(self.source_df, self.aggregate_col)
 
     def _compute_datashader_assets(self):
         self.aggregator = None
@@ -253,8 +261,25 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
     @param.depends("source_df")
     def points(self, **kwargs):
         return hv.Scatter(
-            self.source_df, kdims=[self.x], vdims=self.vdims,
+            self.source_df,
+            kdims=[self.x],
+            vdims=self.vdims,
         ).opts(tools=[], default_tools=[])
+
+    def get_base_chart(self):
+        return dynspread(
+            rasterize(self.points()).opts(
+                cnorm=self.pixel_shade_type,
+                **self.cmap,
+                nodata=0,
+                alpha=self.unselected_alpha,
+                tools=[],
+                default_tools=[],
+            ),
+            threshold=self.spread_threshold,
+            shape=self.point_shape,
+            max_px=self.max_px,
+        )
 
     def get_chart(self, streams=[]):
         dmap = rasterize(
@@ -265,6 +290,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
             **self.cmap,
             colorbar=self.legend,
             nodata=0,
+            alpha=1,
             colorbar_position=self.legend_position,
             tools=[],
             default_tools=[],
@@ -294,6 +320,9 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
             active_tools=["wheel_zoom", "pan"],
         )
 
+        if self.unselected_alpha > 0:
+            dmap *= self.get_base_chart()
+
         return pn.pane.HoloViews(
             self.tiles * dmap if self.tiles is not None else dmap,
             sizing_mode="stretch_both",
@@ -318,7 +347,24 @@ class InteractiveDatashaderLine(InteractiveDatashader):
 
     @param.depends("source_df")
     def line(self, **kwargs):
-        return hv.Curve(self.source_df, kdims=[self.x], vdims=[self.y])
+        return hv.Curve(self.source_df, kdims=[self.x], vdims=[self.y]).opts(
+            tools=[], default_tools=[]
+        )
+
+    def get_base_chart(self):
+        return dynspread(
+            rasterize(self.line()).opts(
+                cmap=[self.color],
+                alpha=self.unselected_alpha,
+                tools=[],
+                default_tools=[],
+            )
+        ).opts(
+            responsive=True,
+            tools=self.tools,
+            active_tools=["wheel_zoom", "pan"],
+            default_tools=[],
+        )
 
     def get_chart(self, streams=[]):
         return rasterize(hv.DynamicMap(self.line, streams=streams)).opts(
@@ -338,7 +384,11 @@ class InteractiveDatashaderLine(InteractiveDatashader):
             responsive=True,
             tools=self.tools,
             active_tools=["wheel_zoom", "pan"],
+            default_tools=[],
         )
+
+        if self.unselected_alpha > 0:
+            dmap *= self.get_base_chart()
 
         return pn.pane.HoloViews(
             self.tiles * dmap if self.tiles is not None else dmap,
@@ -391,6 +441,15 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
             kdims="k",
         )
 
+    def get_base_chart(self):
+        return dynspread(
+            datashade(
+                self.lines(),
+                aggregator=ds.count_cat("k"),
+                color_key=self.colors,
+            ).opts(alpha=self.unselected_alpha, tools=[], default_tools=[])
+        )
+
     def get_chart(self, streams=[]):
         return datashade(
             hv.DynamicMap(self.lines, streams=streams),
@@ -411,6 +470,9 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         if self.legend:
             dmap *= self.legend
 
+        if self.unselected_alpha > 0:
+            dmap *= self.get_base_chart()
+
         return pn.pane.HoloViews(
             self.tiles * dmap if self.tiles is not None else dmap,
             sizing_mode="stretch_both",
@@ -420,10 +482,12 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
 
 class InteractiveDatashaderGraph(InteractiveDatashaderBase):
     nodes_df = param.ClassSelector(
-        class_=cudf.DataFrame, doc="nodes cuDF dataframe",
+        class_=(cudf.DataFrame, dask_cudf.DataFrame),
+        doc="nodes cuDF/dask_cuDF dataframe",
     )
     edges_df = param.ClassSelector(
-        class_=cudf.DataFrame, doc="edges cuDF dataframe",
+        class_=(cudf.DataFrame, dask_cudf.DataFrame),
+        doc="edges cuDF/dask_cuDF dataframe",
     )
     node_x = param.String("x")
     node_y = param.String("y")
@@ -467,6 +531,12 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
         doc="tool to select whether to display edges or not",
     )
 
+    @property
+    def df_type(self):
+        if type(self.nodes_df) == type(self.edges_df):  # noqa: E721
+            return type(self.nodes_df)
+        raise TypeError("nodes and edges must be of the same type")
+
     def update_color_palette(self, value):
         self.node_color_palette = value
         self.nodes_chart.color_palette = value
@@ -503,14 +573,16 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
         )
 
     def update_data(self, nodes=None, edges=None):
-        if nodes:
+        if nodes is not None:
             self.nodes_chart.update_data(nodes)
-        if edges:
+        if edges is not None:
             self.edges_chart.update_data(edges)
 
     def view(self):
         def set_tools(plot, element):
             if plot.state.toolbar.tools[-1] != self.display_edges:
+                # if self.df_type != dask_cudf.DataFrame:
+                #     # no interactions(yet) with dask_cudf backed graph charts
                 plot.state.add_tools(self.inspect_neighbors)
                 plot.state.add_tools(self.display_edges)
 
@@ -540,6 +612,9 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
         )
 
         dmap_graph = dmap_edges * dmap_nodes
+
+        if self.unselected_alpha > 0:
+            dmap_graph *= self.nodes_chart.get_base_chart()
 
         return pn.pane.HoloViews(
             self.tiles * dmap_graph if self.tiles is not None else dmap_graph,

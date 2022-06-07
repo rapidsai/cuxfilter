@@ -1,25 +1,22 @@
 import pytest
-import cudf
-
 from cuxfilter import charts
 from cuxfilter import DataFrame
 from cuxfilter.charts.deckgl.bindings import PanelDeck
 
-pytest
+from ..utils import initialize_df, df_types
+
+df_args = {
+    "states": [float(i + 30) for i in range(10)],
+    "val": [float(i + 10) for i in range(10)],
+    "val_t": [float(i + 100) for i in range(10)],
+}
+dfs = [initialize_df(type, df_args) for type in df_types]
+cux_dfs = [DataFrame.from_dataframe(df) for df in dfs]
 
 
 class TestDeckGL:
-    def test_init(self):
-        cux_df = DataFrame.from_dataframe(
-            cudf.DataFrame(
-                {
-                    "states": [float(i + 30) for i in range(10)],
-                    "val": [float(i + 10) for i in range(10)],
-                    "val_t": [float(i + 100) for i in range(10)],
-                }
-            )
-        )
-
+    @pytest.mark.parametrize("cux_df", cux_dfs)
+    def test_init(self, cux_df):
         choropleth3d_chart = charts.choropleth(
             x="states",
             color_column="val",
@@ -39,10 +36,8 @@ class TestDeckGL:
         cux_df.dashboard([choropleth3d_chart])
 
         assert isinstance(choropleth3d_chart, charts.deckgl.plots.Choropleth)
-
         assert choropleth3d_chart.deck_spec == {
-            "mapboxApiAccessToken": None,
-            "map_style": None,
+            "mapStyle": None,
             "initialViewState": {
                 "latitude": 28.400005999999998,
                 "longitude": 0.31556500000000653,
@@ -52,11 +47,12 @@ class TestDeckGL:
             "controller": True,
             "layers": [
                 {
+                    "@@type": "PolygonLayer",
                     "opacity": 1,
                     "getLineWidth": 10,
-                    "getPolygon": "coordinates",
-                    "getElevation": "val_t*100000",
-                    "getFillColor": "[__r__, __g__, __b__, __a__]",
+                    "getPolygon": "@@=coordinates",
+                    "getElevation": "@@=val_t*100000",
+                    "getFillColor": "@@=[__r__, __g__, __b__, __a__]",
                     "stroked": True,
                     "filled": True,
                     "extruded": True,
@@ -69,24 +65,19 @@ class TestDeckGL:
                     "autoHighlight": True,
                     "elevationScale": 0.8,
                     "pickMultipleObjects": True,
+                    "id": "PolygonLayer-states_count_choropleth_states",
+                    "data": choropleth3d_chart.source,
                 }
             ],
         }
 
-        assert (
-            choropleth3d_chart.chart._deck.map_style
-            == "mapbox://styles/mapbox/dark-v9"
-        )
-
         assert isinstance(choropleth3d_chart.chart, PanelDeck)
 
         assert choropleth3d_chart.chart.x == "states"
-        assert choropleth3d_chart.chart.data.equals(
-            choropleth3d_chart.source_df
-        )
+        assert choropleth3d_chart.chart.data.equals(choropleth3d_chart.source)
 
         assert choropleth3d_chart.chart.colors.equals(
-            choropleth3d_chart.source_df[choropleth3d_chart.rgba_columns],
+            choropleth3d_chart.source[choropleth3d_chart.rgba_columns],
         )
 
         assert choropleth3d_chart.chart.indices == set()

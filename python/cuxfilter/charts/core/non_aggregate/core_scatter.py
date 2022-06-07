@@ -49,6 +49,7 @@ class BaseScatter(BaseNonAggregate):
         timeout=100,
         legend=True,
         legend_position="center",
+        unselected_alpha=0.2,
         **library_specific_params,
     ):
         """
@@ -99,4 +100,5 @@ class BaseScatter(BaseNonAggregate):
         self.pixel_spread = pixel_spread
         self.legend = legend
         self.legend_position = legend_position
+        self.unselected_alpha = unselected_alpha
         self.library_specific_params = library_specific_params

@@ -1,3 +1,4 @@
+import dask_cudf
 import pytest
 import cudf
 import mock
@@ -12,6 +13,8 @@ from cuxfilter.charts.datashader.custom_extensions import CustomInspectTool
 from cuxfilter import DataFrame
 from cuxfilter.layouts import chart_view
 from cuxfilter.charts import constants
+
+from ..utils import df_equals, df_types, initialize_df
 
 
 class TestCoreGraph:
@@ -58,40 +61,62 @@ class TestCoreGraph:
             chart_view(_chart, width=bg.width, title=bg.title)
         )
 
-    def test_get_selection_geometry_callback(self):
+    @pytest.mark.parametrize("df_type", df_types)
+    def test_get_selection_geometry_callback(self, df_type):
         bg = BaseGraph()
 
-        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
+        df = initialize_df(df_type, {"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         assert callable(type(bg.get_box_select_callback(dashboard)))
         assert callable(type(bg.get_lasso_select_callback(dashboard)))
 
     @pytest.mark.parametrize(
-        "inspect_neighbors, result",
+        "df_type, inspect_neighbors, result, index",
         [
             (
+                cudf.DataFrame,
                 CustomInspectTool(_active=True),
-                cudf.DataFrame(
-                    {
-                        "vertex": [0, 1, 2, 3],
-                        "x": [0, 1, 1, 2],
-                        "y": [0, 1, 2, 0],
-                    }
-                ),
+                {
+                    "vertex": [0, 1, 2, 3],
+                    "x": [0, 1, 1, 2],
+                    "y": [0, 1, 2, 0],
+                },
+                [0, 1, 2, 3],
             ),
             (
+                cudf.DataFrame,
                 CustomInspectTool(_active=False),
-                cudf.DataFrame({"vertex": [1, 3], "x": [1, 2], "y": [1, 0]}),
+                {"vertex": [1, 3], "x": [1, 2], "y": [1, 0]},
+                [0, 1],
+            ),
+            (
+                dask_cudf.DataFrame,
+                CustomInspectTool(_active=True),
+                {
+                    "vertex": [0, 1, 2, 3],
+                    "x": [0, 1, 1, 2],
+                    "y": [0, 1, 2, 0],
+                },
+                [0, 1, 2, 3],
+            ),
+            (
+                dask_cudf.DataFrame,
+                CustomInspectTool(_active=False),
+                {"vertex": [1, 3], "x": [1, 2], "y": [1, 0]},
+                [0, 0],
             ),
         ],
     )
-    def test_box_selection_callback(self, inspect_neighbors, result):
-        nodes = cudf.DataFrame(
-            {"vertex": [0, 1, 2, 3], "x": [0, 1, 1, 2], "y": [0, 1, 2, 0]}
+    def test_box_selection_callback(
+        self, df_type, inspect_neighbors, result, index
+    ):
+        nodes = initialize_df(
+            df_type,
+            {"vertex": [0, 1, 2, 3], "x": [0, 1, 1, 2], "y": [0, 1, 2, 0]},
         )
-        edges = cudf.DataFrame(
-            {"source": [1, 1, 1, 1], "target": [0, 1, 2, 3]}
+        edges = initialize_df(
+            df_type, {"source": [1, 1, 1, 1], "target": [0, 1, 2, 3]}
         )
         dashboard = DashBoard(dataframe=DataFrame.load_graph((nodes, edges)))
 
@@ -116,14 +141,18 @@ class TestCoreGraph:
 
         t = bg.get_box_select_callback(dashboard)
         t(evt.bounds, evt.x_selection, evt.y_selection)
-        assert self.result.equals(result)
 
-    def test_lasso_selection_callback(self):
-        nodes = cudf.DataFrame(
-            {"vertex": [0, 1, 2, 3], "x": [0, 1, 1, 2], "y": [0, 1, 2, 0]}
+        result = initialize_df(df_type, result, index)
+        assert df_equals(self.result, result)
+
+    @pytest.mark.parametrize("df_type", df_types)
+    def test_lasso_selection_callback(self, df_type):
+        nodes = initialize_df(
+            df_type,
+            {"vertex": [0, 1, 2, 3], "x": [0, 1, 1, 2], "y": [0, 1, 2, 0]},
         )
-        edges = cudf.DataFrame(
-            {"source": [1, 1, 1, 1], "target": [0, 1, 2, 3]}
+        edges = initialize_df(
+            df_type, {"source": [1, 1, 1, 1], "target": [0, 1, 2, 3]}
         )
         dashboard = DashBoard(dataframe=DataFrame.load_graph((nodes, edges)))
 
@@ -134,7 +163,7 @@ class TestCoreGraph:
         bg.inspect_neighbors = CustomInspectTool(_active=False)
 
         def t_function(data, edges=None, patch_update=False):
-            pass
+            self.result = data
 
         bg.reload_chart = t_function
 
@@ -142,12 +171,19 @@ class TestCoreGraph:
 
         t = bg.get_lasso_select_callback(dashboard)
         with mock.patch("cuspatial.point_in_polygon") as pip:
-            pip.return_value = cudf.DataFrame(
-                {"selection": [True, False, True, False]}
-            )
+            if isinstance(nodes, dask_cudf.DataFrame):
+                # point in polygon is called per partition,
+                # in this case 2 partitions of length 2 each
+                pip.return_value = cudf.DataFrame({"selection": [True, False]})
+            else:
+                pip.return_value = cudf.DataFrame(
+                    {"selection": [True, False, True, False]}
+                )
             t(geometry)
             assert pip.called
+            assert isinstance(self.result, df_type)
 
+    @pytest.mark.parametrize("df_type", df_types)
     @pytest.mark.parametrize(
         "x_range, y_range, query, local_dict",
         [
@@ -165,14 +201,16 @@ class TestCoreGraph:
             ),
         ],
     )
-    def test_compute_query_dict(self, x_range, y_range, query, local_dict):
+    def test_compute_query_dict(
+        self, df_type, x_range, y_range, query, local_dict
+    ):
         bg = BaseGraph()
         bg.chart_type = "test"
         bg.box_selected_range = local_dict
         bg.x_range = x_range
         bg.y_range = y_range
 
-        df = cudf.DataFrame({"x": [1, 2, 2], "y": [3, 4, 5]})
+        df = initialize_df(df_type, {"x": [1, 2, 2], "y": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         bg.compute_query_dict(
@@ -187,6 +225,7 @@ class TestCoreGraph:
                 dashboard._query_local_variables_dict[key] == local_dict[key]
             )
 
+    @pytest.mark.parametrize("df_type", df_types)
     @pytest.mark.parametrize(
         "add_interaction, reset_event, event_1, event_2",
         [
@@ -195,13 +234,15 @@ class TestCoreGraph:
             (False, "test_event", None, None),
         ],
     )
-    def test_add_events(self, add_interaction, reset_event, event_1, event_2):
+    def test_add_events(
+        self, df_type, add_interaction, reset_event, event_1, event_2
+    ):
         bg = BaseGraph()
         bg.add_interaction = add_interaction
         bg.reset_event = reset_event
         bg.chart = hv.InteractiveDatashader()
 
-        df = cudf.DataFrame({"x": [1, 2, 2], "y": [3, 4, 5]})
+        df = initialize_df(df_type, {"x": [1, 2, 2], "y": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         self.event_1 = None
@@ -221,7 +262,8 @@ class TestCoreGraph:
         assert self.event_1 == event_1
         assert self.event_2 == event_2
 
-    def test_add_reset_event(self):
+    @pytest.mark.parametrize("df_type", df_types)
+    def test_add_reset_event(self, df_type):
         bg = BaseGraph()
         bg.edges = None
         bg.chart_type = "test"
@@ -230,7 +272,7 @@ class TestCoreGraph:
         bg.y_range = (3, 5)
         bg.chart = hv.InteractiveDatashader()
 
-        df = cudf.DataFrame({"a": [1, 2, 2], "b": [3, 4, 5]})
+        df = initialize_df(df_type, {"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
         dashboard._active_view = bg
 
@@ -246,7 +288,8 @@ class TestCoreGraph:
 
         assert bg.selected_indices is None
 
-    def test_query_chart_by_range(self):
+    @pytest.mark.parametrize("df_type", df_types)
+    def test_query_chart_by_range(self, df_type):
         bg = BaseGraph()
         bg.chart_type = "test"
         bg.x = "a"
@@ -257,7 +300,7 @@ class TestCoreGraph:
 
         query_tuple = (4, 5)
 
-        df = cudf.DataFrame({"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
+        df = initialize_df(df_type, {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
         bg.nodes = df
 
         self.result = None
@@ -273,17 +316,21 @@ class TestCoreGraph:
             active_chart=bg_1, query_tuple=query_tuple, datatile=None
         )
 
-        assert self.result.to_string() == "   a  b\n1  2  4\n2  3  5"
+        assert df_equals(
+            self.result,
+            initialize_df(df_type, {"a": [2, 3], "b": [4, 5]}, [1, 2]),
+        )
 
+    @pytest.mark.parametrize("df_type", df_types)
     @pytest.mark.parametrize(
-        "new_indices, result",
+        "new_indices, result, index",
         [
-            ([4, 5], "   a  b\n1  2  4\n2  3  5"),
-            ([], "   a  b\n0  1  3\n1  2  4\n2  3  5\n3  4  6"),
-            ([3], "   a  b\n0  1  3"),
+            ([4, 5], {"a": [2, 3], "b": [4, 5]}, [1, 2]),
+            ([], {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]}, [0, 1, 2, 3]),
+            ([3], {"a": [1], "b": [3]}, [0]),
         ],
     )
-    def test_query_chart_by_indices(self, new_indices, result):
+    def test_query_chart_by_indices(self, df_type, new_indices, result, index):
         bg = BaseGraph()
         bg.chart_type = "test"
         bg.x = "a"
@@ -294,7 +341,7 @@ class TestCoreGraph:
 
         new_indices = new_indices
 
-        df = cudf.DataFrame({"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
+        df = initialize_df(df_type, {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
         bg.nodes = df
 
         self.result = None
@@ -312,5 +359,6 @@ class TestCoreGraph:
             new_indices=new_indices,
             datatile=None,
         )
+        result = initialize_df(df_type, result, index)
 
-        assert self.result.to_string() == result
+        assert df_equals(self.result, result)

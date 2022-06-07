@@ -1,4 +1,5 @@
 import cudf
+import dask_cudf
 import pyarrow as pa
 from typing import Type
 
@@ -158,6 +159,18 @@ class DataFrame:
     def __init__(self, data):
         self.data = data
 
+    def validate_dask_index(self, data):
+        if isinstance(data, dask_cudf.DataFrame) and not (
+            data.known_divisions
+        ):
+            return data.set_index(data.index.to_series(), npartitions=2)
+        return data
+
+    def preprocess_data(self):
+        self.data = self.validate_dask_index(self.data)
+        if self.is_graph:
+            self.edges = self.validate_dask_index(self.edges)
+
     def dashboard(
         self,
         charts: list,
@@ -218,14 +231,16 @@ class DataFrame:
         if notebook_assets.pn.config.js_files == {}:
             notebook_assets.load_notebook_assets()
 
+        # self.preprocess_data()
+
         return DashBoard(
-            charts,
-            sidebar,
-            self,
-            layout,
-            theme,
-            title,
-            data_size_widget,
-            warnings,
-            layout_array,
+            charts=charts,
+            sidebar=sidebar,
+            dataframe=self,
+            layout=layout,
+            theme=theme,
+            title=title,
+            data_size_widget=data_size_widget,
+            show_warnings=warnings,
+            layout_array=layout_array,
         )

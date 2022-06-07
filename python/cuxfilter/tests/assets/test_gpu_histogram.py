@@ -33,8 +33,14 @@ test_arr3 = [
 @pytest.mark.parametrize(
     "custom_binning, result",
     [
-        (True, np.array([[0, 1, 2, 3, 7, 8], [100, 150, 300, 100, 50, 150]]),),
-        (False, np.array([test_arr1, test_arr2]),),
+        (
+            True,
+            np.array([[0, 1, 2, 3, 7, 8], [100, 150, 300, 100, 50, 150]]),
+        ),
+        (
+            False,
+            np.array([test_arr1, test_arr2]),
+        ),
     ],
 )
 def test_calc_value_counts(custom_binning, result):
@@ -78,7 +84,9 @@ def test_calc_groupby(aggregate_fn, result):
 
     bc.aggregate_fn = aggregate_fn
 
-    assert np.array_equal(gpu_histogram.calc_groupby(bc, df), result)
+    assert np.array_equal(
+        gpu_histogram.calc_groupby(bc, df).to_numpy().transpose(), result
+    )
 
 
 @pytest.mark.parametrize(
@@ -98,7 +106,11 @@ def test_calc_groupby_for_nulls(x, y, aggregate_fn, result):
     bc.max_value = df[x].max()
     bc.aggregate_fn = aggregate_fn
     assert np.allclose(
-        gpu_histogram.calc_groupby(bc, df).astype(np.float32),
+        gpu_histogram.calc_groupby(bc, df)
+        .to_pandas()
+        .to_numpy()
+        .transpose()
+        .astype(np.float32),
         result.astype(np.float32),
         equal_nan=True,
     )

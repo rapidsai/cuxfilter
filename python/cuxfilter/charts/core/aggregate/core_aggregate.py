@@ -249,7 +249,7 @@ class BaseAggregateChart(BaseChart):
                 )
         else:
             self.aggregate_fn = "mean"
-            df = calc_groupby(self, data)
+            df = calc_groupby(self, data).to_pandas().to_numpy().transpose()
             if self.data_points is None:
                 self.data_points = len(df[0])
 
@@ -260,7 +260,8 @@ class BaseAggregateChart(BaseChart):
             if len(self.x_label_map) == 0:
                 temp_mapper_index = np.array(df[0])
                 temp_mapper_value = np.round(
-                    (temp_mapper_index * self.stride) + self.min_value, 4,
+                    (temp_mapper_index * self.stride) + self.min_value,
+                    4,
                 ).astype("str")
                 temp_mapper_index = temp_mapper_index.astype("str")
                 self.x_label_map = dict(
@@ -392,7 +393,7 @@ class BaseAggregateChart(BaseChart):
                 )
 
         # add callback to reset chart button
-        self.add_event(self.reset_event, reset_callback)
+        self.chart.on_event(self.reset_event, reset_callback)
 
     def query_chart_by_range(self, active_chart, query_tuple, datatile):
         """
@@ -597,7 +598,11 @@ class BaseAggregateChart(BaseChart):
         return datatile_result
 
     def query_chart_by_indices_for_minmax(
-        self, active_chart, old_indices, new_indices, datatile,
+        self,
+        active_chart,
+        old_indices,
+        new_indices,
+        datatile,
     ):
         """
         Description:
@@ -684,6 +689,9 @@ class BaseAggregateChart(BaseChart):
             )
         elif self.aggregate_fn in ["min", "max"]:
             datatile_result = self.query_chart_by_indices_for_minmax(
-                active_chart, old_indices, new_indices, datatile,
+                active_chart,
+                old_indices,
+                new_indices,
+                datatile,
             )
         self.reset_chart(datatile_result)

@@ -77,7 +77,10 @@ class TestDashBoard:
                 "key<3",
                 "   key   val\n0    0  10.0\n1    1  11.0\n2    2  12.0",
             ),
-            ("key>=3", "   key   val\n3    3  13.0\n4    4  14.0",),
+            (
+                "key>=3",
+                "   key   val\n3    3  13.0\n4    4  14.0",
+            ),
         ],
     )
     def test_query(self, query, result):
