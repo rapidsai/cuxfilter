@@ -46,8 +46,7 @@ class LightTheme(DefaultTheme):
                 "border_line_alpha": 0,
                 "background_fill_alpha": 0.4,
                 "background_fill_color": "#ffffff",
-                "background_color": "#ffffff",
-                "text_color": "#000000",
+                "title_text_color": "#000000",
             },
             "ColorBar": {
                 "title_text_color": "#000000",

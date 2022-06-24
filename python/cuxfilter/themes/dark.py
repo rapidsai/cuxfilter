@@ -46,8 +46,7 @@ class DarkTheme(Theme):
                 "border_line_alpha": 0,
                 "background_fill_alpha": 0.25,
                 "background_fill_color": "#20262B",
-                "background_color": "#2f2f2f",
-                "text_color": "#a0a0a0",
+                "title_text_color": "#a0a0a0",
             },
             "ColorBar": {
                 "title_text_color": "#e0e0e0",
