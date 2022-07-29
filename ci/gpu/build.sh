@@ -76,7 +76,7 @@ gpuci_logger "Build and install cuxfilter"
 cd "${WORKSPACE}"
 CONDA_BLD_DIR="${WORKSPACE}/.conda-bld"
 gpuci_conda_retry mambabuild  --croot "${CONDA_BLD_DIR}" conda/recipes/cuxfilter --python=$PYTHON
-gpuci_mamba_retry install -c "${CONDA_BLD_DIR}" cuxfilter "nodejs>=14"
+gpuci_mamba_retry install -c "${CONDA_BLD_DIR}" cuxfilter
 
 ################################################################################
 # TEST - Run pytest
