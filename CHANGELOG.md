@@ -1,6 +1,21 @@
-# cuXfilter 22.08.00 (Date TBD)
+# cuXfilter 22.08.00 (17 Aug 2022)
 
-Please see https://github.com/rapidsai/cuxfilter/releases/tag/v22.08.00a for the latest changes to this development branch.
+## 🐛 Bug Fixes
+
+- fix/incorrect-bokeh-legend-attributes ([#381](https://github.com/rapidsai/cuxfilter/pull/381)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 📖 Documentation
+
+- Use common custom `js` &amp; `css` code ([#394](https://github.com/rapidsai/cuxfilter/pull/394)) [@galipremsagar](https://github.com/galipremsagar)
+- Branch 22.08 merge 22.06 ([#377](https://github.com/rapidsai/cuxfilter/pull/377)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- Update `pyproj` version specifier ([#392](https://github.com/rapidsai/cuxfilter/pull/392)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Update `geopandas` version specificer ([#390](https://github.com/rapidsai/cuxfilter/pull/390)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Revert &quot;Allow CuPy 11&quot; ([#388](https://github.com/rapidsai/cuxfilter/pull/388)) [@galipremsagar](https://github.com/galipremsagar)
+- Update `nodejs` version specifier ([#385](https://github.com/rapidsai/cuxfilter/pull/385)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Allow CuPy 11 ([#383](https://github.com/rapidsai/cuxfilter/pull/383)) [@jakirkham](https://github.com/jakirkham)
 
 # cuXfilter 22.06.00 (7 Jun 2022)
 
