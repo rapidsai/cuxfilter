@@ -1,3 +1,22 @@
+# cuXfilter 22.08.00 (17 Aug 2022)
+
+## 🐛 Bug Fixes
+
+- fix/incorrect-bokeh-legend-attributes ([#381](https://github.com/rapidsai/cuxfilter/pull/381)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 📖 Documentation
+
+- Use common custom `js` &amp; `css` code ([#394](https://github.com/rapidsai/cuxfilter/pull/394)) [@galipremsagar](https://github.com/galipremsagar)
+- Branch 22.08 merge 22.06 ([#377](https://github.com/rapidsai/cuxfilter/pull/377)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- Update `pyproj` version specifier ([#392](https://github.com/rapidsai/cuxfilter/pull/392)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Update `geopandas` version specificer ([#390](https://github.com/rapidsai/cuxfilter/pull/390)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Revert &quot;Allow CuPy 11&quot; ([#388](https://github.com/rapidsai/cuxfilter/pull/388)) [@galipremsagar](https://github.com/galipremsagar)
+- Update `nodejs` version specifier ([#385](https://github.com/rapidsai/cuxfilter/pull/385)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Allow CuPy 11 ([#383](https://github.com/rapidsai/cuxfilter/pull/383)) [@jakirkham](https://github.com/jakirkham)
+
 # cuXfilter 22.06.00 (7 Jun 2022)
 
 ## 🔗 Links
@@ -8,16 +27,26 @@
 
 ## 🐛 Bug Fixes
 
-- Fixed native support for dask_cudf dataframes. Seamless integration results in a dask_cudf.DataFrame working as a drop-in replacement for a cudf.DataFrame([#359, #366](https://github.com/rapidsai/cuxfilter/pull/359, #366)) [@AjayThorve](https://github.com/AjayThorve)
+- Fixed native support for dask_cudf dataframes. Seamless integration results in a dask_cudf.DataFrame working as a drop-in replacement for a cudf.DataFrame([#359, #366](https://github.com/rapidsai/cuxfilter/pull/359, #366)) [@AjayThorve
+](https://github.com/AjayThorve
+)
 
 ## 🛠️ Improvements
 
 - added `unseleced_alpha` parameter to all datashader charts, displays unselected data as transparent (default alpha=0.2) ([#366](https://github.com/rapidsai/cuxfilter/pull/366))
 - added binary data transfer support for choropleth charts, which results in a much smoother experience interacting with the choropleth charts ([#366](https://github.com/rapidsai/cuxfilter/pull/366))
-- Simplify conda recipe ([#373](https://github.com/rapidsai/cuxfilter/pull/373)) [@Ethyling](https://github.com/Ethyling)
-- Forward-merge branch-22.04 to branch-22.06 ([#370](https://github.com/rapidsai/cuxfilter/pull/370)) [@Ethyling](https://github.com/Ethyling)
-- Use conda to build python packages during GPU tests ([#368](https://github.com/rapidsai/cuxfilter/pull/368)) [@Ethyling](https://github.com/Ethyling)
-- Use conda compilers ([#351](https://github.com/rapidsai/cuxfilter/pull/351)) [@Ethyling](https://github.com/Ethyling)
+- Simplify conda recipe ([#373](https://github.com/rapidsai/cuxfilter/pull/373)) [@Ethyling
+](https://github.com/Ethyling
+)
+- Forward-merge branch-22.04 to branch-22.06 ([#370](https://github.com/rapidsai/cuxfilter/pull/370)) [@Ethyling
+](https://github.com/Ethyling
+)
+- Use conda to build python packages during GPU tests ([#368](https://github.com/rapidsai/cuxfilter/pull/368)) [@Ethyling
+](https://github.com/Ethyling
+)
+- Use conda compilers ([#351](https://github.com/rapidsai/cuxfilter/pull/351)) [@Ethyling
+](https://github.com/Ethyling
+)
 - Build packages using mambabuild ([#347](https://github.com/rapidsai/cuxfilter/pull/347)) [@Ethyling](https://github.com/Ethyling)
 
 # cuXfilter 22.04.00 (6 Apr 2022)

@@ -27,9 +27,9 @@ author = 'NVIDIA'
 # built documents.
 #
 # The short X.Y version.
-version = '22.06'
+version = '22.08'
 # The full version, including alpha/beta/rc tags
-release = '22.06.00'
+release = '22.08.00'
 
 nbsphinx_allow_errors = True
 # -- General configuration ---------------------------------------------------
@@ -88,4 +88,5 @@ htmlhelp_basename = "cuxfilterdoc"
 
 
 def setup(app):
-    app.add_css_file('custom.css')
+    app.add_css_file("https://docs.rapids.ai/assets/css/custom.css")
+    app.add_js_file("https://docs.rapids.ai/assets/js/custom.js", loading_method="defer")
