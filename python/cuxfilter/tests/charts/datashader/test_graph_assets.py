@@ -50,7 +50,11 @@ class TestGraphAssets:
             node_y_dtype=cp.float32,
         ).reset_index(drop=True)
 
-        res = res.compute() if isinstance(res, dask_cudf.DataFrame) else res
+        res = (
+            res.compute().reset_index(drop=True)
+            if isinstance(res, dask_cudf.DataFrame)
+            else res
+        )
         result = (
             result.compute()
             if isinstance(result, dask_cudf.DataFrame)
