@@ -1,6 +1,13 @@
-# cuXfilter 22.10.00 (Date TBD)
+# cuXfilter 22.10.00 (12 Oct 2022)
 
-Please see https://github.com/rapidsai/cuxfilter/releases/tag/v22.10.00a for the latest changes to this development branch.
+## 🐛 Bug Fixes
+
+- fix test failing on non-matching indices for newer dask version ([#402](https://github.com/rapidsai/cuxfilter/pull/402)) [@AjayThorve](https://github.com/AjayThorve)
+- Notebook update: removed spaces in directory name ([#400](https://github.com/rapidsai/cuxfilter/pull/400)) [@mmccarty](https://github.com/mmccarty)
+
+## 🚀 New Features
+
+- Allow cupy 11 ([#401](https://github.com/rapidsai/cuxfilter/pull/401)) [@galipremsagar](https://github.com/galipremsagar)
 
 # cuXfilter 22.08.00 (Date TBD)
 
