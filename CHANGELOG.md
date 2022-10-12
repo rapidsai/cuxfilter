@@ -1,5 +1,15 @@
-# cuXfilter 22.08.00 (17 Aug 2022)
+# cuXfilter 22.10.00 (12 Oct 2022)
 
+## 🐛 Bug Fixes
+
+- fix test failing on non-matching indices for newer dask version ([#402](https://github.com/rapidsai/cuxfilter/pull/402)) [@AjayThorve](https://github.com/AjayThorve)
+- Notebook update: removed spaces in directory name ([#400](https://github.com/rapidsai/cuxfilter/pull/400)) [@mmccarty](https://github.com/mmccarty)
+
+## 🚀 New Features
+
+- Allow cupy 11 ([#401](https://github.com/rapidsai/cuxfilter/pull/401)) [@galipremsagar](https://github.com/galipremsagar)
+
+# cuXfilter 22.08.00 (17 Aug 2022)
 ## 🐛 Bug Fixes
 
 - fix/incorrect-bokeh-legend-attributes ([#381](https://github.com/rapidsai/cuxfilter/pull/381)) [@AjayThorve](https://github.com/AjayThorve)
