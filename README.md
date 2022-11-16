@@ -148,8 +148,8 @@ Please see the [Demo Docker Repository](https://hub.docker.com/r/rapidsai/rapids
 
 ### CUDA/GPU requirements
 
-- CUDA 10.1+
-- NVIDIA driver 418.39+
+- CUDA 11.2+
+- NVIDIA driver 450.80.02+
 - Pascal architecture or better (Compute Capability >=6.0)
 
 ### Conda
@@ -160,8 +160,8 @@ For `cuxfilter version == 22.12` :
 
 ```bash
 # for CUDA 11.5
-conda install -c rapidsai -c nvidia -c numba -c conda-forge \
-    cuxfilter=22.12 python=3.7 cudatoolkit=11.5
+conda install -c rapidsai -c numba -c conda-forge -c nvidia \
+    cuxfilter=22.12 python=3.9 cudatoolkit=11.5
 
 ```
 
@@ -169,11 +169,11 @@ For the nightly version of `cuxfilter` :
 
 ```bash
 # for CUDA 11.5
-conda install -c rapidsai-nightly -c nvidia -c numba -c conda-forge \
-    cuxfilter python=3.7 cudatoolkit=11.5
+conda install -c rapidsai-nightly -c numba -c conda-forge -c nvidia \
+    cuxfilter python=3.9 cudatoolkit=11.5
 ```
 
-Note: cuxfilter is supported only on Linux, and with Python versions 3.7 and later.
+Note: cuxfilter is supported only on Linux, and with Python versions 3.8 and later.
 
 See the [Get RAPIDS version picker](https://rapids.ai/start.html) for more OS and version info.
 
