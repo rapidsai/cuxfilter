@@ -38,12 +38,12 @@ To setup a rapids environment in studio lab(you only need to do this the first t
 conda install ipykernel
 
 # for stable rapids version
-conda install -c rapidsai -c nvidia -c numba -c conda-forge \
-    cuxfilter=22.02 python=3.7 cudatoolkit=11.5
+conda install -c rapidsai -c numba -c conda-forge -c nvidia \
+    cuxfilter=22.10 python=3.9 cudatoolkit=11.5
 
 # for nightly rapids version
-conda install -c rapidsai-nightly -c nvidia -c numba -c conda-forge \
-    cuxfilter python=3.7 cudatoolkit=11.5
+conda install -c rapidsai-nightly -c numba -c conda-forge -c nvidia \
+    cuxfilter python=3.9 cudatoolkit=11.5
 ```
 
 > Above are sample install snippets for cuxfilter, see the [Get RAPIDS version picker](https://rapids.ai/start.html) for installing the latest `cuxfilter` version.
