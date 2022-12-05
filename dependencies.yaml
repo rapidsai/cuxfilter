@@ -11,6 +11,7 @@ files:
       - develop
       - doc
       - notebook
+      - py_version
       - run
       - test_python
   test_python:
@@ -34,10 +35,6 @@ channels:
   - anaconda
 dependencies:
   build:
-    common:
-      - output_types: [conda, requirements]
-        packages:
-          - python>=3.8,<3.10
     specific:
       - output_types: conda
         matrices:
@@ -118,6 +115,9 @@ dependencies:
               py: "3.9"
             packages:
               - python=3.9
+          - matrix:
+            packages:
+              - python>=3.8,<3.10
   run:
     common:
       - output_types: [conda, requirements]
