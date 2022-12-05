@@ -8,6 +8,7 @@ channels:
 - conda-forge
 - anaconda
 dependencies:
+- black=22.3.0
 - bokeh>=2.4.2,<=2.5
 - cudatoolkit=11.5
 - cudf=22.12.*
@@ -15,6 +16,7 @@ dependencies:
 - dask-cuda=22.12.*
 - dask-cudf=22.12.*
 - datashader>0.13, <=0.14.3
+- flake8=3.8.3
 - gcc_linux-64=9.*
 - geopandas >=0.11.0
 - holoviews>1.14.1, <=1.14.6
