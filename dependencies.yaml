@@ -136,10 +136,10 @@ dependencies:
           - packaging
       - output_types: conda
         packages:
-          - &cudf_ver cudf=22.12.*
-          - &cuspatial_ver cuspatial=22.12.*
-          - &dask-cudf_ver dask-cudf=22.12.*
-          - &dask-cuda_ver dask-cuda=22.12.*
+          - cudf=22.12.*
+          - cuspatial=22.12.*
+          - dask-cudf=22.12.*
+          - dask-cuda=22.12.*
   test_python:
     common:
       - output_types: [conda, requirements]
