@@ -127,13 +127,10 @@ cd $CUXFILTER_HOME
 - Create the conda development environment `cuxfilter_dev`:
 ```bash
 # create the conda environment (assuming in base `cuxfilter` directory)
-conda env create --name cuxfilter_dev --file conda/environments/cuxfilter_dev_cuda10.0.yml
+conda env create --name cuxfilter_dev --file conda/environments/all*.yaml
 # activate the environment
 source activate cuxfilter_dev
 ```
-- If you're using CUDA 9.2, you will need to create the environment with `conda env create --name cuxfilter_dev --file conda/environments/cuxfilter_dev_cuda9.2.yml` instead.
-
-- If you're using CUDA 10.1, you will need to create the environment with `conda env create --name cuxfilter_dev --file conda/environments/cuxfilter_dev_cuda10.1.yml` instead.
 
 - Build the `cuxfilter` python packages, in the `python` folder:
 ```bash
