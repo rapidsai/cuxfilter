@@ -17,6 +17,13 @@ export PARALLEL_LEVEL=${PARALLEL_LEVEL:-4}
 # Set home to the job's workspace
 export HOME="$WORKSPACE"
 
+# Workaround to keep Jenkins builds working
+# until we migrate fully to GitHub Actions
+export RAPIDS_CUDA_VERSION="${CUDA}"
+export SCCACHE_BUCKET=rapids-sccache
+export SCCACHE_REGION=us-west-2
+export SCCACHE_IDLE_TIMEOUT=32768
+
 # Determine CUDA release version
 export CUDA_REL=${CUDA_VERSION%.*}
 
@@ -75,6 +82,6 @@ gpuci_conda_retry mambabuild conda/recipes/cuxfilter --python=$PYTHON
 # UPLOAD - Conda packages
 ################################################################################
 
-gpuci_logger "Upload conda pkgs"
-source ci/cpu/upload.sh
-
+# Uploads disabled due to new GH Actions implementation
+# gpuci_logger "Upload conda pkgs..."
+# source ci/cpu/upload.sh
