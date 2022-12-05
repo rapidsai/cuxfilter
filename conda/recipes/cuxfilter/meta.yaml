@@ -1,9 +1,9 @@
 # Copyright (c) 2018-2020, NVIDIA CORPORATION.
 
 {% set version = environ.get('GIT_DESCRIBE_TAG', '0.0.0.dev').lstrip('v') + environ.get('VERSION_SUFFIX', '') %}
-{% set minor_version =  version.split('.')[0] + '.' + version.split('.')[1] %}
+{% set minor_version = version.split('.')[0] + '.' + version.split('.')[1] %}
 {% set py_version=environ.get('CONDA_PY', 36) %}
-{% set cuda_version='.'.join(environ.get('CUDA', '10.1').split('.')[:2]) %}
+{% set cuda_version='.'.join(environ.get('RAPIDS_CUDA_VERSION', '11.5.2').split('.')[:2]) %}
 
 package:
   name: cuxfilter
@@ -16,12 +16,25 @@ build:
   number: {{ GIT_DESCRIBE_NUMBER }}
   string: py{{ py_version }}_{{ GIT_DESCRIBE_HASH }}_{{ GIT_DESCRIBE_NUMBER }}
   script_env:
+    - AWS_ACCESS_KEY_ID
+    - AWS_SECRET_ACCESS_KEY
+    - CMAKE_C_COMPILER_LAUNCHER
+    - CMAKE_CUDA_COMPILER_LAUNCHER
+    - CMAKE_CXX_COMPILER_LAUNCHER
+    - CMAKE_GENERATOR
+    - PARALLEL_LEVEL
+    - SCCACHE_BUCKET
+    - SCCACHE_IDLE_TIMEOUT
+    - SCCACHE_REGION
+    - SCCACHE_S3_KEY_PREFIX=cuxfilter-aarch64 # [aarch64]
+    - SCCACHE_S3_KEY_PREFIX=cuxfilter-linux64 # [linux64]
     - VERSION_SUFFIX
 
 requirements:
   build:
     - {{ compiler('c') }}
     - sysroot_{{ target_platform }} {{ sysroot_version }}
+    - ninja
   host:
     - python
     - setuptools
@@ -31,19 +44,19 @@ requirements:
     - cuspatial {{ minor_version }}
     - dask-cudf {{ minor_version }}
     - dask-cuda {{ minor_version }}
-    - datashader>0.13, <0.14
-    - holoviews>1.14.1, <=1.14.6
-    - numba >=0.54
-    - cupy >=9.5.0,<12.0.0a0
-    - panel >=0.12.7,<0.13
+    - datashader>0.13,<0.14
+    - holoviews>1.14.1,<=1.14.6
+    - numba>=0.54
+    - cupy>=9.5.0,<12.0.0a0
+    - panel>=0.12.7,<0.13
     - pyppeteer>=0.2.6
     - bokeh>=2.4.2,<=2.5
     - pyproj>=2.4,<=3.4
-    - geopandas >=0.11.0
-    - nodejs >=14
+    - geopandas>=0.11.0
+    - nodejs>=14
     - libwebp
     - jupyter-server-proxy
-    - pydeck >=0.3, <=0.5.0
+    - pydeck>=0.3,<=0.5.0
     - packaging
 
 test:                                   # [linux64]
@@ -53,7 +66,7 @@ test:                                   # [linux64]
     - cuxfilter                         # [linux64]
 
 about:
-  home: http://rapids.ai/
+  home: https://rapids.ai/
   license: Apache-2.0
   license_family: Apache
   license_file: LICENSE
