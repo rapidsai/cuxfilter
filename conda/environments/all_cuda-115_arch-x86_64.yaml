@@ -11,10 +11,10 @@ dependencies:
 - black=22.3.0
 - bokeh>=2.4.2,<=2.5
 - cudatoolkit=11.5
-- cudf=22.12.*
-- cuspatial=22.12.*
-- dask-cuda=22.12.*
-- dask-cudf=22.12.*
+- cudf=23.02.*
+- cuspatial=23.02.*
+- dask-cuda=23.02.*
+- dask-cudf=23.02.*
 - datashader>0.13, <=0.14.3
 - flake8=3.8.3
 - gcc_linux-64=9.*
