@@ -20,6 +20,12 @@ files:
       - cudatoolkit
       - py_version
       - test_python
+  test_notebooks:
+    output: none
+    includes:
+      - cudatoolkit
+      - notebook
+      - py_version
   checks:
     output: none
     includes:

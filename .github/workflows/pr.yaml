@@ -17,6 +17,7 @@ jobs:
       - conda-python-tests
     secrets: inherit
     uses: rapidsai/shared-action-workflows/.github/workflows/pr-builder.yaml@main
+  # TODO: Make build job depend on checks
   checks:
     secrets: inherit
     uses: rapidsai/shared-action-workflows/.github/workflows/checks.yaml@main
@@ -32,3 +33,15 @@ jobs:
     with:
       build_type: pull-request
       run_codecov: false
+  conda-notebook-tests:
+    needs: conda-python-build
+    secrets: inherit
+    uses: rapidsai/shared-action-workflows/.github/workflows/custom-job.yaml@main
+    with:
+      build_type: pull-request
+      # TODO: Remove this node_type value if PR below is merged
+      # https://github.com/rapidsai/shared-action-workflows/pull/26
+      node_type: "gpu-v100-495-1"
+      arch: "amd64"
+      container_image: "rapidsai/ci:latest"
+      run_script: "ci/test_notebooks.sh"
