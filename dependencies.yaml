@@ -23,9 +23,7 @@ files:
   checks:
     output: none
     includes:
-      - build
       - develop
-      - py_version
 channels:
   - rapidsai
   - rapidsai-nightly
@@ -80,7 +78,6 @@ dependencies:
         packages:
           - black=22.3.0
           - flake8=3.8.3
-          - pre-commit
   doc:
     common:
       - output_types: [conda, requirements]
