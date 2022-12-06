@@ -20,9 +20,6 @@ export HOME="$WORKSPACE"
 # Workaround to keep Jenkins builds working
 # until we migrate fully to GitHub Actions
 export RAPIDS_CUDA_VERSION="${CUDA}"
-export SCCACHE_BUCKET=rapids-sccache
-export SCCACHE_REGION=us-west-2
-export SCCACHE_IDLE_TIMEOUT=32768
 
 # Determine CUDA release version
 export CUDA_REL=${CUDA_VERSION%.*}
