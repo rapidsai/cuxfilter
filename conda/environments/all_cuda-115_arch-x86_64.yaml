@@ -22,7 +22,6 @@ dependencies:
 - jupyter-server-proxy
 - jupyter_sphinx
 - libwebp
-- mock
 - nbsphinx
 - nodejs>=14
 - notebook>=0.5.0
