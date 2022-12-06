@@ -143,3 +143,4 @@ dependencies:
       - output_types: [conda, requirements]
         packages:
           - pytest
+          - pytest-cov
