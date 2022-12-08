@@ -1,6 +1,13 @@
-# cuXfilter 22.12.00 (Date TBD)
+# cuXfilter 22.12.00 (8 Dec 2022)
 
-Please see https://github.com/rapidsai/cuxfilter/releases/tag/v22.12.00a for the latest changes to this development branch.
+## 📖 Documentation
+
+- Create symlink to 10_minutes_to_cuxfilter.ipynb into the notebooks fo… ([#413](https://github.com/rapidsai/cuxfilter/pull/413)) [@taureandyernv](https://github.com/taureandyernv)
+
+## 🛠️ Improvements
+
+- Update `panel` version ([#421](https://github.com/rapidsai/cuxfilter/pull/421)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Remove stale labeler ([#410](https://github.com/rapidsai/cuxfilter/pull/410)) [@raydouglass](https://github.com/raydouglass)
 
 # cuXfilter 22.10.00 (12 Oct 2022)
 
