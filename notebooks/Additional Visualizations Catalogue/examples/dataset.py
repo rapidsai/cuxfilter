@@ -6,7 +6,6 @@ import cupy as cp
 def generate_random_points(
     nodes=100, clusters=10, cluster_spreadout_factor=20, dtype="cudf"
 ):
-    cp.random.seed(101)
     processed_nodes = round(nodes / clusters)
 
     radius = cp.sqrt(

@@ -7,9 +7,20 @@ class PlotBase(param.Parameterized):
     dtype = param.Selector(objects=["cudf", "pandas"], default="cudf")
     n = param.Integer(1000, bounds=(100, 100000))
 
-    @param.depends("dtype", "n")
     def plot_code(self, fn):
         return get_code(fn, self.dtype, self.n)
+
+    @pn.depends("dtype", "n")
+    def points_plot_code(self):
+        return self.plot_code(self.points_plot)
+
+    @pn.depends("dtype", "n")
+    def curve_plot_code(self):
+        return self.plot_code(self.curve_plot)
+
+    @pn.depends("dtype", "n")
+    def bar_plot_code(self):
+        return self.plot_code(self.bar_plot)
 
 
 def get_code(fn, dtype, n):
@@ -21,7 +32,9 @@ def get_code(fn, dtype, n):
                     list(
                         filter(
                             lambda x: not (
-                                "@param.depends" in x or "(self)" in x
+                                "@param.depends" in x
+                                or "(self)" in x
+                                or x.lstrip().startswith(("df_lib", "arr_lib"))
                             ),
                             inspect.getsourcelines(fn)[0],
                         )
@@ -29,11 +42,19 @@ def get_code(fn, dtype, n):
                 )
             )
         )
-        .replace("=self.n", f"={n}")
-        .replace("=self.dtype", f'="{dtype}"')
+        .replace("self.n", f"{n}")
+        .replace("=self.dtype", f"={dtype}")
         .replace("{dtype}", f"{dtype}")
         .replace("return ", "")
-        .replace(f'exec(f"import hvplot.{dtype}")', f"import hvplot.{dtype}")
+        .replace(
+            'exec(f"import hvplot.{self.dtype}")', f"import hvplot.{dtype}"
+        )
+        .replace(
+            'exec(f"import {self.dtype}")',
+            f"import {dtype if dtype == 'cudf' else dtype+' as pd'}\nimport {'cupy as cp' if dtype == 'cudf' else 'numpy as np'}",
+        )
+        .replace("df_lib", f"{dtype if dtype=='cudf' else 'pd'}")
+        .replace("arr_lib", f"{'cp' if dtype=='cudf' else 'np'}")
     )
 
     return pn.widgets.Ace(
