@@ -35,6 +35,13 @@ def get_code(fn, dtype, n):
                                 "@param.depends" in x
                                 or "(self)" in x
                                 or x.lstrip().startswith(("df_lib", "arr_lib"))
+                                or (
+                                    dtype == "pandas"
+                                    and (
+                                        x.lstrip().startswith("# Bokeh")
+                                        or "df.to_pandas()" in x
+                                    )
+                                )
                             ),
                             inspect.getsourcelines(fn)[0],
                         )
@@ -43,7 +50,7 @@ def get_code(fn, dtype, n):
             )
         )
         .replace("self.n", f"{n}")
-        .replace("=self.dtype", f"={dtype}")
+        .replace("=self.dtype", f'="{dtype}"')
         .replace("{dtype}", f"{dtype}")
         .replace("return ", "")
         .replace(
@@ -55,6 +62,7 @@ def get_code(fn, dtype, n):
         )
         .replace("df_lib", f"{dtype if dtype=='cudf' else 'pd'}")
         .replace("arr_lib", f"{'cp' if dtype=='cudf' else 'np'}")
+        .replace(" if type(df) == cudf.DataFrame else df", "")
     )
 
     return pn.widgets.Ace(
