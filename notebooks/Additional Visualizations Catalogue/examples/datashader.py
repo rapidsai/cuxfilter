@@ -47,8 +47,6 @@ class Charts(PlotBase):
 
         df = generate_random_points(nodes=self.n, dtype=self.dtype)
 
-        print(type(df))
-
         # generate datashader line charts
         cvs = ds.Canvas(plot_height=500, plot_width=700)
         aggs1 = cvs.line(source=df, x="vertex", y="x")
