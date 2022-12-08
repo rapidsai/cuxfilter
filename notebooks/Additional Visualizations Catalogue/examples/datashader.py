@@ -50,7 +50,7 @@ class Charts(PlotBase):
         print(type(df))
 
         # generate datashader line charts
-        cvs = ds.Canvas(plot_height=500, plot_width=1800)
+        cvs = ds.Canvas(plot_height=500, plot_width=700)
         aggs1 = cvs.line(source=df, x="vertex", y="x")
         aggs2 = cvs.line(source=df, x="vertex", y="y")
         imgs = [tf.shade(aggs1, cmap="red"), tf.shade(aggs2, cmap="blue")]
