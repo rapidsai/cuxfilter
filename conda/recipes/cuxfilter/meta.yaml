@@ -47,11 +47,11 @@ requirements:
     - pydeck>=0.3,<=0.5.0
     - packaging
 
-test:                                   # [linux64]
-  requires:                             # [linux64]
-    - cudatoolkit {{ cuda_version }}.*  # [linux64]
-  imports:                              # [linux64]
-    - cuxfilter                         # [linux64]
+test:
+  requires:
+    - cudatoolkit {{ cuda_version }}.*
+  imports:
+    - cuxfilter
 
 about:
   home: https://rapids.ai/

@@ -17,11 +17,11 @@ jobs:
       - conda-python-tests
     secrets: inherit
     uses: rapidsai/shared-action-workflows/.github/workflows/pr-builder.yaml@main
-  # TODO: Make build job depend on checks
   checks:
     secrets: inherit
     uses: rapidsai/shared-action-workflows/.github/workflows/checks.yaml@main
   conda-python-build:
+    needs: checks
     secrets: inherit
     uses: rapidsai/shared-action-workflows/.github/workflows/conda-python-matrix-build.yaml@main
     with:
