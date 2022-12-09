@@ -1,6 +1,6 @@
 import holoviews as hv
 import panel as pn
-from examples import holoviews, hvplot, datashader
+from examples import holoviews, hvplot, datashader, bokeh
 
 pn.extension(loading_spinner="dots", loading_color="#0000ff", throttled=True)
 
@@ -19,6 +19,7 @@ if __name__ == "__main__":
             ("Holoviews", holoviews.Charts().view()),
             ("Hvplot", hvplot.Charts().view()),
             ("Datashader", datashader.Charts().view()),
+            ("Bokeh", bokeh.Charts().view()),
             dynamic=True,
         ),
         pn.layout.HSpacer(),
