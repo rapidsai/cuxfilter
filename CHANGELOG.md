@@ -1,3 +1,14 @@
+# cuXfilter 22.12.00 (8 Dec 2022)
+
+## 📖 Documentation
+
+- Create symlink to 10_minutes_to_cuxfilter.ipynb into the notebooks fo… ([#413](https://github.com/rapidsai/cuxfilter/pull/413)) [@taureandyernv](https://github.com/taureandyernv)
+
+## 🛠️ Improvements
+
+- Update `panel` version ([#421](https://github.com/rapidsai/cuxfilter/pull/421)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Remove stale labeler ([#410](https://github.com/rapidsai/cuxfilter/pull/410)) [@raydouglass](https://github.com/raydouglass)
+
 # cuXfilter 22.10.00 (12 Oct 2022)
 
 ## 🐛 Bug Fixes
@@ -10,6 +21,7 @@
 - Allow cupy 11 ([#401](https://github.com/rapidsai/cuxfilter/pull/401)) [@galipremsagar](https://github.com/galipremsagar)
 
 # cuXfilter 22.08.00 (17 Aug 2022)
+
 ## 🐛 Bug Fixes
 
 - fix/incorrect-bokeh-legend-attributes ([#381](https://github.com/rapidsai/cuxfilter/pull/381)) [@AjayThorve](https://github.com/AjayThorve)
