@@ -101,7 +101,7 @@ MAPBOX_API_KEY= "<mapbox-api-key>"
 geoJSONSource='https://raw.githubusercontent.com/rapidsai/cuxfilter/GTC-2018-mortgage-visualization/javascript/demos/GTC%20demo/src/data/zip3-ms-rhs-lessprops.json'
 
 chart0 = cuxfilter.charts.choropleth( x='zip', color_column='delinquency_12_prediction', color_aggregate_fn='mean',
-            elevation_column='current_actual_upb', elevation_factor=0.00001, elevation_aggregate_fn='sum', 
+            elevation_column='current_actual_upb', elevation_factor=0.00001, elevation_aggregate_fn='sum',
             geoJSONSource=geoJSONSource, mapbox_api_key=MAPBOX_API_KEY, data_points=1000
 )
 chart2 = cuxfilter.charts.bar('delinquency_12_prediction',data_points=50)
@@ -156,13 +156,12 @@ Please see the [Demo Docker Repository](https://hub.docker.com/r/rapidsai/rapids
 
 cuxfilter can be installed with conda ([miniconda](https://conda.io/miniconda.html), or the full [Anaconda distribution](https://www.anaconda.com/download)) from the `rapidsai` channel:
 
-For `cuxfilter version == 22.12` :
+For `cuxfilter version == 23.02` :
 
 ```bash
 # for CUDA 11.5
 conda install -c rapidsai -c numba -c conda-forge -c nvidia \
-    cuxfilter=22.12 python=3.9 cudatoolkit=11.5
-
+    cuxfilter=23.02 python=3.9 cudatoolkit=11.5
 ```
 
 For the nightly version of `cuxfilter` :
