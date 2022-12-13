@@ -10,7 +10,7 @@ cuxfilter conda example installation:
 .. code-block:: bash
 
     conda install -c rapidsai -c conda-forge -c nvidia \
-        cuxfilter=22.10 python=3.9 cudatoolkit=11.5
+        cuxfilter=23.02 python=3.9 cudatoolkit=11.5
 
 Docker container
 ----------------
@@ -30,7 +30,7 @@ cuxfilter docker example installation:
 Build/Install from Source
 -------------------------
 
-See `build instructions <https://github.com/rapidsai/cuxfilter/blob/branch-22.10/CONTRIBUTING.md#setting-up-your-build-environment>`_.
+See `build instructions <https://github.com/rapidsai/cuxfilter/blob/branch-23.02/CONTRIBUTING.md#setting-up-your-build-environment>`_.
 
 
 

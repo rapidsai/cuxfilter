@@ -39,7 +39,7 @@ conda install ipykernel
 
 # for stable rapids version
 conda install -c rapidsai -c numba -c conda-forge -c nvidia \
-    cuxfilter=22.10 python=3.9 cudatoolkit=11.5
+    cuxfilter=23.02 python=3.9 cudatoolkit=11.5
 
 # for nightly rapids version
 conda install -c rapidsai-nightly -c numba -c conda-forge -c nvidia \
