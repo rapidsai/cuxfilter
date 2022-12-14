@@ -30,7 +30,7 @@ dependencies:
 - nvcc_linux-64=11.5
 - packaging
 - pandoc<=2.0.0
-- panel>=0.12.7,<0.13
+- panel>=0.14.0,<0.15
 - pre-commit
 - pydeck>=0.3,<=0.5.0
 - pyppeteer>=0.2.6
