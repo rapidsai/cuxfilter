@@ -9,7 +9,6 @@ from . import PlotBase
 
 
 class Charts(PlotBase):
-    @param.depends("dtype", "n")
     def bar_plot(self):
         exec(f"import {self.dtype}")
         from bokeh.plotting import figure
@@ -36,11 +35,10 @@ class Charts(PlotBase):
         df = df.to_pandas() if type(df) == cudf.DataFrame else df
 
         # generate bokeh bar chart
-        p = figure(height=500, width=700, title="Bokeh Bar Chart")
+        p = figure(height=800, width=700, title="Bokeh Bar Chart")
         p.vbar(source=df, x="value", top="freq", width=0.9)
         return pn.pane.Bokeh(p)
 
-    @param.depends("dtype", "n")
     def points_plot(self):
         # Load additional libraries bokeh
         from bokeh.palettes import Spectral10
@@ -66,7 +64,7 @@ class Charts(PlotBase):
         df["cluster_s"] = df.cluster.apply(lambda i: str(i))
 
         # Create scatter chart
-        graph = figure(title="Bokeh Scatter Graph", height=500, width=700)
+        graph = figure(title="Bokeh Scatter Graph", height=800, width=700)
         graph.scatter(
             source=df,
             x="x",
@@ -78,7 +76,6 @@ class Charts(PlotBase):
         )
         return pn.pane.Bokeh(graph)
 
-    @param.depends("dtype", "n")
     def curve_plot(self):
         # Load additional libraries bokeh
         from bokeh.palettes import Spectral10
@@ -103,35 +100,9 @@ class Charts(PlotBase):
             title="Line",
             x_axis_label="x",
             y_axis_label="y",
-            height=500,
+            height=800,
             width=700,
         )
         p.line(x=df["vertex"], y=df["x"], line_width=2, color="red")
         p.line(x=df["vertex"], y=df["y"], line_width=2, color="blue")
         return pn.pane.Bokeh(p)
-
-    def view(self):
-        return pn.Tabs(
-            (
-                "Bar",
-                pn.Row(
-                    pn.WidgetBox(self.param, self.bar_plot_code),
-                    pn.panel(self.bar_plot, loading_indicator=True),
-                ),
-            ),
-            (
-                "Points",
-                pn.Row(
-                    pn.WidgetBox(self.param, self.points_plot_code),
-                    pn.panel(self.points_plot, loading_indicator=True),
-                ),
-            ),
-            (
-                "Curve",
-                pn.Row(
-                    pn.WidgetBox(self.param, self.curve_plot_code),
-                    pn.panel(self.curve_plot, loading_indicator=True),
-                ),
-            ),
-            dynamic=True,
-        )

@@ -4,23 +4,37 @@ import param
 
 
 class PlotBase(param.Parameterized):
-    dtype = param.Selector(objects=["cudf", "pandas"], default="cudf")
+    chart = param.Selector(objects=["bar", "points", "line"], default="bar")
+    dtype = param.Selector(objects=["cudf", "pandas"], default="pandas")
     n = param.Integer(1000, bounds=(100, 100000))
 
-    def plot_code(self, fn):
-        return get_code(fn, self.dtype, self.n)
+    @pn.depends("chart", "dtype", "n")
+    def plot_code(self):
+        if self.chart == "bar":
+            return get_code(self.bar_plot, self.dtype, self.n)
+        elif self.chart == "points":
+            return get_code(self.points_plot, self.dtype, self.n)
+        return get_code(self.curve_plot, self.dtype, self.n)
 
-    @pn.depends("dtype", "n")
-    def points_plot_code(self):
-        return self.plot_code(self.points_plot)
+    @pn.depends("chart", "dtype", "n")
+    def plot(self):
+        if self.chart == "bar":
+            return self.bar_plot()
+        elif self.chart == "points":
+            return self.points_plot()
+        return self.curve_plot()
 
-    @pn.depends("dtype", "n")
-    def curve_plot_code(self):
-        return self.plot_code(self.curve_plot)
-
-    @pn.depends("dtype", "n")
-    def bar_plot_code(self):
-        return self.plot_code(self.bar_plot)
+    def view(self):
+        # return self.plot
+        return pn.WidgetBox(
+            pn.Row(
+                pn.Column(
+                    self.param,
+                    self.plot_code,
+                ),
+                self.plot,
+            ),
+        )
 
 
 def get_code(fn, dtype, n):
@@ -63,12 +77,13 @@ def get_code(fn, dtype, n):
         .replace("df_lib", f"{dtype if dtype=='cudf' else 'pd'}")
         .replace("arr_lib", f"{'cp' if dtype=='cudf' else 'np'}")
         .replace(" if type(df) == cudf.DataFrame else df", "")
+        .replace("# hv.extension", "hv.extension")
     )
 
     return pn.widgets.Ace(
         name="code",
         language="python",
-        height=360,
+        height=500,
         width=800,
         value=result,
         readonly=True,

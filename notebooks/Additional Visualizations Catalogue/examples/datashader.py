@@ -5,9 +5,9 @@ from . import PlotBase
 
 
 class Charts(PlotBase):
+    chart = param.Selector(objects=["points", "line"], default="points")
     n = param.Integer(100000, bounds=(100000, 10000000))
 
-    @param.depends("dtype", "n")
     def points_plot(self):
         import datashader as ds
         import datashader.transfer_functions as tf
@@ -30,7 +30,6 @@ class Charts(PlotBase):
         aggs = cvs.points(source=df, x="x", y="y", agg=ds.count_cat("cluster"))
         return tf.shade(aggs)
 
-    @param.depends("dtype", "n")
     def curve_plot(self):
         import datashader as ds
         import datashader.transfer_functions as tf
@@ -53,22 +52,3 @@ class Charts(PlotBase):
         aggs2 = cvs.line(source=df, x="vertex", y="y")
         imgs = [tf.shade(aggs1, cmap="red"), tf.shade(aggs2, cmap="blue")]
         return tf.stack(*imgs)
-
-    def view(self):
-        return pn.Tabs(
-            (
-                "Points",
-                pn.Row(
-                    pn.WidgetBox(self.param, self.points_plot_code),
-                    pn.panel(self.points_plot, loading_indicator=True),
-                ),
-            ),
-            (
-                "Curve",
-                pn.Row(
-                    pn.WidgetBox(self.param, self.curve_plot_code),
-                    pn.panel(self.curve_plot, loading_indicator=True),
-                ),
-            ),
-            dynamic=True,
-        )
