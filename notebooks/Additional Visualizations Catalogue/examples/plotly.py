@@ -6,11 +6,13 @@ import panel as pn
 
 from . import PlotBase
 
+pn.extension("plotly")
+
 
 class Charts(PlotBase):
     def bar_plot(self):
         exec(f"import {self.dtype}")
-        from bokeh.plotting import figure
+        import plotly.express as px
 
         df_lib = cudf if self.dtype == "cudf" else pd
         arr_lib = cp if self.dtype == "cudf" else np
@@ -34,15 +36,12 @@ class Charts(PlotBase):
         df = df.to_pandas() if type(df) == cudf.DataFrame else df
 
         # generate bokeh bar chart
-        p = figure(height=800, width=700, title="Bokeh Bar Chart")
-        p.vbar(source=df, x="value", top="freq", width=0.9)
-        return pn.pane.Bokeh(p)
+        fig = px.bar(df, x="value", y="freq")
+        return pn.panel(fig)
 
     def points_plot(self):
         # Load additional libraries bokeh
-        from bokeh.palettes import Spectral10
-        from bokeh.plotting import figure
-        from bokeh.transform import factor_cmap
+        import plotly.express as px
         from examples.dataset import generate_random_points
 
         # returns a {dtype} DataFrame
@@ -57,29 +56,18 @@ class Charts(PlotBase):
         # Bokeh does not take cuDF directly, convert cudf dataframe to pandas df
         df = df.to_pandas() if type(df) == cudf.DataFrame else df
 
-        # Assign distinct color based on cluster
-        # Convert to categorical (string) column to map color
-        factor_s = [str(i) for i in df.cluster.unique()]
-        df["cluster_s"] = df.cluster.apply(lambda i: str(i))
-
         # Create scatter chart
-        graph = figure(title="Bokeh Scatter Graph", height=800, width=700)
-        graph.scatter(
-            source=df,
+        fig = px.scatter(
+            df,
             x="x",
             y="y",
-            fill_color=factor_cmap(
-                "cluster_s", palette=Spectral10, factors=factor_s
-            ),
-            color="black",
+            color="cluster",
         )
-        return pn.pane.Bokeh(graph)
+        return pn.panel(fig)
 
     def curve_plot(self):
         # Load additional libraries bokeh
-        from bokeh.palettes import Spectral10
-        from bokeh.plotting import figure, show
-        from bokeh.transform import factor_cmap
+        import plotly.express as px
         from examples.dataset import generate_random_points
 
         # returns a {dtype}.DataFrame
@@ -89,19 +77,14 @@ class Charts(PlotBase):
         # 1        1  49.471650  927.183736        0
         # 2        2  58.157023  937.713367        0
         # ..     ...        ...         ...      ...
-        df = generate_random_points(nodes=self.n, dtype=self.dtype)
+        df = generate_random_points(
+            nodes=self.n, dtype=self.dtype
+        ).sort_values(by="x")
 
         # Bokeh does not take cuDF directly, convert cudf dataframe to pandas df
         df = df.to_pandas() if type(df) == cudf.DataFrame else df
 
         # Create and combine multiple line charts
-        p = figure(
-            title="Line",
-            x_axis_label="x",
-            y_axis_label="y",
-            height=800,
-            width=700,
-        )
-        p.line(x=df["vertex"], y=df["x"], line_width=2, color="red")
-        p.line(x=df["vertex"], y=df["y"], line_width=2, color="blue")
-        return pn.pane.Bokeh(p)
+        fig = px.line(df, x="x", y="y")
+
+        return pn.panel(fig)

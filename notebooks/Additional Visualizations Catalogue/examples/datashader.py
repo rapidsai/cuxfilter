@@ -28,7 +28,7 @@ class Charts(PlotBase):
         df["cluster"] = df["cluster"].astype("category")
         # Convert to category for giving distinct color
         aggs = cvs.points(source=df, x="x", y="y", agg=ds.count_cat("cluster"))
-        return tf.shade(aggs)
+        return pn.panel(tf.shade(aggs))
 
     def curve_plot(self):
         import datashader as ds
@@ -51,4 +51,4 @@ class Charts(PlotBase):
         aggs1 = cvs.line(source=df, x="vertex", y="x")
         aggs2 = cvs.line(source=df, x="vertex", y="y")
         imgs = [tf.shade(aggs1, cmap="red"), tf.shade(aggs2, cmap="blue")]
-        return tf.stack(*imgs)
+        return pn.panel(tf.stack(*imgs))
