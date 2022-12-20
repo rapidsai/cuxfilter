@@ -16,10 +16,6 @@ class Charts(PlotBase):
         df_lib = cudf if self.dtype == "cudf" else pd
         arr_lib = cp if self.dtype == "cudf" else np
 
-        # returns a {dtype} DataFrame, Sample:
-        #      value        freq
-        # 0        0        67
-        # ..     ...        ...
         rand_arr = arr_lib.random.randint(0, 20, self.n)
         rand_vals = df_lib.Series(rand_arr).value_counts()
 
@@ -39,11 +35,6 @@ class Charts(PlotBase):
         from .dataset import generate_random_points
 
         # hv.extension("bokeh")
-
-        # returns a {dtype} DataFrame, Sample:
-        #     vertex          x           y  cluster
-        # 0        0  67.559061  956.872971        0
-        # ..     ...        ...         ...      ...
         df = generate_random_points(nodes=self.n, dtype=self.dtype)
 
         # generate hvplot points chart using {dtype} DataFrame
@@ -57,11 +48,6 @@ class Charts(PlotBase):
         from .dataset import generate_random_points
 
         # hv.extension("bokeh")
-
-        # returns a {dtype} DataFrame, Sample:
-        #     vertex          x           y  cluster
-        # 0        0  67.559061  956.872971        0
-        # ..     ...        ...         ...      ...
         df = generate_random_points(nodes=self.n, dtype=self.dtype)
 
         # generate hvplot line charts

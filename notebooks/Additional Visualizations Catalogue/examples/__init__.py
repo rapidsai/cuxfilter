@@ -5,7 +5,7 @@ import param
 
 class PlotBase(param.Parameterized):
     chart = param.Selector(objects=["bar", "points", "line"], default="bar")
-    dtype = param.Selector(objects=["cudf", "pandas"], default="pandas")
+    dtype = param.Selector(objects=["cudf", "pandas"], default="cudf")
     n = param.Integer(1000, bounds=(100, 100000))
 
     @pn.depends("chart", "dtype", "n")
@@ -33,7 +33,7 @@ class PlotBase(param.Parameterized):
                     self.plot_code,
                 ),
                 self.plot,
-            ),
+            )
         )
 
 
