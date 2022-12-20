@@ -53,6 +53,8 @@ def get_code(fn, dtype, n):
                                     dtype == "pandas"
                                     and (
                                         x.lstrip().startswith("# Bokeh")
+                                        or x.lstrip().startswith("# Seaborn")
+                                        or x.lstrip().startswith("# Plotly")
                                         or "df.to_pandas()" in x
                                     )
                                 )
@@ -84,7 +86,7 @@ def get_code(fn, dtype, n):
         name="code",
         language="python",
         height=500,
-        width=800,
+        width=500,
         value=result,
         readonly=True,
     )
