@@ -2,7 +2,7 @@
 
 {% set version = environ.get('GIT_DESCRIBE_TAG', '0.0.0.dev').lstrip('v') + environ.get('VERSION_SUFFIX', '') %}
 {% set minor_version = version.split('.')[0] + '.' + version.split('.')[1] %}
-{% set py_version = environ.get('CONDA_PY', 38) %}
+{% set py_version = environ['CONDA_PY'] %}
 {% set cuda_version = '.'.join(environ['RAPIDS_CUDA_VERSION'].split('.')[:2]) %}
 
 package:
@@ -25,29 +25,29 @@ requirements:
     - python
     - setuptools
   run:
-    - python
-    - cudf {{ minor_version }}.*
-    - cuspatial {{ minor_version }}.*
-    - dask-cudf {{ minor_version }}.*
-    - dask-cuda {{ minor_version }}.*
-    - datashader>0.13,<0.14
-    - holoviews>1.14.1,<=1.14.6
-    - numba>=0.54
-    - cupy>=9.5.0,<12.0.0a0
-    - panel>=0.12.7,<0.13
-    - pyppeteer>=0.2.6
-    - bokeh>=2.4.2,<=2.5
-    - pyproj>=2.4,<=3.4
-    - geopandas>=0.11.0
-    - nodejs>=14
-    - libwebp
+    - bokeh >=2.4.2,<=2.5
+    - cudf ={{ minor_version }}
+    - cupy >=9.5.0,<12.0.0a0
+    - cuspatial ={{ minor_version }}
+    - dask-cuda ={{ minor_version }}
+    - dask-cudf ={{ minor_version }}
+    - datashader >0.13,<0.14
+    - geopandas >=0.11.0
+    - holoviews >1.14.1,<=1.14.6
     - jupyter-server-proxy
-    - pydeck>=0.3,<=0.5.0
+    - libwebp
+    - nodejs >=14
+    - numba >=0.54
     - packaging
+    - panel >=0.12.7,<0.13
+    - pydeck >=0.3,<=0.5.0
+    - pyppeteer >=0.2.6
+    - pyproj >=2.4,<=3.4
+    - python
 
 test:
   requires:
-    - cudatoolkit {{ cuda_version }}.*
+    - cudatoolkit ={{ cuda_version }}
   imports:
     - cuxfilter
 
