@@ -82,8 +82,7 @@ dependencies:
     common:
       - output_types: [conda, requirements]
         packages:
-          - black=22.3.0
-          - flake8=3.8.3
+          - pre-commit
   doc:
     common:
       - output_types: [conda, requirements]
@@ -134,7 +133,7 @@ dependencies:
           - libwebp
           - nodejs>=14
           - packaging
-          - panel>=0.12.7,<0.13
+          - panel>=0.14.0,<0.15
           - pydeck>=0.3,<=0.5.0
           - pyppeteer>=0.2.6
           - pyproj>=2.4,<=3.4

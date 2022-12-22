@@ -1,0 +1,18 @@
+# Copyright (c) 2019-2022, NVIDIA CORPORATION.
+
+repos:
+      - repo: https://github.com/psf/black
+        rev: 22.10.0
+        hooks:
+              - id: black
+                files: python/cuxfilter/.*
+                # Explicitly specify the pyproject.toml at the repo root, not per-project.
+                args: ["--config", "pyproject.toml"]
+      - repo: https://github.com/PyCQA/flake8
+        rev: 6.0.0
+        hooks:
+              - id: flake8
+                args: ["--config=python/setup.cfg"]
+                files: python/.*$
+default_language_version:
+      python: python3
