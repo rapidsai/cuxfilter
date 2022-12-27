@@ -25,7 +25,7 @@ class Charts(PlotBase):
         aggs = cvs.points(source=df, x="x", y="y", agg=ds.count_cat("cluster"))
         return pn.panel(tf.shade(aggs))
 
-    def curve_plot(self):
+    def line_plot(self):
         import datashader as ds
         import datashader.transfer_functions as tf
         import panel as pn

@@ -63,7 +63,7 @@ class Charts(PlotBase):
         )
         return pn.pane.Bokeh(graph)
 
-    def curve_plot(self):
+    def line_plot(self):
         import panel as pn
         from bokeh.palettes import Spectral10
         from bokeh.plotting import figure, show

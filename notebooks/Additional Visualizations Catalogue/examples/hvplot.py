@@ -42,7 +42,7 @@ class Charts(PlotBase):
             height=500, width=700
         )
 
-    def curve_plot(self):
+    def line_plot(self):
         exec(f"import hvplot.{self.dtype}")
         import holoviews as hv
         from .dataset import generate_random_points
@@ -55,5 +55,5 @@ class Charts(PlotBase):
         line2 = df.hvplot.line(x="vertex", y="y").opts(color="blue")
         # overlay line charts
         return (line1 * line2).opts(
-            ylabel="value", title="Curve Plot", width=700, height=500
+            ylabel="value", title="line Plot", width=700, height=500
         )

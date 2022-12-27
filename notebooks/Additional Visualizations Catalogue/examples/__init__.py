@@ -14,7 +14,7 @@ class PlotBase(param.Parameterized):
             return get_code(self.bar_plot, self.dtype, self.n)
         elif self.chart == "points":
             return get_code(self.points_plot, self.dtype, self.n)
-        return get_code(self.curve_plot, self.dtype, self.n)
+        return get_code(self.line_plot, self.dtype, self.n)
 
     @pn.depends("chart", "dtype", "n")
     def plot(self):
@@ -22,7 +22,7 @@ class PlotBase(param.Parameterized):
             return self.bar_plot()
         elif self.chart == "points":
             return self.points_plot()
-        return self.curve_plot()
+        return self.line_plot()
 
     @pn.depends("chart", "dtype", "n")
     def view(self):

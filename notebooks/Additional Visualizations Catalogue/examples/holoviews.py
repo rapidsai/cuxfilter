@@ -42,19 +42,19 @@ class Charts(PlotBase):
             color="cluster", height=500, width=700
         )
 
-    def curve_plot(self):
+    def line_plot(self):
         import holoviews as hv
         from examples.dataset import generate_random_points
 
         # hv.extension("bokeh")
         df = generate_random_points(nodes=self.n, dtype=self.dtype)
 
-        # Create curve charts
-        curve_x = hv.Curve(df, kdims="vertex", vdims="x").opts(
+        # Create line charts
+        line_x = hv.Curve(df, kdims="vertex", vdims="x").opts(
             color="red",
         )
-        curve_y = hv.Curve(df, kdims="vertex", vdims="y").opts(color="blue")
+        line_y = hv.Curve(df, kdims="vertex", vdims="y").opts(color="blue")
         # overlay line charts
-        return (curve_x * curve_y).opts(
-            ylabel="value", title="Curve Plot", width=700, height=500
+        return (line_x * line_y).opts(
+            ylabel="value", title="line Plot", width=700, height=500
         )

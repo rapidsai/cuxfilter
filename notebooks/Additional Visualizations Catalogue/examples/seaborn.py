@@ -50,7 +50,7 @@ class Charts(PlotBase):
         sns.scatterplot(df, x="x", y="y", hue="cluster", ax=ax)
         return pn.panel(fig)
 
-    def curve_plot(self):
+    def line_plot(self):
         import seaborn as sns
         import panel as pn
         from matplotlib.figure import Figure

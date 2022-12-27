@@ -50,7 +50,7 @@ class Charts(PlotBase):
         )
         return pn.panel(fig)
 
-    def curve_plot(self):
+    def line_plot(self):
         import panel as pn
         import plotly.express as px
         from examples.dataset import generate_random_points
