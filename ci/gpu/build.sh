@@ -74,7 +74,7 @@ conda list --show-channel-urls
 ################################################################################
 
 # TODO: Move boa install to gpuci/rapidsai
-gpuci_mamba_retry install boa
+gpuci_mamba_retry install --freeze-installed boa
 
 gpuci_logger "Build and install cuxfilter"
 cd "${WORKSPACE}"
