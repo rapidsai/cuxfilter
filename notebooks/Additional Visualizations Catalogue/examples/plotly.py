@@ -2,17 +2,16 @@ import cudf
 import cupy as cp
 import numpy as np
 import pandas as pd
-import panel as pn
-
 from . import PlotBase
-
-pn.extension("plotly")
 
 
 class Charts(PlotBase):
     def bar_plot(self):
         exec(f"import {self.dtype}")
+        import panel as pn
         import plotly.express as px
+
+        # pn.extension("plotly")
 
         df_lib = cudf if self.dtype == "cudf" else pd
         arr_lib = cp if self.dtype == "cudf" else np
@@ -32,8 +31,11 @@ class Charts(PlotBase):
         return pn.panel(fig)
 
     def points_plot(self):
+        import panel as pn
         import plotly.express as px
         from examples.dataset import generate_random_points
+
+        # pn.extension("plotly")
 
         df = generate_random_points(nodes=self.n, dtype=self.dtype)
         # Plotly does not take cuDF directly, convert cudf dataframe to pandas df
@@ -49,9 +51,11 @@ class Charts(PlotBase):
         return pn.panel(fig)
 
     def curve_plot(self):
-        # Load additional libraries Plotly
+        import panel as pn
         import plotly.express as px
         from examples.dataset import generate_random_points
+
+        # pn.extension("plotly")
 
         df = generate_random_points(
             nodes=self.n, dtype=self.dtype

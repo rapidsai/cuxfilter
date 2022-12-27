@@ -10,6 +10,7 @@ class Charts(PlotBase):
     def bar_plot(self):
         exec(f"import {self.dtype}")
         import seaborn as sns
+        import panel as pn
         from matplotlib.figure import Figure
 
         df_lib = cudf if self.dtype == "cudf" else pd
@@ -30,10 +31,11 @@ class Charts(PlotBase):
         fig = Figure(figsize=(12, 6))
         ax = fig.add_subplot(111)
         sns.barplot(df, x="value", y="freq", ax=ax)
-        return fig
+        return pn.panel(fig)
 
     def points_plot(self):
         import seaborn as sns
+        import panel as pn
         from matplotlib.figure import Figure
         from examples.dataset import generate_random_points
 
@@ -46,10 +48,11 @@ class Charts(PlotBase):
         fig = Figure(figsize=(12, 6))
         ax = fig.add_subplot(111)
         sns.scatterplot(df, x="x", y="y", hue="cluster", ax=ax)
-        return fig
+        return pn.panel(fig)
 
     def curve_plot(self):
         import seaborn as sns
+        import panel as pn
         from matplotlib.figure import Figure
         from examples.dataset import generate_random_points
 
@@ -64,4 +67,4 @@ class Charts(PlotBase):
         fig = Figure(figsize=(12, 6))
         ax = fig.add_subplot(111)
         sns.lineplot(df, x="x", y="y", ax=ax)
-        return fig
+        return pn.panel(fig)

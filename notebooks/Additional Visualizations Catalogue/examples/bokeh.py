@@ -2,7 +2,6 @@ import cudf
 import cupy as cp
 import numpy as np
 import pandas as pd
-import panel as pn
 
 from . import PlotBase
 
@@ -10,7 +9,10 @@ from . import PlotBase
 class Charts(PlotBase):
     def bar_plot(self):
         exec(f"import {self.dtype}")
+        import panel as pn
         from bokeh.plotting import figure
+
+        # pn.extension()
 
         df_lib = cudf if self.dtype == "cudf" else pd
         arr_lib = cp if self.dtype == "cudf" else np
@@ -27,15 +29,18 @@ class Charts(PlotBase):
         df = df.to_pandas() if type(df) == cudf.DataFrame else df
 
         # generate bokeh bar chart
-        p = figure(height=800, width=700, title="Bokeh Bar Chart")
+        p = figure(height=500, width=700, title="Bokeh Bar Chart")
         p.vbar(source=df, x="value", top="freq", width=0.9)
         return pn.pane.Bokeh(p)
 
     def points_plot(self):
+        import panel as pn
         from bokeh.palettes import Spectral10
         from bokeh.plotting import figure
         from bokeh.transform import factor_cmap
         from examples.dataset import generate_random_points
+
+        # pn.extension()
 
         df = generate_random_points(nodes=self.n, dtype=self.dtype)
 
@@ -46,7 +51,7 @@ class Charts(PlotBase):
         df["cluster_s"] = df.cluster.apply(lambda i: str(i))
 
         # Create scatter chart
-        graph = figure(title="Bokeh Scatter Graph", height=800, width=700)
+        graph = figure(title="Bokeh Scatter Graph", height=500, width=700)
         graph.scatter(
             source=df,
             x="x",
@@ -59,10 +64,13 @@ class Charts(PlotBase):
         return pn.pane.Bokeh(graph)
 
     def curve_plot(self):
+        import panel as pn
         from bokeh.palettes import Spectral10
         from bokeh.plotting import figure, show
         from bokeh.transform import factor_cmap
         from examples.dataset import generate_random_points
+
+        # pn.extension()
 
         df = generate_random_points(nodes=self.n, dtype=self.dtype)
 
@@ -74,7 +82,7 @@ class Charts(PlotBase):
             title="Line",
             x_axis_label="x",
             y_axis_label="y",
-            height=800,
+            height=500,
             width=700,
         )
         p.line(x=df["vertex"], y=df["x"], line_width=2, color="red")

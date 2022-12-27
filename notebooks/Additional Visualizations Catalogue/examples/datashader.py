@@ -11,6 +11,9 @@ class Charts(PlotBase):
     def points_plot(self):
         import datashader as ds
         import datashader.transfer_functions as tf
+        import panel as pn
+
+        # pn.extension()
 
         from .dataset import generate_random_points
 
@@ -25,6 +28,9 @@ class Charts(PlotBase):
     def curve_plot(self):
         import datashader as ds
         import datashader.transfer_functions as tf
+        import panel as pn
+
+        # pn.extension()
 
         from .dataset import generate_random_points
 

@@ -24,16 +24,15 @@ class PlotBase(param.Parameterized):
             return self.points_plot()
         return self.curve_plot()
 
+    @pn.depends("chart", "dtype", "n")
     def view(self):
         # return self.plot
-        return pn.WidgetBox(
-            pn.Row(
-                pn.Column(
-                    self.param,
-                    self.plot_code,
-                ),
-                self.plot,
-            )
+        return pn.Row(
+            pn.Column(
+                self.param,
+                self.plot_code,
+            ),
+            self.plot,
         )
 
 
@@ -80,13 +79,7 @@ def get_code(fn, dtype, n):
         .replace("arr_lib", f"{'cp' if dtype=='cudf' else 'np'}")
         .replace(" if type(df) == cudf.DataFrame else df", "")
         .replace("# hv.extension", "hv.extension")
+        .replace("# pn.extension", "pn.extension")
     )
 
-    return pn.widgets.Ace(
-        name="code",
-        language="python",
-        height=500,
-        width=500,
-        value=result,
-        readonly=True,
-    )
+    return pn.pane.Markdown("```python \n" + result + "```", width=800)
