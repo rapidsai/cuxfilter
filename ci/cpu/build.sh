@@ -73,7 +73,11 @@ gpuci_mamba_retry install -c conda-forge boa
 ################################################################################
 
 echo "Building cuxfilter"
-gpuci_conda_retry mambabuild conda/recipes/cuxfilter --python=$PYTHON
+gpuci_conda_retry \
+  mambabuild \
+  --no-test \
+  conda/recipes/cuxfilter \
+  --python=$PYTHON
 
 ################################################################################
 # UPLOAD - Conda packages
