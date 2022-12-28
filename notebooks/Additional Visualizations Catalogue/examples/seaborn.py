@@ -30,7 +30,7 @@ class Charts(PlotBase):
         # generate seaborn bar chart
         fig = Figure(figsize=(12, 6))
         ax = fig.add_subplot(111)
-        sns.barplot(df, x="value", y="freq", ax=ax)
+        sns.barplot(df, x="value", y="freq", ax=ax, color="blue")
         return pn.panel(fig)
 
     def points_plot(self):

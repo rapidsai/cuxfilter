@@ -11,7 +11,7 @@ class Charts(PlotBase):
         exec(f"import {self.dtype}")
         import holoviews as hv
 
-        # hv.extension("bokeh")
+        # hv.extension("bokeh") # backend: bokeh/matplotlib/plotly
         df_lib = cudf if self.dtype == "cudf" else pd
         arr_lib = cp if self.dtype == "cudf" else np
 
@@ -34,7 +34,7 @@ class Charts(PlotBase):
         import holoviews as hv
         from examples.dataset import generate_random_points
 
-        # hv.extension("bokeh")
+        # hv.extension("bokeh") # backend: bokeh/matplotlib/plotly
         df = generate_random_points(nodes=self.n, dtype=self.dtype)
 
         # generate holoviews points chart using {dtype} DataFrame
@@ -46,7 +46,7 @@ class Charts(PlotBase):
         import holoviews as hv
         from examples.dataset import generate_random_points
 
-        # hv.extension("bokeh")
+        # hv.extension("bokeh") # backend: bokeh/matplotlib/plotly
         df = generate_random_points(nodes=self.n, dtype=self.dtype)
 
         # Create line charts
