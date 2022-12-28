@@ -6,7 +6,11 @@ https://github.com/rapidsai/cuxfilter
 https://docs.rapids.ai/api/cuxfilter/stable/
 Note: uses cuDF, cuGraph, cuML, and cuSpatial
 
+## Generate static webpage
 
+```bash
+rm -rf state/* && jupyter nbconvert --to html RAPIDS\ Viz\ Catalog.ipynb --execute --output index.html
+```
 ## Holoviews
 Powerful visualization library.
 https://holoviews.org/
