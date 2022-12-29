@@ -1,5 +1,4 @@
 import pytest
-import mock
 from bokeh.events import ButtonClick
 
 import cuxfilter
@@ -8,6 +7,7 @@ from cuxfilter.layouts import chart_view
 from cuxfilter.charts.datashader.custom_extensions import (
     holoviews_datashader as hv,
 )
+from unittest import mock
 
 from ..utils import initialize_df, df_types
 
