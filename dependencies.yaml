@@ -6,7 +6,6 @@ files:
       cuda: ["11.5"]
       arch: [x86_64]
     includes:
-      - build
       - cudatoolkit
       - develop
       - doc
@@ -20,44 +19,22 @@ files:
       - cudatoolkit
       - py_version
       - test_python
+  test_notebooks:
+    output: none
+    includes:
+      - cudatoolkit
+      - notebook
+      - py_version
   checks:
     output: none
     includes:
-      - build
       - develop
-      - py_version
 channels:
   - rapidsai
   - rapidsai-nightly
   - conda-forge
   - nvidia
 dependencies:
-  build:
-    specific:
-      - output_types: conda
-        matrices:
-          - matrix:
-              arch: x86_64
-            packages:
-              - gcc_linux-64=9.*
-              - sysroot_linux-64==2.17
-          - matrix:
-              arch: aarch64
-            packages:
-              - gcc_linux-aarch64=9.*
-              - sysroot_linux-aarch64==2.17
-      - output_types: conda
-        matrices:
-          - matrix:
-              arch: x86_64
-              cuda: "11.5"
-            packages:
-              - nvcc_linux-64=11.5
-          - matrix:
-              arch: aarch64
-              cuda: "11.5"
-            packages:
-              - nvcc_linux-aarch64=11.5
   cudatoolkit:
     specific:
       - output_types: conda
@@ -78,8 +55,6 @@ dependencies:
     common:
       - output_types: [conda, requirements]
         packages:
-          - black=22.3.0
-          - flake8=3.8.3
           - pre-commit
   doc:
     common:
@@ -101,6 +76,9 @@ dependencies:
         packages:
           - ipython
           - notebook>=0.5.0
+      - output_types: [conda]
+        packages:
+          - cugraph=23.02.*
   py_version:
     specific:
       - output_types: conda
@@ -142,5 +120,5 @@ dependencies:
     common:
       - output_types: [conda, requirements]
         packages:
-          - mock
           - pytest
+          - pytest-cov

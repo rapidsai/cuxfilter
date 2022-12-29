@@ -20,6 +20,10 @@ export CUDA_REL=${CUDA_VERSION%.*}
 # Set home to the job's workspace
 export HOME="$WORKSPACE"
 
+# Workaround to keep Jenkins builds working
+# until we migrate fully to GitHub Actions
+export RAPIDS_CUDA_VERSION="${CUDA}"
+
 # Parse git describe
 cd "$WORKSPACE"
 export GIT_DESCRIBE_TAG=`git describe --tags`
@@ -70,7 +74,7 @@ conda list --show-channel-urls
 ################################################################################
 
 # TODO: Move boa install to gpuci/rapidsai
-gpuci_mamba_retry install boa
+gpuci_mamba_retry install --freeze-installed boa
 
 gpuci_logger "Build and install cuxfilter"
 cd "${WORKSPACE}"

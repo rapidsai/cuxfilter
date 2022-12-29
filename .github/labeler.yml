@@ -6,7 +6,7 @@ Python:
  - 'python/**'
  - 'notebooks/**'
 
-gpuCI:
+ci:
    - 'ci/**'
 
 conda:

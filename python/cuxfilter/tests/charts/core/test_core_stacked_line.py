@@ -1,7 +1,6 @@
 import pytest
 import dask.dataframe as dd
 import dask_cudf
-import mock
 import cuxfilter
 
 from cuxfilter.charts.core.non_aggregate.core_stacked_line import (
@@ -11,6 +10,7 @@ from cuxfilter.charts.datashader.custom_extensions import (
     holoviews_datashader as hv,
 )
 from cuxfilter.layouts import chart_view
+from unittest import mock
 
 from ..utils import df_equals, initialize_df, df_types
 
