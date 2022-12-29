@@ -24,7 +24,7 @@ rapids-logger "Downloading artifacts from previous jobs"
 PYTHON_CHANNEL=$(rapids-download-conda-from-s3 python)
 
 rapids-mamba-retry install \
-  -c "${PYTHON_CHANNEL}" \
+  --channel "${PYTHON_CHANNEL}" \
   cuxfilter
 
 
