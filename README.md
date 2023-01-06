@@ -101,7 +101,7 @@ MAPBOX_API_KEY= "<mapbox-api-key>"
 geoJSONSource='https://raw.githubusercontent.com/rapidsai/cuxfilter/GTC-2018-mortgage-visualization/javascript/demos/GTC%20demo/src/data/zip3-ms-rhs-lessprops.json'
 
 chart0 = cuxfilter.charts.choropleth( x='zip', color_column='delinquency_12_prediction', color_aggregate_fn='mean',
-            elevation_column='current_actual_upb', elevation_factor=0.00001, elevation_aggregate_fn='sum', 
+            elevation_column='current_actual_upb', elevation_factor=0.00001, elevation_aggregate_fn='sum',
             geoJSONSource=geoJSONSource, mapbox_api_key=MAPBOX_API_KEY, data_points=1000
 )
 chart2 = cuxfilter.charts.bar('delinquency_12_prediction',data_points=50)
@@ -148,8 +148,8 @@ Please see the [Demo Docker Repository](https://hub.docker.com/r/rapidsai/rapids
 
 ### CUDA/GPU requirements
 
-- CUDA 10.1+
-- NVIDIA driver 418.39+
+- CUDA 11.2+
+- NVIDIA driver 450.80.02+
 - Pascal architecture or better (Compute Capability >=6.0)
 
 ### Conda
@@ -160,20 +160,19 @@ For `cuxfilter version == 23.02` :
 
 ```bash
 # for CUDA 11.5
-conda install -c rapidsai -c nvidia -c numba -c conda-forge \
-    cuxfilter=23.02 python=3.7 cudatoolkit=11.5
-
+conda install -c rapidsai -c numba -c conda-forge -c nvidia \
+    cuxfilter=23.02 python=3.9 cudatoolkit=11.5
 ```
 
 For the nightly version of `cuxfilter` :
 
 ```bash
 # for CUDA 11.5
-conda install -c rapidsai-nightly -c nvidia -c numba -c conda-forge \
-    cuxfilter python=3.7 cudatoolkit=11.5
+conda install -c rapidsai-nightly -c numba -c conda-forge -c nvidia \
+    cuxfilter python=3.9 cudatoolkit=11.5
 ```
 
-Note: cuxfilter is supported only on Linux, and with Python versions 3.7 and later.
+Note: cuxfilter is supported only on Linux, and with Python versions 3.8 and later.
 
 See the [Get RAPIDS version picker](https://rapids.ai/start.html) for more OS and version info.
 
