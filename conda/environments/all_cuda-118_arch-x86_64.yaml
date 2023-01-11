@@ -15,7 +15,7 @@ dependencies:
 - dask-cudf=23.02
 - datashader>0.13,<=0.14.3
 - geopandas>=0.11.0
-- holoviews>1.14.1,<=1.14.6
+- holoviews>=1.14.8,<=1.15.3
 - ipython
 - jupyter-server-proxy
 - jupyter_sphinx
@@ -26,7 +26,7 @@ dependencies:
 - numpydoc
 - packaging
 - pandoc<=2.0.0
-- panel>=0.14.0,<0.15
+- panel >=0.14.0,<=0.14.1
 - pre-commit
 - pydeck>=0.3,<=0.5.0
 - pyppeteer>=0.2.6
