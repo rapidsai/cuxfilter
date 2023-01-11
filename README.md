@@ -159,17 +159,17 @@ cuxfilter can be installed with conda ([miniconda](https://conda.io/miniconda.ht
 For `cuxfilter version == 23.02` :
 
 ```bash
-# for CUDA 11.5
+# for CUDA 11.8
 conda install -c rapidsai -c numba -c conda-forge -c nvidia \
-    cuxfilter=23.02 python=3.9 cudatoolkit=11.5
+    cuxfilter=23.02 python=3.10 cudatoolkit=11.8
 ```
 
 For the nightly version of `cuxfilter` :
 
 ```bash
-# for CUDA 11.5
+# for CUDA 11.8
 conda install -c rapidsai-nightly -c numba -c conda-forge -c nvidia \
-    cuxfilter python=3.9 cudatoolkit=11.5
+    cuxfilter python=3.10 cudatoolkit=11.8
 ```
 
 Note: cuxfilter is supported only on Linux, and with Python versions 3.8 and later.
