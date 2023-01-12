@@ -33,7 +33,8 @@ pushd notebooks
 
 # Add notebooks that should be skipped here
 # (space-separated list of filenames without paths)
-SKIPNBS=""
+# FIXME: remove graphs.ipynb notebook once cugraph segfault is fixed upstream
+SKIPNBS="graphs.ipynb"
 
 # Set SUITEERROR to failure if any run fails
 SUITEERROR=0
