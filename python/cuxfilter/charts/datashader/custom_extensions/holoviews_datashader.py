@@ -136,7 +136,14 @@ class InteractiveDatashaderBase(param.Parameterized):
         default=hv.streams.PlotReset(resetting=False),
     )
     tools = param.List(
-        default=["pan", "box_select", "reset", "lasso_select", "wheel_zoom"],
+        default=[
+            "pan",
+            "box_select",
+            "reset",
+            "lasso_select",
+            "wheel_zoom",
+            "save",
+        ],
         doc="interactive tools to add to the chart",
     )
     unselected_alpha = param.Number(
@@ -198,7 +205,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
     legend_position = param.String("right", doc="position of legend")
     cmap = param.Dict(default={"cmap": CUXF_DEFAULT_COLOR_PALETTE})
     tools = param.List(
-        default=["pan", "reset", "lasso_select", "wheel_zoom"],
+        default=["pan", "reset", "lasso_select", "wheel_zoom", "save"],
         doc="interactive tools to add to the chart",
     )
     color_palette = param.List()
@@ -335,7 +342,14 @@ class InteractiveDatashaderLine(InteractiveDatashader):
     transparency = param.Number(0, bounds=(0, 1))
 
     tools = param.List(
-        default=["pan", "reset", "lasso_select", "wheel_zoom", "xbox_select"],
+        default=[
+            "pan",
+            "reset",
+            "lasso_select",
+            "wheel_zoom",
+            "xbox_select",
+            "save",
+        ],
         doc="interactive tools to add to the chart",
     )
 
@@ -408,7 +422,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         ),
     )
     tools = param.List(
-        default=["pan", "reset", "wheel_zoom", "xwheel_zoom"],
+        default=["pan", "reset", "wheel_zoom", "xwheel_zoom", "save"],
         doc="interactive tools to add to the chart",
     )
     legend = param.ClassSelector(
@@ -502,7 +516,7 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
     legend_position = param.String("right", doc="position of legend")
     node_cmap = param.Dict(default={"cmap": CUXF_DEFAULT_COLOR_PALETTE})
     tools = param.List(
-        default=["pan", "reset", "lasso_select", "wheel_zoom"],
+        default=["pan", "reset", "lasso_select", "wheel_zoom", "save"],
         doc="interactive tools to add to the chart",
     )
     node_color_palette = param.List()

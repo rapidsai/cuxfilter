@@ -2,7 +2,7 @@
 
 [![Build Status](https://gpuci.gpuopenanalytics.com/job/rapidsai/job/gpuci/job/cuxfilter/job/branches/job/cuxfilter-branch-pipeline/badge/icon)](https://gpuci.gpuopenanalytics.com/job/rapidsai/job/gpuci/job/cuxfilter/job/branches/job/cuxfilter-branch-pipeline/)
 
-cuxfilter ( ku-cross-filter ) is a [RAPIDS](https://github.com/rapidsai) framework to connect web visualizations to GPU accelerated crossfiltering. Inspired by the javascript version of the [original]( https://github.com/crossfilter/crossfilter), it enables interactive and super fast multi-dimensional filtering of 100 million+ row tabular datasets via [cuDF](https://github.com/rapidsai/cudf).
+cuxfilter ( ku-cross-filter ) is a [RAPIDS](https://github.com/rapidsai) framework to connect web visualizations to GPU accelerated crossfiltering. Inspired by the javascript version of the [original](https://github.com/crossfilter/crossfilter), it enables interactive and super fast multi-dimensional filtering of 100 million+ row tabular datasets via [cuDF](https://github.com/rapidsai/cudf).
 
 ## RAPIDS Viz
 
@@ -71,7 +71,8 @@ chart4 = cuxfilter.charts.bar('MONTH')
 #declare dashboard
 d = cux_df.dashboard([chart1, chart3, chart4], sidebar=[chart2], layout=cuxfilter.layouts.feature_and_double_base, title='Auto Accident Dataset')
 
-#run the dashboard as a webapp:
+# run the dashboard as a webapp:
+# Bokeh and Datashader based charts also have a `save` tool on the side toolbar, which can download and save the individual chart when interacting with the dashboard.
 # d.show('jupyter-notebook/lab-url')
 
 #run the dashboard within the notebook cell
@@ -111,7 +112,8 @@ chart1 = cuxfilter.charts.drop_down('dti')
 #declare dashboard
 d = cux_df.dashboard([chart0, chart2],sidebar=[chart3, chart1], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Mortgage Dashboard')
 
-#run the dashboard within the notebook cell
+# run the dashboard within the notebook cell
+# Bokeh and Datashader based charts also have a `save` tool on the side toolbar, which can download and save the individual chart when interacting with the dashboard.
 # d.app()
 
 #run the dashboard as a webapp:
@@ -231,13 +233,13 @@ Currently supported layout templates and example code can be found on the [layou
 
 ### Currently Supported Charts
 
-| Library  | Chart type |
-| ------------- | ------------- |
-| bokeh  | bar, line  |
-| datashader  | scatter, scatter_geo, line, stacked_lines, heatmap, graph |
-| panel_widgets  | range_slider, date_range_slider, float_slider, int_slider, drop_down, multi_select, card, number  |
-| custom    | view_dataframe |
-| pydeck    | choropleth(3d and 2d)   |
+| Library       | Chart type                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------ |
+| bokeh         | bar, line                                                                                        |
+| datashader    | scatter, scatter_geo, line, stacked_lines, heatmap, graph                                        |
+| panel_widgets | range_slider, date_range_slider, float_slider, int_slider, drop_down, multi_select, card, number |
+| custom        | view_dataframe                                                                                   |
+| pydeck        | choropleth(3d and 2d)                                                                            |
 
 ## Contributing Developers Guide
 

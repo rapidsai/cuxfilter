@@ -57,7 +57,7 @@ class Bar(BaseAggregateChart):
                 if self.x_dtype == "object"
                 else None
             ),
-            tools="pan, wheel_zoom, reset",
+            tools="pan, wheel_zoom, reset, save",
             active_scroll="wheel_zoom",
             active_drag="pan",
         )
@@ -195,7 +195,7 @@ class Line(BaseAggregateChart):
                 if self.x_dtype == "object"
                 else None
             ),
-            tools="pan, wheel_zoom, reset",
+            tools="pan, wheel_zoom, reset, save",
             active_scroll="wheel_zoom",
             active_drag="pan",
         )
