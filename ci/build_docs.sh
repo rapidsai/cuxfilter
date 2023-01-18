@@ -22,14 +22,14 @@ PYTHON_CHANNEL=$(rapids-download-conda-from-s3 python)
 VERSION_NUMBER=$(rapids-get-rapids-version-from-git)
 
 rapids-mamba-retry install \
-    --channel "${PYTHON_CHANNEL}"
+    --channel "${PYTHON_CHANNEL}" \
     cuxfilter
 
 # Build Python docs
 rapids-logger "Build Python docs"
 pushd docs
-sphinx-build -b dirhtml . _html
-sphinx-build -b text . _text
+sphinx-build -b dirhtml ./source _html
+sphinx-build -b text ./source _text
 popd
 
 if [[ "${RAPIDS_BUILD_TYPE}" == "branch" ]]; then
