@@ -8,7 +8,6 @@ files:
     includes:
       - cudatoolkit
       - develop
-      - doc
       - notebook
       - py_version
       - run
@@ -29,6 +28,12 @@ files:
     output: none
     includes:
       - develop
+  docs:
+    output: none
+    includes:
+      - cudatoolkit
+      - docs
+      - py_version
 channels:
   - rapidsai
   - rapidsai-nightly
@@ -60,7 +65,7 @@ dependencies:
       - output_types: [conda, requirements]
         packages:
           - pre-commit
-  doc:
+  docs:
     common:
       - output_types: [conda, requirements]
         packages:
