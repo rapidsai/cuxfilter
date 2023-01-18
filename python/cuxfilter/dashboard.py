@@ -464,7 +464,10 @@ class DashBoard:
 
         Notes
         -----
-        Png format
+        - Png format
+        - Bokeh and Datashader based charts also have a `save` tool
+        on the side toolbar, which can download and save the individual
+        chart when interacting with the dashboard.
 
         Examples
         --------
