@@ -11,12 +11,13 @@ rapids-dependency-file-generator \
     --matrix "cuda=${RAPIDS_CUDA_VERSIONS%.};arch=$(arch);py=${RAPIDS_PY_VERSION}" | tee env.yaml
 
 
-rapids-mamba-retyr env create --force -f env.yaml -n docs
+rapids-mamba-retry env create --force -f env.yaml -n docs
 conda activate docs
 
 rapids-print-env
 
 rapids-logger "Downloading artifacts from previous jobs"
+
 PYTHON_CHANNEL=$(rapids-download-conda-from-s3 python)
 VERSION_NUMBER=$(rapids-get-rapids-version-from-git)
 
