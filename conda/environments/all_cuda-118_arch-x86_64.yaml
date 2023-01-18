@@ -18,10 +18,14 @@ dependencies:
 - holoviews>=1.14.8,<=1.15.3
 - ipython
 - jupyter-server-proxy
+- jupyter_sphinx
 - libwebp
+- nbsphinx
 - nodejs>=14
 - notebook>=0.5.0
+- numpydoc
 - packaging
+- pandoc<=2.0.0
 - panel >=0.14.0,<=0.14.1
 - pre-commit
 - pydeck>=0.3,<=0.5.0
@@ -30,4 +34,9 @@ dependencies:
 - pytest
 - pytest-cov
 - python>=3.8,<3.11
+- recommonmark
+- sphinx
+- sphinx-markdown-tables
+- sphinx_rtd_theme
+- sphinxcontrib-websupport
 name: all_cuda-118_arch-x86_64

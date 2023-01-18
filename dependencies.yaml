@@ -8,6 +8,7 @@ files:
     includes:
       - cudatoolkit
       - develop
+      - docs
       - notebook
       - py_version
       - run
