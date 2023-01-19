@@ -33,6 +33,6 @@ popd
 
 if [[ "${RAPIDS_BUILD_TYPE}" == "branch" ]]; then
   rapids-logger "Upload Docs to S3"
-  aws s3 sync --delete python/docs/_html "s3://rapidsai-docs/cuxfilter/${VERSION_NUMBER}/html"
-  aws s3 sync --delete python/docs/_text "s3://rapidsai-docs/cuxfilter/${VERSION_NUMBER}/txt"
+  aws s3 sync --no-progress --delete python/docs/_html "s3://rapidsai-docs/cuxfilter/${VERSION_NUMBER}/html"
+  aws s3 sync --no-progress --delete python/docs/_text "s3://rapidsai-docs/cuxfilter/${VERSION_NUMBER}/txt"
 fi
