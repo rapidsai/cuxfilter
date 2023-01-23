@@ -127,7 +127,7 @@ cd $CUXFILTER_HOME
 - Create the conda development environment `cuxfilter_dev`:
 ```bash
 # create the conda environment (assuming in base `cuxfilter` directory)
-conda env create --name cuxfilter_dev --file conda/environments/all_cuda-115_arch-x86_64.yaml
+conda env create --name cuxfilter_dev --file conda/environments/all_cuda-118_arch-x86_64.yaml
 # activate the environment
 source activate cuxfilter_dev
 ```
@@ -150,7 +150,7 @@ Done! You are ready to develop for the cuxfilter OSS project
 
 cuxfilter.py acts like a connector library and it is easy to add support for new libraries. The cuxfilter/charts/core directory has all the core chart classes which can be inherited and used to implement a few (viz related) functions and support dashboarding in cuxfilter directly.
 
-You can see the examples to implement viz libraries in the bokeh and datashader directories. 
+You can see the examples to implement viz libraries in the bokeh and datashader directories.
 
 Current plan is to add support for the following libraries apart from bokeh and datashader:
 1. deckgl

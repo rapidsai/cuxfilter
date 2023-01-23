@@ -36,6 +36,7 @@ sed_runner 's/release = .*/release = '"'${NEXT_FULL_TAG}'"'/g' docs/source/conf.
 # bump cudf
 for FILE in conda/environments/*.yaml dependencies.yaml; do
   sed_runner "s/cudf=.*/cudf=${NEXT_SHORT_TAG}/g" ${FILE};
+  sed_runner "s/cugraph=.*/cugraph=${NEXT_SHORT_TAG}/g" ${FILE};
   sed_runner "s/cuspatial=.*/cuspatial=${NEXT_SHORT_TAG}/g" ${FILE};
   sed_runner "s/dask-cuda=.*/dask-cuda=${NEXT_SHORT_TAG}/g" ${FILE};
   sed_runner "s/dask-cudf=.*/dask-cudf=${NEXT_SHORT_TAG}/g" ${FILE};
