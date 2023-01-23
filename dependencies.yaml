@@ -88,7 +88,7 @@ dependencies:
           - notebook>=0.5.0
       - output_types: [conda]
         packages:
-          - cugraph=23.02
+          - cugraph=23.04
   py_version:
     specific:
       - output_types: conda
@@ -126,10 +126,10 @@ dependencies:
           - pyproj>=2.4,<=3.4
       - output_types: conda
         packages:
-          - cudf=23.02
-          - cuspatial=23.02
-          - dask-cuda=23.02
-          - dask-cudf=23.02
+          - cudf=23.04
+          - cuspatial=23.04
+          - dask-cuda=23.04
+          - dask-cudf=23.04
   test_python:
     common:
       - output_types: [conda, requirements]
