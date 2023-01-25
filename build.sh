@@ -17,12 +17,11 @@ ARGS=$*
 # NOTE: ensure all dir changes are relative to the location of this
 # script, and that this script resides in the repo dir!
 REPODIR=$(cd $(dirname $0); pwd)
-VALIDARGS="clean cuxfilter cudatashader -v -g -n --allgpuarch -h"
-HELP="$0 [clean] [cuxfilter] [cudatashader] [-v] [-g] [-n] [-h]
+VALIDARGS="clean cuxfilter -v -g -n --allgpuarch -h"
+HELP="$0 [clean] [cuxfilter] [-v] [-g] [-n] [-h]
    clean        - remove all existing build artifacts and configuration (start
                   over)
    cuxfilter    - build the cuxfilter library only
-   cudatashader - build the cudatashader library only
    -v           - verbose build mode
    -g           - build for debug
    -n           - no install step
@@ -30,8 +29,7 @@ HELP="$0 [clean] [cuxfilter] [cudatashader] [-v] [-g] [-n] [-h]
    -h           - print this text
 "
 CUXFILTER_BUILD_DIR=${REPODIR}/python/cuxfilter/build
-#CUDATASHADER_BUILD_DIR=${REPODIR}/cuDatashader/build
-BUILD_DIRS="${CUXFILTER_BUILD_DIR}" #{CUDATASHADER_BUILD_DIR}
+BUILD_DIRS="${CUXFILTER_BUILD_DIR}"
 
 # Set defaults for vars modified by flags to this script
 VERBOSE=""
