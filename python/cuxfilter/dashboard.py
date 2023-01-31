@@ -106,6 +106,12 @@ class DashBoard:
         [0] Bokeh(Figure)
     [chart2] Column(sizing_mode='scale_both', width=1600)
         [0] Bokeh(Figure)`
+    >>> # d.app() for serving within notebook cell,
+    >>> # d.show() for serving as a separate web-app
+    >>> d.app() #or d.show()
+    displays interactive dashboard
+
+    do some visual querying/ crossfiltering
     """
 
     _charts: Dict[str, Union[CUXF_BASE_CHARTS]]
@@ -362,9 +368,10 @@ class DashBoard:
         >>>    [line_chart_1, line_chart_2],
         >>>    layout=cuxfilter.layouts.double_feature
         >>> )
+        >>> # d.app() for serving within notebook cell,
+        >>> # d.show() for serving as a separate web-app
         >>> d.app() #or d.show()
-        displays dashboard
-        do some visual querying/ crossfiltering
+        displays interactive dashboard
 
         >>> queried_df = d.export()
         final query 2<=key<=4
