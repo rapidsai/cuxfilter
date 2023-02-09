@@ -2,7 +2,7 @@
 
 [![Build Status](https://gpuci.gpuopenanalytics.com/job/rapidsai/job/gpuci/job/cuxfilter/job/branches/job/cuxfilter-branch-pipeline/badge/icon)](https://gpuci.gpuopenanalytics.com/job/rapidsai/job/gpuci/job/cuxfilter/job/branches/job/cuxfilter-branch-pipeline/)
 
-cuxfilter ( ku-cross-filter ) is a [RAPIDS](https://github.com/rapidsai) framework to connect web visualizations to GPU accelerated crossfiltering. Inspired by the javascript version of the [original]( https://github.com/crossfilter/crossfilter), it enables interactive and super fast multi-dimensional filtering of 100 million+ row tabular datasets via [cuDF](https://github.com/rapidsai/cudf).
+cuxfilter ( ku-cross-filter ) is a [RAPIDS](https://github.com/rapidsai) framework to connect web visualizations to GPU accelerated crossfiltering. Inspired by the javascript version of the [original](https://github.com/crossfilter/crossfilter), it enables interactive and super fast multi-dimensional filtering of 100 million+ row tabular datasets via [cuDF](https://github.com/rapidsai/cudf).
 
 ## RAPIDS Viz
 
@@ -71,7 +71,8 @@ chart4 = cuxfilter.charts.bar('MONTH')
 #declare dashboard
 d = cux_df.dashboard([chart1, chart3, chart4], sidebar=[chart2], layout=cuxfilter.layouts.feature_and_double_base, title='Auto Accident Dataset')
 
-#run the dashboard as a webapp:
+# run the dashboard as a webapp:
+# Bokeh and Datashader based charts also have a `save` tool on the side toolbar, which can download and save the individual chart when interacting with the dashboard.
 # d.show('jupyter-notebook/lab-url')
 
 #run the dashboard within the notebook cell
@@ -101,7 +102,7 @@ MAPBOX_API_KEY= "<mapbox-api-key>"
 geoJSONSource='https://raw.githubusercontent.com/rapidsai/cuxfilter/GTC-2018-mortgage-visualization/javascript/demos/GTC%20demo/src/data/zip3-ms-rhs-lessprops.json'
 
 chart0 = cuxfilter.charts.choropleth( x='zip', color_column='delinquency_12_prediction', color_aggregate_fn='mean',
-            elevation_column='current_actual_upb', elevation_factor=0.00001, elevation_aggregate_fn='sum', 
+            elevation_column='current_actual_upb', elevation_factor=0.00001, elevation_aggregate_fn='sum',
             geoJSONSource=geoJSONSource, mapbox_api_key=MAPBOX_API_KEY, data_points=1000
 )
 chart2 = cuxfilter.charts.bar('delinquency_12_prediction',data_points=50)
@@ -111,7 +112,8 @@ chart1 = cuxfilter.charts.drop_down('dti')
 #declare dashboard
 d = cux_df.dashboard([chart0, chart2],sidebar=[chart3, chart1], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Mortgage Dashboard')
 
-#run the dashboard within the notebook cell
+# run the dashboard within the notebook cell
+# Bokeh and Datashader based charts also have a `save` tool on the side toolbar, which can download and save the individual chart when interacting with the dashboard.
 # d.app()
 
 #run the dashboard as a webapp:
@@ -148,32 +150,31 @@ Please see the [Demo Docker Repository](https://hub.docker.com/r/rapidsai/rapids
 
 ### CUDA/GPU requirements
 
-- CUDA 10.1+
-- NVIDIA driver 418.39+
+- CUDA 11.2+
+- NVIDIA driver 450.80.02+
 - Pascal architecture or better (Compute Capability >=6.0)
 
 ### Conda
 
 cuxfilter can be installed with conda ([miniconda](https://conda.io/miniconda.html), or the full [Anaconda distribution](https://www.anaconda.com/download)) from the `rapidsai` channel:
 
-For `cuxfilter version == 22.12` :
+For `cuxfilter version == 23.02` :
 
 ```bash
-# for CUDA 11.5
-conda install -c rapidsai -c nvidia -c numba -c conda-forge \
-    cuxfilter=22.12 python=3.7 cudatoolkit=11.5
-
+# for CUDA 11.8
+conda install -c rapidsai -c numba -c conda-forge -c nvidia \
+    cuxfilter=23.02 python=3.10 cudatoolkit=11.8
 ```
 
 For the nightly version of `cuxfilter` :
 
 ```bash
-# for CUDA 11.5
-conda install -c rapidsai-nightly -c nvidia -c numba -c conda-forge \
-    cuxfilter python=3.7 cudatoolkit=11.5
+# for CUDA 11.8
+conda install -c rapidsai-nightly -c numba -c conda-forge -c nvidia \
+    cuxfilter python=3.10 cudatoolkit=11.8
 ```
 
-Note: cuxfilter is supported only on Linux, and with Python versions 3.7 and later.
+Note: cuxfilter is supported only on Linux, and with Python versions 3.8 and later.
 
 See the [Get RAPIDS version picker](https://rapids.ai/start.html) for more OS and version info.
 
@@ -232,13 +233,13 @@ Currently supported layout templates and example code can be found on the [layou
 
 ### Currently Supported Charts
 
-| Library  | Chart type |
-| ------------- | ------------- |
-| bokeh  | bar, line  |
-| datashader  | scatter, scatter_geo, line, stacked_lines, heatmap, graph |
-| panel_widgets  | range_slider, date_range_slider, float_slider, int_slider, drop_down, multi_select, card, number  |
-| custom    | view_dataframe |
-| pydeck    | choropleth(3d and 2d)   |
+| Library       | Chart type                                                                                       |
+| ------------- | ------------------------------------------------------------------------------------------------ |
+| bokeh         | bar, line                                                                                        |
+| datashader    | scatter, scatter_geo, line, stacked_lines, heatmap, graph                                        |
+| panel_widgets | range_slider, date_range_slider, float_slider, int_slider, drop_down, multi_select, card, number |
+| custom        | view_dataframe                                                                                   |
+| pydeck        | choropleth(3d and 2d)                                                                            |
 
 ## Contributing Developers Guide
 

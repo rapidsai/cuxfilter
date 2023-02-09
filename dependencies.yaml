@@ -1,0 +1,138 @@
+# Dependency list for https://github.com/rapidsai/dependency-file-generator
+files:
+  all:
+    output: conda
+    matrix:
+      cuda: ["11.8"]
+      arch: [x86_64]
+    includes:
+      - cudatoolkit
+      - develop
+      - docs
+      - notebook
+      - py_version
+      - run
+      - test_python
+  test_python:
+    output: none
+    includes:
+      - cudatoolkit
+      - py_version
+      - test_python
+  test_notebooks:
+    output: none
+    includes:
+      - cudatoolkit
+      - notebook
+      - py_version
+  checks:
+    output: none
+    includes:
+      - develop
+  docs:
+    output: none
+    includes:
+      - cudatoolkit
+      - docs
+      - py_version
+channels:
+  - rapidsai
+  - rapidsai-nightly
+  - conda-forge
+  - nvidia
+dependencies:
+  cudatoolkit:
+    specific:
+      - output_types: conda
+        matrices:
+          - matrix:
+              cuda: "11.2"
+            packages:
+              - cudatoolkit=11.2
+          - matrix:
+              cuda: "11.4"
+            packages:
+              - cudatoolkit=11.4
+          - matrix:
+              cuda: "11.5"
+            packages:
+              - cudatoolkit=11.5
+          - matrix:
+              cuda: "11.8"
+            packages:
+              - cudatoolkit=11.8
+  develop:
+    common:
+      - output_types: [conda, requirements]
+        packages:
+          - pre-commit
+  docs:
+    common:
+      - output_types: [conda, requirements]
+        packages:
+          - ipython
+          - jupyter_sphinx
+          - nbsphinx
+          - numpydoc
+          - pandoc<=2.0.0 # We should check and fix all "<=" pinnings
+          - recommonmark
+          - sphinx
+          - sphinx_rtd_theme
+          - sphinx-markdown-tables
+          - sphinxcontrib-websupport
+  notebook:
+    common:
+      - output_types: [conda, requirements]
+        packages:
+          - ipython
+          - notebook>=0.5.0
+      - output_types: [conda]
+        packages:
+          - cugraph=23.02
+  py_version:
+    specific:
+      - output_types: conda
+        matrices:
+          - matrix:
+              py: "3.8"
+            packages:
+              - python=3.8
+          - matrix:
+              py: "3.9"
+            packages:
+              - python=3.9
+          - matrix:
+              py: "3.10"
+            packages:
+              - python=3.10
+          - matrix:
+            packages:
+              - python>=3.8,<3.11
+  run:
+    common:
+      - output_types: [conda, requirements]
+        packages:
+          - bokeh>=2.4.2,<=2.5
+          - datashader>0.13,<=0.14.3
+          - geopandas>=0.11.0
+          - holoviews>=1.14.8,<=1.15.3
+          - jupyter-server-proxy
+          - libwebp
+          - nodejs>=14
+          - packaging
+          - panel >=0.14.0,<=0.14.1
+          - pydeck>=0.3,<=0.5.0
+          - pyppeteer>=0.2.6
+          - pyproj>=2.4,<=3.4
+      - output_types: conda
+        packages:
+          - cudf=23.02
+          - cuspatial=23.02
+          - dask-cuda=23.02
+          - dask-cudf=23.02
+  test_python:
+    common:
+      - output_types: [conda, requirements]
+        packages:
+          - pytest
+          - pytest-cov
