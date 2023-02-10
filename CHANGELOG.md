@@ -1,6 +1,31 @@
-# cuXfilter 23.02.00 (Date TBD)
+# cuXfilter 23.02.00 (9 Feb 2023)
 
-Please see https://github.com/rapidsai/cuxfilter/releases/tag/v23.02.00a for the latest changes to this development branch.
+## 🐛 Bug Fixes
+
+- fix path for dir to uploaded ([#437](https://github.com/rapidsai/cuxfilter/pull/437)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 📖 Documentation
+
+- Docs/update ([#439](https://github.com/rapidsai/cuxfilter/pull/439)) [@AjayThorve](https://github.com/AjayThorve)
+- Update channel priority ([#415](https://github.com/rapidsai/cuxfilter/pull/415)) [@bdice](https://github.com/bdice)
+
+## 🚀 New Features
+
+- Fea/add save chart option to individual charts ([#429](https://github.com/rapidsai/cuxfilter/pull/429)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- Update shared workflow branches ([#442](https://github.com/rapidsai/cuxfilter/pull/442)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Add docs build to GH actions ([#436](https://github.com/rapidsai/cuxfilter/pull/436)) [@AjayThorve](https://github.com/AjayThorve)
+- Re-enable `graphs.ipynb` notebook in CI ([#428](https://github.com/rapidsai/cuxfilter/pull/428)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Build CUDA 11.8 and Python 3.10 Packages ([#426](https://github.com/rapidsai/cuxfilter/pull/426)) [@bdice](https://github.com/bdice)
+- Update workflows for nightly tests ([#425](https://github.com/rapidsai/cuxfilter/pull/425)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Enable `Recently Updated` Check ([#424](https://github.com/rapidsai/cuxfilter/pull/424)) [@ajschmidt8](https://github.com/ajschmidt8)
+- remove stale cudatashader build commands ([#423](https://github.com/rapidsai/cuxfilter/pull/423)) [@AjayThorve](https://github.com/AjayThorve)
+- Update style checks to use pre-commit. ([#420](https://github.com/rapidsai/cuxfilter/pull/420)) [@bdice](https://github.com/bdice)
+- Fix broken symlink ([#419](https://github.com/rapidsai/cuxfilter/pull/419)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Add GitHub Actions Workflows ([#418](https://github.com/rapidsai/cuxfilter/pull/418)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Add dependencies.yaml ([#416](https://github.com/rapidsai/cuxfilter/pull/416)) [@AjayThorve](https://github.com/AjayThorve)
 
 # cuXfilter 22.12.00 (8 Dec 2022)
 
