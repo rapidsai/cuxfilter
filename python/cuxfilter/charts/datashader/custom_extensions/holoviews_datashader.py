@@ -1,5 +1,4 @@
 import cudf
-import cupy
 import dask_cudf
 import datashader as ds
 import holoviews as hv
@@ -14,7 +13,6 @@ import panel as pn
 import param
 
 from . import CustomInspectTool
-from datashader import transfer_functions as tf
 from ...constants import CUXF_DEFAULT_COLOR_PALETTE
 from ....assets.cudf_utils import get_min_max
 import requests
