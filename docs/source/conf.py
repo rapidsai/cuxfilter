@@ -1,23 +1,7 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# http://www.sphinx-doc.org/en/master/config
-
-# -- Path setup --------------------------------------------------------------
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-import os
-import sys
-
-sys.path.insert(0, os.path.abspath("..."))
-
+#!/usr/bin/env python3
+# Copyright (c) 2019-2023, NVIDIA CORPORATION.
 
 # -- Project information -----------------------------------------------------
-
 project = "cuxfilter"
 copyright = "2019, NVIDIA"
 author = "NVIDIA"
