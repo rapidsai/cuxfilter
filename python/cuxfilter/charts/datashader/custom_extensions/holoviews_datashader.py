@@ -1,5 +1,4 @@
 import cudf
-import cupy
 import dask_cudf
 import datashader as ds
 import holoviews as hv
@@ -97,6 +96,7 @@ class dynspread(SpreadingOperation):
         Higher values give more spreading, up to the max_px
         allowed.""",
     )
+
     shape = param.ObjectSelector(
         default="circle",
         objects=[
@@ -109,9 +109,6 @@ class dynspread(SpreadingOperation):
     )
 
     def _apply_spreading(self, array):
-        if cupy and isinstance(array.data, cupy.ndarray):
-            # Convert img.data to numpy array before passing to nb.jit kernels
-            array.data = cupy.asnumpy(array.data)
         return tf.dynspread(
             array,
             max_px=self.p.max_px,
@@ -268,9 +265,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
     @param.depends("source_df")
     def points(self, **kwargs):
         return hv.Scatter(
-            self.source_df,
-            kdims=[self.x],
-            vdims=self.vdims,
+            self.source_df, kdims=[self.x], vdims=self.vdims
         ).opts(tools=[], default_tools=[])
 
     def get_base_chart(self):
