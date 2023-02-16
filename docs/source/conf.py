@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # Copyright (c) 2019-2023, NVIDIA CORPORATION.
 
+import os
+
 # -- Project information -----------------------------------------------------
 project = "cuxfilter"
 copyright = "2019, NVIDIA"
