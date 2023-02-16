@@ -1,7 +1,5 @@
-#!/usr/bin/env python3
 # Copyright (c) 2019-2023, NVIDIA CORPORATION.
-
-import os
+import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
 project = "cuxfilter"
@@ -51,23 +49,10 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"
-
-
-on_rtd = os.environ.get("READTHEDOCS", None) == "True"
-
-if not on_rtd:
-    # only import and set the theme if we're building docs locally
-    # otherwise, readthedocs.org uses their theme by default,
-    # so no need to specify it
-    import sphinx_rtd_theme
-
-    html_theme = "sphinx_rtd_theme"
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 
 htmlhelp_basename = "cuxfilterdoc"
-
-# cuxfilter.load_notebook_assets()
 
 
 def setup(app):
