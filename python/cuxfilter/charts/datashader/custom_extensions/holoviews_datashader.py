@@ -4,7 +4,7 @@ import datashader as ds
 import holoviews as hv
 from holoviews.element.tiles import tile_sources
 from holoviews.operation.datashader import (
-    dynspread,
+    SpreadingOperation,
     datashade,
     rasterize,
 )
@@ -13,6 +13,7 @@ import panel as pn
 import param
 
 from . import CustomInspectTool
+from datashader import transfer_functions as tf
 from ...constants import CUXF_DEFAULT_COLOR_PALETTE
 from ....assets.cudf_utils import get_min_max
 import requests
@@ -66,6 +67,55 @@ def _cross_mask(px):
 ds.transfer_functions._mask_lookup["rect_vertical"] = _rect_vertical_mask
 ds.transfer_functions._mask_lookup["rect_horizontal"] = _rect_horizontal_mask
 ds.transfer_functions._mask_lookup["cross"] = _cross_mask
+
+
+class dynspread(SpreadingOperation):
+    """
+    datashader has a pending change to support internally converting
+    cupy arrays to numpy(https://github.com/holoviz/datashader/pull/1015)
+
+    This class is a custom implmentation of
+    https://github.com/holoviz/holoviews/blob/master/holoviews/operation/datashader.py#L1660
+    to support the cupy array internal conversion until datashader merges the
+    changes
+    """
+
+    max_px = param.Integer(
+        default=3,
+        doc="""
+        Maximum number of pixels to spread on all sides.""",
+    )
+
+    threshold = param.Number(
+        default=0.5,
+        bounds=(0, 1),
+        doc="""
+        When spreading, determines how far to spread.
+        Spreading starts at 1 pixel, and stops when the fraction
+        of adjacent non-empty pixels reaches this threshold.
+        Higher values give more spreading, up to the max_px
+        allowed.""",
+    )
+
+    shape = param.ObjectSelector(
+        default="circle",
+        objects=[
+            "circle",
+            "square",
+            "rect_vertical",
+            "rect_horizontal",
+            "cross",
+        ],
+    )
+
+    def _apply_spreading(self, array):
+        return tf.dynspread(
+            array,
+            max_px=self.p.max_px,
+            threshold=self.p.threshold,
+            how=self.p.how,
+            shape=self.p.shape,
+        )
 
 
 class InteractiveDatashaderBase(param.Parameterized):
@@ -215,9 +265,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
     @param.depends("source_df")
     def points(self, **kwargs):
         return hv.Scatter(
-            self.source_df,
-            kdims=[self.x],
-            vdims=self.vdims,
+            self.source_df, kdims=[self.x], vdims=self.vdims
         ).opts(tools=[], default_tools=[])
 
     def get_base_chart(self):
