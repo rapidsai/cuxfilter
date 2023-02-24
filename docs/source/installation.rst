@@ -9,8 +9,8 @@ cuxfilter conda example installation:
 
 .. code-block:: bash
 
-    conda install -c rapidsai -c nvidia -c conda-forge \
-        cuxfilter=0.15 python=3.7 cudatoolkit=10.0
+    conda install -c rapidsai -c conda-forge -c nvidia \
+        cuxfilter=23.02 python=3.10 cudatoolkit=11.8
 
 Docker container
 ----------------
@@ -20,17 +20,17 @@ cuxfilter docker example installation:
 
 .. code-block:: bash
 
-    # ex. for CUDA 10.0
-    docker pull rapidsai/rapidsai:cuda10.0-runtime-ubuntu16.04
+    # ex. for CUDA 11.8
+    docker pull rapidsai/rapidsai:cuda11.8-runtime-ubuntu20.04
     docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 \
-        rapidsai/rapidsai:cuda10.0-runtime-ubuntu16.04
+        rapidsai/rapidsai:cuda11.8-runtime-ubuntu20.04
 
     # open http://localhost:8888
 
 Build/Install from Source
 -------------------------
 
-See `build instructions <https://github.com/rapidsai/cuxfilter/blob/branch-0.15/CONTRIBUTING.md#setting-up-your-build-environment>`_.
+See `build instructions <https://github.com/rapidsai/cuxfilter/blob/branch-23.02/CONTRIBUTING.md#setting-up-your-build-environment>`_.
 
 
 
@@ -87,7 +87,7 @@ While in the directory you want the datasets to be saved, execute the following
 
     #download and extract the datasets
     curl https://s3.amazonaws.com/nyc-tlc/trip+data/yellow_tripdata_2015-01.csv --create-dirs -o ./nyc_taxi.csv
-    curl https://s3.us-east-2.amazonaws.com/rapidsai-data/viz-data/146M_predictions_v2.arrow.gz --create-dirs -o ./146M_predictions_v2.arrow.gz
-    curl https://s3.us-east-2.amazonaws.com/rapidsai-data/viz-data/auto_accidents.arrow.gz --create-dirs -o ./auto_accidents.arrow.gz
+    curl https://data.rapids.ai/viz-data/146M_predictions_v2.arrow.gz --create-dirs -o ./146M_predictions_v2.arrow.gz
+    curl https://data.rapids.ai/viz-data/auto_accidents.arrow.gz --create-dirs -o ./auto_accidents.arrow.gz
 
     python -c "from cuxfilter.sampledata import datasets_check; datasets_check(base_dir='./')"

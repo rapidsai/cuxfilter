@@ -1,10 +1,72 @@
-# cuXfilter 22.10.00 (Date TBD)
+# cuXfilter 23.02.00 (9 Feb 2023)
 
-Please see https://github.com/rapidsai/cuxfilter/releases/tag/v22.10.00a for the latest changes to this development branch.
+## 🐛 Bug Fixes
 
-# cuXfilter 22.08.00 (Date TBD)
+- fix path for dir to uploaded ([#437](https://github.com/rapidsai/cuxfilter/pull/437)) [@AjayThorve](https://github.com/AjayThorve)
 
-Please see https://github.com/rapidsai/cuxfilter/releases/tag/v22.08.00a for the latest changes to this development branch.
+## 📖 Documentation
+
+- Docs/update ([#439](https://github.com/rapidsai/cuxfilter/pull/439)) [@AjayThorve](https://github.com/AjayThorve)
+- Update channel priority ([#415](https://github.com/rapidsai/cuxfilter/pull/415)) [@bdice](https://github.com/bdice)
+
+## 🚀 New Features
+
+- Fea/add save chart option to individual charts ([#429](https://github.com/rapidsai/cuxfilter/pull/429)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- Update shared workflow branches ([#442](https://github.com/rapidsai/cuxfilter/pull/442)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Add docs build to GH actions ([#436](https://github.com/rapidsai/cuxfilter/pull/436)) [@AjayThorve](https://github.com/AjayThorve)
+- Re-enable `graphs.ipynb` notebook in CI ([#428](https://github.com/rapidsai/cuxfilter/pull/428)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Build CUDA 11.8 and Python 3.10 Packages ([#426](https://github.com/rapidsai/cuxfilter/pull/426)) [@bdice](https://github.com/bdice)
+- Update workflows for nightly tests ([#425](https://github.com/rapidsai/cuxfilter/pull/425)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Enable `Recently Updated` Check ([#424](https://github.com/rapidsai/cuxfilter/pull/424)) [@ajschmidt8](https://github.com/ajschmidt8)
+- remove stale cudatashader build commands ([#423](https://github.com/rapidsai/cuxfilter/pull/423)) [@AjayThorve](https://github.com/AjayThorve)
+- Update style checks to use pre-commit. ([#420](https://github.com/rapidsai/cuxfilter/pull/420)) [@bdice](https://github.com/bdice)
+- Fix broken symlink ([#419](https://github.com/rapidsai/cuxfilter/pull/419)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Add GitHub Actions Workflows ([#418](https://github.com/rapidsai/cuxfilter/pull/418)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Add dependencies.yaml ([#416](https://github.com/rapidsai/cuxfilter/pull/416)) [@AjayThorve](https://github.com/AjayThorve)
+
+# cuXfilter 22.12.00 (8 Dec 2022)
+
+## 📖 Documentation
+
+- Create symlink to 10_minutes_to_cuxfilter.ipynb into the notebooks fo… ([#413](https://github.com/rapidsai/cuxfilter/pull/413)) [@taureandyernv](https://github.com/taureandyernv)
+
+## 🛠️ Improvements
+
+- Update `panel` version ([#421](https://github.com/rapidsai/cuxfilter/pull/421)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Remove stale labeler ([#410](https://github.com/rapidsai/cuxfilter/pull/410)) [@raydouglass](https://github.com/raydouglass)
+
+# cuXfilter 22.10.00 (12 Oct 2022)
+
+## 🐛 Bug Fixes
+
+- fix test failing on non-matching indices for newer dask version ([#402](https://github.com/rapidsai/cuxfilter/pull/402)) [@AjayThorve](https://github.com/AjayThorve)
+- Notebook update: removed spaces in directory name ([#400](https://github.com/rapidsai/cuxfilter/pull/400)) [@mmccarty](https://github.com/mmccarty)
+
+## 🚀 New Features
+
+- Allow cupy 11 ([#401](https://github.com/rapidsai/cuxfilter/pull/401)) [@galipremsagar](https://github.com/galipremsagar)
+
+# cuXfilter 22.08.00 (17 Aug 2022)
+
+## 🐛 Bug Fixes
+
+- fix/incorrect-bokeh-legend-attributes ([#381](https://github.com/rapidsai/cuxfilter/pull/381)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 📖 Documentation
+
+- Use common custom `js` &amp; `css` code ([#394](https://github.com/rapidsai/cuxfilter/pull/394)) [@galipremsagar](https://github.com/galipremsagar)
+- Branch 22.08 merge 22.06 ([#377](https://github.com/rapidsai/cuxfilter/pull/377)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- Update `pyproj` version specifier ([#392](https://github.com/rapidsai/cuxfilter/pull/392)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Update `geopandas` version specificer ([#390](https://github.com/rapidsai/cuxfilter/pull/390)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Revert &quot;Allow CuPy 11&quot; ([#388](https://github.com/rapidsai/cuxfilter/pull/388)) [@galipremsagar](https://github.com/galipremsagar)
+- Update `nodejs` version specifier ([#385](https://github.com/rapidsai/cuxfilter/pull/385)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Allow CuPy 11 ([#383](https://github.com/rapidsai/cuxfilter/pull/383)) [@jakirkham](https://github.com/jakirkham)
 
 # cuXfilter 22.06.00 (7 Jun 2022)
 
