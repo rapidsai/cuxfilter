@@ -1,7 +1,6 @@
 import pytest
 import cudf
 import dask_cudf
-import mock
 import numpy as np
 
 from cuxfilter.charts.datashader.custom_extensions import (
@@ -13,6 +12,7 @@ from cuxfilter.charts.core.non_aggregate.core_non_aggregate import (
 from cuxfilter.dashboard import DashBoard
 from cuxfilter import DataFrame
 from cuxfilter.layouts import chart_view
+from unittest import mock
 
 from ..utils import df_equals, df_types, initialize_df
 

@@ -87,27 +87,22 @@ def datasets_check(*args, base_dir="./"):
     filename = {}
 
     # mortgage dataset
-    url["mortgage"] = (
-        "https://s3.us-east-2.amazonaws.com/rapidsai-data/"
-        + "viz-data/146M_predictions_v2.arrow.gz"
-    )
+    url[
+        "mortgage"
+    ] = "https://data.rapids.ai/viz-data/146M_predictions_v2.arrow.gz"
     downloaded_filename["mortgage"] = (
         dir_name + "/146M_predictions_v2.arrow.gz"
     )
     filename["mortgage"] = dir_name + "/146M_predictions_v2.arrow"
 
     # nyc taxi dataset
-    url["nyc_taxi"] = (
-        "https://s3.us-east-2.amazonaws.com/rapidsai-data/viz-data/"
-        + "nyc_taxi.tar.gz"
-    )
+    url["nyc_taxi"] = "https://data.rapids.ai/viz-data/nyc_taxi.tar.gz"
     downloaded_filename["nyc_taxi"] = dir_name + "/nyc_taxi.tar.gz"
     filename["nyc_taxi"] = dir_name + "/nyc_taxi.csv"
 
-    url["auto_accidents"] = (
-        "https://s3.us-east-2.amazonaws.com/rapidsai-data/viz-data/"
-        + "auto_accidents.arrow.gz"
-    )
+    url[
+        "auto_accidents"
+    ] = "https://data.rapids.ai/viz-data/auto_accidents.arrow.gz"
     downloaded_filename["auto_accidents"] = (
         dir_name + "/auto_accidents.arrow.gz"
     )

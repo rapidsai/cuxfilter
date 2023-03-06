@@ -1,9 +1,10 @@
-# Copyright (c) 2018-2020, NVIDIA CORPORATION.
+# Copyright (c) 2018-2023, NVIDIA CORPORATION.
 
-{% set version = environ.get('GIT_DESCRIBE_TAG', '0.0.0.dev').lstrip('v') + environ.get('VERSION_SUFFIX', '') %}
-{% set minor_version =  version.split('.')[0] + '.' + version.split('.')[1] %}
-{% set py_version=environ.get('CONDA_PY', 36) %}
-{% set cuda_version='.'.join(environ.get('CUDA', '10.1').split('.')[:2]) %}
+{% set version = environ.get('GIT_DESCRIBE_TAG', '0.0.0.dev').lstrip('v') %}
+{% set minor_version = version.split('.')[0] + '.' + version.split('.')[1] %}
+{% set py_version = environ['CONDA_PY'] %}
+{% set cuda_version = '.'.join(environ['RAPIDS_CUDA_VERSION'].split('.')[:2]) %}
+{% set date_string = environ['RAPIDS_DATE_STRING'] %}
 
 package:
   name: cuxfilter
@@ -14,46 +15,41 @@ source:
 
 build:
   number: {{ GIT_DESCRIBE_NUMBER }}
-  string: py{{ py_version }}_{{ GIT_DESCRIBE_HASH }}_{{ GIT_DESCRIBE_NUMBER }}
-  script_env:
-    - VERSION_SUFFIX
+  string: py{{ py_version }}_{{ date_string }}_{{ GIT_DESCRIBE_HASH }}_{{ GIT_DESCRIBE_NUMBER }}
 
 requirements:
-  build:
-    - {{ compiler('c') }}
-    - sysroot_{{ target_platform }} {{ sysroot_version }}
   host:
     - python
     - setuptools
   run:
-    - python
-    - cudf {{ minor_version }}
-    - cuspatial {{ minor_version }}
-    - dask-cudf {{ minor_version }}
-    - dask-cuda {{ minor_version }}
-    - datashader>0.13, <0.14
-    - holoviews>1.14.1, <=1.14.6
-    - numba >=0.54
+    - bokeh >=2.4.2,<=2.5
+    - cudf ={{ minor_version }}
     - cupy >=9.5.0,<12.0.0a0
-    - panel >=0.14.0,<0.15
-    - pyppeteer>=0.2.6
-    - bokeh>=2.4.2,<=2.5
-    - pyproj>=2.4,<=3.4
+    - cuspatial ={{ minor_version }}
+    - dask-cuda ={{ minor_version }}
+    - dask-cudf ={{ minor_version }}
+    - datashader >=0.14,<=0.14.4
     - geopandas >=0.11.0
-    - nodejs >=14
-    - libwebp
+    - holoviews >=1.14.8,<=1.15.3
     - jupyter-server-proxy
-    - pydeck >=0.3, <=0.5.0
+    - libwebp
+    - nodejs >=14
+    - numba >=0.54
     - packaging
+    - panel >=0.14.0,<=0.14.1
+    - pydeck >=0.3,<=0.5.0
+    - pyppeteer >=0.2.6
+    - pyproj >=2.4,<=3.4
+    - python
 
-test:                                   # [linux64]
-  requires:                             # [linux64]
-    - cudatoolkit {{ cuda_version }}.*  # [linux64]
-  imports:                              # [linux64]
-    - cuxfilter                         # [linux64]
+test:
+  requires:
+    - cudatoolkit ={{ cuda_version }}
+  imports:
+    - cuxfilter
 
 about:
-  home: http://rapids.ai/
+  home: https://rapids.ai/
   license: Apache-2.0
   license_family: Apache
   license_file: LICENSE
