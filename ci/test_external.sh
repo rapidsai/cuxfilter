@@ -14,7 +14,7 @@ conda activate test_external
 # Define input parameter
 PROJECT=$1
 PR_NUMBER=$2
-LIBRARIES=("datashader" "holoviews" "hvplot")
+LIBRARIES=("datashader" "holoviews")
 
 pushd /tmp
 
@@ -26,14 +26,15 @@ if [ "$PROJECT" = "all" ]; then
         rapids-logger "Clone $LIBRARY"
         # Clone the repository
         git clone https://github.com/holoviz/$LIBRARY.git
-        # Change directory to the library
-        cd $LIBRARY
 
         rapids-logger "Install $LIBRARY"
+
+        # Change directory to the library
+        pushd $LIBRARY
         # Run setup.py with test dependencies
         python -m pip install -e .[tests]
 
-        cd ..
+        popd
     done
 else
     rapids-logger "Clone $PROJECT"
@@ -46,50 +47,41 @@ else
         git fetch origin pull/$PR_NUMBER/head:pr/$PR_NUMBER
         git checkout pr/$PR_NUMBER
     fi
+    rapids-logger "Install $PROJECT"
 
     # Change directory to the specified project
-    cd $PROJECT
-    rapids-logger "Install $PROJECT"
+    pushd $PROJECT
     # Run setup.py with test dependencies
     python -m pip install -e .[tests]
+    popd
 fi
 
+FILES=""
 # Install and run tests
 if [ "$PROJECT" = "all" ]; then
     # Loop through each library and install dependencies
     for LIBRARY in "${LIBRARIES[@]}"
     do
-        rapids-logger "run GPU tests for $LIBRARY"
-        # Change directory to the library
-        cd $LIBRARY
-
-        TEST_DIR="$LIBRARY/tests"
-
+        rapids-logger "gathering GPU tests for $LIBRARY"
+        TEST_DIR="$LIBRARY/$LIBRARY/tests"
         # Find all Python scripts containing the keywords cudf or dask_cudf
-        FILES=$(grep -l -R -e 'cudf' --include='*.py' "$TEST_DIR")
-
-        EXITCODE=0
-        trap "EXITCODE=1" ERR
-        set +e
-
-        DATASHADER_TEST_GPU=1 pytest $FILES
-        # Change directory back to the parent directory
-        cd ..
+        FILES+=$(grep -l -R -e 'cudf' --include='*.py' "$TEST_DIR")
+        echo $FILES
     done
 else
-    rapids-logger "run GPU tests for $PROJECT"
-
-    TEST_DIR="$PROJECT/tests"
-
+    rapids-logger "gathering GPU tests for $PROJECT"
+    TEST_DIR="$PROJECT/$PROJECT/tests"
     # Find all Python scripts containing the keywords cudf or dask_cudf
-    FILES=$(grep -l -R -e 'cudf' --include='*.py' "$TEST_DIR")
-
-    EXITCODE=0
-    trap "EXITCODE=1" ERR
-    set +e
-
-    pytest $FILES
+    FILES+=$(grep -l -R -e 'cudf' --include='*.py' "$TEST_DIR")
 fi
+
+echo $FILES
+EXITCODE=0
+trap "EXITCODE=1" ERR
+set +e
+
+rapids-logger "running all gathered tests"
+DATASHADER_TEST_GPU=1 pytest $FILES
 
 rapids-logger "Test script exiting with value: $EXITCODE"
 exit ${EXITCODE}
