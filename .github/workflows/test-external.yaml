@@ -4,13 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       external-project:
-        description: "one of [datashader, holoviews, hvplot, all]"
+        description: "one of [datashader, holoviews, all]"
         required: true
         type: choice
         options:
           - datashader
           - holoviews
-          - hvplot
           - all
       pr_number:
         description: "
