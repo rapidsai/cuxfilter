@@ -54,10 +54,6 @@ else
     python -m pip install -e .[tests]
 fi
 
-EXITCODE=0
-trap "EXITCODE=1" ERR
-set +e
-
 # Install and run tests
 if [ "$PROJECT" = "all" ]; then
     # Loop through each library and install dependencies
@@ -72,7 +68,10 @@ if [ "$PROJECT" = "all" ]; then
         # Find all Python scripts containing the keywords cudf or dask_cudf
         FILES=$(grep -l -R -e 'cudf' --include='*.py' "$TEST_DIR")
 
-        echo $FILES
+        EXITCODE=0
+        trap "EXITCODE=1" ERR
+        set +e
+
         DATASHADER_TEST_GPU=1 pytest $FILES
         # Change directory back to the parent directory
         cd ..
@@ -84,6 +83,10 @@ else
 
     # Find all Python scripts containing the keywords cudf or dask_cudf
     FILES=$(grep -l -R -e 'cudf' --include='*.py' "$TEST_DIR")
+
+    EXITCODE=0
+    trap "EXITCODE=1" ERR
+    set +e
 
     pytest $FILES
 fi
