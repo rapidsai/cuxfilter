@@ -7,9 +7,7 @@ rapids-logger "Create test_external conda environment"
 . /opt/conda/etc/profile.d/conda.sh
 
 rapids-mamba-retry create -n test_external -c rapidsai -c conda-forge -c nvidia  \
-    cudf=23.02 dask-cudf=23.02 python=3.10 cudatoolkit=11.8 \
-    dash pyct pytest pytest-benchmark pyviz_comms panel parameterized matplotlib \
-    colorcet xarray
+    cudf=23.02 dask-cudf=23.02 python=3.10 cudatoolkit=11.8
 
 conda activate test_external
 
@@ -32,8 +30,8 @@ if [ "$PROJECT" = "all" ]; then
         cd $LIBRARY
 
         rapids-logger "Install $LIBRARY"
-        # Run setup.py
-        python setup.py install
+        # Run setup.py with test dependencies
+        python -m pip install -e .[tests]
 
         cd ..
     done
@@ -52,8 +50,8 @@ else
     # Change directory to the specified project
     cd $PROJECT
     rapids-logger "Install $PROJECT"
-    # Run setup.py
-    python setup.py install
+    # Run setup.py with test dependencies
+    python -m pip install -e .[tests]
 fi
 
 EXITCODE=0
