@@ -65,8 +65,7 @@ if [ "$PROJECT" = "all" ]; then
         rapids-logger "gathering GPU tests for $LIBRARY"
         TEST_DIR="$LIBRARY/$LIBRARY/tests"
         # Find all Python scripts containing the keywords cudf or dask_cudf
-        FILES+=$(grep -l -R -e 'cudf' --include='*.py' "$TEST_DIR")
-        echo $FILES
+        FILES+=" $(grep -l -R -e 'cudf' --include='*.py' "$TEST_DIR")"
     done
 else
     rapids-logger "gathering GPU tests for $PROJECT"
@@ -75,7 +74,6 @@ else
     FILES+=$(grep -l -R -e 'cudf' --include='*.py' "$TEST_DIR")
 fi
 
-echo $FILES
 EXITCODE=0
 trap "EXITCODE=1" ERR
 set +e
