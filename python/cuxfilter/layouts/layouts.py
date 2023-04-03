@@ -1,7 +1,6 @@
 import re
 import numpy as np
 import panel as pn
-from panel.layout.gridstack import GridStack
 
 from .custom_react_template import ReactTemplate
 
@@ -51,10 +50,8 @@ class _LayoutBase:
         plots = [x for x in charts.values()]
 
         if self._render_location == "notebook":
-            self.cols, self.rows = 11, 6
-            tmpl = GridStack(
-                allow_drag=False,
-                allow_resize=False,
+            self.cols, self.rows = 12, 6
+            tmpl = pn.GridSpec(
                 sizing_mode="stretch_both",
             )
             self._apply_themes(charts, theme)
