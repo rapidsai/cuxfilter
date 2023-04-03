@@ -1,24 +1,13 @@
 from typing import Tuple
 import cudf
-import cuspatial
 import dask.dataframe as dd
 import dask_cudf
 
+from .utils import point_in_polygon
 from ..core_chart import BaseChart
 from ....layouts import chart_view
 from ...constants import CUXF_DEFAULT_COLOR_PALETTE
 from ....assets import cudf_utils
-
-
-def point_in_polygon(df, x, y, xs, ys):
-    return cuspatial.point_in_polygon(
-        df[x],
-        df[y],
-        cudf.Series([0], index=["selection"]),
-        [0],
-        xs,
-        ys,
-    )
 
 
 class BaseGraph(BaseChart):
@@ -355,9 +344,6 @@ class BaseGraph(BaseChart):
                 dashboard_cls._reset_current_view(new_active_view=self)
                 self.nodes = dashboard_cls._cuxfilter_df.data
 
-            xs = self._to_xaxis_type(geometry[:, 0])
-            ys = self._to_yaxis_type(geometry[:, 1])
-
             # set box selected ranges to None
             self.x_range, self.y_range, self.box_selected_range = (
                 None,
@@ -365,14 +351,9 @@ class BaseGraph(BaseChart):
                 None,
             )
 
-            args = (
-                self.node_x,
-                self.node_y,
-                xs,
-                ys,
-            )
-            # convert datetime to int64 since, point_in_polygon does not
-            # support datetime
+            args = (self.node_x, self.node_y, geometry)
+            print(args)
+
             if isinstance(self.nodes, dask_cudf.DataFrame):
                 self.selected_indices = (
                     self.nodes.assign(

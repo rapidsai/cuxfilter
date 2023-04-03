@@ -1,24 +1,12 @@
 from typing import Tuple
 import cudf
-import cuspatial
 import dask_cudf
 import dask.dataframe as dd
-from shapely.geometry import Polygon
-import geopandas as gpd
 
+from .utils import point_in_polygon
 from ..core_chart import BaseChart
 from ....layouts import chart_view
 from ....assets import cudf_utils
-
-
-def point_in_polygon(df, x, y, polygons):
-    points = cuspatial.GeoSeries.from_points_xy(
-        df[[x, y]].interleave_columns()
-    )
-    polygons = cuspatial.GeoSeries(
-        gpd.GeoSeries(Polygon(polygons)), index=["selection"]
-    )
-    return cuspatial.point_in_polygon(points, polygons)
 
 
 class BaseNonAggregate(BaseChart):
@@ -155,9 +143,6 @@ class BaseNonAggregate(BaseChart):
                 # set current chart as active view
                 dashboard_cls._reset_current_view(new_active_view=self)
                 self.source = dashboard_cls._cuxfilter_df.data
-            print(geometry, type(geometry))
-            # xs = self._to_xaxis_type(geometry[:, 0])
-            # ys = self._to_yaxis_type(geometry[:, 1])
 
             # set box selected ranges to None
             self.x_range, self.y_range, self.box_selected_range = (
@@ -165,8 +150,7 @@ class BaseNonAggregate(BaseChart):
                 None,
                 None,
             )
-            # convert datetime to int64 since, point_in_polygon does not
-            # support datetime
+
             args = (self.x, self.y, geometry)
 
             if isinstance(self.source, dask_cudf.DataFrame):
