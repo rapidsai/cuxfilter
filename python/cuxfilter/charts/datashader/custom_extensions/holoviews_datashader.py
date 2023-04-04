@@ -332,7 +332,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.pane.HoloViews(
+        return pn.panel(
             self.tiles * dmap if self.tiles is not None else dmap,
             sizing_mode="stretch_both",
             height=self.height,
@@ -407,11 +407,7 @@ class InteractiveDatashaderLine(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.pane.HoloViews(
-            self.tiles * dmap if self.tiles is not None else dmap,
-            sizing_mode="stretch_both",
-            height=self.height,
-        )
+        return pn.panel(self.tiles * dmap if self.tiles is not None else dmap)
 
 
 class InteractiveDatashaderMultiLine(InteractiveDatashader):
@@ -497,11 +493,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.pane.HoloViews(
-            self.tiles * dmap if self.tiles is not None else dmap,
-            sizing_mode="stretch_both",
-            height=self.height,
-        )
+        return pn.panel(self.tiles * dmap if self.tiles is not None else dmap)
 
 
 class InteractiveDatashaderGraph(InteractiveDatashaderBase):
@@ -647,7 +639,7 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
         if self.unselected_alpha > 0:
             dmap_graph *= self.nodes_chart.get_base_chart()
 
-        return pn.pane.HoloViews(
+        return pn.panel(
             self.tiles * dmap_graph if self.tiles is not None else dmap_graph,
             sizing_mode="stretch_both",
             height=self.height,
