@@ -2,7 +2,7 @@ import re
 import numpy as np
 import panel as pn
 
-from .custom_react_template import ReactTemplate
+from panel.template import ReactTemplate
 
 css = """
 .center-header {
