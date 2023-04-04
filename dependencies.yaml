@@ -115,7 +115,7 @@ dependencies:
           - bokeh>=2.4.2,<=2.5
           - datashader>=0.14,<=0.14.4
           - geopandas>=0.11.0
-          - holoviews>=1.14.8,<=1.15.3
+          - holoviews>=1.15.0,<=1.15.4
           - jupyter-server-proxy
           - libwebp
           - nodejs>=14

@@ -7,7 +7,7 @@ from ..charts.constants import DATATILE_ACTIVE_COLOR, STATIC_DIR_THEMES
 
 
 class LightTheme(DefaultTheme):
-    LIGHT = {
+    RAPIDS_LIGHT = {
         "attrs": {
             "Figure": {
                 "background_fill_color": "#ffffff",
@@ -69,14 +69,14 @@ class LightTheme(DefaultTheme):
             },
         }
     }
-    bokeh_theme = _BkTheme(json=LIGHT)
+    bokeh_theme = _BkTheme(json=RAPIDS_LIGHT)
     map_style = "mapbox://styles/mapbox/light-v9"
     map_style_without_token = (
         "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
     )
     color_palette = list(palettes.Blues[9])
     chart_color = "#4292c6"
-    css = param.Filename(default=STATIC_DIR_THEMES / "default.css")
+    css = param.Filename(default=STATIC_DIR_THEMES / "rapids-light.css")
     datatile_active_color = DATATILE_ACTIVE_COLOR
 
     # Custom React Template

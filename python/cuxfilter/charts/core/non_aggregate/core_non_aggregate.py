@@ -1,23 +1,12 @@
 from typing import Tuple
 import cudf
-import cuspatial
 import dask_cudf
 import dask.dataframe as dd
 
+from .utils import point_in_polygon
 from ..core_chart import BaseChart
 from ....layouts import chart_view
 from ....assets import cudf_utils
-
-
-def point_in_polygon(df, x, y, xs, ys):
-    return cuspatial.point_in_polygon(
-        df[x],
-        df[y],
-        cudf.Series([0], index=["selection"]),
-        [0],
-        xs,
-        ys,
-    )
 
 
 class BaseNonAggregate(BaseChart):
@@ -155,23 +144,14 @@ class BaseNonAggregate(BaseChart):
                 dashboard_cls._reset_current_view(new_active_view=self)
                 self.source = dashboard_cls._cuxfilter_df.data
 
-            xs = self._to_xaxis_type(geometry[:, 0])
-            ys = self._to_yaxis_type(geometry[:, 1])
-
             # set box selected ranges to None
             self.x_range, self.y_range, self.box_selected_range = (
                 None,
                 None,
                 None,
             )
-            # convert datetime to int64 since, point_in_polygon does not
-            # support datetime
-            args = (
-                self.x,
-                self.y,
-                xs,
-                ys,
-            )
+
+            args = (self.x, self.y, geometry)
 
             if isinstance(self.source, dask_cudf.DataFrame):
                 self.selected_indices = (
