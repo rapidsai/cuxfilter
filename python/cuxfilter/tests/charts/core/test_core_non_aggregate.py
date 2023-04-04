@@ -128,7 +128,8 @@ class TestCoreNonAggregateChart:
         df = initialize_df(df_type, {"a": [0, 1, 1, 2], "b": [0, 1, 2, 0]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
-        geometry = np.array([[1, 1, 2], [1, 2, 1]])
+        # Add the last point to close the shape
+        geometry = np.array([[1, 1], [1, 2], [2, 2], [2, 1], [1, 1]])
 
         t = bnac.get_lasso_select_callback(dashboard)
         with mock.patch("cuspatial.point_in_polygon") as pip:

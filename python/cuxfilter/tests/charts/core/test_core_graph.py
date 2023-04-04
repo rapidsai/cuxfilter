@@ -166,8 +166,8 @@ class TestCoreGraph:
             self.result = data
 
         bg.reload_chart = t_function
-
-        geometry = np.array([[1, 1, 2], [1, 2, 1]])
+        # Add the last point to close the shape
+        geometry = np.array([[1, 1], [1, 2], [2, 2], [2, 1], [1, 1]])
 
         t = bg.get_lasso_select_callback(dashboard)
         with mock.patch("cuspatial.point_in_polygon") as pip:
