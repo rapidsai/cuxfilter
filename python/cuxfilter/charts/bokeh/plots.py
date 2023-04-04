@@ -36,17 +36,19 @@ class Bar(BaseAggregateChart):
                 self.reset_chart(np.array(source_dict["Y"]))
             else:
                 """
-                Updating chart source may not work in some environments as expected,
-                throwing a "_pending_writes should be a non-None when we have a document lock"
-                error, for example in a web-app environment. For such cases,
-                we add a next_tick_callback to patch source dataset on the next render.
+                Updating chart source may not work in some environments
+                as expected, throwing a "_pending_writes should be a
+                non-None when we have a document lock" error, for example
+                in a web-app environment. For such cases, we add a
+                next_tick_callback to patch source dataset on the next render.
                 """
 
                 def cb():
                     self.reset_chart(np.array(source_dict["Y"]))
 
-                self.chart.document and self.chart.document.add_next_tick_callback(
-                    cb
+                (
+                    self.chart.document
+                    and self.chart.document.add_next_tick_callback(cb)
                 )
 
     def get_source_y_axis(self):
@@ -184,17 +186,19 @@ class Line(BaseAggregateChart):
                 self.reset_chart(np.array(source_dict["Y"]))
             else:
                 """
-                Updating chart source may not work in some environments as expected,
-                throwing a "_pending_writes should be a non-None when we have a document lock"
-                error, for example in a web-app environment. For such cases,
-                we add a next_tick_callback to patch source dataset on the next render.
+                Updating chart source may not work in some environments
+                as expected, throwing a "_pending_writes should be a
+                non-None when we have a document lock" error, for example
+                in a web-app environment. For such cases, we add a
+                next_tick_callback to patch source dataset on the next render.
                 """
 
                 def cb():
                     self.reset_chart(np.array(source_dict["Y"]))
 
-                self.chart.document and self.chart.document.add_next_tick_callback(
-                    cb
+                (
+                    self.chart.document
+                    and self.chart.document.add_next_tick_callback(cb)
                 )
 
     def get_source_y_axis(self):

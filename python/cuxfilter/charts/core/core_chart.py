@@ -45,7 +45,8 @@ class BaseChart:
         valid_values = ["web-app", "notebook"]
         if value not in valid_values:
             raise ValueError(
-                f"Invalid value '{value}'. Value must be one of {valid_values}."
+                f"""Invalid value '{value}'. Value must be one of
+                {valid_values}."""
             )
         self._renderer_mode = value
 
