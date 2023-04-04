@@ -49,6 +49,9 @@ class _LayoutBase:
         widgets = [x for x in sidebar.values() if x.is_widget]
         plots = [x for x in charts.values()]
 
+        for chart in charts.values():
+            chart.renderer_mode = render_location
+
         if self._render_location == "notebook":
             self.cols, self.rows = 12, 6
             tmpl = pn.GridSpec(
