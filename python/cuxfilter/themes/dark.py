@@ -77,7 +77,7 @@ class DarkTheme(Theme):
     )
     color_palette = list(palettes.Blues[9])
     chart_color = "#4292c6"
-    css = param.Filename(default=STATIC_DIR_THEMES / "dark.css")
+    css = param.Filename(default=STATIC_DIR_THEMES / "rapids-dark.css")
     datatile_active_color = DATATILE_ACTIVE_COLOR
 
     # Custom React Template

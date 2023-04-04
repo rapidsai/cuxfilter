@@ -92,6 +92,7 @@ class Scatter(BaseScatter):
             point_shape=self.point_shape,
             max_px=self.point_size,
             unselected_alpha=self.unselected_alpha,
+            height=self.height,
         )
 
     def reload_chart(self, data=None, patch_update=False):
@@ -230,6 +231,7 @@ class Graph(BaseGraph):
             inspect_neighbors=self.inspect_neighbors,
             display_edges=self.display_edges,
             unselected_alpha=self.unselected_alpha,
+            height=self.height,
         )
 
     def reload_chart(self, data, edges=None, patch_update=False):
@@ -347,6 +349,7 @@ class Line(BaseLine):
             color=self.color,
             pixel_shade_type=self.pixel_shade_type,
             unselected_alpha=self.unselected_alpha,
+            height=self.height,
         )
 
     def reload_chart(self, data, patch_update=False):
@@ -468,6 +471,7 @@ class StackedLines(BaseStackedLine):
             colors=self.colors,
             legend=self.compute_legend(),
             unselected_alpha=self.unselected_alpha,
+            height=self.height,
         )
 
     def reload_chart(self, data, patch_update=False):

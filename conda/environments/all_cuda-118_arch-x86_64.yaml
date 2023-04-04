@@ -15,7 +15,7 @@ dependencies:
 - dask-cudf=23.04
 - datashader>=0.14,<=0.14.4
 - geopandas>=0.11.0
-- holoviews>=1.14.8,<=1.15.3
+- holoviews>=1.15.0,<=1.15.4
 - ipython
 - jupyter-server-proxy
 - jupyter_sphinx

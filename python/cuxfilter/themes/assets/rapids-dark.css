@@ -7,7 +7,7 @@ body {
   background-color: #2f2f2f;
 }
 
-.panel-df tbody tr:nth-child(odd){
+.panel-df tbody tr:nth-child(odd) {
   background-color: #000 !important;
 }
 
@@ -21,7 +21,8 @@ body {
   border-color: #292929 !important;
   background-color: #121212 !important;
 }
-.drag-handle, .react-resizable-handle {
+.drag-handle,
+.react-resizable-handle {
   filter: brightness(0) invert(1);
 }
 
@@ -30,7 +31,7 @@ body {
   background-color: #2f2f2f;
 }
 
-.bk-root .bk-input{
+.bk-root .bk-input {
   color: white;
   background-color: #2f2f2f;
 }

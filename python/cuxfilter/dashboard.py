@@ -14,8 +14,6 @@ from collections import Counter
 from .charts.core import BaseChart, BaseWidget, ViewDataFrame
 from .charts.constants import (
     CUSTOM_DIST_PATH_THEMES,
-    CUSTOM_DIST_PATH_LAYOUTS,
-    STATIC_DIR_LAYOUT,
     STATIC_DIR_THEMES,
 )
 from .datatile import DataTile
@@ -455,7 +453,6 @@ class DashBoard:
             start=start,
             title=self.title,
             static_dirs={
-                CUSTOM_DIST_PATH_LAYOUTS: STATIC_DIR_LAYOUT,
                 CUSTOM_DIST_PATH_THEMES: STATIC_DIR_THEMES,
             },
             **kwargs,
