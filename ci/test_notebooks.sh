@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (c) 2020-2022, NVIDIA CORPORATION.
+# Copyright (c) 2020-2023, NVIDIA CORPORATION.
 
 set -euo pipefail
 
@@ -35,9 +35,8 @@ pushd notebooks
 # (space-separated list of filenames without paths)
 SKIPNBS=""
 
-# Set SUITEERROR to failure if any run fails
-SUITEERROR=0
-
+EXITCODE=0
+trap "EXITCODE=1" ERR
 set +e
 for nb in $(find . -name "*.ipynb"); do
     nbBasename=$(basename ${nb})
@@ -54,8 +53,8 @@ for nb in $(find . -name "*.ipynb"); do
     else
         nvidia-smi
         ${NBTEST} ${nbBasename}
-        SUITEERROR=$((SUITEERROR | $?))
     fi
 done
 
-exit ${SUITEERROR}
+rapids-logger "Test script exiting with value: $EXITCODE"
+exit ${EXITCODE}

@@ -4,7 +4,7 @@ import logging
 import panel as pn
 from bokeh.models import ColumnDataSource
 from panel.config import panel_extension
-from typing import Dict
+from typing import Dict, Literal
 
 from ...assets import datetime as dt
 
@@ -34,6 +34,21 @@ class BaseChart:
     # widget=False can only be rendered the main layout
     is_widget = False
     title = ""
+    _renderer_mode: Literal["web-app", "notebook"] = "web-app"
+
+    @property
+    def renderer_mode(self):
+        return self._renderer_mode
+
+    @renderer_mode.setter
+    def renderer_mode(self, value):
+        valid_values = ["web-app", "notebook"]
+        if value not in valid_values:
+            raise ValueError(
+                f"""Invalid value '{value}'. Value must be one of
+                {valid_values}."""
+            )
+        self._renderer_mode = value
 
     @property
     def name(self):

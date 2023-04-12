@@ -8,14 +8,14 @@ channels:
 dependencies:
 - bokeh>=2.4.2,<=2.5
 - cudatoolkit=11.8
-- cudf=23.02
-- cugraph=23.02
-- cuspatial=23.02
-- dask-cuda=23.02
-- dask-cudf=23.02
-- datashader>0.13,<=0.14.3
+- cudf=23.04
+- cugraph=23.04
+- cuspatial=23.04
+- dask-cuda=23.04
+- dask-cudf=23.04
+- datashader>=0.14,<=0.14.4
 - geopandas>=0.11.0
-- holoviews>=1.14.8,<=1.15.3
+- holoviews>=1.15.0,<=1.15.4
 - ipython
 - jupyter-server-proxy
 - jupyter_sphinx

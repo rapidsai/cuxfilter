@@ -1,9 +1,8 @@
 import re
 import numpy as np
 import panel as pn
-from panel.layout.gridstack import GridStack
 
-from .custom_react_template import ReactTemplate
+from panel.template import ReactTemplate
 
 css = """
 .center-header {
@@ -50,11 +49,12 @@ class _LayoutBase:
         widgets = [x for x in sidebar.values() if x.is_widget]
         plots = [x for x in charts.values()]
 
+        for chart in charts.values():
+            chart.renderer_mode = render_location
+
         if self._render_location == "notebook":
-            self.cols, self.rows = 11, 6
-            tmpl = GridStack(
-                allow_drag=False,
-                allow_resize=False,
+            self.cols, self.rows = 12, 6
+            tmpl = pn.GridSpec(
                 sizing_mode="stretch_both",
             )
             self._apply_themes(charts, theme)

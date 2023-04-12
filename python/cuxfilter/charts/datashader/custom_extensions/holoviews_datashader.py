@@ -1,5 +1,4 @@
 import cudf
-import cupy
 import dask_cudf
 import datashader as ds
 import holoviews as hv
@@ -97,6 +96,7 @@ class dynspread(SpreadingOperation):
         Higher values give more spreading, up to the max_px
         allowed.""",
     )
+
     shape = param.ObjectSelector(
         default="circle",
         objects=[
@@ -109,9 +109,6 @@ class dynspread(SpreadingOperation):
     )
 
     def _apply_spreading(self, array):
-        if cupy and isinstance(array.data, cupy.ndarray):
-            # Convert img.data to numpy array before passing to nb.jit kernels
-            array.data = cupy.asnumpy(array.data)
         return tf.dynspread(
             array,
             max_px=self.p.max_px,
@@ -205,7 +202,14 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
     legend_position = param.String("right", doc="position of legend")
     cmap = param.Dict(default={"cmap": CUXF_DEFAULT_COLOR_PALETTE})
     tools = param.List(
-        default=["pan", "reset", "lasso_select", "wheel_zoom", "save"],
+        default=[
+            "pan",
+            "reset",
+            "box_select",
+            "lasso_select",
+            "wheel_zoom",
+            "save",
+        ],
         doc="interactive tools to add to the chart",
     )
     color_palette = param.List()
@@ -268,9 +272,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
     @param.depends("source_df")
     def points(self, **kwargs):
         return hv.Scatter(
-            self.source_df,
-            kdims=[self.x],
-            vdims=self.vdims,
+            self.source_df, kdims=[self.x], vdims=self.vdims
         ).opts(tools=[], default_tools=[])
 
     def get_base_chart(self):
@@ -330,7 +332,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.pane.HoloViews(
+        return pn.panel(
             self.tiles * dmap if self.tiles is not None else dmap,
             sizing_mode="stretch_both",
             height=self.height,
@@ -345,6 +347,7 @@ class InteractiveDatashaderLine(InteractiveDatashader):
         default=[
             "pan",
             "reset",
+            "box_select",
             "lasso_select",
             "wheel_zoom",
             "xbox_select",
@@ -404,11 +407,7 @@ class InteractiveDatashaderLine(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.pane.HoloViews(
-            self.tiles * dmap if self.tiles is not None else dmap,
-            sizing_mode="stretch_both",
-            height=self.height,
-        )
+        return pn.panel(self.tiles * dmap if self.tiles is not None else dmap)
 
 
 class InteractiveDatashaderMultiLine(InteractiveDatashader):
@@ -422,7 +421,14 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         ),
     )
     tools = param.List(
-        default=["pan", "reset", "wheel_zoom", "xwheel_zoom", "save"],
+        default=[
+            "pan",
+            "reset",
+            "box_select",
+            "wheel_zoom",
+            "xwheel_zoom",
+            "save",
+        ],
         doc="interactive tools to add to the chart",
     )
     legend = param.ClassSelector(
@@ -487,11 +493,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.pane.HoloViews(
-            self.tiles * dmap if self.tiles is not None else dmap,
-            sizing_mode="stretch_both",
-            height=self.height,
-        )
+        return pn.panel(self.tiles * dmap if self.tiles is not None else dmap)
 
 
 class InteractiveDatashaderGraph(InteractiveDatashaderBase):
@@ -516,7 +518,14 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
     legend_position = param.String("right", doc="position of legend")
     node_cmap = param.Dict(default={"cmap": CUXF_DEFAULT_COLOR_PALETTE})
     tools = param.List(
-        default=["pan", "reset", "lasso_select", "wheel_zoom", "save"],
+        default=[
+            "pan",
+            "reset",
+            "box_select",
+            "lasso_select",
+            "wheel_zoom",
+            "save",
+        ],
         doc="interactive tools to add to the chart",
     )
     node_color_palette = param.List()
@@ -630,7 +639,7 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
         if self.unselected_alpha > 0:
             dmap_graph *= self.nodes_chart.get_base_chart()
 
-        return pn.pane.HoloViews(
+        return pn.panel(
             self.tiles * dmap_graph if self.tiles is not None else dmap_graph,
             sizing_mode="stretch_both",
             height=self.height,
