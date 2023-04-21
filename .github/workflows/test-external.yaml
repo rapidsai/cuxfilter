@@ -21,7 +21,7 @@ on:
 jobs:
   test-external:
     secrets: inherit
-    uses: rapidsai/shared-action-workflows/.github/workflows/custom-job.yaml@branch-23.06
+    uses: rapidsai/shared-action-workflows/.github/workflows/custom-job.yaml@py-39
     with:
       build_type: branch
       node_type: "gpu-v100-latest-1"

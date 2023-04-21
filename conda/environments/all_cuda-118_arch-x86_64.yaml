@@ -33,7 +33,7 @@ dependencies:
 - pyproj>=2.4,<=3.4
 - pytest
 - pytest-cov
-- python>=3.8,<3.11
+- python>=3.9,<3.11
 - recommonmark
 - sphinx
 - sphinx-markdown-tables
