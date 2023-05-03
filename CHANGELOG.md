@@ -1,3 +1,30 @@
+# cuXfilter 23.04.00 (6 Apr 2023)
+
+## 🐛 Bug Fixes
+
+- Updates and fixes ([#463](https://github.com/rapidsai/cuxfilter/pull/463)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 📖 Documentation
+
+- Add Viz catalogue code to default branch ([#455](https://github.com/rapidsai/cuxfilter/pull/455)) [@AjayThorve](https://github.com/AjayThorve)
+- Update datashader version ([#451](https://github.com/rapidsai/cuxfilter/pull/451)) [@AjayThorve](https://github.com/AjayThorve)
+- Forward-merge branch-23.02 to branch-23.04 ([#440](https://github.com/rapidsai/cuxfilter/pull/440)) [@GPUtester](https://github.com/GPUtester)
+
+## 🚀 New Features
+
+- Fea/dependency gpu testing ([#456](https://github.com/rapidsai/cuxfilter/pull/456)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- fix input paramter to workflow ([#457](https://github.com/rapidsai/cuxfilter/pull/457)) [@AjayThorve](https://github.com/AjayThorve)
+- Update datasets download URL ([#454](https://github.com/rapidsai/cuxfilter/pull/454)) [@jjacobelli](https://github.com/jjacobelli)
+- Fix GHA build workflow ([#453](https://github.com/rapidsai/cuxfilter/pull/453)) [@AjayThorve](https://github.com/AjayThorve)
+- Reduce error handling verbosity in CI tests scripts ([#447](https://github.com/rapidsai/cuxfilter/pull/447)) [@AjayThorve](https://github.com/AjayThorve)
+- Update shared workflow branches ([#446](https://github.com/rapidsai/cuxfilter/pull/446)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Remove gpuCI scripts. ([#445](https://github.com/rapidsai/cuxfilter/pull/445)) [@bdice](https://github.com/bdice)
+- Move date to build string in `conda` recipe ([#441](https://github.com/rapidsai/cuxfilter/pull/441)) [@ajschmidt8](https://github.com/ajschmidt8)
+- CVE-2007-4559 Patch ([#409](https://github.com/rapidsai/cuxfilter/pull/409)) [@TrellixVulnTeam](https://github.com/TrellixVulnTeam)
+
 # cuXfilter 23.02.00 (9 Feb 2023)
 
 ## 🐛 Bug Fixes
