@@ -24,7 +24,7 @@ requirements:
   run:
     - bokeh >=2.4.2,<=2.5
     - cudf ={{ minor_version }}
-    - cupy >=9.5.0,<12.0.0a0
+    - cupy >=12.0.0
     - cuspatial ={{ minor_version }}
     - dask-cuda ={{ minor_version }}
     - dask-cudf ={{ minor_version }}
