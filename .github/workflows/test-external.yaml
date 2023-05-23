@@ -29,4 +29,4 @@ jobs:
       node_type: "gpu-v100-latest-1"
       arch: "amd64"
       container_image: "rapidsai/ci:latest"
-      run_script: "./ci/test_external.sh ${{ inputs.external-project }} ${{ inputs.pr_number}}"
+      run_script: "./ci/test_external.sh ${{ inputs.external-project || 'all' }} ${{ inputs.pr_number }}"
