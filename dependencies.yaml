@@ -73,6 +73,7 @@ dependencies:
           - ipython
           - jupyter_sphinx
           - nbsphinx
+          - numpy>=1.21,<1.24 # fixes rendering issue for datashader with np(v1.24.3)
           - numpydoc
           - pandoc<=2.0.0 # We should check and fix all "<=" pinnings
           - recommonmark
