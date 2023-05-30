@@ -34,7 +34,7 @@ requirements:
     - jupyter-server-proxy
     - libwebp
     - nodejs >=14
-    - numba >=0.54
+    - numba >=0.57
     - packaging
     - panel >=0.14.0,<=0.14.1
     - pydeck >=0.3,<=0.5.0
