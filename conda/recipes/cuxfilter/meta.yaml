@@ -28,7 +28,7 @@ requirements:
     - cuspatial ={{ minor_version }}
     - dask-cuda ={{ minor_version }}
     - dask-cudf ={{ minor_version }}
-    - datashader >=0.14,<=0.14.4
+    - datashader >=0.15
     - geopandas >=0.11.0
     - holoviews>=1.15.0,<=1.15.4
     - jupyter-server-proxy
