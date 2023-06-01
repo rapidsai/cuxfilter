@@ -152,6 +152,6 @@ def test_aggregated_column_unique():
     bc.min_value = df["key"].min()
 
     assert np.array_equal(
-        gpu_histogram.aggregated_column_unique(bc, df),
+        np.sort(np.array(gpu_histogram.aggregated_column_unique(bc, df))),
         np.array([0, 4, 9, 10, 14, 21, 22, 24, 26, 29, 34, 38, 98, 103, 108]),
     )

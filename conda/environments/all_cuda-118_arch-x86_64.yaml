@@ -13,7 +13,7 @@ dependencies:
 - cuspatial=23.08
 - dask-cuda=23.08
 - dask-cudf=23.08
-- datashader>=0.14,<=0.14.4
+- datashader>=0.15
 - geopandas>=0.11.0
 - holoviews>=1.15.0,<=1.15.4
 - ipython
@@ -23,6 +23,8 @@ dependencies:
 - nbsphinx
 - nodejs>=14
 - notebook>=0.5.0
+- numba>=0.57
+- numpy>=1.21
 - numpydoc
 - packaging
 - pandoc<=2.0.0
