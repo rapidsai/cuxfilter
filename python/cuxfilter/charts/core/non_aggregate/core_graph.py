@@ -288,11 +288,7 @@ class BaseGraph(BaseChart):
 
     def get_box_select_callback(self, dashboard_cls):
         def cb(bounds, x_selection, y_selection):
-            if dashboard_cls._active_view != self:
-                # reset previous active view and
-                # set current chart as active view
-                dashboard_cls._reset_current_view(new_active_view=self)
-                self.nodes = dashboard_cls._cuxfilter_df.data
+            self.nodes = dashboard_cls._cuxfilter_df.data
 
             self.x_range = self._xaxis_dt_transform(x_selection)
             self.y_range = self._yaxis_dt_transform(y_selection)
@@ -338,11 +334,7 @@ class BaseGraph(BaseChart):
 
     def get_lasso_select_callback(self, dashboard_cls):
         def cb(geometry):
-            if dashboard_cls._active_view != self:
-                # reset previous active view and
-                # set current chart as active view
-                dashboard_cls._reset_current_view(new_active_view=self)
-                self.nodes = dashboard_cls._cuxfilter_df.data
+            self.nodes = dashboard_cls._cuxfilter_df.data
 
             # set box selected ranges to None
             self.x_range, self.y_range, self.box_selected_range = (
@@ -462,10 +454,6 @@ class BaseGraph(BaseChart):
         """
 
         def reset_callback(resetting):
-            if dashboard_cls._active_view != self:
-                # reset previous active view and set current
-                # chart as active view
-                dashboard_cls._reset_current_view(new_active_view=self)
             self.selected_indices = None
             self.box_selected_range = None
             self.chart.reset_all_selections()

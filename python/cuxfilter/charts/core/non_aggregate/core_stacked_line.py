@@ -177,11 +177,7 @@ class BaseStackedLine(BaseChart):
 
     def get_box_select_callback(self, dashboard_cls):
         def cb(boundsx):
-            if dashboard_cls._active_view != self:
-                # reset previous active view and
-                # set current chart as active view
-                dashboard_cls._reset_current_view(new_active_view=self)
-                self.source = dashboard_cls._cuxfilter_df.data
+            self.source = dashboard_cls._cuxfilter_df.data
             self.x_range = self._xaxis_dt_transform(boundsx)
 
             query = f"@{self.x}_min<={self.x}<=@{self.x}_max"
@@ -268,11 +264,7 @@ class BaseStackedLine(BaseChart):
         """
 
         def reset_callback(resetting):
-            if dashboard_cls._active_view != self:
-                # reset previous active view and
-                # set current chart as active view
-                dashboard_cls._reset_current_view(new_active_view=self)
-                self.source = dashboard_cls._cuxfilter_df.data
+            self.source = dashboard_cls._cuxfilter_df.data
             self.box_selected_range = None
             self.chart.reset_all_selections()
             dashboard_cls._query_str_dict.pop(self.name, None)

@@ -113,7 +113,6 @@ class DashBoard:
     """
 
     _charts: Dict[str, Union[CUXF_BASE_CHARTS]]
-    _data_tiles: Dict[str, Type[DataTile]]
     _query_str_dict: Dict[str, str]
     _query_local_variables_dict = {}
     _active_view = None
@@ -168,7 +167,6 @@ class DashBoard:
         self._cuxfilter_df = dataframe
         self._charts = dict()
         self._sidebar = dict()
-        self._data_tiles = dict()
         self._query_str_dict = dict()
 
         # check if charts and sidebar lists contain cuxfilter.charts with
@@ -262,11 +260,6 @@ class DashBoard:
         >>> d.add_charts(charts=[], sidebar=[panel_widgets.card("test")])
 
         """
-        self._data_tiles = {}
-        if self._active_view is not None:
-            self._active_view.datatile_loaded_state = False
-            self._active_view = None
-
         if len(charts) > 0 or len(sidebar) > 0:
             for chart in charts:
                 if chart not in self._charts:
@@ -293,8 +286,7 @@ class DashBoard:
 
     def _query(self, query_str, local_dict=None, local_indices=None):
         """
-        Query the cudf.DataFrame, inplace or create a copy based on the
-        value of inplace.
+        Query the cudf.DataFrame
         """
         if local_dict is None:
             local_dict = self._query_local_variables_dict
@@ -376,28 +368,17 @@ class DashBoard:
 
 
         """
-        # Compute query for currently active chart, and consider its
-        # current state as final state
-        if self._active_view is None:
-            print("no querying done, returning original dataframe")
-            # return self._backup_data
-            return self._cuxfilter_df.data
+        if (
+            len(self._generate_query_str()) > 0
+            or self.queried_indices is not None
+        ):
+            print("final query", self._generate_query_str())
+            if self.queried_indices is not None:
+                print("polygon selected using lasso selection tool")
+            return self._query(self._generate_query_str())
         else:
-            self._active_view.compute_query_dict(
-                self._query_str_dict, self._query_local_variables_dict
-            )
-
-            if (
-                len(self._generate_query_str()) > 0
-                or self.queried_indices is not None
-            ):
-                print("final query", self._generate_query_str())
-                if self.queried_indices is not None:
-                    print("polygon selected using lasso selection tool")
-                return self._query(self._generate_query_str())
-            else:
-                print("no querying done, returning original dataframe")
-                return self._cuxfilter_df.data
+            print("no querying done, returning original dataframe")
+            return self._cuxfilter_df.data
 
     def __str__(self):
         return self.__repr__()
@@ -660,136 +641,3 @@ class DashBoard:
         for chart in self.charts.values():
             if chart.name not in ignore_cols and chart.name in include_cols:
                 chart.reload_chart(data, patch_update=True)
-
-    def _calc_data_tiles(self, cumsum=True):
-        """
-        Calculate data tiles for all aggregate type charts.
-        """
-        # NO DATATILES for scatter types, as they are essentially all
-        # points in the dataset
-        query = self._generate_query_str(ignore_chart=self._active_view)
-
-        for chart in self.charts.values():
-            if chart.use_data_tiles and (self._active_view != chart):
-                self._data_tiles[chart.name] = DataTile(
-                    self._active_view,
-                    chart,
-                    dtype="pandas",
-                    cumsum=cumsum,
-                ).calc_data_tile(self._query(query).copy())
-
-        self._active_view.datatile_loaded_state = True
-
-    def _query_datatiles_by_range(self, query_tuple):
-        """
-        Update each chart using the updated values after querying
-        the datatiles using query_tuple.
-        Parameters
-        ----------
-        query_tuple: tuple
-            (min_val, max_val) of the query
-
-        """
-        for chart in self.charts.values():
-            if self._active_view != chart and hasattr(
-                chart, "query_chart_by_range"
-            ):
-                if chart.chart_type == "view_dataframe":
-                    chart.query_chart_by_range(
-                        self._active_view,
-                        query_tuple,
-                        data=self._cuxfilter_df.data,
-                        query=self._generate_query_str(
-                            ignore_chart=self._active_view
-                        ),
-                        local_dict=self._query_local_variables_dict,
-                        indices=self.queried_indices,
-                    )
-                elif not chart.use_data_tiles:
-                    # if the chart does not use datatiles, pass the query_dict
-                    # & queried_indices for a one-time cudf.query() computation
-                    chart.query_chart_by_range(
-                        self._active_view,
-                        query_tuple,
-                        datatile=None,
-                        query=self._generate_query_str(
-                            ignore_chart=self._active_view
-                        ),
-                        local_dict=self._query_local_variables_dict,
-                        indices=self.queried_indices,
-                    )
-                else:
-                    chart.query_chart_by_range(
-                        self._active_view,
-                        query_tuple,
-                        datatile=self._data_tiles[chart.name],
-                    )
-
-    def _query_datatiles_by_indices(self, old_indices, new_indices):
-        """
-        Update each chart using the updated values after querying the
-        datatiles using new_indices.
-        """
-        for chart in self.charts.values():
-            if self._active_view != chart and hasattr(
-                chart, "query_chart_by_range"
-            ):
-                if chart.chart_type == "view_dataframe":
-                    chart.query_chart_by_indices(
-                        self._active_view,
-                        old_indices,
-                        new_indices,
-                        data=self._cuxfilter_df.data,
-                        query=self._generate_query_str(
-                            ignore_chart=self._active_view
-                        ),
-                        local_dict=self._query_local_variables_dict,
-                        indices=self.queried_indices,
-                    )
-                elif not chart.use_data_tiles:
-                    chart.query_chart_by_indices(
-                        self._active_view,
-                        old_indices,
-                        new_indices,
-                        datatile=None,
-                        query=self._generate_query_str(
-                            ignore_chart=self._active_view
-                        ),
-                        local_dict=self._query_local_variables_dict,
-                        indices=self.queried_indices,
-                    )
-                else:
-                    chart.query_chart_by_indices(
-                        self._active_view,
-                        old_indices,
-                        new_indices,
-                        datatile=self._data_tiles[chart.name],
-                    )
-
-    def _reset_current_view(self, new_active_view: CUXF_BASE_CHARTS):
-        """
-        Reset current view and assign new view as the active view.
-        """
-        if self._active_view is None:
-            self._active_view = new_active_view
-            return -1
-
-        self._active_view.compute_query_dict(
-            self._query_str_dict, self._query_local_variables_dict
-        )
-
-        # resetting the loaded state
-        self._active_view.datatile_loaded_state = False
-
-        # switching the active view
-        self._active_view = new_active_view
-
-        self._query_str_dict.pop(self._active_view.name, None)
-
-        if not self._active_view.is_widget:
-            self._active_view.reload_chart(
-                data=self._query(
-                    self._generate_query_str(ignore_chart=self._active_view)
-                ),
-                patch_update=True,
-            )
