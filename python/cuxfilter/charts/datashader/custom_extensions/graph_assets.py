@@ -314,16 +314,22 @@ def calc_connected_edges(
     nodes[node_x] = dt.to_int64_if_datetime(nodes[node_x], node_x_dtype)
     nodes[node_y] = dt.to_int64_if_datetime(nodes[node_y], node_y_dtype)
 
-    connected_edges_df = edges.merge(
-        nodes, left_on=edge_source, right_on=node_id
-    )[edges_columns].reset_index(drop=True)
+    connected_edges_df = (
+        edges.merge(nodes, left_on=edge_source, right_on=node_id)
+        .drop_duplicates(subset=[edge_source, edge_target])[edges_columns]
+        .reset_index(drop=True)
+    )
 
-    connected_edges_df = connected_edges_df.merge(
-        nodes,
-        left_on=edge_target,
-        right_on=node_id,
-        suffixes=("_src", "_dst"),
-    ).reset_index(drop=True)
+    connected_edges_df = (
+        connected_edges_df.merge(
+            nodes,
+            left_on=edge_target,
+            right_on=node_id,
+            suffixes=("_src", "_dst"),
+        )
+        .drop_duplicates(subset=[edge_source, edge_target])
+        .reset_index(drop=True)
+    )
 
     result = cudf.DataFrame()
 
