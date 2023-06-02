@@ -75,12 +75,11 @@ class RangeSlider(BaseWidget):
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self:
-                dashboard_cls._reset_current_view(new_active_view=self)
-                dashboard_cls._calc_data_tiles()
-
-            query_tuple = self._xaxis_np_dt64_transform(event.new)
-            dashboard_cls._query_datatiles_by_range(query_tuple)
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict
+            )
+            dashboard_cls._reload_charts()
 
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
 
@@ -186,11 +185,11 @@ class DateRangeSlider(BaseWidget):
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self:
-                dashboard_cls._reset_current_view(new_active_view=self)
-                dashboard_cls._calc_data_tiles()
-            query_tuple = self._xaxis_np_dt64_transform(event.new)
-            dashboard_cls._query_datatiles_by_range(query_tuple)
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict
+            )
+            dashboard_cls._reload_charts()
 
         # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
@@ -285,10 +284,11 @@ class IntSlider(BaseWidget):
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self:
-                dashboard_cls._reset_current_view(new_active_view=self)
-                dashboard_cls._calc_data_tiles()
-            dashboard_cls._query_datatiles_by_indices([], [event.new])
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict
+            )
+            dashboard_cls._reload_charts()
 
         # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
@@ -380,11 +380,11 @@ class FloatSlider(BaseWidget):
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self:
-                dashboard_cls._reset_current_view(new_active_view=self)
-                dashboard_cls._calc_data_tiles(cumsum=False)
-
-            dashboard_cls._query_datatiles_by_indices([], [event.new])
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict
+            )
+            dashboard_cls._reload_charts()
 
         # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
@@ -481,10 +481,11 @@ class DropDown(BaseWidget):
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self:
-                dashboard_cls._reset_current_view(new_active_view=self)
-                dashboard_cls._calc_data_tiles(cumsum=False)
-            dashboard_cls._query_datatiles_by_indices([], [event.new])
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict
+            )
+            dashboard_cls._reload_charts()
 
         # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
@@ -581,10 +582,11 @@ class MultiSelect(BaseWidget):
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self:
-                dashboard_cls._reset_current_view(new_active_view=self)
-                dashboard_cls._calc_data_tiles(cumsum=False)
-            dashboard_cls._query_datatiles_by_indices(event.old, event.new)
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict
+            )
+            dashboard_cls._reload_charts()
 
         # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)

@@ -193,10 +193,11 @@ class BaseChoropleth(BaseChart):
         """
 
         def selection_callback(old, new):
-            if dashboard_cls._active_view != self:
-                dashboard_cls._reset_current_view(new_active_view=self)
-                dashboard_cls._calc_data_tiles(cumsum=False)
-            dashboard_cls._query_datatiles_by_indices(old, new)
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict
+            )
+            dashboard_cls._reload_charts()
 
         return selection_callback
 
@@ -251,10 +252,6 @@ class BaseChoropleth(BaseChart):
         """
 
         def reset_callback(event):
-            if dashboard_cls._active_view != self:
-                # reset previous active view and set current chart as
-                # active view
-                dashboard_cls._reset_current_view(new_active_view=self)
             dashboard_cls._reload_charts()
 
         # add callback to reset chart button
