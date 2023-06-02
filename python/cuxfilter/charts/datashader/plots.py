@@ -225,7 +225,7 @@ class Graph(BaseGraph):
             node_point_shape=self.node_point_shape,
             node_max_px=self.node_point_size,
             edge_source=self.node_x,
-            edge_target=self.node_x,
+            edge_target=self.node_y,
             edge_color=self.edge_color_palette[0],
             edge_transparency=self.edge_transparency,
             inspect_neighbors=self.inspect_neighbors,
