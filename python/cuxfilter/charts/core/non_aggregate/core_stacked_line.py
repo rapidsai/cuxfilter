@@ -177,35 +177,18 @@ class BaseStackedLine(BaseChart):
 
     def get_box_select_callback(self, dashboard_cls):
         def cb(boundsx):
-            self.source = dashboard_cls._cuxfilter_df.data
             self.x_range = self._xaxis_dt_transform(boundsx)
 
-            query = f"@{self.x}_min<={self.x}<=@{self.x}_max"
-            temp_str_dict = {
-                **dashboard_cls._query_str_dict,
-                **{self.name: query},
-            }
             self.box_selected_range = {
                 self.x + "_min": self.x_range[0],
                 self.x + "_max": self.x_range[1],
             }
-            temp_local_dict = {
-                **dashboard_cls._query_local_variables_dict,
-                **self.box_selected_range,
-            }
-
-            temp_data = dashboard_cls._query(
-                dashboard_cls._generate_query_str(temp_str_dict),
-                temp_local_dict,
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict
             )
             # reload all charts with new queried data (cudf.DataFrame only)
-            dashboard_cls._reload_charts(
-                data=temp_data, ignore_cols=[self.name]
-            )
-            self.reload_chart(temp_data, False)
-            # self.reload_chart(temp_data, False)
-            del temp_data
-
+            dashboard_cls._reload_charts()
         return cb
 
     def compute_query_dict(self, query_str_dict, query_local_variables_dict):
@@ -264,7 +247,6 @@ class BaseStackedLine(BaseChart):
         """
 
         def reset_callback(resetting):
-            self.source = dashboard_cls._cuxfilter_df.data
             self.box_selected_range = None
             self.chart.reset_all_selections()
             dashboard_cls._query_str_dict.pop(self.name, None)
@@ -272,82 +254,6 @@ class BaseStackedLine(BaseChart):
 
         # add callback to reset chart button
         self.chart.add_reset_event(reset_callback)
-
-    def query_chart_by_range(
-        self,
-        active_chart: BaseChart,
-        query_tuple,
-        datatile=None,
-        query="",
-        local_dict={},
-        indices=None,
-    ):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-            1. active_chart: chart object of active_chart
-            2. query_tuple: (min_val, max_val) of the query [type: tuple]
-            3. datatile: None in case of Gpu Geo Scatter charts
-        -------------------------------------------
-
-        Ouput:
-        """
-        min_val, max_val = query_tuple
-        final_query = f"@min_val<={active_chart.x}<=@max_val"
-        local_dict.update({"min_val": min_val, "max_val": max_val})
-        if len(query) > 0:
-            final_query += f" and {query}"
-        self.reload_chart(
-            cudf_utils.query_df(self.source, final_query, local_dict),
-            False,
-        )
-
-    def query_chart_by_indices(
-        self,
-        active_chart: BaseChart,
-        old_indices,
-        new_indices,
-        datatile=None,
-        query="",
-        local_dict={},
-        indices=None,
-    ):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-            1. active_chart: chart object of active_chart
-            2. query_tuple: (min_val, max_val) of the query [type: tuple]
-            3. datatile: None in case of Gpu Geo Scatter charts
-        -------------------------------------------
-
-        Ouput:
-        """
-        if "" in new_indices:
-            new_indices.remove("")
-        if len(new_indices) == 0:
-            # case: all selected indices were reset
-            # reset the chart
-            final_query = query
-        elif len(new_indices) == 1:
-            final_query = f"{active_chart.x}=={str(float(new_indices[0]))}"
-            if len(query) > 0:
-                final_query += f" and {query}"
-        else:
-            new_indices_str = ",".join(map(str, new_indices))
-            final_query = f"{active_chart.x} in ({new_indices_str})"
-            if len(query) > 0:
-                final_query += f" and {query}"
-
-        self.reload_chart(
-            cudf_utils.query_df(self.source, final_query, local_dict)
-            if len(final_query) > 0
-            else self.source,
-            False,
-        )
 
     def add_selection_geometry_event(self, callback):
         """

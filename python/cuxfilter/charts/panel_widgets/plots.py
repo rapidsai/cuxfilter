@@ -439,8 +439,6 @@ class DropDown(BaseWidget):
                 self.list_of_values = self.list_of_values.compute()
 
             self.list_of_values = self.list_of_values.to_pandas().tolist()
-            # if len(self.list_of_values) > self.data_points:
-            #     self.list_of_values = aggregated_column_unique(self, data)
 
             if len(self.list_of_values) > 500:
                 print(
@@ -542,8 +540,6 @@ class MultiSelect(BaseWidget):
                 self.list_of_values = self.list_of_values.compute()
 
             self.list_of_values = self.list_of_values.to_pandas().tolist()
-            # if len(self.list_of_values) > self.data_points:
-            #     self.list_of_values = aggregated_column_unique(self, data)
 
             if len(self.list_of_values) > 500:
                 print(
