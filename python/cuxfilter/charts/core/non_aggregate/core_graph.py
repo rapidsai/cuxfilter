@@ -295,33 +295,23 @@ class BaseGraph(BaseChart):
             # set lasso selected indices to None
             self.selected_indices = None
 
-            query = (
-                f"@{self.node_x}_min<={self.node_x}<=@{self.node_x}_max"
-                + f" and @{self.node_y}_min<={self.node_y}<=@{self.node_y}_max"
-            )
-            temp_str_dict = {
-                **dashboard_cls._query_str_dict,
-                **{self.name: query},
-            }
             self.box_selected_range = {
                 self.node_x + "_min": self.x_range[0],
                 self.node_x + "_max": self.x_range[1],
                 self.node_y + "_min": self.y_range[0],
                 self.node_y + "_max": self.y_range[1],
             }
-            temp_local_dict = {
-                **dashboard_cls._query_local_variables_dict,
-                **self.box_selected_range,
-            }
-            nodes = dashboard_cls._query(
-                dashboard_cls._generate_query_str(temp_str_dict),
-                temp_local_dict,
-            )
 
             edges = None
 
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict
+            )
+
+            nodes = dashboard_cls._query(dashboard_cls._generate_query_str())
+
             if self.inspect_neighbors._active:
-                # node_ids = nodes[self.node_id]
                 nodes, edges = self.query_graph(nodes, self.nodes, self.edges)
 
             # reload all charts with new queried data (cudf.DataFrame only)
@@ -344,7 +334,6 @@ class BaseGraph(BaseChart):
             )
 
             args = (self.node_x, self.node_y, geometry)
-            print(args)
 
             if isinstance(self.nodes, dask_cudf.DataFrame):
                 self.selected_indices = (
@@ -364,10 +353,12 @@ class BaseGraph(BaseChart):
             else:
                 self.selected_indices = point_in_polygon(self.nodes, *args)
 
-            nodes = dashboard_cls._query(
-                dashboard_cls._generate_query_str(),
-                local_indices=self.selected_indices.selection,
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict
             )
+
+            nodes = dashboard_cls._query(dashboard_cls._generate_query_str())
             edges = None
 
             if self.inspect_neighbors._active:
@@ -459,106 +450,10 @@ class BaseGraph(BaseChart):
             self.chart.reset_all_selections()
             dashboard_cls._query_str_dict.pop(self.name, None)
 
-            nodes = dashboard_cls._query(dashboard_cls._generate_query_str())
-            dashboard_cls._reload_charts(nodes)
-            # reload graph chart separately as it has an extra edges argument
-            self.reload_chart(data=nodes)
-            del nodes
+            dashboard_cls._reload_charts()
 
         # add callback to reset chart button
         self.chart.add_reset_event(reset_callback)
-
-    def _compute_source(self, query, local_dict, indices):
-        return cudf_utils.query_df(self.nodes, query, local_dict, indices)
-
-    def query_chart_by_range(
-        self,
-        active_chart: BaseChart,
-        query_tuple,
-        datatile=None,
-        query="",
-        local_dict={},
-        indices=None,
-    ):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-            1. active_chart: chart object of active_chart
-            2. query_tuple: (min_val, max_val) of the query [type: tuple]
-            3. datatile: None in case of Gpu Geo Scatter charts
-            4. query: query string representing the current filtered state of
-                    the dashboard
-            5. local_dict: dictionary containing the variable:value mapping
-                    local to the query_string.
-                    Passed as a parameter to cudf.query() api
-            6. indices: cudf.Series representing the current filtered state
-                    of the dashboard, apart from the query_string,
-                    since the lasso_select callback results in a boolean mask
-        -------------------------------------------
-
-        Ouput:
-        """
-        min_val, max_val = query_tuple
-        final_query = f"@min_val<={active_chart.x}<=@max_val"
-        local_dict.update({"min_val": min_val, "max_val": max_val})
-        if len(query) > 0:
-            final_query += f" and {query}"
-        self.reload_chart(
-            self._compute_source(final_query, local_dict, indices),
-        )
-
-    def query_chart_by_indices(
-        self,
-        active_chart: BaseChart,
-        old_indices,
-        new_indices,
-        datatile=None,
-        query="",
-        local_dict={},
-        indices=None,
-    ):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-            1. active_chart: chart object of active_chart
-            2. old_indices: list of indices selected in previous callback
-            3. new_indices: list of indices selected in currently
-            4. datatile: None in case of Geo scatter charts
-            5. query: query string representing the current filtered state of
-                    the dashboard
-            6. local_dict: dictionary containing the variable:value mapping
-                    local to the query_string.
-                    Passed as a parameter to cudf.query() api
-            7. indices: cudf.Series representing the current filtered state
-                    of the dashboard, apart from the query_string,
-                    since the lasso_select callback results in a boolean mask
-        -------------------------------------------
-
-        Ouput:
-        """
-        if "" in new_indices:
-            new_indices.remove("")
-        if len(new_indices) == 0:
-            # case: all selected indices were reset
-            # reset the chart
-            final_query = query
-        elif len(new_indices) == 1:
-            final_query = f"{active_chart.x}=={str(float(new_indices[0]))}"
-            if len(query) > 0:
-                final_query += f" and {query}"
-        else:
-            new_indices_str = ",".join(map(str, new_indices))
-            final_query = f"{active_chart.x} in ({new_indices_str})"
-            if len(query) > 0:
-                final_query += f" and {query}"
-
-        self.reload_chart(
-            self._compute_source(final_query, local_dict, indices)
-        )
 
     def add_selection_geometry_event(self, callback):
         """
