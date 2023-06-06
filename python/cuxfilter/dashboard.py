@@ -1,4 +1,4 @@
-from typing import Dict, Type, Union
+from typing import Dict, Union
 import bokeh.embed.util as u
 import cudf
 import dask_cudf
@@ -11,15 +11,15 @@ import warnings
 from IPython.display import Image, display
 from collections import Counter
 
-from .charts.core import BaseChart, BaseWidget, ViewDataFrame
-from .charts.constants import (
+from cuxfilter.charts.core import BaseChart, BaseWidget, ViewDataFrame
+from cuxfilter.charts.constants import (
     CUSTOM_DIST_PATH_THEMES,
     STATIC_DIR_THEMES,
 )
-from .layouts import single_feature
-from .charts.panel_widgets import data_size_indicator
-from .assets import screengrab, get_open_port, cudf_utils
-from .themes import light
+from cuxfilter.layouts import single_feature
+from cuxfilter.charts.panel_widgets import data_size_indicator
+from cuxfilter.assets import screengrab, get_open_port, cudf_utils
+from cuxfilter.themes import light
 
 DEFAULT_NOTEBOOK_URL = "http://localhost:8888"
 

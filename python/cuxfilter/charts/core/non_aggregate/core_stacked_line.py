@@ -4,7 +4,6 @@ from typing import Tuple
 
 from ..core_chart import BaseChart
 from ....layouts import chart_view
-from ....assets import cudf_utils
 
 
 class BaseStackedLine(BaseChart):

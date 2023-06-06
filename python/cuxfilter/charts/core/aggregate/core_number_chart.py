@@ -1,5 +1,3 @@
-import numpy as np
-
 from ..core_chart import BaseChart
 from ....layouts import chart_view
 from ....assets import cudf_utils

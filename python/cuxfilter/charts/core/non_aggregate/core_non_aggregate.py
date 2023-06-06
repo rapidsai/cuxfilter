@@ -6,7 +6,6 @@ import dask.dataframe as dd
 from .utils import point_in_polygon
 from ..core_chart import BaseChart
 from ....layouts import chart_view
-from ....assets import cudf_utils
 
 
 class BaseNonAggregate(BaseChart):

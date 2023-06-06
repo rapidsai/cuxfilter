@@ -7,7 +7,6 @@ from .utils import point_in_polygon
 from ..core_chart import BaseChart
 from ....layouts import chart_view
 from ...constants import CUXF_DEFAULT_COLOR_PALETTE
-from ....assets import cudf_utils
 
 
 class BaseGraph(BaseChart):
