@@ -106,7 +106,7 @@ class BaseNonAggregate(BaseChart):
 
             self.compute_query_dict(
                 dashboard_cls._query_str_dict,
-                dashboard_cls._query_local_variables_dict
+                dashboard_cls._query_local_variables_dict,
             )
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts()
@@ -145,7 +145,7 @@ class BaseNonAggregate(BaseChart):
 
             self.compute_query_dict(
                 dashboard_cls._query_str_dict,
-                dashboard_cls._query_local_variables_dict
+                dashboard_cls._query_local_variables_dict,
             )
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts()
