@@ -77,7 +77,7 @@ class RangeSlider(BaseWidget):
         def widget_callback(event):
             self.compute_query_dict(
                 dashboard_cls._query_str_dict,
-                dashboard_cls._query_local_variables_dict
+                dashboard_cls._query_local_variables_dict,
             )
             dashboard_cls._reload_charts()
 
@@ -187,7 +187,7 @@ class DateRangeSlider(BaseWidget):
         def widget_callback(event):
             self.compute_query_dict(
                 dashboard_cls._query_str_dict,
-                dashboard_cls._query_local_variables_dict
+                dashboard_cls._query_local_variables_dict,
             )
             dashboard_cls._reload_charts()
 
@@ -286,7 +286,7 @@ class IntSlider(BaseWidget):
         def widget_callback(event):
             self.compute_query_dict(
                 dashboard_cls._query_str_dict,
-                dashboard_cls._query_local_variables_dict
+                dashboard_cls._query_local_variables_dict,
             )
             dashboard_cls._reload_charts()
 
@@ -382,7 +382,7 @@ class FloatSlider(BaseWidget):
         def widget_callback(event):
             self.compute_query_dict(
                 dashboard_cls._query_str_dict,
-                dashboard_cls._query_local_variables_dict
+                dashboard_cls._query_local_variables_dict,
             )
             dashboard_cls._reload_charts()
 
@@ -481,7 +481,7 @@ class DropDown(BaseWidget):
         def widget_callback(event):
             self.compute_query_dict(
                 dashboard_cls._query_str_dict,
-                dashboard_cls._query_local_variables_dict
+                dashboard_cls._query_local_variables_dict,
             )
             dashboard_cls._reload_charts()
 
@@ -580,7 +580,7 @@ class MultiSelect(BaseWidget):
         def widget_callback(event):
             self.compute_query_dict(
                 dashboard_cls._query_str_dict,
-                dashboard_cls._query_local_variables_dict
+                dashboard_cls._query_local_variables_dict,
             )
             dashboard_cls._reload_charts()
 

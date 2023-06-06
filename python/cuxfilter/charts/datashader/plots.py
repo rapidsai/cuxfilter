@@ -201,9 +201,7 @@ class Graph(BaseGraph):
 
         def cb(attr, old, new):
             if not new:
-                self.chart.update_data(
-                    edges=self.connected_edges.head(0)
-                )
+                self.chart.update_data(edges=self.connected_edges.head(0))
             else:
                 self.chart.update_data(edges=self.connected_edges)
 

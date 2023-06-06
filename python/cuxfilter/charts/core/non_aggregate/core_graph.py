@@ -306,7 +306,7 @@ class BaseGraph(BaseChart):
 
             self.compute_query_dict(
                 dashboard_cls._query_str_dict,
-                dashboard_cls._query_local_variables_dict
+                dashboard_cls._query_local_variables_dict,
             )
 
             nodes = dashboard_cls._query(dashboard_cls._generate_query_str())
@@ -355,7 +355,7 @@ class BaseGraph(BaseChart):
 
             self.compute_query_dict(
                 dashboard_cls._query_str_dict,
-                dashboard_cls._query_local_variables_dict
+                dashboard_cls._query_local_variables_dict,
             )
 
             nodes = dashboard_cls._query(dashboard_cls._generate_query_str())

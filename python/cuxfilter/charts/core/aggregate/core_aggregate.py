@@ -324,7 +324,7 @@ class BaseAggregateChart(BaseChart):
         def filter_widget_callback(event):
             self.compute_query_dict(
                 dashboard_cls._query_str_dict,
-                dashboard_cls._query_local_variables_dict
+                dashboard_cls._query_local_variables_dict,
             )
             dashboard_cls._reload_charts()
 
