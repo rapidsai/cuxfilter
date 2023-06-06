@@ -23,8 +23,6 @@ from .themes import light
 
 DEFAULT_NOTEBOOK_URL = "http://localhost:8888"
 
-CUXF_BASE_CHARTS = (BaseChart, BaseWidget, ViewDataFrame)
-
 
 def _get_host(url):
     parsed_url = urllib.parse.urlparse(url)
@@ -111,7 +109,7 @@ class DashBoard:
     do some visual querying/ crossfiltering
     """
 
-    _charts: Dict[str, Union[CUXF_BASE_CHARTS]]
+    _charts: Dict[str, Union[BaseChart, BaseWidget, ViewDataFrame]]
     _query_str_dict: Dict[str, str]
     _query_local_variables_dict = {}
     _active_view = None
@@ -308,7 +306,7 @@ class DashBoard:
         popped_value = None
         query_dict = query_dict or self._query_str_dict
         if (
-            isinstance(ignore_chart, CUXF_BASE_CHARTS)
+            isinstance(ignore_chart, (BaseChart, BaseWidget, ViewDataFrame))
             and len(ignore_chart.name) > 0
             and ignore_chart.name in query_dict
         ):
