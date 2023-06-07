@@ -8,28 +8,20 @@ from ....layouts import chart_view
 from ...constants import (
     BOOL_MAP,
     CUDF_DATETIME_TYPES,
-    DATATILE_ACTIVE_COLOR,
-    DATATILE_INACTIVE_COLOR,
 )
 from ....assets.cudf_utils import get_min_max
 
 
 class BaseAggregateChart(BaseChart):
     reset_event = None
-    _datatile_loaded_state: bool = False
     filter_widget = None
     x_axis_tick_formatter = None
     y_axis_tick_formatter = None
     use_data_tiles = True
     custom_binning = False
-    datatile_active_color = DATATILE_ACTIVE_COLOR
     stride = None
     data_points = None
     _x_dtype = float
-
-    @property
-    def datatile_loaded_state(self):
-        return self._datatile_loaded_state
 
     @property
     def name(self):
@@ -41,15 +33,6 @@ class BaseAggregateChart(BaseChart):
             )
         else:
             return f"{self.x}_{self.aggregate_fn}_chart_{self.title}"
-
-    @datatile_loaded_state.setter
-    def datatile_loaded_state(self, state: bool):
-        self._datatile_loaded_state = state
-        if self.add_interaction:
-            if state:
-                self.filter_widget.bar_color = self.datatile_active_color
-            else:
-                self.filter_widget.bar_color = DATATILE_INACTIVE_COLOR
 
     @property
     def x_dtype(self):
@@ -294,8 +277,7 @@ class BaseAggregateChart(BaseChart):
         """
         Description: add range slider to the bottom of the chart,
                     for the filter function to facilitate interaction behavior,
-                    that updates the rest of the charts on the page,
-                    using datatiles
+                    that updates the rest of the charts on the page
         -------------------------------------------
         Input:
 

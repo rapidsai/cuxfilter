@@ -14,13 +14,8 @@ np.seterr(divide="ignore", invalid="ignore")
 
 class BaseChoropleth(BaseChart):
     reset_event = None
-    _datatile_loaded_state: bool = False
     geo_mapper: Dict[str, str] = {}
     use_data_tiles = True
-
-    @property
-    def datatile_loaded_state(self):
-        return self._datatile_loaded_state
 
     @property
     def name(self):
@@ -32,10 +27,6 @@ class BaseChoropleth(BaseChart):
             )
         else:
             return f"{self.x}_{self.aggregate_fn}_chart_{self.title}"
-
-    @datatile_loaded_state.setter
-    def datatile_loaded_state(self, state: bool):
-        self._datatile_loaded_state = state
 
     def __init__(
         self,

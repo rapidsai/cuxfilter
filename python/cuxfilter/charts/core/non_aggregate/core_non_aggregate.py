@@ -10,12 +10,11 @@ from ....layouts import chart_view
 
 class BaseNonAggregate(BaseChart):
     """
-    No datatiles support in non_data_tiles plot charts
-
-    If dataset size is greater than a few thousand points,
-    scatter geos can crash the browser tabs, and is only recommended
-    with datashader plugin, in which case an image is
-    rendered instead of points on canvas
+    .. note::
+        If dataset size is greater than a few thousand points,
+        scatter geos can crash the browser tabs, and is only recommended
+        with datashader plugin, in which case an image is
+        rendered instead of points on canvas
     """
 
     reset_event = None

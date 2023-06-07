@@ -78,7 +78,6 @@ class RapidsTheme(Theme):
     color_palette = list(palettes.Purples[9])
     chart_color = "#8735fb"
     css = param.Filename(default=STATIC_DIR_THEMES / "rapids.css")
-    datatile_active_color = "#8735fb"
 
     # Custom React Template
     _template = ReactTemplate

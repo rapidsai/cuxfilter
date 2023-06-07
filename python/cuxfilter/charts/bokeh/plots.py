@@ -152,9 +152,6 @@ class Bar(BaseAggregateChart):
             self.sub_chart.glyph.fill_color = theme.chart_color
             self.sub_chart.glyph.line_color = theme.chart_color
 
-        # interactive slider
-        self.datatile_active_color = theme.datatile_active_color
-
 
 class Line(BaseAggregateChart):
     """
@@ -294,6 +291,3 @@ class Line(BaseAggregateChart):
         """
         if self.color is None:
             self.sub_chart.glyph.line_color = theme.chart_color
-
-        # interactive slider
-        self.datatile_active_color = theme.datatile_active_color
