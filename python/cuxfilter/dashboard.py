@@ -112,7 +112,6 @@ class DashBoard:
     _charts: Dict[str, Union[BaseChart, BaseWidget, ViewDataFrame]]
     _query_str_dict: Dict[str, str]
     _query_local_variables_dict = {}
-    _active_view = None
     _dashboard = None
     _theme = None
     _notebook_url = DEFAULT_NOTEBOOK_URL
@@ -281,21 +280,16 @@ class DashBoard:
             chart.initiate_chart(self)
             chart._initialized = True
 
-    def _query(self, query_str, local_dict=None, local_indices=None):
+    def _query(self, query_str):
         """
         Query the cudf.DataFrame
         """
-        if local_dict is None:
-            local_dict = self._query_local_variables_dict
-        if local_indices is None:
-            local_indices = self.queried_indices
-
         # filter the source data with current queries: indices and query strs
         return cudf_utils.query_df(
             self._cuxfilter_df.data,
             query_str,
-            local_dict,
-            local_indices,
+            self._query_local_variables_dict,
+            self.queried_indices,
         )
 
     def _generate_query_str(self, query_dict=None, ignore_chart=""):
