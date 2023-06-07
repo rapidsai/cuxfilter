@@ -7,7 +7,7 @@ rapids-logger "Create test_external conda environment"
 . /opt/conda/etc/profile.d/conda.sh
 
 rapids-mamba-retry create -n test_external -c rapidsai-nightly -c conda-forge -c nvidia  \
-    cudf=23.06 dask-cudf=23.06 python=3.10 cudatoolkit=11.8
+    cudf=23.06
 
 conda activate test_external
 
