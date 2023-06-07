@@ -10,8 +10,16 @@ def initialize_df(type, *df_args):
 
 
 def df_equals(df1, df2):
-    df1 = df1.compute() if isinstance(df1, dask_cudf.DataFrame) else df1
-    df2 = df2.compute() if isinstance(df2, dask_cudf.DataFrame) else df2
+    df1 = (
+        df1.compute().reset_index(drop=True)
+        if isinstance(df1, dask_cudf.DataFrame)
+        else df1.reset_index(drop=True)
+    )
+    df2 = (
+        df2.compute().reset_index(drop=True)
+        if isinstance(df2, dask_cudf.DataFrame)
+        else df2.reset_index(drop=True)
+    )
 
     return df1.equals(df2)
 

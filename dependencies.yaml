@@ -88,15 +88,11 @@ dependencies:
           - notebook>=0.5.0
       - output_types: [conda]
         packages:
-          - cugraph=23.04
+          - cugraph=23.06
   py_version:
     specific:
       - output_types: conda
         matrices:
-          - matrix:
-              py: "3.8"
-            packages:
-              - python=3.8
           - matrix:
               py: "3.9"
             packages:
@@ -107,18 +103,20 @@ dependencies:
               - python=3.10
           - matrix:
             packages:
-              - python>=3.8,<3.11
+              - python>=3.9,<3.11
   run:
     common:
       - output_types: [conda, requirements]
         packages:
           - bokeh>=2.4.2,<=2.5
-          - datashader>=0.14,<=0.14.4
+          - datashader>=0.15
           - geopandas>=0.11.0
           - holoviews>=1.15.0,<=1.15.4
           - jupyter-server-proxy
           - libwebp
           - nodejs>=14
+          - numba>=0.57
+          - numpy>=1.21
           - packaging
           - panel >=0.14.0,<=0.14.1
           - pydeck>=0.3,<=0.5.0
@@ -126,10 +124,10 @@ dependencies:
           - pyproj>=2.4,<=3.4
       - output_types: conda
         packages:
-          - cudf=23.04
-          - cuspatial=23.04
-          - dask-cuda=23.04
-          - dask-cudf=23.04
+          - cudf=23.06
+          - cuspatial=23.06
+          - dask-cuda=23.06
+          - dask-cudf=23.06
   test_python:
     common:
       - output_types: [conda, requirements]

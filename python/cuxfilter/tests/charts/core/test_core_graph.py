@@ -128,7 +128,7 @@ class TestCoreGraph:
         self.result = None
 
         def t_function(data, edges=None, patch_update=False):
-            self.result = data.reset_index(drop=True)
+            self.result = data.sort_values(by="vertex").reset_index(drop=True)
 
         bg.reload_chart = t_function
 

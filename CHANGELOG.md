@@ -1,3 +1,27 @@
+# cuXfilter 23.06.00 (7 Jun 2023)
+
+## 🚨 Breaking Changes
+
+- Dropping Python 3.8 ([#469](https://github.com/rapidsai/cuxfilter/pull/469)) [@divyegala](https://github.com/divyegala)
+
+## 🐛 Bug Fixes
+
+- fix tests failing due to unsorted results ([#479](https://github.com/rapidsai/cuxfilter/pull/479)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🚀 New Features
+
+- GHA - external dependency testing workflow: add a schedule to run once every week ([#478](https://github.com/rapidsai/cuxfilter/pull/478)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- Require Numba 0.57.0+ &amp; NumPy 1.21.0+ ([#480](https://github.com/rapidsai/cuxfilter/pull/480)) [@jakirkham](https://github.com/jakirkham)
+- run docs nightly too ([#477](https://github.com/rapidsai/cuxfilter/pull/477)) [@AyodeAwe](https://github.com/AyodeAwe)
+- Update cupy to &gt;=12 ([#475](https://github.com/rapidsai/cuxfilter/pull/475)) [@raydouglass](https://github.com/raydouglass)
+- Revert shared-action-workflows pin ([#472](https://github.com/rapidsai/cuxfilter/pull/472)) [@divyegala](https://github.com/divyegala)
+- Dropping Python 3.8 ([#469](https://github.com/rapidsai/cuxfilter/pull/469)) [@divyegala](https://github.com/divyegala)
+- Remove usage of rapids-get-rapids-version-from-git ([#468](https://github.com/rapidsai/cuxfilter/pull/468)) [@jjacobelli](https://github.com/jjacobelli)
+- Use ARC V2 self-hosted runners for GPU jobs ([#467](https://github.com/rapidsai/cuxfilter/pull/467)) [@jjacobelli](https://github.com/jjacobelli)
+
 # cuXfilter 23.04.00 (6 Apr 2023)
 
 ## 🐛 Bug Fixes
