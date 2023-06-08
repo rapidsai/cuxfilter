@@ -18,10 +18,6 @@ The current version of cuxfilter leverages jupyter notebook and bokeh server to 
 
 ![layout architecture](./docs/_images/RAPIDS_cuxfilter.png)
 
-### What is cuDataTiles?
-
-cuxfilter implements cuDataTiles, a GPU accelerated version of data tiles based on the work of [Falcon](https://github.com/uwdata/falcon). When starting to interact with specific charts in a cuxfilter dashboard, values for the other charts are precomputed to allow for fast slider scrubbing without having to recalculate values.
-
 ### Open Source Projects
 
 cuxfilter wouldn’t be possible without using these great open source projects:
