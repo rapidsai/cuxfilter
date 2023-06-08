@@ -188,7 +188,7 @@ class Graph(BaseGraph):
         self.inspect_neighbors = CustomInspectTool(
             icon=load_image(impath),
             _active=True,
-            description="Inspect Neighboring Edges"
+            description="Inspect Neighboring Edges",
         )
 
         # loading icon from a url
