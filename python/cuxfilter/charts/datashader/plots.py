@@ -188,15 +188,16 @@ class Graph(BaseGraph):
         self.inspect_neighbors = CustomInspectTool(
             icon=load_image(impath),
             _active=True,
-            tool_name="Inspect Neighboring Edges",
+            description="Inspect Neighboring Edges"
         )
+
         # loading icon from a url
         impath = (
             "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
             + "branch-0.15/python/cuxfilter/charts/datashader/icons/XPan.png"
         )
         self.display_edges = CustomInspectTool(
-            icon=load_image(impath), _active=True, tool_name="Display Edges"
+            icon=load_image(impath), _active=True, description="Display Edges"
         )
 
         def cb(attr, old, new):
