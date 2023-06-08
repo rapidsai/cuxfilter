@@ -1,7 +1,7 @@
 import param
 from bokeh.themes import Theme as _BkTheme
 from bokeh import palettes
-from panel.template.theme import Theme
+from panel.theme import Theme
 from ..layouts.layouts import ReactTemplate
 from ..charts.constants import STATIC_DIR_THEMES
 
@@ -9,7 +9,7 @@ from ..charts.constants import STATIC_DIR_THEMES
 class RapidsTheme(Theme):
     RAPIDS = {
         "attrs": {
-            "Figure": {
+            "figure": {
                 "background_fill_color": "#2f2f2f",
                 "border_fill_color": "#2f2f2f",
                 "outline_line_color": "#E0E0E0",

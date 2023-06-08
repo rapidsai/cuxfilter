@@ -1,7 +1,7 @@
 import param
 from bokeh.themes import Theme as _BkTheme
 from bokeh import palettes
-from panel.template.theme import DefaultTheme
+from panel.theme import DefaultTheme
 from ..layouts.layouts import ReactTemplate
 from ..charts.constants import STATIC_DIR_THEMES
 
@@ -9,7 +9,7 @@ from ..charts.constants import STATIC_DIR_THEMES
 class LightTheme(DefaultTheme):
     RAPIDS_LIGHT = {
         "attrs": {
-            "Figure": {
+            "figure": {
                 "background_fill_color": "#ffffff",
                 "border_fill_color": "#ffffff",
                 "outline_line_color": "#000000",
