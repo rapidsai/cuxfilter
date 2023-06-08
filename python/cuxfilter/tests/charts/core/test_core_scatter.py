@@ -1,9 +1,5 @@
-import pytest
-
 from cuxfilter.charts.core.non_aggregate.core_scatter import BaseScatter
 from cuxfilter.charts import constants
-
-pytest
 
 
 class TestBaseScatter:

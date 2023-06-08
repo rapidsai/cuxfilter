@@ -1,7 +1,6 @@
 import pytest
 import cuxfilter
 from cuxfilter.charts.core.aggregate.core_number_chart import BaseNumberChart
-from cuxfilter.charts import bar, panel_widgets
 from cuxfilter.layouts import chart_view
 
 from ..utils import initialize_df, df_types
@@ -58,42 +57,3 @@ class TestBaseNumberChart:
         bnc.title = "title"
 
         assert str(bnc.view()) == str(chart_view(_chart, title="title"))
-
-    @pytest.mark.parametrize("cux_df", cux_dfs)
-    @pytest.mark.parametrize(
-        "query_tuple, result", [((1, 4), 4.0), ((0, 4), 5.0), ((1, 1), 1.0)]
-    )
-    def test_query_chart_by_range(self, cux_df, query_tuple, result):
-        active_chart = bar(x="key")
-        active_chart.stride = 1
-        active_chart.min_value = 0
-        dashboard = cux_df.dashboard(charts=[active_chart])
-        dashboard._active_view = active_chart
-        dashboard._calc_data_tiles()
-        bnc = dashboard._sidebar[self._datasize_title]
-        datatile = dashboard._data_tiles[self._datasize_title]
-        bnc.query_chart_by_range(active_chart, query_tuple, datatile)
-
-        assert result == bnc.chart[0].value
-
-    @pytest.mark.parametrize("cux_df", cux_dfs)
-    @pytest.mark.parametrize(
-        "old_indices, new_indices, prev_value, result",
-        [([], [1], 5.0, 1.0), ([1], [2], 1.0, 1.0), ([2], [2, 4], 1.0, 2.0)],
-    )
-    def test_query_chart_by_indices(
-        self, cux_df, old_indices, new_indices, prev_value, result
-    ):
-        active_chart = panel_widgets.multi_select("key")
-        dashboard = cux_df.dashboard(charts=[active_chart])
-        dashboard._active_view = active_chart
-        dashboard._calc_data_tiles(cumsum=False)
-        bnc = dashboard._sidebar[self._datasize_title]
-        bnc.reset_chart(prev_value)
-
-        datatile = dashboard._data_tiles[self._datasize_title]
-        bnc.query_chart_by_indices(
-            active_chart, old_indices, new_indices, datatile
-        )
-
-        assert result == bnc.chart[0].value

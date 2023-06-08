@@ -3,9 +3,6 @@ import panel as pn
 import cuxfilter
 
 from cuxfilter.charts.core.core_view_dataframe import ViewDataFrame
-from cuxfilter.charts.core.non_aggregate.core_stacked_line import (
-    BaseStackedLine,
-)
 from cuxfilter.layouts import chart_view
 
 from ..utils import df_equals, initialize_df, df_types
@@ -100,66 +97,3 @@ class TestViewDataFrame:
 
         assert vd.chart.width == result1
         assert vd.chart.height == result2
-
-    @pytest.mark.parametrize("df_type", df_types)
-    def test_query_chart_by_range(self, df_type):
-        bsl = ViewDataFrame()
-        bsl_1 = BaseStackedLine("b", ["a"])
-        query_tuple = (4, 5)
-        df = initialize_df(df_type, {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
-        bsl.source = df
-        self.result = None
-        self.patch_update = None
-
-        def t_func(data, patch_update):
-            self.result = data
-            self.patch_update = patch_update
-
-        # creating a dummy reload chart fn as its not implemented in core
-        # non aggregate chart class
-        bsl.reload_chart = t_func
-        bsl.query_chart_by_range(
-            active_chart=bsl_1, query_tuple=query_tuple, data=df
-        )
-
-        assert df_equals(
-            self.result,
-            initialize_df(df_type, {"a": [2, 3], "b": [4, 5]}, [1, 2]),
-        )
-        assert self.patch_update is False
-
-    @pytest.mark.parametrize("df_type", df_types)
-    @pytest.mark.parametrize(
-        "new_indices, result, index",
-        [
-            ([4, 5], {"a": [2, 3], "b": [4, 5]}, [1, 2]),
-            ([], {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]}, [0, 1, 2, 3]),
-            ([3], {"a": [1], "b": [3]}, [0]),
-        ],
-    )
-    def test_query_chart_by_indices(self, df_type, new_indices, result, index):
-        bsl = ViewDataFrame()
-        bsl_1 = BaseStackedLine("b", ["a"])
-        new_indices = new_indices
-        df = initialize_df(df_type, {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
-        bsl.source = df
-        self.result = None
-        self.patch_update = None
-
-        def t_func(data, patch_update):
-            self.result = data
-            self.patch_update = patch_update
-
-        # creating a dummy reload chart fn as its not implemented in core
-        # non aggregate chart class
-        bsl.reload_chart = t_func
-        bsl.query_chart_by_indices(
-            active_chart=bsl_1,
-            old_indices=[],
-            new_indices=new_indices,
-            data=df,
-        )
-        result = initialize_df(df_type, result, index)
-
-        assert df_equals(self.result, result)
-        assert self.patch_update is False

@@ -1,9 +1,6 @@
 import pytest
 from bokeh.events import ButtonClick
-from bokeh.models import ColumnDataSource
 import panel as pn
-import pandas as pd
-import numpy as np
 
 from cuxfilter.charts.core.aggregate.core_aggregate import BaseAggregateChart
 import cuxfilter
@@ -26,7 +23,6 @@ class TestBaseAggregateChart:
 
         assert bb.chart_type is None
         assert bb.reset_event is None
-        assert bb._datatile_loaded_state is False
         assert bb.filter_widget is None
         assert bb.use_data_tiles is True
         assert bb.x == "test_x"
@@ -179,115 +175,3 @@ class TestBaseAggregateChart:
 
         assert bac.x_label_map == {"a": 1, "b": 2}
         assert bac.y_label_map == {"a": 1, "b": 2}
-
-    @pytest.mark.parametrize(
-        "query_tuple, result",
-        [
-            ((10, 13), [1.0, 1.0, 1.0, 1.0, 0.0]),
-            ((10, 10), [1.0, 0.0, 0.0, 0.0, 0.0]),
-            ((10, 12), [1.0, 1.0, 1.0, 0.0, 0.0]),
-        ],
-    )
-    def test_query_chart_by_range(self, query_tuple, result):
-        active_chart = BaseAggregateChart(x="test_x")
-
-        active_chart.stride = 1
-        active_chart.min_value = 10.0
-        active_chart.data_x_axis = "x"
-        self.result = ""
-
-        def reset_chart(datatile_result):
-            self.result = datatile_result
-
-        active_chart.reset_chart = reset_chart
-        active_chart.source = ColumnDataSource(
-            {
-                "x": np.array([10.0, 11.0, 12.0, 13.0, 14.0]),
-                "y": np.array([1, 1, 1, 1, 1]),
-            }
-        )
-        active_chart.source_backup = pd.DataFrame(
-            {
-                "x": np.array([10.0, 11.0, 12.0, 13.0, 14.0]),
-                "y": np.array([1, 1, 1, 1, 1]),
-            }
-        )
-
-        datatile = pd.DataFrame(
-            {
-                0: {0: 1.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0},
-                1: {0: 1.0, 1: 1.0, 2: 0.0, 3: 0.0, 4: 0.0},
-                2: {0: 1.0, 1: 1.0, 2: 1.0, 3: 0.0, 4: 0.0},
-                3: {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 0.0},
-                4: {0: 1.0, 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0},
-            }
-        )
-
-        active_chart.query_chart_by_range(active_chart, query_tuple, datatile)
-
-        assert all(result == self.result)
-
-    @pytest.mark.parametrize(
-        "old_indices, new_indices, prev_result,result",
-        [
-            ([], [0], [0.0, 0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 0.0, 0.0]),
-            (
-                [0],
-                [0, 1],
-                [1.0, 0.0, 0.0, 0.0, 0.0],
-                [1.0, 1.0, 0.0, 0.0, 0.0],
-            ),
-            ([0, 1], [], [1.0, 0.0, 0.0, 0.0, 0.0], [1.0, 1.0, 1.0, 1.0, 1.0]),
-            (
-                [],
-                [0, 1, 2, 3, 4],
-                [1.0, 1.0, 1.0, 1.0, 1.0],
-                [1.0, 1.0, 1.0, 1.0, 1.0],
-            ),
-        ],
-    )
-    def test_query_chart_by_indices(
-        self, old_indices, new_indices, prev_result, result
-    ):
-        active_chart = BaseAggregateChart(x="test_x")
-        passive_chart = BaseAggregateChart(x="test_x")
-
-        active_chart.stride = 1
-        active_chart.min_value = 0.0
-        active_chart.aggregate_fn = "count"
-        active_chart.data_points = 5
-        passive_chart.stride = 1
-        passive_chart.min_value = 2.0
-        passive_chart.data_points = 5
-        self.result = None
-
-        def f_temp():
-            return prev_result
-
-        passive_chart.get_source_y_axis = f_temp
-
-        def reset_chart(datatile_result):
-            self.result = datatile_result
-
-        passive_chart.reset_chart = reset_chart
-        passive_chart.source = ColumnDataSource(
-            {
-                "x": np.array([2.0, 3.0, 4.0, 5.0, 6.0]),
-                "y": np.array([1, 1, 1, 1, 1]),
-            }
-        )
-        passive_chart.data_x_axis = "x"
-        datatile = pd.DataFrame(
-            {
-                0: {0: 1.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0},
-                1: {0: 0.0, 1: 1.0, 2: 0.0, 3: 0.0, 4: 0.0},
-                2: {0: 0.0, 1: 0.0, 2: 1.0, 3: 0.0, 4: 0.0},
-                3: {0: 0.0, 1: 0.0, 2: 0.0, 3: 1.0, 4: 0.0},
-                4: {0: 0.0, 1: 0.0, 2: 0.0, 3: 0.0, 4: 1.0},
-            }
-        )
-
-        passive_chart.query_chart_by_indices(
-            active_chart, old_indices, new_indices, datatile
-        )
-        assert all(self.result == result)

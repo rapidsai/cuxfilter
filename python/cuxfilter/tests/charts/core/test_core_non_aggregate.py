@@ -94,16 +94,9 @@ class TestCoreNonAggregateChart:
         bnac.x = "a"
         bnac.y = "b"
         bnac.chart_type = "temp"
-        self.result = None
 
-        def t_function(data, patch_update=False):
-            self.result = data
-
-        bnac.reload_chart = t_function
         df = initialize_df(df_type, {"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
-
-        dashboard._active_view = bnac
 
         class evt:
             bounds = (1, 2, 3, 4)
@@ -112,7 +105,18 @@ class TestCoreNonAggregateChart:
 
         t = bnac.get_box_select_callback(dashboard)
         t(evt.bounds, evt.x_selection, evt.y_selection)
-        assert df_equals(self.result, df.query("1<=a<=2 and 3<=b<=4"))
+
+        result_query = dashboard._generate_query_str()
+        query_variables = dashboard._query_local_variables_dict
+        assert result_query == "@a_min<=a<=@a_max and @b_min<=b<=@b_max"
+        assert query_variables["a_min"] == 1
+        assert query_variables["a_max"] == 2
+        assert query_variables["b_min"] == 3
+        assert query_variables["b_max"] == 4
+
+        result_df = dashboard._query(dashboard._generate_query_str())
+        expected_df = df.query("1<=a<=2 and 3<=b<=4")
+        assert df_equals(result_df, expected_df)
 
     @pytest.mark.parametrize("df_type", df_types)
     def test_lasso_selection_callback(self, df_type):
@@ -121,11 +125,8 @@ class TestCoreNonAggregateChart:
         bnac.y = "b"
         bnac.chart_type = "temp"
 
-        def t_function(data, patch_update=False):
-            self.result = data
-
-        bnac.reload_chart = t_function
         df = initialize_df(df_type, {"a": [0, 1, 1, 2], "b": [0, 1, 2, 0]})
+        expected_df = initialize_df(df_type, {"a": [0, 1], "b": [0, 2]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         # Add the last point to close the shape
@@ -143,7 +144,9 @@ class TestCoreNonAggregateChart:
                 )
             t(geometry)
             assert pip.called
-            assert isinstance(self.result, df_type)
+            result_df = dashboard._query(dashboard._generate_query_str())
+            assert isinstance(result_df, df_type)
+            assert df_equals(result_df, expected_df)
 
     @pytest.mark.parametrize(
         "data, _data",
@@ -288,83 +291,3 @@ class TestCoreNonAggregateChart:
         bnac.add_reset_event(dashboard)
 
         assert bnac.selected_indices is None
-
-    @pytest.mark.parametrize("df_type", df_types)
-    def test_query_chart_by_range(self, df_type):
-        bnac = BaseNonAggregate()
-        bnac.chart_type = "test"
-        bnac.x = "a"
-
-        bnac_1 = BaseNonAggregate()
-        bnac_1.chart_type = "test"
-        bnac_1.x = "b"
-
-        query_tuple = (4, 5)
-
-        df = initialize_df(df_type, {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
-        bnac.source = df
-
-        self.result = None
-        self.patch_update = None
-
-        def t_func(data, patch_update):
-            self.result = data
-            self.patch_update = patch_update
-
-        # creating a dummy reload chart fn as its not implemented in core
-        # non aggregate chart class
-        bnac.reload_chart = t_func
-
-        bnac.query_chart_by_range(
-            active_chart=bnac_1, query_tuple=query_tuple, datatile=None
-        )
-        assert df_equals(
-            self.result,
-            initialize_df(df_type, {"a": [2, 3], "b": [4, 5]}, [1, 2]),
-        )
-        assert self.patch_update is False
-
-    @pytest.mark.parametrize("df_type", df_types)
-    @pytest.mark.parametrize(
-        "new_indices, result, index",
-        [
-            ([4, 5], {"a": [2, 3], "b": [4, 5]}, [1, 2]),
-            ([], {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]}, [0, 1, 2, 3]),
-            ([3], {"a": [1], "b": [3]}, [0]),
-        ],
-    )
-    def test_query_chart_by_indices(self, df_type, new_indices, result, index):
-        bnac = BaseNonAggregate()
-        bnac.chart_type = "test"
-        bnac.x = "a"
-
-        bnac_1 = BaseNonAggregate()
-        bnac_1.chart_type = "test"
-        bnac_1.x = "b"
-
-        new_indices = new_indices
-
-        df = initialize_df(df_type, {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
-        bnac.source = df
-
-        self.result = None
-        self.patch_update = None
-
-        def t_func(data, patch_update):
-            self.result = data
-            self.patch_update = patch_update
-
-        # creating a dummy reload chart fn as its not implemented in core
-        # non aggregate chart class
-        bnac.reload_chart = t_func
-
-        bnac.query_chart_by_indices(
-            active_chart=bnac_1,
-            old_indices=[],
-            new_indices=new_indices,
-            datatile=None,
-        )
-        result = initialize_df(df_type, result, index)
-
-        assert df_equals(self.result, result)
-        assert self.patch_update is False
