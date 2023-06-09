@@ -3,7 +3,7 @@ from bokeh.themes import Theme as _BkTheme
 from bokeh import palettes
 from panel.template.theme import Theme
 from ..layouts.layouts import ReactTemplate
-from ..charts.constants import DATATILE_ACTIVE_COLOR, STATIC_DIR_THEMES
+from ..charts.constants import STATIC_DIR_THEMES
 
 
 class DarkTheme(Theme):
@@ -78,7 +78,6 @@ class DarkTheme(Theme):
     color_palette = list(palettes.Blues[9])
     chart_color = "#4292c6"
     css = param.Filename(default=STATIC_DIR_THEMES / "rapids-dark.css")
-    datatile_active_color = DATATILE_ACTIVE_COLOR
 
     # Custom React Template
     _template = ReactTemplate

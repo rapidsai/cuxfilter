@@ -102,12 +102,7 @@ class TestBaseStackedLine:
     def test_box_selection_callback(self, df_type):
         bsl = BaseStackedLine("a", ["b"])
         bsl.chart_type = "stacked_lines"
-        self.result = None
 
-        def t_function(data, patch_update=False):
-            self.result = data
-
-        bsl.reload_chart = t_function
         df = initialize_df(df_type, {"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = cuxfilter.dashboard.DashBoard(
             dataframe=cuxfilter.DataFrame.from_dataframe(df)
@@ -116,7 +111,16 @@ class TestBaseStackedLine:
 
         t = bsl.get_box_select_callback(dashboard)
         t(boundsx=(1, 2))
-        df_equals(self.result, df.query("1<=a<=2"))
+
+        result_query = dashboard._generate_query_str()
+        query_variables = dashboard._query_local_variables_dict
+        assert result_query == "@a_min<=a<=@a_max"
+        assert query_variables["a_min"] == 1
+        assert query_variables["a_max"] == 2
+
+        result_df = dashboard._query(dashboard._generate_query_str())
+        expected_df = df.query("1<=a<=2")
+        assert df_equals(result_df, expected_df)
 
     @pytest.mark.parametrize("df_type", df_types)
     @pytest.mark.parametrize(
@@ -216,67 +220,3 @@ class TestBaseStackedLine:
             f"x_{'_'.join(['y'])}_stacked_lines_{bsl.title}"
             not in dashboard._query_str_dict
         )
-
-    @pytest.mark.parametrize("df_type", df_types)
-    def test_query_chart_by_range(self, df_type):
-        bsl = BaseStackedLine("a", ["b"])
-        bsl_1 = BaseStackedLine("b", ["a"])
-        query_tuple = (4, 5)
-        df = initialize_df(df_type, {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
-        bsl.source = df
-        self.result = None
-        self.patch_update = None
-
-        def t_func(data, patch_update):
-            self.result = data
-            self.patch_update = patch_update
-
-        # creating a dummy reload chart fn as its not implemented in core
-        # non aggregate chart class
-        bsl.reload_chart = t_func
-        bsl.query_chart_by_range(
-            active_chart=bsl_1, query_tuple=query_tuple, datatile=None
-        )
-
-        assert df_equals(
-            self.result,
-            initialize_df(df_type, {"a": [2, 3], "b": [4, 5]}, [1, 2]),
-        )
-        assert self.patch_update is False
-
-    @pytest.mark.parametrize("df_type", df_types)
-    @pytest.mark.parametrize(
-        "new_indices, result, index",
-        [
-            ([4, 5], {"a": [2, 3], "b": [4, 5]}, [1, 2]),
-            ([], {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]}, [0, 1, 2, 3]),
-            ([3], {"a": [1], "b": [3]}, [0]),
-        ],
-    )
-    def test_query_chart_by_indices(self, df_type, new_indices, result, index):
-        bsl = BaseStackedLine("a", ["b"])
-        bsl_1 = BaseStackedLine("b", ["a"])
-        new_indices = new_indices
-        df = initialize_df(df_type, {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
-        bsl.source = df
-        self.result = None
-        self.patch_update = None
-
-        def t_func(data, patch_update):
-            self.result = data
-            self.patch_update = patch_update
-
-        # creating a dummy reload chart fn as its not implemented in core
-        # non aggregate chart class
-        bsl.reload_chart = t_func
-        bsl.query_chart_by_indices(
-            active_chart=bsl_1,
-            old_indices=[],
-            new_indices=new_indices,
-            datatile=None,
-        )
-
-        result = initialize_df(df_type, result, index)
-
-        assert df_equals(self.result, result)
-        assert self.patch_update is False

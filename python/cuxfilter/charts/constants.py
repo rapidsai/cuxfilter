@@ -9,8 +9,6 @@ CUDF_DATETIME_TYPES = tuple(
     f"datetime64[{i}]" for i in ["s", "ms", "us", "ns"]
 ) + (np.datetime64,)
 CUDF_TIMEDELTA_TYPE = np.timedelta64
-DATATILE_ACTIVE_COLOR = "#8ab4f7"
-DATATILE_INACTIVE_COLOR = "#d3d9e2"
 
 # Static server paths
 CUSTOM_DIST_PATH_LAYOUTS = "layouts"

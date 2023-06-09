@@ -3,10 +3,10 @@ import dask_cudf
 import pyarrow as pa
 from typing import Type
 
-from .dashboard import DashBoard
-from .layouts import single_feature
-from .themes import light
-from .assets import notebook_assets
+from cuxfilter.dashboard import DashBoard
+from cuxfilter.layouts import single_feature
+from cuxfilter.themes import light
+from cuxfilter.assets import notebook_assets
 
 
 def read_arrow(source):
@@ -230,8 +230,6 @@ class DataFrame:
         """
         if notebook_assets.pn.config.js_files == {}:
             notebook_assets.load_notebook_assets()
-
-        # self.preprocess_data()
 
         return DashBoard(
             charts=charts,

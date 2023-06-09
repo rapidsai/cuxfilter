@@ -3,8 +3,6 @@ from ..core import BaseWidget
 from ..core.aggregate import BaseNumberChart
 from ..constants import (
     CUDF_DATETIME_TYPES,
-    DATATILE_ACTIVE_COLOR,
-    DATATILE_INACTIVE_COLOR,
 )
 from ...assets.cudf_utils import get_min_max
 from bokeh.models import ColumnDataSource
@@ -14,21 +12,6 @@ import panel as pn
 
 
 class RangeSlider(BaseWidget):
-    _datatile_loaded_state: bool = False
-    datatile_active_color = DATATILE_ACTIVE_COLOR
-
-    @property
-    def datatile_loaded_state(self):
-        return self._datatile_loaded_state
-
-    @datatile_loaded_state.setter
-    def datatile_loaded_state(self, state: bool):
-        self._datatile_loaded_state = state
-        if state:
-            self.chart.bar_color = self.datatile_active_color
-        else:
-            self.chart.bar_color = DATATILE_INACTIVE_COLOR
-
     def compute_stride(self):
         if self.stride_type == int and self.max_value < 1:
             self.stride_type = float
@@ -62,25 +45,17 @@ class RangeSlider(BaseWidget):
         )
         self.compute_stride()
 
-    def apply_theme(self, theme):
-        """
-        apply thematic changes to the chart based on the theme
-        """
-        # interactive slider
-        self.datatile_active_color = theme.datatile_active_color
-
     def add_events(self, dashboard_cls):
         """
         add events
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self:
-                dashboard_cls._reset_current_view(new_active_view=self)
-                dashboard_cls._calc_data_tiles()
-
-            query_tuple = self._xaxis_np_dt64_transform(event.new)
-            dashboard_cls._query_datatiles_by_range(query_tuple)
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict,
+            )
+            dashboard_cls._reload_charts()
 
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
 
@@ -107,13 +82,6 @@ class RangeSlider(BaseWidget):
 
 
 class DateRangeSlider(BaseWidget):
-    _datatile_loaded_state: bool = False
-    datatile_active_color = DATATILE_ACTIVE_COLOR
-
-    @property
-    def datatile_loaded_state(self):
-        return self._datatile_loaded_state
-
     @property
     def x_dtype(self):
         if isinstance(self.source, ColumnDataSource):
@@ -121,14 +89,6 @@ class DateRangeSlider(BaseWidget):
         elif isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
             return self.source[self.x].dtype
         return None
-
-    @datatile_loaded_state.setter
-    def datatile_loaded_state(self, state: bool):
-        self._datatile_loaded_state = state
-        if state:
-            self.chart.bar_color = self.datatile_active_color
-        else:
-            self.chart.bar_color = DATATILE_INACTIVE_COLOR
 
     def compute_stride(self):
         self.stride = self.stride_type(
@@ -173,24 +133,17 @@ class DateRangeSlider(BaseWidget):
             **self.params,
         )
 
-    def apply_theme(self, theme):
-        """
-        apply thematic changes to the chart based on the theme
-        """
-        # interactive slider
-        self.datatile_active_color = theme.datatile_active_color
-
     def add_events(self, dashboard_cls):
         """
         add events
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self:
-                dashboard_cls._reset_current_view(new_active_view=self)
-                dashboard_cls._calc_data_tiles()
-            query_tuple = self._xaxis_np_dt64_transform(event.new)
-            dashboard_cls._query_datatiles_by_range(query_tuple)
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict,
+            )
+            dashboard_cls._reload_charts()
 
         # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
@@ -218,21 +171,7 @@ class DateRangeSlider(BaseWidget):
 
 
 class IntSlider(BaseWidget):
-    _datatile_loaded_state: bool = False
     value = None
-    datatile_active_color = DATATILE_ACTIVE_COLOR
-
-    @property
-    def datatile_loaded_state(self):
-        return self._datatile_loaded_state
-
-    @datatile_loaded_state.setter
-    def datatile_loaded_state(self, state: bool):
-        self._datatile_loaded_state = state
-        if state:
-            self.chart.bar_color = self.datatile_active_color
-        else:
-            self.chart.bar_color = DATATILE_INACTIVE_COLOR
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -272,23 +211,17 @@ class IntSlider(BaseWidget):
                 **self.params,
             )
 
-    def apply_theme(self, theme):
-        """
-        apply thematic changes to the chart based on the theme
-        """
-        # interactive slider
-        self.datatile_active_color = theme.datatile_active_color
-
     def add_events(self, dashboard_cls):
         """
         add events
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self:
-                dashboard_cls._reset_current_view(new_active_view=self)
-                dashboard_cls._calc_data_tiles()
-            dashboard_cls._query_datatiles_by_indices([], [event.new])
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict,
+            )
+            dashboard_cls._reload_charts()
 
         # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
@@ -314,21 +247,7 @@ class IntSlider(BaseWidget):
 
 
 class FloatSlider(BaseWidget):
-    _datatile_loaded_state: bool = False
     value = None
-    datatile_active_color = DATATILE_ACTIVE_COLOR
-
-    @property
-    def datatile_loaded_state(self):
-        return self._datatile_loaded_state
-
-    @datatile_loaded_state.setter
-    def datatile_loaded_state(self, state: bool):
-        self._datatile_loaded_state = state
-        if state:
-            self.chart.bar_color = self.datatile_active_color
-        else:
-            self.chart.bar_color = DATATILE_INACTIVE_COLOR
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -367,24 +286,17 @@ class FloatSlider(BaseWidget):
                 **self.params,
             )
 
-    def apply_theme(self, theme):
-        """
-        apply thematic changes to the chart based on the theme
-        """
-        # interactive slider
-        self.datatile_active_color = theme.datatile_active_color
-
     def add_events(self, dashboard_cls):
         """
         add events
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self:
-                dashboard_cls._reset_current_view(new_active_view=self)
-                dashboard_cls._calc_data_tiles(cumsum=False)
-
-            dashboard_cls._query_datatiles_by_indices([], [event.new])
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict,
+            )
+            dashboard_cls._reload_charts()
 
         # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
@@ -439,8 +351,6 @@ class DropDown(BaseWidget):
                 self.list_of_values = self.list_of_values.compute()
 
             self.list_of_values = self.list_of_values.to_pandas().tolist()
-            # if len(self.list_of_values) > self.data_points:
-            #     self.list_of_values = aggregated_column_unique(self, data)
 
             if len(self.list_of_values) > 500:
                 print(
@@ -481,10 +391,11 @@ class DropDown(BaseWidget):
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self:
-                dashboard_cls._reset_current_view(new_active_view=self)
-                dashboard_cls._calc_data_tiles(cumsum=False)
-            dashboard_cls._query_datatiles_by_indices([], [event.new])
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict,
+            )
+            dashboard_cls._reload_charts()
 
         # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
@@ -541,8 +452,6 @@ class MultiSelect(BaseWidget):
                 self.list_of_values = self.list_of_values.compute()
 
             self.list_of_values = self.list_of_values.to_pandas().tolist()
-            # if len(self.list_of_values) > self.data_points:
-            #     self.list_of_values = aggregated_column_unique(self, data)
 
             if len(self.list_of_values) > 500:
                 print(
@@ -581,10 +490,11 @@ class MultiSelect(BaseWidget):
         """
 
         def widget_callback(event):
-            if dashboard_cls._active_view != self:
-                dashboard_cls._reset_current_view(new_active_view=self)
-                dashboard_cls._calc_data_tiles(cumsum=False)
-            dashboard_cls._query_datatiles_by_indices(event.old, event.new)
+            self.compute_query_dict(
+                dashboard_cls._query_str_dict,
+                dashboard_cls._query_local_variables_dict,
+            )
+            dashboard_cls._reload_charts()
 
         # add callback to filter_Widget on value change
         self.chart.param.watch(widget_callback, ["value"], onlychanged=False)
