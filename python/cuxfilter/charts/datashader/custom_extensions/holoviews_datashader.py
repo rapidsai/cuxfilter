@@ -334,7 +334,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
 
         return pn.panel(
             self.tiles * dmap if self.tiles is not None else dmap,
-            sizing_mode="stretch_both",
+            sizing_mode="stretch_width",
             height=self.height,
         )
 
@@ -641,6 +641,6 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
 
         return pn.panel(
             self.tiles * dmap_graph if self.tiles is not None else dmap_graph,
-            sizing_mode="stretch_both",
+            sizing_mode="stretch_width",
             height=self.height,
         )
