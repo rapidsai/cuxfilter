@@ -43,7 +43,7 @@ def calc_value_counts(a_gpu, stride, min_value, custom_binning=False):
                 .sort_index()
             )
 
-    return val_count.reset_index().values_host
+    return (val_count.index.values_host, val_count.values_host)
 
 
 def calc_groupby(chart: Type[BaseChart], data, agg=None):
