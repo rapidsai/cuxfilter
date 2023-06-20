@@ -269,8 +269,7 @@ def data_size_indicator(**library_specific_params):
 
 
 def number(
-    x=None,
-    expression=None,
+    expression,
     aggregate_fn="mean",
     title="",
     widget=True,
@@ -288,9 +287,6 @@ def number(
 
     Parameters
     ----------
-    x: str
-        column name from gpu dataframe
-
     expression:
         string containing computable expression containing column names
         e.g: "(x+y)/2" will result in number value = (df.x + df.y)/2
@@ -320,21 +316,17 @@ def number(
         documentation for more info
 
     """
-    if not (x or expression):
-        raise ArgumentError(
-            "Atleast one of x or expression arg should be provided"
-        )
     plot = NumberChart(
-        x,
-        expression,
-        aggregate_fn,
-        title,
-        widget,
-        format,
-        colors,
-        font_size,
+        expression=expression,
+        aggregate_fn=aggregate_fn,
+        title=title,
+        widget=widget,
+        format=format,
+        colors=colors,
+        font_size=font_size,
         **library_specific_params,
     )
+    plot.chart_type = "number"
     return plot
 
 

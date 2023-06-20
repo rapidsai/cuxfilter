@@ -52,7 +52,7 @@ class ViewDataFrame:
 
     @property
     def name(self):
-        return self.chart_type
+        return f"{self.chart_type}_{self.columns}"
 
     @property
     def width(self):
@@ -143,7 +143,7 @@ class ViewDataFrame:
     def view(self):
         return chart_view(self.chart, width=self.width, title="Dataset View")
 
-    def reload_chart(self, data, patch_update: bool):
+    def reload_chart(self, data):
         if isinstance(data, dask_cudf.core.DataFrame):
             if self.force_computation:
                 self.chart[0].object = self._format_data(

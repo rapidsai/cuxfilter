@@ -79,8 +79,7 @@ class TestBaseChart:
         assert bc.compute_query_dict(query_dict={}) == -1
         assert bc.reset_chart() == -1
         assert bc.reload_chart(data={}, patch_update=False) == -1
-        assert bc.reload_chart(data={}, patch_update=True) == -1
+        assert bc.reload_chart(data={}) == -1
         assert bc.format_source_data(source_dict={}, patch_update=False) == -1
-        assert bc.format_source_data(source_dict={}, patch_update=True) == -1
+        assert bc.format_source_data(source_dict={}) == -1
         assert bc.apply_mappers() == -1
-        assert bc.get_source_y_axis() == []

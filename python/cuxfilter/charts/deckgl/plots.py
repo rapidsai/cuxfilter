@@ -10,7 +10,6 @@ from PIL import ImageColor
 
 
 class Choropleth(BaseChoropleth):
-
     debug = False
     # reset event handling not required, as the default behavior
     # unselects all selected points, and that is already taken care of
@@ -111,14 +110,13 @@ class Choropleth(BaseChoropleth):
                 color_map
             ).tolist()
 
-    def format_source_data(self, data, patch_update=False):
+    def format_source_data(self, data):
         """
         format source
 
         Parameters:
         -----------
         data: cudf.DataFrame or dask_cudf.DataFrame
-        patch_update: boolean
 
         returns a pandas.DataFrame merged with geojson polygon coordinates
         """
@@ -128,18 +126,18 @@ class Choropleth(BaseChoropleth):
             .dropna(subset=["coordinates"])
             .reset_index(drop=True)
         )
-        if patch_update is False:
-            self.source = source_temp
-            self.compute_colors()
-        else:
-            self.source.loc[
-                :, [self.color_column, self.elevation_column]
-            ] = np.nan
-            self.source.loc[
-                self.source[self.x].isin(source_temp[self.x]),
-                [self.color_column, self.elevation_column],
-            ] = source_temp[[self.color_column, self.elevation_column]].values
-            self.compute_colors()
+        # if patch_update is False:
+        self.source = source_temp
+        self.compute_colors()
+        # else:
+        #     self.source.loc[
+        #         :, [self.color_column, self.elevation_column]
+        #     ] = np.nan
+        #     self.source.loc[
+        #         self.source[self.x].isin(source_temp[self.x]),
+        #         [self.color_column, self.elevation_column],
+        #     ] = source_temp[[self.color_column, self.elevation_column]].values
+        #     self.compute_colors()
 
         if self.chart:
             self.chart.data = self.source
@@ -196,12 +194,12 @@ class Choropleth(BaseChoropleth):
         if height is not None:
             self.chart.height = height
 
-    def reload_chart(self, data, patch_update=True):
+    def reload_chart(self, data):
         """
         reload chart
         ---
         """
-        self.calculate_source(data, patch_update=patch_update)
+        self.calculate_source(data)
 
     def reset_chart(self, data: np.array = np.array([]), column=None):
         """

@@ -52,18 +52,19 @@ class _LayoutBase:
         for chart in charts.values():
             chart.renderer_mode = render_location
 
+        self._apply_themes(charts, theme)
+        self._apply_themes(sidebar, theme)
+
         if self._render_location == "notebook":
             self.cols, self.rows = 12, 6
             tmpl = pn.GridSpec(
                 sizing_mode="stretch_both",
             )
-            self._apply_themes(charts, theme)
             self._process_plots(plots, tmpl)
             tmpl = self._process_widgets_notebook(widgets, tmpl)
         else:
             self.cols, self.rows = 12, 6
             tmpl = ReactTemplate(title=title, theme=theme, compact="both")
-            self._apply_themes(charts, theme)
             self._process_widgets(widgets, tmpl)
             self._process_plots(plots, tmpl)
 
@@ -85,8 +86,9 @@ class _LayoutBase:
         for obj in widgets_list:
             obj.chart.sizing_mode = "stretch_both"
             temp_chart = obj.view()
-            temp_chart.collapsible = False
-            temp_chart.header_css_classes.append("center-header")
+            if isinstance(temp_chart, pn.layout.Card):
+                temp_chart.collapsible = False
+                temp_chart.header_css_classes.append("center-header")
             x.append(temp_chart)
         return pn.Row(x, tmpl)
 

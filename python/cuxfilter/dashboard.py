@@ -181,10 +181,7 @@ class DashBoard:
 
         # add data_size_indicator to sidebar if data_size_widget=True
         if data_size_widget:
-            chart = data_size_indicator()
-            chart.initiate_chart(self)
-            chart._initialized = True
-            self._sidebar[chart.name] = chart
+            sidebar.insert(0, data_size_indicator())
 
         # process all sidebar widgets
         for chart in sidebar:
@@ -525,6 +522,46 @@ class DashBoard:
             sidebar_width,
         )
 
+    def servable(self, sidebar_width=280):
+        """
+        Run the dashboard with a bokeh backend server within the notebook.
+        Parameters
+        ----------
+        Examples
+        --------
+
+        >>> import cudf
+        >>> import cuxfilter
+        >>> from cuxfilter.charts import bokeh
+        >>> df = cudf.DataFrame(
+        >>>     {
+        >>>         'key': [0, 1, 2, 3, 4],
+        >>>         'val':[float(i + 10) for i in range(5)]
+        >>>     }
+        >>> )
+        >>> cux_df = cuxfilter.DataFrame.from_dataframe(df)
+        >>> line_chart_1 = bokeh.line(
+        >>>     'key', 'val', data_points=5, add_interaction=False
+        >>> )
+        >>> d = cux_df.dashboard([line_chart_1])
+        >>> d.app()
+
+        """
+        self._reinit_all_charts()
+        self._current_server_type = "servable"
+
+        self._dashboard.generate_dashboard(
+            self.title,
+            self._charts,
+            self._sidebar,
+            self._theme,
+            self._layout_array,
+            "web-app",
+            sidebar_width,
+        ).servable()
+
+        print("click panel logo to launch dashboard")
+
     def show(
         self,
         notebook_url=DEFAULT_NOTEBOOK_URL,
@@ -631,4 +668,4 @@ class DashBoard:
         # reloading charts as per current data state
         for chart in self.charts.values():
             if chart.name not in ignore_cols and chart.name in include_cols:
-                chart.reload_chart(data, patch_update=True)
+                chart.reload_chart(data)

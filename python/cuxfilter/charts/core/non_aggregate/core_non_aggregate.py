@@ -106,6 +106,7 @@ class BaseNonAggregate(BaseChart):
                 dashboard_cls._query_str_dict,
                 dashboard_cls._query_local_variables_dict,
             )
+            print("hello")
             # reload all charts with new queried data (cudf.DataFrame only)
             dashboard_cls._reload_charts()
 
@@ -213,6 +214,7 @@ class BaseNonAggregate(BaseChart):
 
         Ouput:
         """
+
         # def reset_callback():
         def reset_callback(resetting):
             self.selected_indices = None

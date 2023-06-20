@@ -146,9 +146,7 @@ class InteractiveDatashaderBase(param.Parameterized):
     unselected_alpha = param.Number(
         0.2,
         bounds=(0, 1),
-        doc=(
-            "display unselected data as the same color palette but transparent"
-        ),
+        doc=("Transparency of the unselected points. "),
     )
 
     def __init__(self, **params):

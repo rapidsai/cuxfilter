@@ -232,18 +232,14 @@ class BaseChart:
         print("base calc source function, to over-ridden by delegated classes")
         return -1
 
-    def reload_chart(self, data, patch_update: bool):
+    def reload_chart(self, data):
         print("base calc source function, to over-ridden by delegated classes")
         return -1
 
-    def format_source_data(self, source_dict, patch_update=False):
+    def format_source_data(self, source_dict):
         """"""
         # print('function to be overridden by library specific extensions')
         return -1
-
-    def get_source_y_axis(self):
-        # print('function to be overridden by library specific extensions')
-        return []
 
     def apply_mappers(self):
         """"""

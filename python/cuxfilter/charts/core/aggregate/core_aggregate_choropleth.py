@@ -157,7 +157,7 @@ class BaseChoropleth(BaseChart):
             self.chart.view(), width=self.width, title=self.title
         )
 
-    def calculate_source(self, data, patch_update=False):
+    def calculate_source(self, data):
         """
         Description:
 
@@ -169,7 +169,7 @@ class BaseChoropleth(BaseChart):
         Ouput:
         """
         self.format_source_data(
-            calc_groupby(self, data, agg=self.aggregate_dict), patch_update
+            calc_groupby(self, data, agg=self.aggregate_dict)
         )
 
     def get_selection_callback(self, dashboard_cls):
