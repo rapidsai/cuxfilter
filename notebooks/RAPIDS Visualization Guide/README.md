@@ -1,6 +1,10 @@
+# RAPIDS Visualization Guide Notebook
+Try an end to end RAPIDS visualization integrated workflow using the Divvy Bikeshare dataset.
+
+
 # RAPIDS Visualization Guide Catalog
 
-Run the RAPIDS Visualization Guide Catalog notebook to interactively explore the below viz libraries and compare how easy it is to switch from cpu to gpu usage.
+View online at [docs.rapids.ai/visualization](https://docs.rapids.ai/visualization) or run the RAPIDS Visualization Guide Catalog notebook to interactively explore the below viz libraries and compare how easy it is to switch from cpu to gpu usage.
 
 ## Featured Libraries
 
