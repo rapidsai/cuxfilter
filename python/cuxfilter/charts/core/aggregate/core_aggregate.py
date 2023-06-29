@@ -187,6 +187,7 @@ class BaseAggregateChart(BaseChart):
                 self.compute_stride()
 
         self.source = dashboard_cls._cuxfilter_df.data
+        self.generate_chart()
         self.add_events(dashboard_cls)
         # self.apply_mappers()
 
@@ -286,9 +287,7 @@ class BaseAggregateChart(BaseChart):
         Input:
         - dashboard_cls = current dashboard class reference
         """
-        self.box_stream = hv.streams.SelectionXY(
-            subscribers=[self.get_box_select_callback(dashboard_cls)]
+        self.chart.add_box_select_callback(
+            self.get_box_select_callback(dashboard_cls)
         )
-        self.reset_stream = hv.streams.PlotReset(
-            subscribers=[self.get_reset_callback(dashboard_cls)]
-        )
+        self.chart.add_reset_callback(self.get_reset_callback(dashboard_cls))

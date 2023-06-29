@@ -237,7 +237,7 @@ Currently supported layout templates and example code can be found on the [layou
 | datashader    | scatter, scatter_geo, line, stacked_lines, heatmap, graph                                        |
 | panel_widgets | range_slider, date_range_slider, float_slider, int_slider, drop_down, multi_select, card, number |
 | custom        | view_dataframe                                                                                   |
-| pydeck        | choropleth(3d and 2d)                                                                            |
+| deckgl        | choropleth(3d and 2d)                                                                            |
 
 ## Contributing Developers Guide
 
