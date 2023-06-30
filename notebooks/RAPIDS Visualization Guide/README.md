@@ -1,10 +1,16 @@
 # RAPIDS Visualization Guide Notebook
-Try an end to end RAPIDS visualization integrated workflow using the Divvy Bikeshare dataset.
+Try a user guide notebook of an end-to-end RAPIDS visualization integrated workflow using the [Divvy Bikeshare dataset](https://divvybikes.com/system-data).
+![divvy dashboard](images/plotly-dash-divvy.png)
 
+### The workflow includes integrated examples that use:
+- cuDF for EDA
+- cuML for KDE and Kmeans
+- cuSpatial for Haversine Distance
+- cuGraph for FA2
+- cuxfilter for cross-filtered bars, graph, and geospatial scatter charts
+- hvPlot with bokeh, datashader, and panel for multiple chart types
+- Plotly Dash for Dashboard App
 
-# RAPIDS Visualization Guide Catalog
-
-View online at [docs.rapids.ai/visualization](https://docs.rapids.ai/visualization) or run the RAPIDS Visualization Guide Catalog notebook to interactively explore the below viz libraries and compare how easy it is to switch from cpu to gpu usage.
 
 # RAPIDS Visualization Guide Catalog
 Interactively explore the below viz libraries and compare how easy it is to switch from CPU to GPU usage. View online at [docs.rapids.ai/visualization](https://docs.rapids.ai/visualization) or run the RAPIDS Visualization Guide Catalog notebook locally. 
