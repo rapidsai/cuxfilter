@@ -8,7 +8,7 @@ requires = []
 name = "cuxfilter"
 version = "23.08.00"
 description = "GPU accelerated cross filtering with cuDF"
-readme = { file = "README.md", content_type = "text/markdown" }
+readme = { file = "README.md", content-type = "text/markdown" }
 authors = [
     {name = "NVIDIA Corporation"},
 ]
