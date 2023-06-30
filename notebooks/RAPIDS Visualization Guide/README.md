@@ -1,13 +1,21 @@
 # RAPIDS Visualization Guide Notebook
-Try an end to end RAPIDS visualization integrated workflow using the Divvy Bikeshare dataset.
+Try a user guide notebook of an end-to-end RAPIDS visualization integrated workflow using the [Divvy Bikeshare dataset](https://divvybikes.com/system-data).
+![divvy dashboard](images/plotly-dash-divvy.png)
+
+### The workflow includes integrated examples that use:
+- cuDF for EDA
+- cuML for KDE and Kmeans
+- cuSpatial for Haversine Distance
+- cuGraph for FA2
+- cuxfilter for cross-filtered bars, graph, and geospatial scatter charts
+- hvPlot with bokeh, datashader, and panel for multiple chart types
+- Plotly Dash for Dashboard App
 
 
 # RAPIDS Visualization Guide Catalog
+Interactively explore the below viz libraries and compare how easy it is to switch from CPU to GPU usage. View online at [docs.rapids.ai/visualization](https://docs.rapids.ai/visualization) or run the RAPIDS Visualization Guide Catalog notebook locally. 
 
-View online at [docs.rapids.ai/visualization](https://docs.rapids.ai/visualization) or run the RAPIDS Visualization Guide Catalog notebook to interactively explore the below viz libraries and compare how easy it is to switch from cpu to gpu usage.
-
-## Featured Libraries
-
+### Featured Libraries:
 - HoloViews: Declarative objects for quickly building complex interactive plots from high-level specifications. Directly uses cuDF.
 - hvPlot: Quickly return interactive plots from cuDF, Pandas, Xarray, or other data structures. Just replace .plot() with .hvplot().
 - Datashader: Rasterizing huge datasets quickly as scatter, line, geospatial, or graph charts. Directly uses cuDF.
@@ -15,15 +23,14 @@ View online at [docs.rapids.ai/visualization](https://docs.rapids.ai/visualizati
 - Bokeh: Charting library for building complex interactive visualizations.
 - Seaborn: Static single charting library that extends matplotlib.
 
-## Other Notable Libraries
-
+### Other Notable Libraries:
 - Panel: A high-level app and dashboarding solution for the Python ecosystem.
 - PyDeck: Python bindings for interactive spatial visualizations with webGL powered deck.gl, optimized for a Jupyter environment.
 - node RAPIDS: RAPIDS bindings in nodeJS, a high performance JS/TypeScript visualization alternative to using Python.
 - cuxfilter: RAPIDS developed cross filtering dashboarding tool that integrates many of the libraries above.
 
 
-## Generate Static Charts from Notebook for Jekyll
+### Dev Guide: Generate Static Charts from Notebook for Jekyll
 **Note:** code for the apps are in the `/examples/` folder.
 
 Be sure to replace `Charts().view()` with below to pre-compute and export each chart:
