@@ -2,17 +2,25 @@
 
 repos:
       - repo: https://github.com/psf/black
-        rev: 22.10.0
+        rev: 22.3.0
         hooks:
               - id: black
                 files: python/cuxfilter/.*
                 # Explicitly specify the pyproject.toml at the repo root, not per-project.
                 args: ["--config", "pyproject.toml"]
       - repo: https://github.com/PyCQA/flake8
-        rev: 6.0.0
+        rev: 5.0.4
         hooks:
               - id: flake8
-                args: ["--config=python/setup.cfg"]
+                args: ["--config=.flake8"]
                 files: python/.*$
+                types: [file]
+                types_or: [python, cython]
+                additional_dependencies: ["flake8-force"]
+      - repo: https://github.com/rapidsai/dependency-file-generator
+        rev: v1.5.1
+        hooks:
+            - id: rapids-dependency-file-generator
+              args: ["--clean"]
 default_language_version:
       python: python3
