@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (c) 2020-2023, NVIDIA CORPORATION.
 #############################
 # cuxfilter Version Updater #
 #############################
@@ -22,6 +23,9 @@ NEXT_MAJOR=$(echo $NEXT_FULL_TAG | awk '{split($0, a, "."); print a[1]}')
 NEXT_MINOR=$(echo $NEXT_FULL_TAG | awk '{split($0, a, "."); print a[2]}')
 NEXT_SHORT_TAG=${NEXT_MAJOR}.${NEXT_MINOR}
 
+# Need to distutils-normalize the original version
+NEXT_SHORT_TAG_PEP440=$(python -c "from setuptools.extern import packaging; print(packaging.version.Version('${NEXT_SHORT_TAG}'))")
+
 echo "Preparing release $CURRENT_TAG => $NEXT_FULL_TAG"
 
 # Inplace sed replace; workaround for Linux and Mac
@@ -33,14 +37,19 @@ function sed_runner() {
 sed_runner 's/version = .*/version = '"'${NEXT_SHORT_TAG}'"'/g' docs/source/conf.py
 sed_runner 's/release = .*/release = '"'${NEXT_FULL_TAG}'"'/g' docs/source/conf.py
 
-# bump cudf
-for FILE in conda/environments/*.yaml dependencies.yaml; do
-  sed_runner "s/cudf=.*/cudf=${NEXT_SHORT_TAG}/g" ${FILE};
-  sed_runner "s/cugraph=.*/cugraph=${NEXT_SHORT_TAG}/g" ${FILE};
-  sed_runner "s/cuspatial=.*/cuspatial=${NEXT_SHORT_TAG}/g" ${FILE};
-  sed_runner "s/dask-cuda=.*/dask-cuda=${NEXT_SHORT_TAG}/g" ${FILE};
-  sed_runner "s/dask-cudf=.*/dask-cudf=${NEXT_SHORT_TAG}/g" ${FILE};
+DEPENDENCIES=(
+  cudf
+  dask-cuda
+  dask-cudf
+  cugraph
+  cuspatial
+)
+for FILE in dependencies.yaml conda/environments/*.yaml; do
+  for DEP in "${DEPENDENCIES[@]}"; do
+    sed_runner "/- ${DEP}==/ s/==.*/==${NEXT_SHORT_TAG_PEP440}\.*/g" ${FILE};
+  done
 done
+
 
 # README.md update
 sed_runner "s/version == ${CURRENT_SHORT_TAG}/version == ${NEXT_SHORT_TAG}/g" README.md
