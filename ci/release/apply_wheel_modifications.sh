@@ -7,16 +7,17 @@ VERSION=${1}
 CUDA_SUFFIX=${2}
 
 # pyproject.toml versions
-sed -i "s/^version = .*/version = \"${VERSION}\"/g" python/cuxfilter/pyproject.toml
+sed -i "s/^version = .*/version = \"${VERSION}\"/g" python/pyproject.toml
 
 # cuxfilter pyproject.toml cuda suffixes
-sed -i "s/^name = \"cuxfilter\"/name = \"cuxfilter${CUDA_SUFFIX}\"/g" python/cuxfilter/pyproject.toml
+sed -i "s/^name = \"cuxfilter\"/name = \"cuxfilter${CUDA_SUFFIX}\"/g" python/pyproject.toml
 # Need to provide the == to avoid modifying the URL
-sed -i "s/\"cudf==/\"cudf${CUDA_SUFFIX}==/g" python/cuxfilter/pyproject.toml
-sed -i "s/\"cuspatial==/\"cudf${CUDA_SUFFIX}==/g" python/cuxfilter/pyproject.toml
-sed -i "s/\"dask-cuda==/\"cudf${CUDA_SUFFIX}==/g" python/cuxfilter/pyproject.toml
-sed -i "s/\"dask-cudf==/\"cudf${CUDA_SUFFIX}==/g" python/cuxfilter/pyproject.toml
+sed -i "s/\"cudf==/\"cudf${CUDA_SUFFIX}==/g" python/pyproject.toml
+sed -i "s/\"cuspatial==/\"cudf${CUDA_SUFFIX}==/g" python/pyproject.toml
+sed -i "s/\"dask-cuda==/\"cudf${CUDA_SUFFIX}==/g" python/pyproject.toml
+sed -i "s/\"dask-cudf==/\"cudf${CUDA_SUFFIX}==/g" python/pyproject.toml
 
 if [[ $CUDA_SUFFIX == "-cu12" ]]; then
-    sed -i "s/numba[<=>\.,0-9]*/numba>=0.57/g" python/cuxfilter/pyproject.toml
+    sed -i "s/numba[<=>\.,0-9]*/numba>=0.57/g" python/pyproject.toml
+    sed -i "s/cuda-python[<=>\.,0-9]*/cuda-python>=12.0,<13.0/g" python/pyproject.toml
 fi
