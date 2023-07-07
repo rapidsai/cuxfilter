@@ -6,6 +6,7 @@ files:
       cuda: ["11.8", "12.0"]
       arch: [x86_64]
     includes:
+      - build_wheels
       - cudatoolkit
       - checks
       - docs
@@ -35,12 +36,40 @@ files:
       - cudatoolkit
       - docs
       - py_version
+  py_build:
+    output: pyproject
+    pyproject_dir: python
+    extras:
+      table: build-system
+    includes:
+      - build_wheels
+  py_run:
+    output: pyproject
+    pyproject_dir: python
+    extras:
+      table: project
+    includes:
+      - run
+  py_test:
+    output: pyproject
+    pyproject_dir: python
+    extras:
+      table: project.optional-dependencies
+      key: test
+    includes:
+      - test_python
 channels:
   - rapidsai
   - rapidsai-nightly
   - conda-forge
   - nvidia
 dependencies:
+  build_wheels:
+    common:
+      - output_types: pyproject
+        packages:
+          - wheel
+          - setuptools
   cudatoolkit:
     specific:
       - output_types: conda
@@ -114,7 +143,7 @@ dependencies:
               - python>=3.9,<3.11
   run:
     common:
-      - output_types: [conda, requirements]
+      - output_types: [conda, requirements, pyproject]
         packages:
           - bokeh>=2.4.2,<=2.5
           - cudf=23.08.*
@@ -134,7 +163,7 @@ dependencies:
           - pydeck>=0.3,<=0.5.0
           - pyppeteer>=0.2.6
           - pyproj>=2.4,<=3.4
-      - output_types: conda
+      - output_types: [conda, pyproject]
         packages:
           - cupy>=12.0.0
       - output_types: requirements
@@ -142,7 +171,7 @@ dependencies:
           - cupy-cuda11x>=12.0.0
   test_python:
     common:
-      - output_types: [conda, requirements]
+      - output_types: [conda, requirements, pyproject]
         packages:
           - pytest
           - pytest-cov
