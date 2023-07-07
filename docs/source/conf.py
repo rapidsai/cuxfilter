@@ -60,7 +60,12 @@ html_theme = "pydata_sphinx_theme"
 html_logo = "_static/rapids_logo.png"
 html_static_path = ["_static"]
 
+# Removes sidebar
 htmlhelp_basename = "cuxfilterdoc"
+
+html_sidebars = {
+  "user_guide/index": []
+}
 
 html_theme_options = {
     "external_links": [],
