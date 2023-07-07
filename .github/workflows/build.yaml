@@ -59,7 +59,7 @@ jobs:
       sha: ${{ inputs.sha }}
   wheel-build:
     secrets: inherit
-    uses: rapidsai/shared-action-workflows/.github/workflows/wheels-manylinux-build.yml@branch-23.08
+    uses: rapidsai/shared-action-workflows/.github/workflows/wheels-manylinux-build.yml@cuda-120
     with:
       build_type: ${{ inputs.build_type || 'branch' }}
       branch: ${{ inputs.branch }}
@@ -70,7 +70,7 @@ jobs:
   wheel-publish:
     needs: wheel-build
     secrets: inherit
-    uses: rapidsai/shared-action-workflows/.github/workflows/wheels-manylinux-publish.yml@branch-23.08
+    uses: rapidsai/shared-action-workflows/.github/workflows/wheels-manylinux-publish.yml@cuda-120
     with:
       build_type: ${{ inputs.build_type || 'branch' }}
       branch: ${{ inputs.branch }}
