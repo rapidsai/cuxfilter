@@ -65,8 +65,8 @@ jobs:
       branch: ${{ inputs.branch }}
       sha: ${{ inputs.sha }}
       date: ${{ inputs.date }}
-      package-name: cudf
-      package-dir: python/cuxfilter
+      package-name: cuxfilter
+      package-dir: python/
   wheel-publish:
     needs: wheel-build
     secrets: inherit

@@ -3,7 +3,6 @@
 [flake8]
 filename = *.py,
 exclude = __init__.py, *.egg, build, docs, .git
-force-check = True
 ignore =
     # line break before binary operator
     W503,
