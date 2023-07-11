@@ -2,14 +2,14 @@
 
 repos:
       - repo: https://github.com/psf/black
-        rev: 22.3.0
+        rev: 23.7.0
         hooks:
               - id: black
                 files: python/cuxfilter/.*
                 # Explicitly specify the pyproject.toml at the repo root, not per-project.
                 args: ["--config", "pyproject.toml"]
       - repo: https://github.com/PyCQA/flake8
-        rev: 5.0.4
+        rev: 6.0.0
         hooks:
               - id: flake8
                 args: ["--config=.flake8"]
