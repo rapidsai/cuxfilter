@@ -60,7 +60,7 @@ jobs:
   wheel-build:
     needs: checks
     secrets: inherit
-    uses: rapidsai/shared-action-workflows/.github/workflows/wheels-manylinux-build.yml@cuda-120
+    uses: rapidsai/shared-action-workflows/.github/workflows/wheels-pure-build.yml@cuda-120
     with:
       build_type: pull-request
       package-name: cuxfilter
@@ -68,7 +68,7 @@ jobs:
   wheel-tests:
     needs: wheel-build
     secrets: inherit
-    uses: rapidsai/shared-action-workflows/.github/workflows/wheels-manylinux-test.yml@cuda-120
+    uses: rapidsai/shared-action-workflows/.github/workflows/wheels-pure-test.yml@cuda-120
     with:
       build_type: pull-request
       package-name: cuxfilter
