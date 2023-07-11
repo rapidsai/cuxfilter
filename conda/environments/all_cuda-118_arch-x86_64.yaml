@@ -9,12 +9,12 @@ dependencies:
 - bokeh>=2.4.2,<=2.5
 - cuda-version=11.8
 - cudatoolkit
-- cudf==23.08.*
-- cugraph==23.08.*
+- cudf==23.8.*
+- cugraph==23.8.*
 - cupy>=12.0.0
-- cuspatial==23.08.*
-- dask-cuda==23.08.*
-- dask-cudf==23.08.*
+- cuspatial==23.8.*
+- dask-cuda==23.8.*
+- dask-cudf==23.8.*
 - datashader>=0.15
 - geopandas>=0.11.0
 - holoviews>=1.15.0,<=1.15.4
