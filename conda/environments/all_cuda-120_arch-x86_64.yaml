@@ -7,8 +7,7 @@ channels:
 - nvidia
 dependencies:
 - bokeh>=2.4.2,<=2.5
-- cuda-version=11.8
-- cudatoolkit
+- cuda-version=12.0
 - cudf==23.8.*
 - cugraph==23.8.*
 - cupy>=12.0.0
@@ -43,4 +42,4 @@ dependencies:
 - sphinx-markdown-tables
 - sphinx_rtd_theme
 - sphinxcontrib-websupport
-name: all_cuda-118_arch-x86_64
+name: all_cuda-120_arch-x86_64

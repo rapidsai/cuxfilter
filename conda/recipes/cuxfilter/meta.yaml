@@ -2,8 +2,9 @@
 
 {% set version = environ.get('GIT_DESCRIBE_TAG', '0.0.0.dev').lstrip('v') %}
 {% set minor_version = version.split('.')[0] + '.' + version.split('.')[1] %}
-{% set py_version = environ['CONDA_PY'] %}
 {% set cuda_version = '.'.join(environ['RAPIDS_CUDA_VERSION'].split('.')[:2]) %}
+{% set cuda_major = cuda_version.split('.')[0] %}
+{% set py_version = environ['CONDA_PY'] %}
 {% set date_string = environ['RAPIDS_DATE_STRING'] %}
 
 package:
@@ -15,12 +16,13 @@ source:
 
 build:
   number: {{ GIT_DESCRIBE_NUMBER }}
-  string: py{{ py_version }}_{{ date_string }}_{{ GIT_DESCRIBE_HASH }}_{{ GIT_DESCRIBE_NUMBER }}
+  string: cuda{{ cuda_major }}_py{{ py_version }}_{{ date_string }}_{{ GIT_DESCRIBE_HASH }}_{{ GIT_DESCRIBE_NUMBER }}
 
 requirements:
   host:
     - python
     - setuptools
+    - cuda-version ={{ cuda_version }}
   run:
     - bokeh >=2.4.2,<=2.5
     - cudf ={{ minor_version }}
@@ -42,10 +44,11 @@ requirements:
     - pyppeteer >=0.2.6
     - pyproj >=2.4,<=3.4
     - python
+    - {{ pin_compatible('cuda-version', max_pin='x', min_pin='x') }}
 
 test:
   requires:
-    - cudatoolkit ={{ cuda_version }}
+    - cuda-version ={{ cuda_version }}
   imports:
     - cuxfilter
 
