@@ -83,6 +83,7 @@ dependencies:
           - nbsphinx
           - numpydoc
           - pandoc<=2.0.0 # We should check and fix all "<=" pinnings
+          - pydata-sphinx-theme
           - recommonmark
           - sphinx
           - sphinx_rtd_theme
