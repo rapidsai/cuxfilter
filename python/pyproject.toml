@@ -28,8 +28,6 @@ dependencies = [
     "geopandas>=0.11.0",
     "holoviews>=1.15.0,<=1.15.4",
     "jupyter-server-proxy",
-    "libwebp",
-    "nodejs>=14",
     "numba>=0.57",
     "numpy>=1.21",
     "packaging",
