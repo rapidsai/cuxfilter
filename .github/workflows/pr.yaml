@@ -73,4 +73,3 @@ jobs:
       build_type: pull-request
       package-name: cuxfilter
       test-unittest: "python -m pytest -n 8 ./python/cuxfilter/tests"
-      test-smoketest: "python ./ci/wheel_smoke_test.py"
