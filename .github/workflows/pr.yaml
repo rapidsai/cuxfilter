@@ -64,7 +64,7 @@ jobs:
     with:
       build_type: pull-request
       package-name: cuxfilter
-      package-dir: python
+      package-dir: python/
   wheel-tests:
     needs: wheel-build
     secrets: inherit
