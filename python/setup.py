@@ -1,3 +1,5 @@
+# Copyright (c) 2019-2023, NVIDIA CORPORATION.
+
 from setuptools import find_packages, setup
 
 setup(

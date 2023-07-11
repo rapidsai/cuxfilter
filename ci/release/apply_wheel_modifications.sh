@@ -18,6 +18,5 @@ sed -i "s/\"dask-cuda==/\"dask-cuda${CUDA_SUFFIX}==/g" python/pyproject.toml
 sed -i "s/\"dask-cudf==/\"dask-cudf${CUDA_SUFFIX}==/g" python/pyproject.toml
 
 if [[ $CUDA_SUFFIX == "-cu12" ]]; then
-    sed -i "s/numba[<=>\.,0-9]*/numba>=0.57/g" python/pyproject.toml
     sed -i "s/cupy-cuda11x/cupy-cuda12x/g" python/pyproject.toml
 fi
