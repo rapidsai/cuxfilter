@@ -22,7 +22,6 @@ dependencies = [
     "cudf==23.8.*",
     "cupy-cuda11x>=12.0.0",
     "cuspatial==23.8.*",
-    "dask-cuda==23.8.*",
     "dask-cudf==23.8.*",
     "datashader>=0.15",
     "geopandas>=0.11.0",

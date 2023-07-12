@@ -72,6 +72,4 @@ jobs:
     with:
       build_type: pull-request
       package-name: cuxfilter
-      # dask-cuda has to install from source because it is not yet released on PyPI.
-      test-before: "python -m pip install git+https://github.com/rapidsai/dask-cuda.git@branch-23.08"
       test-unittest: "python -m pytest -n 8 ./python/cuxfilter/tests"

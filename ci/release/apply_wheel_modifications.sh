@@ -14,7 +14,6 @@ sed -i "s/^name = \"cuxfilter\"/name = \"cuxfilter${CUDA_SUFFIX}\"/g" python/pyp
 # Need to provide the == to avoid modifying the URL
 sed -i "s/\"cudf==/\"cudf${CUDA_SUFFIX}==/g" python/pyproject.toml
 sed -i "s/\"cuspatial==/\"cuspatial${CUDA_SUFFIX}==/g" python/pyproject.toml
-sed -i "s/\"dask-cuda==/\"dask-cuda${CUDA_SUFFIX}==/g" python/pyproject.toml
 sed -i "s/\"dask-cudf==/\"dask-cudf${CUDA_SUFFIX}==/g" python/pyproject.toml
 
 if [[ $CUDA_SUFFIX == "-cu12" ]]; then

@@ -28,7 +28,6 @@ requirements:
     - cudf ={{ minor_version }}
     - cupy >=12.0.0
     - cuspatial ={{ minor_version }}
-    - dask-cuda ={{ minor_version }}
     - dask-cudf ={{ minor_version }}
     - datashader >=0.15
     - geopandas >=0.11.0
