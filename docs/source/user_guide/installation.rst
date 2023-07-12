@@ -3,18 +3,18 @@ Installation
 
 Conda
 -----
-For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the RAPIDS `Get Started Page <https://rapids.ai/start.html#rapids-release-selector>`_.
+For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the RAPIDS `Install Page <https://docs.rapids.ai/install>`_.
 
 cuxfilter conda example installation:
 
 .. code-block:: bash
 
     conda install -c rapidsai -c conda-forge -c nvidia \
-        cuxfilter=23.02 python=3.10 cudatoolkit=11.8
+        cuxfilter=23.6 python=3.10 cudatoolkit=11.8
 
 Docker container
 ----------------
-For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the RAPIDS `Get Started Page <https://rapids.ai/start.html#rapids-release-selector>`_.
+For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the RAPIDS `Install Page <https://docs.rapids.ai/install>`_.
 
 cuxfilter docker example installation:
 
@@ -30,14 +30,14 @@ cuxfilter docker example installation:
 Build/Install from Source
 -------------------------
 
-See `build instructions <https://github.com/rapidsai/cuxfilter/blob/branch-23.02/CONTRIBUTING.md#setting-up-your-build-environment>`_.
+See `build instructions <https://github.com/rapidsai/cuxfilter/blob/main/CONTRIBUTING.md#setting-up-your-build-environment>` on our GitHub.
 
 
 
 Troubleshooting
 ---------------
 
-1. Install jupyterlab dependencies
+Install jupyterlab dependencies
 **********************************
 
 .. code-block:: bash
@@ -46,18 +46,8 @@ Troubleshooting
     jupyter labextension install @pyviz/jupyterlab_pyviz
     jupyter labextension install @bokeh/jupyter_bokeh
 
-2.running the server
-********************
 
-.. code-block:: bash
-
-    #enter ip address without http://
-    #current port is the port at which jupyterlab is running
-    d.app(notebook_url='ip.addr:current_port')
-    # OR for a separate web app
-    d.show(notebook_url='ip.addr:current_port')
-
-3. libxcomposite.so.1 not found error
+libxcomposite.so.1 not found error
 *************************************
 
 If using **await d.preview()** throws a **libxcomposite.so.1 not found error**, execute the following commands:
@@ -67,13 +57,14 @@ If using **await d.preview()** throws a **libxcomposite.so.1 not found error**, 
     apt-get update
     apt-get install libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxrandr2 libxtst6 libcups2 libxss1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libatk1.0-0 libgtk-3-0 libgdk-pixbuf2.0-0
 
+
 Download datasets
 -----------------
 
-1. Auto download datasets
+1. Automatically download datasets
 *************************
 
-The notebooks inside `python/notebooks` already have a check function which verifies whether the example dataset is downloaded, and downloads it if it's not.
+The notebooks inside `python/notebooks` already have a check function which verifies whether the example dataset is downloaded, and downloads if not present.
 
 2. Download manually
 ********************

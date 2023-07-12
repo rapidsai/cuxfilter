@@ -10,7 +10,6 @@ from PIL import ImageColor
 
 
 class Choropleth(BaseChoropleth):
-
     debug = False
     # reset event handling not required, as the default behavior
     # unselects all selected points, and that is already taken care of

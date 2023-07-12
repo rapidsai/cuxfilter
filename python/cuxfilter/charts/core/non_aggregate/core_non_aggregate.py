@@ -213,6 +213,7 @@ class BaseNonAggregate(BaseChart):
 
         Ouput:
         """
+
         # def reset_callback():
         def reset_callback(resetting):
             self.selected_indices = None

@@ -171,7 +171,6 @@ def graph(
     unselected_alpha=0.2,
     **library_specific_params,
 ):
-
     """
     Parameters
     ----------
