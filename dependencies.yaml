@@ -176,3 +176,5 @@ dependencies:
         packages:
           - pytest
           - pytest-cov
+          - pytest-xdist
+
