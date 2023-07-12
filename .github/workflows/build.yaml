@@ -57,3 +57,23 @@ jobs:
       node_type: "gpu-v100-latest-1"
       run_script: "ci/build_docs.sh"
       sha: ${{ inputs.sha }}
+  wheel-build:
+    secrets: inherit
+    uses: rapidsai/shared-action-workflows/.github/workflows/wheels-pure-build.yml@cuda-120
+    with:
+      build_type: ${{ inputs.build_type || 'branch' }}
+      branch: ${{ inputs.branch }}
+      sha: ${{ inputs.sha }}
+      date: ${{ inputs.date }}
+      package-name: cuxfilter
+      package-dir: python/
+  wheel-publish:
+    needs: wheel-build
+    secrets: inherit
+    uses: rapidsai/shared-action-workflows/.github/workflows/wheels-pure-publish.yml@cuda-120
+    with:
+      build_type: ${{ inputs.build_type || 'branch' }}
+      branch: ${{ inputs.branch }}
+      sha: ${{ inputs.sha }}
+      date: ${{ inputs.date }}
+      package-name: cuxfilter

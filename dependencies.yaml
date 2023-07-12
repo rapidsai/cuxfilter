@@ -6,6 +6,7 @@ files:
       cuda: ["11.8", "12.0"]
       arch: [x86_64]
     includes:
+      - build_wheels
       - cudatoolkit
       - checks
       - docs
@@ -35,12 +36,40 @@ files:
       - cudatoolkit
       - docs
       - py_version
+  py_build:
+    output: pyproject
+    pyproject_dir: python
+    extras:
+      table: build-system
+    includes:
+      - build_wheels
+  py_run:
+    output: pyproject
+    pyproject_dir: python
+    extras:
+      table: project
+    includes:
+      - run
+  py_test:
+    output: pyproject
+    pyproject_dir: python
+    extras:
+      table: project.optional-dependencies
+      key: test
+    includes:
+      - test_python
 channels:
   - rapidsai
   - rapidsai-nightly
   - conda-forge
   - nvidia
 dependencies:
+  build_wheels:
+    common:
+      - output_types: pyproject
+        packages:
+          - wheel
+          - setuptools
   cudatoolkit:
     specific:
       - output_types: conda
@@ -98,6 +127,7 @@ dependencies:
       - output_types: [conda]
         packages:
           - cugraph==23.8.*
+          - dask-cuda==23.8.*
   py_version:
     specific:
       - output_types: conda
@@ -115,19 +145,16 @@ dependencies:
               - python>=3.9,<3.11
   run:
     common:
-      - output_types: [conda, requirements]
+      - output_types: [conda, requirements, pyproject]
         packages:
           - bokeh>=2.4.2,<=2.5
           - cudf==23.8.*
           - cuspatial==23.8.*
-          - dask-cuda==23.8.*
           - dask-cudf==23.8.*
           - datashader>=0.15
           - geopandas>=0.11.0
           - holoviews>=1.15.0,<=1.15.4
           - jupyter-server-proxy
-          - libwebp
-          - nodejs>=14
           - numba>=0.57
           - numpy>=1.21
           - packaging
@@ -138,12 +165,16 @@ dependencies:
       - output_types: conda
         packages:
           - cupy>=12.0.0
-      - output_types: requirements
+          - nodejs>=14
+          - libwebp
+      - output_types: [requirements, pyproject]
         packages:
           - cupy-cuda11x>=12.0.0
   test_python:
     common:
-      - output_types: [conda, requirements]
+      - output_types: [conda, requirements, pyproject]
         packages:
           - pytest
           - pytest-cov
+          - pytest-xdist
+

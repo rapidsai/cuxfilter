@@ -1,2 +1,0 @@
-include versioneer.py
-include cuxfilter/_version.py

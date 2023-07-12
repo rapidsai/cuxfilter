@@ -38,6 +38,7 @@ dependencies:
 - pyproj>=2.4,<=3.4
 - pytest
 - pytest-cov
+- pytest-xdist
 - python>=3.9,<3.11
 - recommonmark
 - sphinx
