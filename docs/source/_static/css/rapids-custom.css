@@ -1,0 +1,13 @@
+# RAPIDS Custom Docs css
+# https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/styling.html#custom-css
+# primary secondary success info warning danger background on-background surface on-surface target
+
+html[data-theme="light"] {
+    --pst-color-primary: rgb(124, 16, 151);
+}
+
+html[data-theme="dark"] {
+    --pst-color-primary: white;
+}
+
+

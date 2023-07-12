@@ -15,6 +15,9 @@ version = '23.08'
 # The full version, including alpha/beta/rc tags
 release = '23.08.00'
 
+# Allow errors in all notebooks by setting this option
+# https://nbsphinx.readthedocs.io/en/0.2.7/allow-errors.html
+# 
 nbsphinx_allow_errors = True
 
 
@@ -51,32 +54,45 @@ source_suffix = {".rst": "restructuredtext"}
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
-# -- Options for HTML output -------------------------------------------------
-
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
+# Output file base name for HTML help builder. Default is 'pydoc'
 #
-html_theme = "pydata_sphinx_theme"
-html_logo = "_static/rapids_logo.png"
-html_static_path = ["_static"]
-
-# Removes sidebar
 htmlhelp_basename = "cuxfilterdoc"
 
-html_sidebars = {
-  "user_guide/index": []
-}
+# -- Options for HTML output -------------------------------------------------
+
+# PyData Theme Options
+# https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html
+#
+html_theme = "pydata_sphinx_theme"
+html_static_path = ["_static"]
+html_css_files = ['css/rapids-custom.css']
 
 html_theme_options = {
+    "logo": {"text": project},
     "external_links": [],
     "icon_links": [],
     "github_url": "https://github.com/rapidsai/cuxfilter",
     "twitter_url": "https://twitter.com/rapidsai",
     "show_toc_level": 1,
-    "navbar_align": "right",
+    "navbar_start": ["navbar-logo", "version-switcher"],
+    "navbar_center": ["navbar-nav"],
+    "navbar_end": ["theme-switcher.html","navbar-icon-links.html"],
+    "announcement": "https://github.com/pydata/pydata-sphinx-theme/raw/main/docs/_templates/custom-template.html", 
+    "switcher": { 
+        "version_match": version,
+        "json_url": "_static/doc-versions.json"
+        }
 }
 
 
-def setup(app):
-    app.add_css_file("https://docs.rapids.ai/assets/css/custom.css")
-    app.add_js_file("https://docs.rapids.ai/assets/js/custom.js", loading_method="defer")
+#def setup(app):
+#    app.add_css_file("https://docs.rapids.ai/assets/css/custom.css")
+#    app.add_js_file("https://docs.rapids.ai/assets/js/custom.js", loading_method="defer")
+
+
+# TO DO NOTES: 
+# - Find out way to locally test CORS issues with remote announcements (rapids nav) *
+# - Find good location for switcher json
+# - Update custom CSS
+# - Find out way to do adobe analytics (GOOGLE: https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/analytics.html)
+# - FontAwesome https://fontawesome.com/icons?m=free
