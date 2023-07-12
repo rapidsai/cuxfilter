@@ -1,5 +1,5 @@
-Examples
-========
+Example Dashboards
+==================
 
 .. toctree::
    :maxdepth: 1

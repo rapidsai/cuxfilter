@@ -1,4 +1,4 @@
-Panel Widgets
+Widgets
 =============
 
 .. currentmodule:: cuxfilter.charts

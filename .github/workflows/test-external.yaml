@@ -17,13 +17,13 @@ on:
           Will be ignored if external-project=all
           "
         required: false
-    schedule:
-      - cron: "0 0 * * 1" # Run every Sunday evening Pacific Time (Monday 0:00 UTC)
+  schedule:
+    - cron: "0 0 * * 1" # Run every Sunday evening Pacific Time (Monday 0:00 UTC)
 
 jobs:
   test-external:
     secrets: inherit
-    uses: rapidsai/shared-action-workflows/.github/workflows/custom-job.yaml@branch-23.08
+    uses: rapidsai/shared-action-workflows/.github/workflows/custom-job.yaml@cuda-120
     with:
       build_type: branch
       node_type: "gpu-v100-latest-1"

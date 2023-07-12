@@ -3,11 +3,12 @@ files:
   all:
     output: conda
     matrix:
-      cuda: ["11.8"]
+      cuda: ["11.8", "12.0"]
       arch: [x86_64]
     includes:
+      - build_wheels
       - cudatoolkit
-      - develop
+      - checks
       - docs
       - notebook
       - py_version
@@ -28,40 +29,76 @@ files:
   checks:
     output: none
     includes:
-      - develop
+      - checks
   docs:
     output: none
     includes:
       - cudatoolkit
       - docs
       - py_version
+  py_build:
+    output: pyproject
+    pyproject_dir: python
+    extras:
+      table: build-system
+    includes:
+      - build_wheels
+  py_run:
+    output: pyproject
+    pyproject_dir: python
+    extras:
+      table: project
+    includes:
+      - run
+  py_test:
+    output: pyproject
+    pyproject_dir: python
+    extras:
+      table: project.optional-dependencies
+      key: test
+    includes:
+      - test_python
 channels:
   - rapidsai
   - rapidsai-nightly
   - conda-forge
   - nvidia
 dependencies:
+  build_wheels:
+    common:
+      - output_types: pyproject
+        packages:
+          - wheel
+          - setuptools
   cudatoolkit:
     specific:
       - output_types: conda
         matrices:
           - matrix:
-              cuda: "11.2"
+              cuda: "12.0"
             packages:
-              - cudatoolkit=11.2
-          - matrix:
-              cuda: "11.4"
-            packages:
-              - cudatoolkit=11.4
-          - matrix:
-              cuda: "11.5"
-            packages:
-              - cudatoolkit=11.5
+              - cuda-version=12.0
           - matrix:
               cuda: "11.8"
             packages:
-              - cudatoolkit=11.8
-  develop:
+              - cuda-version=11.8
+              - cudatoolkit
+          - matrix:
+              cuda: "11.5"
+            packages:
+              - cuda-version=11.5
+              - cudatoolkit
+          - matrix:
+              cuda: "11.4"
+            packages:
+              - cuda-version=11.4
+              - cudatoolkit
+          - matrix:
+              cuda: "11.2"
+            packages:
+              - cuda-version=11.2
+              - cudatoolkit
+  checks:
     common:
       - output_types: [conda, requirements]
         packages:
@@ -75,6 +112,7 @@ dependencies:
           - nbsphinx
           - numpydoc
           - pandoc<=2.0.0 # We should check and fix all "<=" pinnings
+          - pydata-sphinx-theme
           - recommonmark
           - sphinx
           - sphinx_rtd_theme
@@ -88,7 +126,8 @@ dependencies:
           - notebook>=0.5.0
       - output_types: [conda]
         packages:
-          - cugraph=23.08
+          - cugraph==23.8.*
+          - dask-cuda==23.8.*
   py_version:
     specific:
       - output_types: conda
@@ -106,15 +145,16 @@ dependencies:
               - python>=3.9,<3.11
   run:
     common:
-      - output_types: [conda, requirements]
+      - output_types: [conda, requirements, pyproject]
         packages:
           - bokeh>=3.1
+          - cudf==23.8.*
+          - cuspatial==23.8.*
+          - dask-cudf==23.8.*
           - datashader>=0.15
           - geopandas>=0.11.0
           - holoviews>=1.16.0
           - jupyter-server-proxy
-          - libwebp
-          - nodejs>=14
           - numba>=0.57
           - numpy>=1.21
           - packaging
@@ -123,13 +163,17 @@ dependencies:
           - pyproj>=2.4,<=3.4
       - output_types: conda
         packages:
-          - cudf=23.08
-          - cuspatial=23.08
-          - dask-cuda=23.08
-          - dask-cudf=23.08
+          - cupy>=12.0.0
+          - nodejs>=14
+          - libwebp
+      - output_types: [requirements, pyproject]
+        packages:
+          - cupy-cuda11x>=12.0.0
   test_python:
     common:
-      - output_types: [conda, requirements]
+      - output_types: [conda, requirements, pyproject]
         packages:
           - pytest
           - pytest-cov
+          - pytest-xdist
+
