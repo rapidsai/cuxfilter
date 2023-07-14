@@ -65,7 +65,7 @@ htmlhelp_basename = "cuxfilterdoc"
 #
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
-html_css_files = ['css/rapids-custom.css']
+html_css_files = ['https://raw.githubusercontent.com/exactlyallan/sphinx-theme-conf/main/_static/css/rapids-custom.css']
 
 html_theme_options = {
     "logo": {"text": project},
@@ -77,10 +77,10 @@ html_theme_options = {
     "navbar_start": ["navbar-logo", "version-switcher"],
     "navbar_center": ["navbar-nav"],
     "navbar_end": ["theme-switcher.html","navbar-icon-links.html"],
-    "announcement": "https://github.com/pydata/pydata-sphinx-theme/raw/main/docs/_templates/custom-template.html", 
+    "announcement": "https://raw.githubusercontent.com/exactlyallan/sphinx-theme-conf/main/_static/rapids-nav.html", 
     "switcher": { 
         "version_match": version,
-        "json_url": "_static/doc-versions.json"
+        "json_url": "https://raw.githubusercontent.com/exactlyallan/sphinx-theme-conf/main/_static/doc-versions.json"
         }
 }
 
