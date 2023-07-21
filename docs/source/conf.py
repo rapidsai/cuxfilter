@@ -65,34 +65,22 @@ htmlhelp_basename = "cuxfilterdoc"
 #
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
-html_css_files = ['https://raw.githubusercontent.com/exactlyallan/sphinx-theme-conf/main/_static/css/rapids-custom.css']
+html_css_files = ['https://raw.githubusercontent.com/rapidsai/sphinx-theme/main/_static/css/rapids-custom.css']
 
 html_theme_options = {
     "logo": {"text": project},
     "external_links": [],
     "icon_links": [],
-    "github_url": "https://github.com/rapidsai/cuxfilter",
+    "github_url": f"https://github.com/rapidsai/{project}",
     "twitter_url": "https://twitter.com/rapidsai",
     "show_toc_level": 1,
     "navbar_start": ["navbar-logo", "version-switcher"],
     "navbar_center": ["navbar-nav"],
     "navbar_end": ["theme-switcher.html","navbar-icon-links.html"],
-    "announcement": "https://raw.githubusercontent.com/exactlyallan/sphinx-theme-conf/main/_static/rapids-nav.html", 
+    "announcement": "https://raw.githubusercontent.com/rapidsai/sphinx-theme/main/_static/rapids-nav.html", 
     "switcher": { 
         "version_match": version,
-        "json_url": "https://raw.githubusercontent.com/exactlyallan/sphinx-theme-conf/main/_static/doc-versions.json"
+        "json_url": f"https://raw.githubusercontent.com/rapidsai/sphinx-theme/main/_static/versions/{project}-doc-versions.json"
         }
 }
 
-
-#def setup(app):
-#    app.add_css_file("https://docs.rapids.ai/assets/css/custom.css")
-#    app.add_js_file("https://docs.rapids.ai/assets/js/custom.js", loading_method="defer")
-
-
-# TO DO NOTES: 
-# - Find out way to locally test CORS issues with remote announcements (rapids nav) *
-# - Find good location for switcher json
-# - Update custom CSS
-# - Find out way to do adobe analytics (GOOGLE: https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/analytics.html)
-# - FontAwesome https://fontawesome.com/icons?m=free
