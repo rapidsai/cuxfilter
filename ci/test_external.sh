@@ -6,7 +6,7 @@ set -e
 rapids-logger "Create test_external conda environment"
 . /opt/conda/etc/profile.d/conda.sh
 
-RAPIDS_VERSION=23.06.*
+RAPIDS_VERSION=23.10.*
 
 rapids-mamba-retry create -n test_external -c rapidsai -c conda-forge -c nvidia  \
     cudf=${RAPIDS_VERSION} dask-cudf=${RAPIDS_VERSION} python=3.10 cudatoolkit=11.8
