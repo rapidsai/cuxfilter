@@ -64,7 +64,7 @@ jobs:
     with:
       build_type: pull-request
       script: ci/build_wheel.sh
-      matrix_filter: map(select(.arch == "amd64" and .python == "3.10" and (.ctk == "11.8.0" or .ctk == "12.0.1")))
+      matrix_filter: map(select(.ARCH == "amd64" and .PY_VER == "3.10" and (.CUDA_VER == "11.8.0" or .CUDA_VER == "12.0.1")))
   wheel-tests:
     needs: wheel-build
     secrets: inherit
@@ -72,4 +72,4 @@ jobs:
     with:
       build_type: pull-request
       script: ci/test_wheel.sh
-      matrix_filter: map(select(.arch == "amd64" and .python == "3.10" and (.ctk == "11.8.0" or .ctk == "12.0.1")))
+      matrix_filter: map(select(.ARCH == "amd64" and .PY_VER == "3.10" and (.CUDA_VER == "11.8.0" or .CUDA_VER == "12.0.1")))
