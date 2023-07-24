@@ -25,8 +25,7 @@ jobs:
   wheel-tests:
     needs: wheel-build
     secrets: inherit
-    uses: rapidsai/shared-action-workflows/.github/workflows/wheels-pure-test.yml@cuda-120
+    uses: rapidsai/shared-action-workflows/.github/workflows/wheels-test.yaml@branch-23.08
     with:
       build_type: pull-request
       package-name: cuxfilter
-      test-unittest: "python -m pytest -n 8 ./python/cuxfilter/tests"
