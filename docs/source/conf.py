@@ -65,22 +65,34 @@ htmlhelp_basename = "cuxfilterdoc"
 #
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
-html_css_files = ['https://raw.githubusercontent.com/rapidsai/sphinx-theme/main/_static/css/rapids-custom.css']
+html_css_files = ['css/custom.css'] # temp
 
 html_theme_options = {
     "logo": {"text": project},
-    "external_links": [],
+    "external_links": [
+        {"name": "Ecosystem", "url": "https://rapids.ai/ecosystem"},
+        {"name": "Learn More", "url": "https://rapids.ai/learn-more"},
+        {"name": "News", "url": "https://rapids.ai/news"},
+        {"name": "User Guides", "url": "https://rapids.ai/user-guides"},
+        {"name": "API Docs", "url": "https://rapids.ai/api"},
+        {"name": "Install", "url": "https://rapids.ai/install"}
+    ],
+    "header_links_before_dropdown": 2, # note: change based on number of top level directories
+    "announcement": "https://raw.githubusercontent.com/rapidsai/sphinx-theme/main/_static/rapids-nav.html", # static
     "icon_links": [],
     "github_url": f"https://github.com/rapidsai/{project}",
     "twitter_url": "https://twitter.com/rapidsai",
-    "show_toc_level": 1,
+    "show_toc_level": 2,
+    "navbar_align": "left",
     "navbar_start": ["navbar-logo", "version-switcher"],
     "navbar_center": ["navbar-nav"],
     "navbar_end": ["theme-switcher.html","navbar-icon-links.html"],
-    "announcement": "https://raw.githubusercontent.com/rapidsai/sphinx-theme/main/_static/rapids-nav.html", 
     "switcher": { 
         "version_match": version,
         "json_url": f"https://raw.githubusercontent.com/rapidsai/sphinx-theme/main/_static/versions/{project}-doc-versions.json"
-        }
+    }
 }
 
+
+# NOTE TO DO:
+# works well, but need to fix scroll behavior and z index
