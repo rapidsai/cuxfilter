@@ -41,7 +41,6 @@ requirements:
     - panel >=0.14.0,<=0.14.1
     - pydeck >=0.3,<=0.5.0
     - pyppeteer >=0.2.6
-    - pyproj >=2.4,<=3.4
     - python
     - {{ pin_compatible('cuda-version', max_pin='x', min_pin='x') }}
 
