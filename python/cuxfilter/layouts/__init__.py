@@ -1,4 +1,4 @@
-from .chart_views import chart_view
+from .chart_views import chart_view, widget_view
 from .layouts import (
     Layout0 as single_feature,
     Layout1 as feature_and_base,

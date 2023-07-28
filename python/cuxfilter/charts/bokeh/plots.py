@@ -64,14 +64,11 @@ class Bar(BaseAggregateChart):
         generate chart
         """
         self.chart = figure(
-            x_range=(
-                self.source.data[self.data_x_axis]
-                if self.x_dtype == "object"
-                else None
-            ),
             tools="pan, wheel_zoom, reset, save",
             active_scroll="wheel_zoom",
             active_drag="pan",
+            # sizing_mode="inherit",
+            height=self.height,
         )
         if self.color is None:
             self.sub_chart = self.chart.vbar(
@@ -106,10 +103,11 @@ class Bar(BaseAggregateChart):
         """
         update dimensions
         """
-        if width is not None:
-            self.chart.plot_width = width
-        if height is not None:
-            self.chart.plot_height = height
+        pass
+        # if width is not None:
+        #     self.chart.plot_width = width
+        # if height is not None:
+        #     self.chart.plot_height = height
 
     def apply_mappers(self):
         """
@@ -211,14 +209,10 @@ class Line(BaseAggregateChart):
         generate chart
         """
         self.chart = figure(
-            x_range=(
-                self.source.data[self.data_x_axis]
-                if self.x_dtype == "object"
-                else None
-            ),
             tools="pan, wheel_zoom, reset, save",
             active_scroll="wheel_zoom",
             active_drag="pan",
+            sizing_mode="inherit",
         )
         if self.x_axis_tick_formatter:
             self.chart.xaxis.formatter = self.x_axis_tick_formatter

@@ -3,8 +3,9 @@ import panel as pn
 from panel.config import panel_extension
 from typing import Dict
 
-from ...layouts import chart_view
-from ...assets import datetime as dt
+from cuxfilter.layouts.chart_views import widget_view
+
+from cuxfilter.assets import datetime as dt
 
 
 class BaseWidget:
@@ -117,7 +118,7 @@ class BaseWidget:
         return None
 
     def view(self):
-        return chart_view(self.chart, width=self.width, title=self.name)
+        return widget_view(self.chart, width=self.width)
 
     def add_event(self, event, callback):
         self.chart.on_event(event, callback)

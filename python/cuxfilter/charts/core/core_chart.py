@@ -28,8 +28,8 @@ class BaseChart:
     stride_type = int
     min_value: float = 0.0
     max_value: float = 0.0
-    x_label_map = {}
-    y_label_map = {}
+    x_label_map = None
+    y_label_map = None
     _initialized = False
     # widget=False can only be rendered the main layout
     is_widget = False

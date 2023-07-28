@@ -1,6 +1,8 @@
-from ..core_chart import BaseChart
-from ....layouts import chart_view
-from ....assets import cudf_utils
+from cuxfilter.charts.core import BaseChart
+from cuxfilter.layouts import widget_view
+from cuxfilter.assets import cudf_utils
+
+import panel as pn
 
 
 class BaseNumberChart(BaseChart):
@@ -82,7 +84,12 @@ class BaseNumberChart(BaseChart):
         self.generate_chart()
 
     def view(self):
-        return chart_view(self.chart, title=self.title)
+        return widget_view(
+            pn.WidgetBox(
+                self.title,
+                self.chart,
+            )
+        )
 
     def apply_theme(self, theme):
         """

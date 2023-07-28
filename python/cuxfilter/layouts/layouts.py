@@ -11,6 +11,7 @@ css = """
 """
 
 pn.config.raw_css += [css]
+# pn.extension("gridstack")
 
 
 def compute_position(arr, i, pos, offset, cols=12, rows=6):
@@ -42,7 +43,7 @@ class _LayoutBase:
         render_location="notebook",  # ["notebook", "web-app"]
         sidebar_width=280,
     ):
-        pn.config.sizing_mode = "stretch_both"
+        # pn.config.sizing_mode = "stretch_both"
         self._layout_array = layout_array
         self._render_location = render_location
         self.sidebar_width = sidebar_width
@@ -51,19 +52,24 @@ class _LayoutBase:
 
         for chart in charts.values():
             chart.renderer_mode = render_location
+            # chart.chart.sizing_mode = "scale_both"
 
         if self._render_location == "notebook":
             self.cols, self.rows = 12, 6
-            tmpl = pn.GridSpec(
-                sizing_mode="stretch_both",
-            )
+            tmpl = pn.GridSpec(sizing_mode="stretch_both", min_height=800)
             self._apply_themes(charts, theme)
+            self._apply_themes(sidebar, theme)
             self._process_plots(plots, tmpl)
             tmpl = self._process_widgets_notebook(widgets, tmpl)
         else:
-            self.cols, self.rows = 12, 6
-            tmpl = ReactTemplate(title=title, theme=theme, compact="both")
+            self.cols, self.rows = 12, 5
+            tmpl = ReactTemplate(
+                title=title,
+                theme=theme,
+                compact="both",
+            )
             self._apply_themes(charts, theme)
+            self._apply_themes(sidebar, theme)
             self._process_widgets(widgets, tmpl)
             self._process_plots(plots, tmpl)
 
@@ -75,20 +81,35 @@ class _LayoutBase:
                 chart.apply_theme(theme)
 
     def _process_widgets(self, widgets_list, tmpl):
+        widget_box = pn.WidgetBox(
+            sizing_mode="scale_width",
+        )
         for obj in widgets_list:
             obj.chart.width = self.sidebar_width
             obj.chart.sizing_mode = "scale_width"
-            tmpl.sidebar.append(obj.view())
+            if obj.chart_type == "datasize_indicator":
+                tmpl.sidebar.append(obj.view())
+            else:
+                widget_box.append(obj.view())
+        tmpl.sidebar.append(pn.VSpacer())
+        tmpl.sidebar.append(widget_box)
 
     def _process_widgets_notebook(self, widgets_list, tmpl):
-        x = pn.Column(width=self.sidebar_width)
+        tmpl_with_widgets = pn.GridSpec()
+        tmpl_with_widgets[:, 2 : self.cols] = tmpl
+        widget_box = pn.WidgetBox(
+            sizing_mode="stretch_width",
+        )
+
         for obj in widgets_list:
-            obj.chart.sizing_mode = "stretch_both"
-            temp_chart = obj.view()
-            temp_chart.collapsible = False
-            temp_chart.header_css_classes.append("center-header")
-            x.append(temp_chart)
-        return pn.Row(x, tmpl)
+            if obj.chart_type == "datasize_indicator":
+                tmpl_with_widgets[0:1, 0:2] = obj.view()
+            else:
+                obj.chart.sizing_mode = "scale_width"
+                widget_box.append(obj.view())
+
+        tmpl_with_widgets[1:, 0:2] = widget_box
+        return tmpl_with_widgets
 
     def _assign_template_main(self, tmpl, x, y, plot):
         if self._render_location == "notebook":
@@ -106,7 +127,7 @@ class _LayoutBase:
                     tmpl,
                     compute_position(arr, i, 0, 0, self.cols, self.rows),
                     compute_position(arr, i, -1, 1, self.cols, self.rows),
-                    plots[i].view(),
+                    plots[i].view(self._render_location),
                 )
 
     def _process_plots(self, plots, tmpl):

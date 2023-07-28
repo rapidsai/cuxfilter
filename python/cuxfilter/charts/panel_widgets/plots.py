@@ -1,4 +1,4 @@
-from cuxfilter.layouts.chart_views import chart_view
+from cuxfilter.layouts.chart_views import widget_view
 from ..core import BaseWidget
 from ..core.aggregate import BaseNumberChart
 from ..constants import (
@@ -127,8 +127,8 @@ class DateRangeSlider(BaseWidget):
         self.chart = pn.widgets.DateRangeSlider(
             start=self.min_value,
             end=self.max_value,
+            name=self.name,
             value=(self.min_value, self.max_value),
-            width=self.width,
             sizing_mode="scale_width",
             **self.params,
         )
@@ -194,6 +194,7 @@ class IntSlider(BaseWidget):
             self.chart = pn.widgets.IntSlider(
                 start=self.min_value,
                 end=self.max_value,
+                name=self.name,
                 value=self.value,
                 step=self.stride,
                 width=self.width,
@@ -205,6 +206,7 @@ class IntSlider(BaseWidget):
             self.chart = pn.widgets.IntSlider(
                 start=self.min_value,
                 end=self.max_value,
+                name=self.name,
                 value=self.value,
                 width=self.width,
                 height=self.height,
@@ -269,6 +271,7 @@ class FloatSlider(BaseWidget):
             self.chart = pn.widgets.FloatSlider(
                 start=self.min_value,
                 end=self.max_value,
+                name=self.name,
                 value=self.value,
                 width=self.width,
                 height=self.height,
@@ -279,6 +282,7 @@ class FloatSlider(BaseWidget):
             self.chart = pn.widgets.FloatSlider(
                 start=self.min_value,
                 end=self.max_value,
+                name=self.name,
                 value=self.value,
                 step=self.stride,
                 width=self.width,
@@ -373,6 +377,7 @@ class DropDown(BaseWidget):
         self.chart = pn.widgets.Select(
             options=self.list_of_values,
             value="",
+            name=self.name,
             width=self.width,
             height=self.height,
             **self.params,
@@ -472,6 +477,7 @@ class MultiSelect(BaseWidget):
         self.chart = pn.widgets.MultiSelect(
             options=self.list_of_values,
             value=[""],
+            name=self.name,
             width=self.width,
             height=self.height,
             **self.params,
@@ -563,6 +569,9 @@ class DataSizeIndicator(BaseNumberChart):
         """
         return self.chart[0].value
 
+    def view(self):
+        return pn.WidgetBox(self.chart)
+
     def generate_chart(self):
         """
         generate chart float slider
@@ -572,6 +581,8 @@ class DataSizeIndicator(BaseNumberChart):
                 value=int(self.max_value),
                 format="{value:,}",
                 font_size="18pt",
+                name=self.title,
+                title_size="14pt",
                 sizing_mode="stretch_width",
                 css_classes=["indicator"],
             ),
@@ -586,7 +597,9 @@ class DataSizeIndicator(BaseNumberChart):
         """
         apply thematic changes to the chart based on the theme
         """
-        self.chart[1].bar_color = theme.datasize_indicator_class
+        self.chart[1].styles = {
+            "--success-bg-color": theme.datasize_indicator_class
+        }
 
     def reset_chart(self, data: int = -1):
         """
@@ -687,7 +700,7 @@ class Card:
         self.chart_type = "card"
 
     def view(self):
-        return chart_view(self.content, title=self.title)
+        return widget_view(self.content, title=self.title)
 
     def initiate_chart(self, dashboard_cls):
         self.generate_chart()

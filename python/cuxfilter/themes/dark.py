@@ -1,12 +1,12 @@
 import param
 from bokeh.themes import Theme as _BkTheme
 from bokeh import palettes
-from panel.theme import Theme
+from panel.theme import DarkTheme
 from ..layouts.layouts import ReactTemplate
 from ..charts.constants import STATIC_DIR_THEMES
 
 
-class DarkTheme(Theme):
+class DarkTheme(DarkTheme):
     DARK = {
         "attrs": {
             "figure": {
@@ -81,8 +81,4 @@ class DarkTheme(Theme):
 
     # Custom React Template
     _template = ReactTemplate
-
-    # datasize_indicator_class: The color of the progress bar, one of
-    # 'primary', 'secondary', 'success', 'info', 'warn', 'danger', 'light',
-    # 'dark'
-    datasize_indicator_class = "success"
+    datasize_indicator_class = "#4292c6"

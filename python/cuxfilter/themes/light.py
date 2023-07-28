@@ -80,8 +80,4 @@ class LightTheme(DefaultTheme):
 
     # Custom React Template
     _template = ReactTemplate
-
-    # datasize_indicator_class: The color of the progress bar, one of
-    # 'primary', 'secondary', 'success', 'info', 'warn', 'danger', 'light',
-    # 'dark'
-    datasize_indicator_class = "success"
+    datasize_indicator_class = "#4292c6"

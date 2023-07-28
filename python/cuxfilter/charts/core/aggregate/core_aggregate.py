@@ -171,15 +171,15 @@ class BaseAggregateChart(BaseChart):
             self.min_value = 0
             self.max_value = 1
             self.stride = 1
-            # set axis labels:
-            if len(self.x_label_map) == 0:
-                self.x_label_map = BOOL_MAP
-            if (
-                self.y != self.x
-                and self.y is not None
-                and len(self.y_label_map) == 0
-            ):
-                self.y_label_map = BOOL_MAP
+            # # set axis labels:
+            # if len(self.x_label_map) == 0:
+            #     self.x_label_map = BOOL_MAP
+            # if (
+            #     self.y != self.x
+            #     and self.y is not None
+            #     and len(self.y_label_map) == 0
+            # ):
+            #     self.y_label_map = BOOL_MAP
         else:
             self.compute_min_max(dashboard_cls)
             if self.x_dtype in CUDF_DATETIME_TYPES:
@@ -197,10 +197,25 @@ class BaseAggregateChart(BaseChart):
             self.add_range_slider_filter(dashboard_cls)
         self.add_events(dashboard_cls)
 
-    def view(self):
-        return chart_view(
-            self.chart, self.filter_widget, width=self.width, title=self.title
-        )
+    def view(self, render_location=None):
+        self.chart.sizing_mode = None
+        if render_location:
+            return self.get_dashboard_view(render_location)
+        return pn.panel(self.chart)
+
+    def get_dashboard_view(self, render_location="notebook"):
+        if render_location == "notebook":
+            self.chart.sizing_mode = "inherit"
+            self.chart.title = self.title
+            return pn.WidgetBox(self.chart, self.filter_widget)
+        else:
+            self.chart.sizing_mode = "scale_both"
+            return chart_view(
+                self.chart,
+                self.filter_widget,
+                title=self.title,
+                sizing_mode="stretch_both",
+            )
 
     def calculate_source(self, data, patch_update=False):
         """
@@ -239,17 +254,17 @@ class BaseAggregateChart(BaseChart):
         if self.stride is None and self.x_dtype != "object":
             self.compute_stride()
 
-        if self.custom_binning:
-            if len(self.x_label_map) == 0:
-                temp_mapper_index = np.array(df[0])
-                temp_mapper_value = np.round(
-                    (temp_mapper_index * self.stride) + self.min_value,
-                    4,
-                ).astype("str")
-                temp_mapper_index = temp_mapper_index.astype("str")
-                self.x_label_map = dict(
-                    zip(temp_mapper_index, temp_mapper_value)
-                )
+        # if self.custom_binning:
+        # if len(self.x_label_map) == 0:
+        #     temp_mapper_index = np.array(df[0])
+        #     temp_mapper_value = np.round(
+        #         (temp_mapper_index * self.stride) + self.min_value,
+        #         4,
+        #     ).astype("str")
+        #     temp_mapper_index = temp_mapper_index.astype("str")
+        #     self.x_label_map = dict(
+        #         zip(temp_mapper_index, temp_mapper_value)
+        #     )
         dict_temp = {
             "X": df[0],
             "Y": df[1],
@@ -290,8 +305,7 @@ class BaseAggregateChart(BaseChart):
                 start=self.min_value,
                 end=self.max_value,
                 value=(self.min_value, self.max_value),
-                width=self.width,
-                sizing_mode="scale_width",
+                sizing_mode="stretch_width",
             )
         else:
             self.filter_widget = pn.widgets.RangeSlider(
@@ -299,8 +313,7 @@ class BaseAggregateChart(BaseChart):
                 end=self.max_value,
                 value=(self.min_value, self.max_value),
                 step=self.stride,
-                width=self.width,
-                sizing_mode="scale_width",
+                sizing_mode="stretch_width",
             )
 
         def filter_widget_callback(event):

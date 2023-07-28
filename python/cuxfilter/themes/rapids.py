@@ -1,12 +1,12 @@
 import param
 from bokeh.themes import Theme as _BkTheme
 from bokeh import palettes
-from panel.theme import Theme
+from panel.theme import DarkTheme
 from ..layouts.layouts import ReactTemplate
 from ..charts.constants import STATIC_DIR_THEMES
 
 
-class RapidsTheme(Theme):
+class RapidsTheme(DarkTheme):
     RAPIDS = {
         "attrs": {
             "figure": {
@@ -77,12 +77,8 @@ class RapidsTheme(Theme):
     )
     color_palette = list(palettes.Purples[9])
     chart_color = "#8735fb"
-    css = param.Filename(default=STATIC_DIR_THEMES / "rapids.css")
 
     # Custom React Template
     _template = ReactTemplate
-
-    # datasize_indicator_class: The color of the progress bar, one of
-    # 'primary', 'secondary', 'success', 'info', 'warn', 'danger', 'light',
-    # 'dark'
-    datasize_indicator_class = "primary"
+    datasize_indicator_class = "#8735fb"
+    css = param.Filename(default=STATIC_DIR_THEMES / "rapids.css")
