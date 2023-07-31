@@ -81,19 +81,3 @@ class TestViewDataFrame:
             )
         else:
             assert df_equals(vd.chart[0].object, df_duplicate)
-
-    @pytest.mark.parametrize("dashboard", dashboards)
-    @pytest.mark.parametrize(
-        "width, height, result1, result2",
-        [(400, 400, 400, 400), (None, None, 400, 400)],
-    )
-    def test_update_dimensions(
-        self, dashboard, width, height, result1, result2
-    ):
-        vd = ViewDataFrame()
-        vd.initiate_chart(dashboard)
-        vd.width, vd.height = 400, 400
-        vd.update_dimensions(width=width, height=height)
-
-        assert vd.chart.width == result1
-        assert vd.chart.height == result2

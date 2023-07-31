@@ -72,7 +72,6 @@ class TestBaseChart:
 
     def test_umimplemented_fns(self):
         bc = BaseChart()
-        assert bc.update_dimensions() == -1
         assert bc.calculate_source(data={}) == -1
         assert bc.generate_chart() == -1
         assert bc.add_reset_event() == -1

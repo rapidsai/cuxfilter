@@ -67,8 +67,6 @@ class BaseAggregateChart(BaseChart):
         data_points=None,
         add_interaction=True,
         aggregate_fn="count",
-        width=400,
-        height=400,
         step_size=None,
         step_size_type=int,
         title="",
@@ -87,8 +85,6 @@ class BaseAggregateChart(BaseChart):
             data_points
             add_interaction
             aggregate_fn
-            width
-            height
             step_size
             step_size_type
             title
@@ -110,8 +106,6 @@ class BaseAggregateChart(BaseChart):
         self.stride_type = step_size_type
         self.add_interaction = add_interaction
         self.aggregate_fn = aggregate_fn
-        self.height = height
-        self.width = width
         self.title = title if title else self.x
         self.autoscaling = autoscaling
         self.x_axis_tick_formatter = x_axis_tick_formatter
@@ -197,25 +191,11 @@ class BaseAggregateChart(BaseChart):
             self.add_range_slider_filter(dashboard_cls)
         self.add_events(dashboard_cls)
 
-    def view(self, render_location=None):
-        self.chart.sizing_mode = None
-        if render_location:
-            return self.get_dashboard_view(render_location)
-        return pn.panel(self.chart)
-
-    def get_dashboard_view(self, render_location="notebook"):
-        if render_location == "notebook":
-            self.chart.sizing_mode = "inherit"
-            self.chart.title = self.title
-            return pn.WidgetBox(self.chart, self.filter_widget)
-        else:
-            self.chart.sizing_mode = "scale_both"
-            return chart_view(
-                self.chart,
-                self.filter_widget,
-                title=self.title,
-                sizing_mode="stretch_both",
-            )
+    def get_dashboard_view(self):
+        return pn.Column(
+            self.chart,
+            self.filter_widget,
+        )
 
     def calculate_source(self, data, patch_update=False):
         """

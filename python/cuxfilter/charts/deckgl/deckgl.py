@@ -12,8 +12,6 @@ def choropleth(
     elevation_aggregate_fn="sum",
     elevation_factor=1,
     add_interaction=True,
-    width=800,
-    height=400,
     geoJSONSource=None,
     geoJSONProperty=None,
     geo_color_palette=None,
@@ -58,10 +56,6 @@ def choropleth(
         scaling the elevation
 
     add_interaction: {True, False},  default True
-
-    width: int,  default 800
-
-    height: int,  default 400
 
     geoJSONSource: str
         url to the geoJSON file
@@ -112,8 +106,6 @@ def choropleth(
         elevation_aggregate_fn,
         elevation_factor,
         add_interaction,
-        width,
-        height,
         geoJSONSource,
         geoJSONProperty,
         geo_color_palette,

@@ -1,3 +1,4 @@
+import pathlib
 import param
 from bokeh.themes import Theme as _BkTheme
 from bokeh import palettes
@@ -76,7 +77,9 @@ class LightTheme(DefaultTheme):
     )
     color_palette = list(palettes.Blues[9])
     chart_color = "#4292c6"
-    css = param.Filename(default=STATIC_DIR_THEMES / "rapids-light.css")
+    css = param.Filename(
+        default=pathlib.Path(__file__).parent / "assets" / "rapids-light.css"
+    )
 
     # Custom React Template
     _template = ReactTemplate

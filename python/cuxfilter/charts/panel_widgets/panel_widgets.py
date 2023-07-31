@@ -15,8 +15,6 @@ from ..constants import CUDF_TIMEDELTA_TYPE
 
 def range_slider(
     x,
-    width=400,
-    height=20,
     data_points=None,
     step_size=None,
     step_size_type=int,
@@ -34,10 +32,6 @@ def range_slider(
     x: str
         column name from gpu dataframe
 
-    width: int,  default 400
-
-    height: int,  default 20
-
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
         data_points will default to df[self.x].nunique()
@@ -52,17 +46,13 @@ def range_slider(
 
 
     """
-    plot = RangeSlider(
-        x, width, height, data_points, step_size, step_size_type, **params
-    )
+    plot = RangeSlider(x, data_points, step_size, step_size_type, **params)
     plot.chart_type = "range_slider"
     return plot
 
 
 def date_range_slider(
     x,
-    width=400,
-    height=20,
     data_points=None,
     **params,
 ):
@@ -78,10 +68,6 @@ def date_range_slider(
     x: str
         column name from gpu dataframe
 
-    width: int,  default 400
-
-    height: int,  default 20
-
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
         data_points will default to df[self.x].nunique()
@@ -95,8 +81,6 @@ def date_range_slider(
     """
     plot = DateRangeSlider(
         x,
-        width,
-        height,
         data_points,
         step_size=None,
         step_size_type=CUDF_TIMEDELTA_TYPE,
@@ -106,9 +90,7 @@ def date_range_slider(
     return plot
 
 
-def int_slider(
-    x, width=400, height=40, data_points=None, step_size=1, **params
-):
+def int_slider(x, data_points=None, step_size=1, **params):
     """
 
     Widget in the navbar of the cuxfilter dashboard.
@@ -120,10 +102,6 @@ def int_slider(
 
     x: str
         column name from gpu dataframe
-
-    width: int,  default 400
-
-    height: int,  default 40
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -137,16 +115,12 @@ def int_slider(
 
 
     """
-    plot = IntSlider(
-        x, width, height, data_points, step_size, step_size_type=int, **params
-    )
+    plot = IntSlider(x, data_points, step_size, step_size_type=int, **params)
     plot.chart_type = "int_slider"
     return plot
 
 
-def float_slider(
-    x, width=400, height=40, data_points=None, step_size=None, **params
-):
+def float_slider(x, data_points=None, step_size=None, **params):
     """
 
     Widget in the navbar of the cuxfilter dashboard.
@@ -158,10 +132,6 @@ def float_slider(
 
     x: str
         column name from gpu dataframe
-
-    width: int,  default 400
-
-    height: int,  default 40
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -177,8 +147,6 @@ def float_slider(
     """
     plot = FloatSlider(
         x,
-        width,
-        height,
         data_points,
         step_size,
         step_size_type=float,
@@ -188,7 +156,7 @@ def float_slider(
     return plot
 
 
-def drop_down(x, width=400, height=50, **params):
+def drop_down(x, **params):
     """
 
     Widget in the navbar of the cuxfilter dashboard.
@@ -201,10 +169,6 @@ def drop_down(x, width=400, height=50, **params):
     x: str
         column name from gpu dataframe
 
-    width: int,  default 400
-
-    height: int,  default 50
-
     data_points: int,  default number of unique values
 
     **params:
@@ -212,12 +176,12 @@ def drop_down(x, width=400, height=50, **params):
         documentation for more info
 
     """
-    plot = DropDown(x, width, height, **params)
+    plot = DropDown(x, **params)
     plot.chart_type = "dropdown"
     return plot
 
 
-def multi_select(x, width=400, height=200, **params):
+def multi_select(x, **params):
     """
 
     Widget in the navbar of the cuxfilter dashboard.
@@ -230,10 +194,6 @@ def multi_select(x, width=400, height=200, **params):
     x: str
         column name from gpu dataframe
 
-    width: int,  default 400
-
-    height: int,  default 200
-
     data_points: int,  default number of unique values
 
     **params:
@@ -241,7 +201,7 @@ def multi_select(x, width=400, height=200, **params):
         documentation for more info
 
     """
-    plot = MultiSelect(x, width, height, **params)
+    plot = MultiSelect(x, **params)
     plot.chart_type = "multi_select"
     return plot
 

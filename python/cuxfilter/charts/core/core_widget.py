@@ -3,8 +3,6 @@ import panel as pn
 from panel.config import panel_extension
 from typing import Dict
 
-from cuxfilter.layouts.chart_views import widget_view
-
 from cuxfilter.assets import datetime as dt
 
 
@@ -12,8 +10,6 @@ class BaseWidget:
     chart_type: str = None
     x: str = None
     color: str = None
-    height: int = None
-    width: int = None
     chart = None
     data_points = None
     start: float = None
@@ -62,8 +58,6 @@ class BaseWidget:
     def __init__(
         self,
         x,
-        width=400,
-        height=10,
         data_points=None,
         step_size=None,
         step_size_type=int,
@@ -80,8 +74,6 @@ class BaseWidget:
         Ouput:
         """
         self.x = x
-        self.width = width
-        self.height = height
         self.params = params
         self.data_points = data_points
         self.stride_type = step_size_type
@@ -117,8 +109,11 @@ class BaseWidget:
                 return view.pprint()
         return None
 
-    def view(self):
-        return widget_view(self.chart, width=self.width)
+    def view(self, width=400, height=10):
+        return pn.panel(self.chart, width=width, height=10)
+
+    def get_dashboard_view(self):
+        return pn.panel(self.chart, sizing_mode="stretch_width")
 
     def add_event(self, event, callback):
         self.chart.on_event(event, callback)

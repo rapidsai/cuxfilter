@@ -2,6 +2,7 @@ from typing import Tuple
 import cudf
 import dask_cudf
 import dask.dataframe as dd
+import panel as pn
 
 from .utils import point_in_polygon
 from ..core_chart import BaseChart
@@ -65,15 +66,11 @@ class BaseNonAggregate(BaseChart):
         self.generate_chart()
         self.add_events(dashboard_cls)
 
-    def view(self):
-        return chart_view(
-            self.chart.view(),
-            width=self.width,
-            title=self.title,
-        )
+    def view(self, width=800, height=400):
+        return chart_view(self.chart.view(), width=width, height=height)
 
-    def update_dimensions(self, **kwargs):
-        pass
+    def get_dashboard_view(self):
+        return pn.panel(self.chart.view(), sizing_mode="stretch_both")
 
     def calculate_source(self, data):
         """

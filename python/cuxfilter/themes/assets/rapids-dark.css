@@ -20,7 +20,9 @@ body {
   color: white;
   border-color: #292929 !important;
   background-color: #121212 !important;
+  padding-top: 0px !important;
 }
+
 .drag-handle,
 .react-resizable-handle {
   filter: brightness(0) invert(1);
@@ -47,4 +49,9 @@ body {
 
 .indicator > div > div {
   color: white !important;
+}
+
+.custom-widget-box {
+  margin-top: 20px !important;
+  padding: 10px !important;
 }

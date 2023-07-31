@@ -180,20 +180,9 @@ class Choropleth(BaseChoropleth):
             data=self.source,
             spec=self.deck_spec,
             colors=self.source[self.rgba_columns],
-            width=self.width,
-            height=self.height,
             default_color=list(ImageColor.getrgb(self.nan_color)) + [50],
             tooltip_include_cols=self.tooltip_include_cols,
         )
-
-    def update_dimensions(self, width=None, height=None):
-        """
-        update dimensions
-        """
-        if width is not None:
-            self.chart.width = width
-        if height is not None:
-            self.chart.height = height
 
     def reload_chart(self, data, patch_update=True):
         """

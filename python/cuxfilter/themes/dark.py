@@ -1,3 +1,4 @@
+import pathlib
 import param
 from bokeh.themes import Theme as _BkTheme
 from bokeh import palettes
@@ -6,7 +7,7 @@ from ..layouts.layouts import ReactTemplate
 from ..charts.constants import STATIC_DIR_THEMES
 
 
-class DarkTheme(DarkTheme):
+class CustomDarkTheme(DarkTheme):
     DARK = {
         "attrs": {
             "figure": {
@@ -78,6 +79,8 @@ class DarkTheme(DarkTheme):
     color_palette = list(palettes.Blues[9])
     chart_color = "#4292c6"
     css = param.Filename(default=STATIC_DIR_THEMES / "rapids-dark.css")
+    base_css = param.Filename(default=STATIC_DIR_THEMES / "rapids-dark.css")
+
 
     # Custom React Template
     _template = ReactTemplate

@@ -7,8 +7,6 @@ def bar(
     data_points=None,
     add_interaction=True,
     aggregate_fn="count",
-    width=400,
-    height=400,
     step_size=None,
     step_size_type=int,
     title="",
@@ -30,10 +28,6 @@ def bar(
     add_interaction: {True, False},  default True
 
     aggregate_fn: {'count', 'mean'},  default 'count'
-
-    width: int,  default 400
-
-    height: int,  default 400
 
     step_size: int,  default 1
 
@@ -69,8 +63,6 @@ def bar(
         data_points,
         add_interaction,
         aggregate_fn,
-        width,
-        height,
         step_size,
         step_size_type,
         title,
@@ -87,8 +79,6 @@ def line(
     data_points=None,
     add_interaction=True,
     aggregate_fn="count",
-    width=400,
-    height=400,
     step_size=None,
     step_size_type=int,
     title="",
@@ -111,10 +101,6 @@ def line(
     add_interaction: {True, False},  default True
 
     aggregate_fn: {'count', 'mean'},  default 'count'
-
-    width: int,  default 400
-
-    height: int,  default 400
 
     step_size: int,  default 1
 
@@ -150,8 +136,6 @@ def line(
         data_points,
         add_interaction,
         aggregate_fn,
-        width,
-        height,
         step_size,
         step_size_type,
         title,

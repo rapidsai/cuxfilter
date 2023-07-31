@@ -15,3 +15,5 @@ CUSTOM_DIST_PATH_LAYOUTS = "layouts"
 CUSTOM_DIST_PATH_THEMES = "themes"
 STATIC_DIR_LAYOUT = pathlib.Path(__file__).parent.parent / "layouts/assets"
 STATIC_DIR_THEMES = pathlib.Path(__file__).parent.parent / "themes/assets"
+
+print(STATIC_DIR_THEMES)

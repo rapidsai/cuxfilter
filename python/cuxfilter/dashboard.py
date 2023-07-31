@@ -376,11 +376,11 @@ class DashBoard:
 
     def __repr__(self):
         template_obj = self._dashboard.generate_dashboard(
-            self.title,
-            self._charts,
-            self._sidebar,
-            self._theme,
-            self._layout_array,
+            title=self.title,
+            charts=self._charts,
+            sidebar=self._sidebar,
+            theme=self._theme,
+            layout_array=self._layout_array,
         )
         cls = "#### cuxfilter " + type(self).__name__
         spacer = "\n    "
@@ -402,6 +402,7 @@ class DashBoard:
 
     def _get_server(
         self,
+        panel=None,
         port=0,
         websocket_origin=None,
         loop=None,
@@ -410,14 +411,7 @@ class DashBoard:
         **kwargs,
     ):
         server = get_server(
-            panel=self._dashboard.generate_dashboard(
-                self.title,
-                self._charts,
-                self._sidebar,
-                self._theme,
-                self._layout_array,
-                render_location="web-app",
-            ),
+            panel=panel,
             port=port,
             websocket_origin=websocket_origin,
             loop=loop,
@@ -432,7 +426,7 @@ class DashBoard:
         server_document(websocket_origin, resources=None)
         return server
 
-    async def preview(self):
+    async def preview(self, sidebar_width=280, height=800):
         """
         Preview(Async) all the charts in a jupyter cell, non interactive(no
         backend server). Mostly intended to save notebook state for blogs,
@@ -479,15 +473,29 @@ class DashBoard:
         else:
             port = get_open_port()
         url = "localhost:" + str(port)
+
         self.server = self._get_server(
-            port=port, websocket_origin=url, show=False, start=True
+            panel=self._dashboard.generate_dashboard(
+                title=self.title,
+                charts=self._charts,
+                sidebar=self._sidebar,
+                theme=self._theme,
+                layout_array=self._layout_array,
+                render_location="web-app",
+                sidebar_width=sidebar_width,
+                height=height,
+            ),
+            port=port,
+            websocket_origin=url,
+            show=False,
+            start=True,
         )
         await screengrab("http://" + url)
         self.stop()
 
         display(Image("temp.png"))
 
-    def app(self, sidebar_width=280):
+    def app(self, sidebar_width=280, width=1200, height=800):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
@@ -509,20 +517,22 @@ class DashBoard:
         >>>     'key', 'val', data_points=5, add_interaction=False
         >>> )
         >>> d = cux_df.dashboard([line_chart_1])
-        >>> d.app()
+        >>> d.app(sidebar_width=200, width=1000, height=450)
 
         """
         self._reinit_all_charts()
         self._current_server_type = "app"
 
         return self._dashboard.generate_dashboard(
-            self.title,
-            self._charts,
-            self._sidebar,
-            self._theme,
-            self._layout_array,
-            "notebook",
-            sidebar_width,
+            title=self.title,
+            charts=self._charts,
+            sidebar=self._sidebar,
+            theme=self._theme,
+            layout_array=self._layout_array,
+            render_location="notebook",
+            sidebar_width=sidebar_width,
+            width=width,
+            height=height,
         )
 
     def show(
@@ -531,6 +541,8 @@ class DashBoard:
         port=0,
         threaded=False,
         service_proxy=None,
+        sidebar_width=280,
+        height=800,
         **kwargs,
     ):
         """
@@ -581,18 +593,32 @@ class DashBoard:
         )
         print("Dashboard running at port " + str(port))
 
+        panel = self._dashboard.generate_dashboard(
+            title=self.title,
+            charts=self._charts,
+            sidebar=self._sidebar,
+            theme=self._theme,
+            layout_array=self._layout_array,
+            render_location="web-app",
+            sidebar_width=sidebar_width,
+            height=height,
+        )
         try:
             self.server = self._get_server(
+                panel=panel,
                 port=port,
                 websocket_origin=self._notebook_url.netloc,
                 show=False,
                 start=True,
                 threaded=threaded,
+                sidebar_width=sidebar_width,
+                height=height,
                 **kwargs,
             )
         except OSError:
             self.server.stop()
             self.server = self._get_server(
+                panel=panel,
                 port=port,
                 websocket_origin=self._notebook_url.netloc,
                 show=False,

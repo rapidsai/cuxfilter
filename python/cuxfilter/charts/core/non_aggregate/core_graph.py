@@ -2,6 +2,7 @@ from typing import Tuple
 import cudf
 import dask.dataframe as dd
 import dask_cudf
+import panel as pn
 
 from .utils import point_in_polygon
 from ..core_chart import BaseChart
@@ -83,8 +84,6 @@ class BaseGraph(BaseChart):
         edge_transparency=0,
         curve_params=dict(strokeWidth=1, curve_total_steps=100),
         tile_provider="CARTODBPOSITRON",
-        width=800,
-        height=400,
         title="",
         timeout=100,
         legend=True,
@@ -122,8 +121,6 @@ class BaseGraph(BaseChart):
             edge_transparency
             curve_params
             tile_provider
-            width
-            height
             title
             timeout
             legend
@@ -161,8 +158,6 @@ class BaseGraph(BaseChart):
         self.edge_transparency = edge_transparency
         self.curve_params = curve_params
         self.tile_provider = tile_provider
-        self.width = width
-        self.height = height
         self.title = title
         self.timeout = timeout
         self.legend = legend
@@ -226,10 +221,11 @@ class BaseGraph(BaseChart):
         self.generate_chart()
         self.add_events(dashboard_cls)
 
-    def view(self):
-        return chart_view(
-            self.chart.view(), width=self.width, title=self.title
-        )
+    def view(self, width=800, height=400):
+        return chart_view(self.chart.view(), width=width, height=height)
+
+    def get_dashboard_view(self):
+        return pn.panel(self.chart.view(), sizing_mode="stretch_both")
 
     def calculate_source(self, cuxfilter_df):
         """

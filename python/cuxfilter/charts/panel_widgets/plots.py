@@ -129,7 +129,7 @@ class DateRangeSlider(BaseWidget):
             end=self.max_value,
             name=self.name,
             value=(self.min_value, self.max_value),
-            sizing_mode="scale_width",
+            sizing_mode="stretch_width",
             **self.params,
         )
 
@@ -197,8 +197,6 @@ class IntSlider(BaseWidget):
                 name=self.name,
                 value=self.value,
                 step=self.stride,
-                width=self.width,
-                height=self.height,
                 **self.params,
             )
             self.stride = self.chart.step
@@ -208,8 +206,6 @@ class IntSlider(BaseWidget):
                 end=self.max_value,
                 name=self.name,
                 value=self.value,
-                width=self.width,
-                height=self.height,
                 **self.params,
             )
 
@@ -273,8 +269,6 @@ class FloatSlider(BaseWidget):
                 end=self.max_value,
                 name=self.name,
                 value=self.value,
-                width=self.width,
-                height=self.height,
                 **self.params,
             )
             self.stride = self.chart.step
@@ -285,8 +279,6 @@ class FloatSlider(BaseWidget):
                 name=self.name,
                 value=self.value,
                 step=self.stride,
-                width=self.width,
-                height=self.height,
                 **self.params,
             )
 
@@ -378,8 +370,6 @@ class DropDown(BaseWidget):
             options=self.list_of_values,
             value="",
             name=self.name,
-            width=self.width,
-            height=self.height,
             **self.params,
         )
 
@@ -478,8 +468,6 @@ class MultiSelect(BaseWidget):
             options=self.list_of_values,
             value=[""],
             name=self.name,
-            width=self.width,
-            height=self.height,
             **self.params,
         )
 
@@ -700,7 +688,9 @@ class Card:
         self.chart_type = "card"
 
     def view(self):
-        return widget_view(self.content, title=self.title)
+        return pn.layout.Card(
+            self.content, title=self.title, collapsible=False
+        )
 
     def initiate_chart(self, dashboard_cls):
         self.generate_chart()

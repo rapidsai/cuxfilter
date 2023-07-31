@@ -1,7 +1,7 @@
 import panel as pn
 
 
-def chart_view(*charts, **params):
+def chart_view(charts, **params):
     """
     Parameters:
     -----------
@@ -12,11 +12,11 @@ def chart_view(*charts, **params):
     ------
     layout view
     """
-    view = pn.layout.Card(**params)
-    for chart in charts:
-        if chart is not None:
-            view.append(chart)
-    return view
+    return pn.panel(charts, **params)
+    # for chart in charts:
+    #     if chart is not None:
+    #         view.append(chart)
+    # return view
 
 
 def widget_view(*charts, **params):

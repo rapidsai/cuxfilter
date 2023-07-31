@@ -67,8 +67,8 @@ class Bar(BaseAggregateChart):
             tools="pan, wheel_zoom, reset, save",
             active_scroll="wheel_zoom",
             active_drag="pan",
-            # sizing_mode="inherit",
-            height=self.height,
+            title=self.title,
+            sizing_mode="stretch_both",
         )
         if self.color is None:
             self.sub_chart = self.chart.vbar(
@@ -98,16 +98,6 @@ class Bar(BaseAggregateChart):
             self.chart.yaxis.axis_label = self.y
         else:
             self.chart.yaxis.axis_label = self.aggregate_fn
-
-    def update_dimensions(self, width=None, height=None):
-        """
-        update dimensions
-        """
-        pass
-        # if width is not None:
-        #     self.chart.plot_width = width
-        # if height is not None:
-        #     self.chart.plot_height = height
 
     def apply_mappers(self):
         """
@@ -212,7 +202,8 @@ class Line(BaseAggregateChart):
             tools="pan, wheel_zoom, reset, save",
             active_scroll="wheel_zoom",
             active_drag="pan",
-            sizing_mode="inherit",
+            title=self.title,
+            sizing_mode="stretch_both",
         )
         if self.x_axis_tick_formatter:
             self.chart.xaxis.formatter = self.x_axis_tick_formatter
@@ -236,15 +227,6 @@ class Line(BaseAggregateChart):
                 color=self.color,
                 **self.library_specific_params,
             )
-
-    def update_dimensions(self, width=None, height=None):
-        """
-        update dimensions
-        """
-        if width is not None:
-            self.chart.plot_width = width
-        if height is not None:
-            self.chart.plot_height = height
 
     def apply_mappers(self):
         """

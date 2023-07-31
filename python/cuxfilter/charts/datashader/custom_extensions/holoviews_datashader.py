@@ -119,9 +119,8 @@ class dynspread(SpreadingOperation):
 
 
 class InteractiveDatashaderBase(param.Parameterized):
-    width = param.Integer(400)
-    height = param.Integer(400)
     tile_provider = param.String(None)
+    title = param.String("Interactive Datashader Chart")
     box_stream = param.ClassSelector(
         class_=hv.streams.SelectionXY, default=hv.streams.SelectionXY()
     )
@@ -272,7 +271,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
     @param.depends("source_df")
     def points(self, **kwargs):
         return hv.Scatter(
-            self.source_df, kdims=[self.x], vdims=self.vdims
+            self.source_df, kdims=[self.x], vdims=self.vdims, title=self.title
         ).opts(tools=[], default_tools=[])
 
     def get_base_chart(self):
@@ -334,8 +333,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
 
         return pn.panel(
             self.tiles * dmap if self.tiles is not None else dmap,
-            sizing_mode="stretch_width",
-            height=self.height,
+            sizing_mode="stretch_both",
         )
 
 
@@ -641,6 +639,5 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
 
         return pn.panel(
             self.tiles * dmap_graph if self.tiles is not None else dmap_graph,
-            sizing_mode="stretch_width",
-            height=self.height,
+            sizing_mode="stretch_both",
         )
