@@ -4,9 +4,7 @@ from bokeh.models import DatetimeTickFormatter
 
 from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby, calc_value_counts
-from ....layouts import chart_view
 from ...constants import (
-    BOOL_MAP,
     CUDF_DATETIME_TYPES,
 )
 from ....assets.cudf_utils import get_min_max

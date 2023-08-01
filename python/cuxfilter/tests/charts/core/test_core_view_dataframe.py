@@ -3,7 +3,6 @@ import panel as pn
 import cuxfilter
 
 from cuxfilter.charts.core.core_view_dataframe import ViewDataFrame
-from cuxfilter.layouts import chart_view
 
 from ..utils import df_equals, initialize_df, df_types
 
@@ -61,7 +60,7 @@ class TestViewDataFrame:
         vd.chart = chart
 
         assert str(vd.view()) == str(
-            chart_view(_chart, width=vd.width, title="Dataset View")
+            pn.panel(_chart, width=vd.width, title="Dataset View")
         )
 
     @pytest.mark.parametrize(

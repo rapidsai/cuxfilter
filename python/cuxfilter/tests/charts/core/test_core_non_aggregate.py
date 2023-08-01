@@ -1,4 +1,5 @@
 import pytest
+import panel as pn
 import cudf
 import dask_cudf
 import numpy as np
@@ -11,7 +12,6 @@ from cuxfilter.charts.core.non_aggregate.core_non_aggregate import (
 )
 from cuxfilter.dashboard import DashBoard
 from cuxfilter import DataFrame
-from cuxfilter.layouts import chart_view
 from unittest import mock
 
 from ..utils import df_equals, df_types, initialize_df
@@ -75,7 +75,7 @@ class TestCoreNonAggregateChart:
         bnac.title = "test_title"
 
         assert str(bnac.view()) == str(
-            chart_view(_chart, width=bnac.width, title=bnac.title)
+            pn.panel(_chart, width=bnac.width, title=bnac.title)
         )
 
     @pytest.mark.parametrize("df_type", df_types)

@@ -1,9 +1,9 @@
 import pytest
+import panel as pn
 from bokeh.events import ButtonClick
 
 import cuxfilter
 from cuxfilter.charts.core.non_aggregate.core_line import BaseLine
-from cuxfilter.layouts import chart_view
 from cuxfilter.charts.datashader.custom_extensions import (
     holoviews_datashader as hv,
 )
@@ -43,7 +43,7 @@ class TestNonAggregateBaseLine:
         bl.chart = mock.Mock(**{"view.return_value": chart})
         bl.width = 400
 
-        assert str(bl.view()) == str(chart_view(_chart, width=bl.width))
+        assert str(bl.view()) == str(pn.panel(_chart, width=bl.width))
 
     @pytest.mark.parametrize("dashboard", dashboards)
     @pytest.mark.parametrize(

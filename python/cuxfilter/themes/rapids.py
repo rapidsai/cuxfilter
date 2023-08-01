@@ -1,13 +1,12 @@
-import pathlib
 import param
 from bokeh.themes import Theme as _BkTheme
 from bokeh import palettes
-from panel.theme import DefaultTheme
-from ..layouts.layouts import ReactTemplate
+from panel.theme.fast import FastDefaultTheme
+from panel.template import FastGridTemplate
 from ..charts.constants import STATIC_DIR_THEMES
 
 
-class RapidsTheme(DefaultTheme):
+class RapidsTheme(FastDefaultTheme):
     RAPIDS = {
         "attrs": {
             "figure": {
@@ -80,8 +79,6 @@ class RapidsTheme(DefaultTheme):
     chart_color = "#8735fb"
 
     # Custom React Template
-    _template = ReactTemplate
+    _template = FastGridTemplate
     datasize_indicator_class = "#8735fb"
-    css = param.Filename(
-        default=pathlib.Path(__file__).parent / "assets" / "rapids.css"
-    )
+    css = param.Filename(default=STATIC_DIR_THEMES / "rapids.css")

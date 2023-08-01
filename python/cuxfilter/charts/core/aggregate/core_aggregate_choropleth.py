@@ -147,7 +147,7 @@ class BaseChoropleth(BaseChart):
         self.add_events(dashboard_cls)
 
     def view(self, width=800, height=400):
-        return pn.panel(self.chart.view(), width=width, height=height)
+        return pn.WidgetBox(self.chart.pane, width=width, height=height)
 
     def get_dashboard_view(self):
         return pn.panel(self.chart.view(), sizing_mode="stretch_both")

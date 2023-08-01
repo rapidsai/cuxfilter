@@ -4,7 +4,6 @@ import panel as pn
 
 from cuxfilter.charts.core.aggregate.core_aggregate import BaseAggregateChart
 import cuxfilter
-from cuxfilter.layouts import chart_view
 
 from ..utils import initialize_df, df_types
 
@@ -54,7 +53,7 @@ class TestBaseAggregateChart:
         bnac.width = 400
 
         assert str(bnac.view()) == str(
-            chart_view(_chart, width=bnac.width, title=bnac.title)
+            pn.panel(_chart, width=bnac.width, title=bnac.title)
         )
 
     @pytest.mark.parametrize("dashboard", dashboards)

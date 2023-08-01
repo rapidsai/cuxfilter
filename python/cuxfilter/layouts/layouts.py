@@ -2,8 +2,7 @@ import re
 import numpy as np
 import panel as pn
 
-from panel.template import ReactTemplate, FastGridTemplate
-from cuxfilter.themes import dark
+from panel.template import FastGridTemplate
 
 css = """
 .center-header {
@@ -68,6 +67,8 @@ class _LayoutBase:
                 title=title,
                 sidebar_width=self.sidebar_width,
                 row_height=int(self.height / self.rows),
+                theme=theme,
+                theme_toggle=False,
             )
             self._apply_themes(charts, theme)
             self._apply_themes(sidebar, theme)
@@ -93,8 +94,8 @@ class _LayoutBase:
                 tmpl.sidebar.append(obj.get_dashboard_view())
             else:
                 widget_box.append(obj.get_dashboard_view())
-        tmpl.sidebar.append(pn.VSpacer())
-        tmpl.sidebar.append(widget_box)
+        if len(widget_box) > 0:
+            tmpl.sidebar.append(widget_box)
 
     def _process_widgets_notebook(self, widgets_list, tmpl):
         tmpl_with_widgets = pn.GridSpec()
@@ -109,8 +110,8 @@ class _LayoutBase:
             else:
                 obj.chart.sizing_mode = "scale_width"
                 widget_box.append(obj.get_dashboard_view())
-
-        tmpl_with_widgets[1:, 0:2] = widget_box
+        if len(widget_box) > 0:
+            tmpl_with_widgets[1 : self.rows, 0:2] = widget_box
         return tmpl_with_widgets
 
     def _assign_template_main(self, tmpl, x, y, plot):

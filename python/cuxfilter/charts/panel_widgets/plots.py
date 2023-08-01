@@ -1,4 +1,3 @@
-from cuxfilter.layouts.chart_views import widget_view
 from ..core import BaseWidget
 from ..core.aggregate import BaseNumberChart
 from ..constants import (

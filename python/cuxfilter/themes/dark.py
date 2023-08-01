@@ -1,13 +1,12 @@
-import pathlib
 import param
 from bokeh.themes import Theme as _BkTheme
 from bokeh import palettes
-from panel.theme import DarkTheme
-from ..layouts.layouts import ReactTemplate
+from panel.theme.fast import FastDarkTheme
+from panel.template import FastGridTemplate
 from ..charts.constants import STATIC_DIR_THEMES
 
 
-class CustomDarkTheme(DarkTheme):
+class CustomDarkTheme(FastDarkTheme):
     DARK = {
         "attrs": {
             "figure": {
@@ -71,7 +70,7 @@ class CustomDarkTheme(DarkTheme):
         }
     }
 
-    bokeh_theme = _BkTheme(json=DARK)
+    # bokeh_theme = _BkTheme(json=DARK)
     map_style = "mapbox://styles/mapbox/dark-v9"
     map_style_without_token = (
         "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
@@ -81,7 +80,6 @@ class CustomDarkTheme(DarkTheme):
     css = param.Filename(default=STATIC_DIR_THEMES / "rapids-dark.css")
     base_css = param.Filename(default=STATIC_DIR_THEMES / "rapids-dark.css")
 
-
     # Custom React Template
-    _template = ReactTemplate
+    _template = FastGridTemplate
     datasize_indicator_class = "#4292c6"

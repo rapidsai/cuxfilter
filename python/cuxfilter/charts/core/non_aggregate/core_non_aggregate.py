@@ -6,7 +6,6 @@ import panel as pn
 
 from .utils import point_in_polygon
 from ..core_chart import BaseChart
-from ....layouts import chart_view
 
 
 class BaseNonAggregate(BaseChart):
@@ -67,7 +66,7 @@ class BaseNonAggregate(BaseChart):
         self.add_events(dashboard_cls)
 
     def view(self, width=800, height=400):
-        return chart_view(self.chart.view(), width=width, height=height)
+        return pn.panel(self.chart.view(), width=width, height=height)
 
     def get_dashboard_view(self):
         return pn.panel(self.chart.view(), sizing_mode="stretch_both")

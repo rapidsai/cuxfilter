@@ -1,4 +1,5 @@
 import dask_cudf
+import panel as pn
 import pytest
 import cudf
 import numpy as np
@@ -10,7 +11,6 @@ from cuxfilter.charts.datashader.custom_extensions import (
 from cuxfilter.dashboard import DashBoard
 from cuxfilter.charts.datashader.custom_extensions import CustomInspectTool
 from cuxfilter import DataFrame
-from cuxfilter.layouts import chart_view
 from cuxfilter.charts import constants
 from unittest import mock
 
@@ -58,7 +58,7 @@ class TestCoreGraph:
         bg.title = "test"
 
         assert str(bg.view()) == str(
-            chart_view(_chart, width=bg.width, title=bg.title)
+            pn.panel(_chart, width=bg.width, title=bg.title)
         )
 
     @pytest.mark.parametrize("df_type", df_types)

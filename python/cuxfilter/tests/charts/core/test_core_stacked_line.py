@@ -1,4 +1,5 @@
 import pytest
+import panel as pn
 import dask.dataframe as dd
 import dask_cudf
 import cuxfilter
@@ -9,7 +10,6 @@ from cuxfilter.charts.core.non_aggregate.core_stacked_line import (
 from cuxfilter.charts.datashader.custom_extensions import (
     holoviews_datashader as hv,
 )
-from cuxfilter.layouts import chart_view
 from unittest import mock
 
 from ..utils import df_equals, initialize_df, df_types
@@ -77,7 +77,7 @@ class TestBaseStackedLine:
         bsl.chart = mock.Mock(**{"view.return_value": chart})
         bsl.width = 400
 
-        assert str(bsl.view()) == str(chart_view(_chart, width=bsl.width))
+        assert str(bsl.view()) == str(pn.panel(_chart, width=bsl.width))
 
     @pytest.mark.parametrize("dashboard", dashboards)
     def test_calculate_source(self, dashboard):
