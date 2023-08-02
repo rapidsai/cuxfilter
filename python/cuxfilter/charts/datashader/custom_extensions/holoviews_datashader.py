@@ -271,7 +271,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
     @param.depends("source_df")
     def points(self, **kwargs):
         return hv.Scatter(
-            self.source_df, kdims=[self.x], vdims=self.vdims, title=self.title
+            self.source_df, kdims=[self.x], vdims=self.vdims
         ).opts(tools=[], default_tools=[])
 
     def get_base_chart(self):
@@ -332,7 +332,9 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
             dmap *= self.get_base_chart()
 
         return pn.panel(
-            self.tiles * dmap if self.tiles is not None else dmap,
+            (self.tiles * dmap if self.tiles is not None else dmap).relabel(
+                self.title
+            ),
             sizing_mode="stretch_both",
         )
 
@@ -405,7 +407,11 @@ class InteractiveDatashaderLine(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.panel(self.tiles * dmap if self.tiles is not None else dmap)
+        return pn.panel(
+            (self.tiles * dmap if self.tiles is not None else dmap).relabel(
+                self.title
+            )
+        )
 
 
 class InteractiveDatashaderMultiLine(InteractiveDatashader):
@@ -491,7 +497,11 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.panel(self.tiles * dmap if self.tiles is not None else dmap)
+        return pn.panel(
+            (self.tiles * dmap if self.tiles is not None else dmap).relabel(
+                self.title
+            )
+        )
 
 
 class InteractiveDatashaderGraph(InteractiveDatashaderBase):
@@ -638,6 +648,10 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
             dmap_graph *= self.nodes_chart.get_base_chart()
 
         return pn.panel(
-            self.tiles * dmap_graph if self.tiles is not None else dmap_graph,
+            (
+                self.tiles * dmap_graph
+                if self.tiles is not None
+                else dmap_graph
+            ).relabel(self.title),
             sizing_mode="stretch_both",
         )
