@@ -85,21 +85,26 @@ class _LayoutBase:
         for chart in charts.values():
             chart.renderer_mode = render_location
 
+        if theme:
+            self._apply_themes(charts, theme)
+            self._apply_themes(sidebar, theme)
+
         if self._render_location == "notebook":
             tmpl = pn.GridSpec(width=self.width, height=self.height)
             self._process_plots(plots, tmpl)
             tmpl = self._process_widgets_notebook(widgets, tmpl)
         else:
-            tmpl = pn.template.FastGridTemplate(
-                title=title,
-                sidebar_width=self.sidebar_width,
-                row_height=int(self.height / self.rows),
-                theme=theme,
-                theme_toggle=False,
-            )
-            tmpl.header_background = theme.style.header_background
-            self._apply_themes(charts, theme)
-            self._apply_themes(sidebar, theme)
+            kwargs = {
+                "title": title,
+                "sidebar_width": self.sidebar_width,
+                "row_height": int(self.height / self.rows),
+                "theme_toggle": False,
+            }
+            if theme:
+                kwargs["theme"] = theme
+                kwargs["header_background"] = theme.style.header_background
+
+            tmpl = pn.template.FastGridTemplate(**kwargs)
             self._process_widgets(widgets, tmpl)
             self._process_plots(plots, tmpl)
 

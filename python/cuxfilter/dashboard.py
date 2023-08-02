@@ -520,7 +520,7 @@ class DashBoard:
             title=self.title,
             charts=self._charts,
             sidebar=self._sidebar,
-            theme=self._theme,
+            theme=light if self._theme is not None else None,
             layout_array=self._layout_array,
             render_location="notebook",
             sidebar_width=sidebar_width,
