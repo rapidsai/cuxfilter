@@ -12,10 +12,6 @@ from IPython.display import Image, display
 from collections import Counter
 
 from cuxfilter.charts.core import BaseChart, BaseWidget, ViewDataFrame
-from cuxfilter.charts.constants import (
-    CUSTOM_DIST_PATH_THEMES,
-    STATIC_DIR_THEMES,
-)
 from cuxfilter.layouts import single_feature
 from cuxfilter.charts.panel_widgets import data_size_indicator
 from cuxfilter.assets import screengrab, get_open_port, cudf_utils
@@ -181,7 +177,7 @@ class DashBoard:
 
         # add data_size_indicator to sidebar if data_size_widget=True
         if data_size_widget:
-            chart = data_size_indicator()
+            chart = data_size_indicator(title_size="14pt")
             chart.initiate_chart(self)
             chart._initialized = True
             self._sidebar[chart.name] = chart
@@ -418,9 +414,6 @@ class DashBoard:
             show=show,
             start=start,
             title=self.title,
-            static_dirs={
-                CUSTOM_DIST_PATH_THEMES: STATIC_DIR_THEMES,
-            },
             **kwargs,
         )
         server_document(websocket_origin, resources=None)

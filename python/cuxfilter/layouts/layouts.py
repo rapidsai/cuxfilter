@@ -2,11 +2,40 @@ import re
 import numpy as np
 import panel as pn
 
-from panel.template import FastGridTemplate
-
 css = """
 .center-header {
     text-align: center
+}
+.bk-input-group {
+    padding: 10px;
+}
+#sidebar {
+    padding-top: 10px;
+}
+.custom-widget-box {
+    margin-top: 20px;
+    padding: 5px;
+    border: None !important;
+}
+.custom-widget-box > p {
+    margin: 0px;
+}
+.bk-input-group {
+    color: None !important;
+}
+.indicator {
+    text-align: center;
+}
+.widget-card {
+    margin: 5px 10px;
+}
+.number-card {
+    margin: 5px 10px;
+    text-align: center;
+}
+.number-card-value {
+    width: 100%;
+    margin: 0px;
 }
 """
 
@@ -58,18 +87,17 @@ class _LayoutBase:
 
         if self._render_location == "notebook":
             tmpl = pn.GridSpec(width=self.width, height=self.height)
-            self._apply_themes(charts, theme)
-            self._apply_themes(sidebar, theme)
             self._process_plots(plots, tmpl)
             tmpl = self._process_widgets_notebook(widgets, tmpl)
         else:
-            tmpl = FastGridTemplate(
+            tmpl = pn.template.FastGridTemplate(
                 title=title,
                 sidebar_width=self.sidebar_width,
                 row_height=int(self.height / self.rows),
                 theme=theme,
                 theme_toggle=False,
             )
+            tmpl.header_background = theme.style.header_background
             self._apply_themes(charts, theme)
             self._apply_themes(sidebar, theme)
             self._process_widgets(widgets, tmpl)
@@ -83,9 +111,11 @@ class _LayoutBase:
                 chart.apply_theme(theme)
 
     def _process_widgets(self, widgets_list, tmpl):
-        widget_box = pn.WidgetBox(
+        widget_box = pn.Card(
             sizing_mode="scale_width",
             css_classes=["panel-widget-box", "custom-widget-box"],
+            hide_header=True,
+            collapsible=False,
         )
         for obj in widgets_list:
             obj.chart.width = self.sidebar_width

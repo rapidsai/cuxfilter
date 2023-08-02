@@ -1,15 +1,8 @@
-from .light import LightTheme as light
-from .dark import CustomDarkTheme as dark
-from .rapids import RapidsTheme as rapids
-from panel.theme import Fast
+from .default import LightTheme as light, CustomDarkTheme as dark
+from .rapids import (
+    RapidsDefaultTheme as rapids_light,
+    RapidsDarkTheme as rapids_dark,
+)
 
 
-class RapidsFastDesign(Fast):
-    _themes = {"default": rapids, "dark": dark}
-
-
-class DefaultFastDesign(Fast):
-    _themes = {"default": light, "dark": dark}
-
-
-__all__ = ["RapidsFastDesign", "DefaultFastDesign"]
+__all__ = ["light", "dark", "rapids_light", "rapids_dark"]

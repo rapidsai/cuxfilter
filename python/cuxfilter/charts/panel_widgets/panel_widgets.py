@@ -6,8 +6,7 @@ from .plots import (
     DateRangeSlider,
     IntSlider,
     FloatSlider,
-    DropDown,
-    MultiSelect,
+    MultiChoice,
     DataSizeIndicator,
 )
 from ..constants import CUDF_TIMEDELTA_TYPE
@@ -176,7 +175,7 @@ def drop_down(x, **params):
         documentation for more info
 
     """
-    plot = DropDown(x, **params)
+    plot = MultiChoice(x, max_items=1, **params)
     plot.chart_type = "dropdown"
     return plot
 
@@ -186,7 +185,7 @@ def multi_select(x, **params):
 
     Widget in the navbar of the cuxfilter dashboard.
 
-    Type: multi_select
+    Type: multi_choice
 
     Parameters
     ----------
@@ -201,8 +200,8 @@ def multi_select(x, **params):
         documentation for more info
 
     """
-    plot = MultiSelect(x, **params)
-    plot.chart_type = "multi_select"
+    plot = MultiChoice(x, **params)
+    plot.chart_type = "multi_choice"
     return plot
 
 
@@ -235,6 +234,7 @@ def number(
     title="",
     widget=True,
     format="{value}",
+    default_color="black",
     colors=[],
     font_size="18pt",
     **library_specific_params,
@@ -267,6 +267,10 @@ def number(
     format: str, default='{value}'
         A formatter string which accepts a {value}.
 
+    default_color: str, default 'black'
+        A color string to use as the default color if no thresholds are passed
+        via the colors argument.
+
     colors: list
         Color thresholds for the Number indicator,
         specified as a tuple of the absolute thresholds and the color to
@@ -274,6 +278,8 @@ def number(
         e,g: colors=[(33, 'green'), (66, 'gold'), (100, 'red')]
 
     font_size: str, default '18pt'
+
+    title_size: str, default '14pt'
 
     **params:
         additional arguments to be passed to the function. See panel
@@ -291,6 +297,7 @@ def number(
         title,
         widget,
         format,
+        default_color,
         colors,
         font_size,
         **library_specific_params,
@@ -304,22 +311,15 @@ def card(content="", title="", widget=True, **library_specific_params):
     Card chart contating markdown content and can be located in either
     the main dashboard or side navbar.
 
-    Type: number_chart or number_chart_widget
+    Type: number_chart
 
     Parameters
     ----------
     content: {str, markdown static content}, default ""
-
-    title: str,
-        chart title
-
-    widget: bool, default True
-        if widget is True, the chart gets placed on the side navbar,
-        else its placed in the main dashboard
 
     **params:
         additional arguments to be passed to the function. See panel
         documentation for more info
 
     """
-    return Card(content, title, widget, **library_specific_params)
+    return Card(content, **library_specific_params)

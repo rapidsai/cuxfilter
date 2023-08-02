@@ -125,3 +125,24 @@ class BaseWidget:
         # No reload functionality, added function for consistency
         # with other charts
         return -1
+
+    def apply_theme(self, theme):
+        """
+        apply thematic changes to the chart based on the theme
+        """
+        if hasattr(self.chart, "styles"):
+            self.chart.styles = {
+                "color": theme.style.color,
+            }
+        if hasattr(self.chart, "stylesheets"):
+            self.chart.stylesheets = [
+                f"""
+                .noUi-handle {{
+                    background-color: {theme.chart_color};
+                    border-color: {theme.chart_color};
+                }}
+                .noUi-connect {{
+                    background-color: {theme.chart_color} !important;
+                }}
+            """
+            ]
