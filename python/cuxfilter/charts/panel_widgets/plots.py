@@ -40,7 +40,7 @@ class RangeSlider(BaseWidget):
         self.chart = pn.widgets.RangeSlider(
             start=self.min_value,
             end=self.max_value,
-            name=self.name,
+            name=self.x,
             value=(self.min_value, self.max_value),
             **self.params,
         )
@@ -128,7 +128,7 @@ class DateRangeSlider(BaseWidget):
         self.chart = pn.widgets.DateRangeSlider(
             start=self.min_value,
             end=self.max_value,
-            name=self.name,
+            name=self.x,
             value=(self.min_value, self.max_value),
             sizing_mode="stretch_width",
             **self.params,
@@ -195,7 +195,7 @@ class IntSlider(BaseWidget):
             self.chart = pn.widgets.IntSlider(
                 start=self.min_value,
                 end=self.max_value,
-                name=self.name,
+                name=self.x,
                 value=self.value,
                 step=self.stride,
                 **self.params,
@@ -268,7 +268,7 @@ class FloatSlider(BaseWidget):
             self.chart = pn.widgets.FloatSlider(
                 start=self.min_value,
                 end=self.max_value,
-                name=self.name,
+                name=self.x,
                 value=self.value,
                 **self.params,
             )
@@ -368,7 +368,7 @@ class MultiChoice(BaseWidget):
         self.chart = pn.widgets.MultiChoice(
             options=self.list_of_values,
             value=[""],
-            name=self.name,
+            name=self.x,
             **self.params,
         )
 
