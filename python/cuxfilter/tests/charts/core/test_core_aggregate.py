@@ -29,8 +29,6 @@ class TestBaseAggregateChart:
         assert bb.data_points is None
         assert bb.add_interaction is True
         assert bb.aggregate_fn == "count"
-        assert bb.width == 400
-        assert bb.height == 400
         assert bb.stride is None
         assert bb.stride_type == int
         assert bb.library_specific_params == {}
@@ -50,10 +48,9 @@ class TestBaseAggregateChart:
     def test_view(self, chart, _chart):
         bnac = BaseAggregateChart(x="test_x", add_interaction=False)
         bnac.chart = chart
-        bnac.width = 400
 
         assert str(bnac.view()) == str(
-            pn.panel(_chart, width=bnac.width, title=bnac.title)
+            pn.panel(_chart, width=600, height=400)
         )
 
     @pytest.mark.parametrize("dashboard", dashboards)

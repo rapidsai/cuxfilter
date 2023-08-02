@@ -56,4 +56,4 @@ class TestBaseNumberChart:
         bnc.chart = chart
         bnc.title = "title"
 
-        assert str(bnc.view()) == str(pn.panel(_chart, title="title"))
+        assert bnc.view() == _chart

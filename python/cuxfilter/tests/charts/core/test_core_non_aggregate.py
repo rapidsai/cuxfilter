@@ -5,8 +5,9 @@ import dask_cudf
 import numpy as np
 
 from cuxfilter.charts.datashader.custom_extensions import (
-    holoviews_datashader as hv,
+    holoviews_datashader as hv_dt,
 )
+import holoviews as hv
 from cuxfilter.charts.core.non_aggregate.core_non_aggregate import (
     BaseNonAggregate,
 )
@@ -15,6 +16,10 @@ from cuxfilter import DataFrame
 from unittest import mock
 
 from ..utils import df_equals, df_types, initialize_df
+
+
+def hv_test_cb():
+    return pn.pane.HoloViews(hv.Curve([1, 2, 3]))
 
 
 class TestCoreNonAggregateChart:
@@ -27,8 +32,6 @@ class TestCoreNonAggregateChart:
         assert bnac.y is None
         assert bnac.aggregate_fn == "count"
         assert bnac.color is None
-        assert bnac.height == 0
-        assert bnac.width == 0
         assert bnac.add_interaction is True
         assert bnac.chart is None
         assert bnac.source is None
@@ -39,8 +42,8 @@ class TestCoreNonAggregateChart:
         assert bnac.stride_type == int
         assert bnac.min_value == 0.0
         assert bnac.max_value == 0.0
-        assert bnac.x_label_map == {}
-        assert bnac.y_label_map == {}
+        assert bnac.x_label_map is None
+        assert bnac.y_label_map is None
         assert bnac.title == ""
 
         # test chart name setter
@@ -67,16 +70,13 @@ class TestCoreNonAggregateChart:
         assert bnac.x_label_map == {"a": 1, "b": 2}
         assert bnac.y_label_map == {"a": 1, "b": 2}
 
-    @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
-    def test_view(self, chart, _chart):
+    def test_view(self):
         bnac = BaseNonAggregate()
-        bnac.chart = mock.Mock(**{"view.return_value": chart})
-        bnac.width = 400
-        bnac.title = "test_title"
-
-        assert str(bnac.view()) == str(
-            pn.panel(_chart, width=bnac.width, title=bnac.title)
+        bnac.chart = mock.Mock(
+            **{"view.return_value": hv.DynamicMap(hv_test_cb)}
         )
+
+        assert isinstance(bnac.view(), pn.pane.HoloViews)
 
     @pytest.mark.parametrize("df_type", df_types)
     def test_get_selection_geometry_callback(self, df_type):
@@ -249,7 +249,7 @@ class TestCoreNonAggregateChart:
         bnac = BaseNonAggregate()
         bnac.add_interaction = add_interaction
         bnac.reset_event = reset_event
-        bnac.chart = hv.InteractiveDatashader()
+        bnac.chart = hv_dt.InteractiveDatashader()
 
         df = initialize_df(df_type, {"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
@@ -278,7 +278,7 @@ class TestCoreNonAggregateChart:
         bnac.x = "a"
         bnac.x_range = (0, 2)
         bnac.y_range = (3, 5)
-        bnac.chart = hv.InteractiveDatashader()
+        bnac.chart = hv_dt.InteractiveDatashader()
 
         df = initialize_df(df_type, {"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
