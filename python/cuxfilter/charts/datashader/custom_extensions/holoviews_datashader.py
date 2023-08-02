@@ -9,7 +9,6 @@ from holoviews.operation.datashader import (
     rasterize,
 )
 import numpy as np
-import panel as pn
 import param
 
 from . import CustomInspectTool

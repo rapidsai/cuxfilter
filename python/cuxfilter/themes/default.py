@@ -1,4 +1,3 @@
-import param
 from bokeh import palettes
 from panel.theme.fast import FastDefaultTheme, FastDarkTheme, FastStyle
 
