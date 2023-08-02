@@ -193,6 +193,8 @@ class DataFrame:
 
         layout: cuxfilter.layouts
 
+        theme: cuxfilter.themes, default cuxfilter.themes.default.
+
         title: str
             title of the dashboard, default "Dashboard"
 
