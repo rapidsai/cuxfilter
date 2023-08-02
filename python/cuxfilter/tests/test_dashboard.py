@@ -20,7 +20,7 @@ class TestDashBoard:
             self.dashboard._dashboard.__class__
             == cuxfilter.layouts.single_feature
         )
-        assert self.dashboard._theme == cuxfilter.themes.light
+        assert self.dashboard._theme == cuxfilter.themes.default
 
         assert list(self.dashboard._sidebar.keys()) == [self._datasize_title]
         assert self.dashboard._query_str_dict == {}

@@ -15,7 +15,7 @@ from cuxfilter.charts.core import BaseChart, BaseWidget, ViewDataFrame
 from cuxfilter.layouts import single_feature
 from cuxfilter.charts.panel_widgets import data_size_indicator
 from cuxfilter.assets import screengrab, get_open_port, cudf_utils
-from cuxfilter.themes import light
+from cuxfilter.themes import default
 
 DEFAULT_NOTEBOOK_URL = "http://localhost:8888"
 
@@ -150,7 +150,7 @@ class DashBoard:
         sidebar=[],
         dataframe=None,
         layout=single_feature,
-        theme=light,
+        theme=default,
         title="Dashboard",
         data_size_widget=True,
         show_warnings=False,
@@ -520,7 +520,7 @@ class DashBoard:
             title=self.title,
             charts=self._charts,
             sidebar=self._sidebar,
-            theme=light if self._theme is not None else None,
+            theme=default if self._theme is not None else None,
             layout_array=self._layout_array,
             render_location="notebook",
             sidebar_width=sidebar_width,

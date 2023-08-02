@@ -13,7 +13,6 @@ class RapidsDefaultTheme(FastDefaultTheme):
     color_palette = list(palettes.Purples[9])
     chart_color = "#8735fb"
     datasize_indicator_class = "#8735fb"
-    _theme_type = "rapids"
 
 
 class RapidsDarkTheme(FastDarkTheme):
@@ -34,4 +33,3 @@ class RapidsDarkTheme(FastDarkTheme):
     color_palette = list(palettes.Purples[9])
     chart_color = "#8735fb"
     datasize_indicator_class = "#8735fb"
-    _theme_type = "rapids"

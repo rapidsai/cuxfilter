@@ -1,7 +1,6 @@
 import param
 from bokeh import palettes
 from panel.theme.fast import FastDefaultTheme, FastDarkTheme, FastStyle
-from ..charts.constants import STATIC_DIR_THEMES
 
 
 class LightTheme(FastDefaultTheme):
@@ -11,9 +10,7 @@ class LightTheme(FastDefaultTheme):
     )
     color_palette = list(palettes.Blues[9])
     chart_color = "#4292c6"
-    css = param.Filename(default=STATIC_DIR_THEMES / "rapids-light.css")
     datasize_indicator_class = "#4292c6"
-    _theme_type = "default"
 
 
 class CustomDarkTheme(FastDarkTheme):
@@ -32,7 +29,4 @@ class CustomDarkTheme(FastDarkTheme):
     )
     color_palette = list(palettes.Blues[9])
     chart_color = "#4292c6"
-    css = param.Filename(default=STATIC_DIR_THEMES / "rapids-dark.css")
-
     datasize_indicator_class = "#4292c6"
-    _theme_type = "default"

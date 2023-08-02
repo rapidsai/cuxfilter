@@ -1,8 +1,8 @@
-from .default import LightTheme as light, CustomDarkTheme as dark
+from .default import LightTheme as default, CustomDarkTheme as dark
 from .rapids import (
-    RapidsDefaultTheme as rapids_light,
+    RapidsDefaultTheme as rapids,
     RapidsDarkTheme as rapids_dark,
 )
 
 
-__all__ = ["light", "dark", "rapids_light", "rapids_dark"]
+__all__ = ["default", "dark", "rapids", "rapids_dark"]

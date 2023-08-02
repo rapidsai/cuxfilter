@@ -71,8 +71,8 @@ def choropleth(
 
     map_style: str,
         default based on cuxfilter.themes:
-            dark/rapids theme: 'mapbox://styles/mapbox/dark-v9'
-            light theme: 'mapbox://styles/mapbox/light-v9'
+            dark/rapids_dark theme: 'mapbox://styles/mapbox/dark-v9'
+            default/rapids theme: 'mapbox://styles/mapbox/light-v9'
         URI for Mapbox basemap style.
         See Mapbox's `https://docs.mapbox.com/mapbox-gl-js/example/setstyle/`
         for examples
