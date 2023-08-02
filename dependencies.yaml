@@ -128,6 +128,7 @@ dependencies:
         packages:
           - cugraph==23.8.*
           - dask-cuda==23.8.*
+          - pyproj>=2.4
   py_version:
     specific:
       - output_types: conda
@@ -160,7 +161,6 @@ dependencies:
           - packaging
           - panel >=1.0
           - pyppeteer>=0.2.6
-          - pyproj>=2.4,<=3.4
       - output_types: conda
         packages:
           - cupy>=12.0.0

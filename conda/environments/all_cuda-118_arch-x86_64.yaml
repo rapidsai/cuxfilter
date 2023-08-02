@@ -34,7 +34,7 @@ dependencies:
 - pre-commit
 - pydata-sphinx-theme
 - pyppeteer>=0.2.6
-- pyproj>=2.4,<=3.4
+- pyproj>=2.4
 - pytest
 - pytest-cov
 - pytest-xdist
