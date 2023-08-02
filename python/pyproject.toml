@@ -45,6 +45,7 @@ classifiers = [
 
 [project.optional-dependencies]
 test = [
+    "ipython",
     "pytest",
     "pytest-cov",
     "pytest-xdist",
