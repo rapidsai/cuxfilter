@@ -38,7 +38,7 @@ main.py
         chart4 = cuxfilter.charts.bar('MONTH')
 
         # declare dashboard
-        d = cux_df.dashboard([chart1, chart2, chart3, chart4], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Auto Accident Dataset')
+        d = cux_df.dashboard([chart1, chart2, chart3, chart4], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.default, title='Auto Accident Dataset')
 
         # run the dashboard as a webapp:
         d._dashboard.generate_dashboard(

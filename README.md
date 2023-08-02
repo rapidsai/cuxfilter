@@ -104,7 +104,7 @@ chart3 = cuxfilter.charts.range_slider('borrower_credit_score',data_points=50)
 chart1 = cuxfilter.charts.drop_down('dti')
 
 #declare dashboard
-d = cux_df.dashboard([chart0, chart2],sidebar=[chart3, chart1], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Mortgage Dashboard')
+d = cux_df.dashboard([chart0, chart2],sidebar=[chart3, chart1], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.default, title='Mortgage Dashboard')
 
 # run the dashboard within the notebook cell
 # Bokeh and Datashader based charts also have a `save` tool on the side toolbar, which can download and save the individual chart when interacting with the dashboard.
