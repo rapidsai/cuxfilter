@@ -1,5 +1,4 @@
 import pytest
-import panel as pn
 import cuxfilter
 from cuxfilter.charts.core.aggregate.core_number_chart import BaseNumberChart
 
