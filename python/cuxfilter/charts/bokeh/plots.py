@@ -139,22 +139,22 @@ class Bar(BaseAggregateChart):
         if self.color is None:
             self.sub_chart.glyph.fill_color = theme.chart_color
             self.sub_chart.glyph.line_color = theme.chart_color
+        if self.filter_widget and hasattr(self.filter_widget, "styles"):
+            self.filter_widget.styles = {
+                "color": theme.style.color,
+            }
 
-        self.filter_widget.styles = {
-            "color": theme.style.color,
-        }
-
-        self.filter_widget.stylesheets = [
-            f"""
-            .noUi-handle {{
-                background-color: {theme.chart_color};
-                border-color: {theme.chart_color};
-            }}
-            .noUi-connect {{
-                background-color: {theme.chart_color} !important;
-            }}
+            self.filter_widget.stylesheets = [
+                f"""
+                .noUi-handle {{
+                    background-color: {theme.chart_color};
+                    border-color: {theme.chart_color};
+                }}
+                .noUi-connect {{
+                    background-color: {theme.chart_color} !important;
+                }}
         """
-        ]
+            ]
 
 
 class Line(BaseAggregateChart):
@@ -283,19 +283,19 @@ class Line(BaseAggregateChart):
         """
         if self.color is None:
             self.sub_chart.glyph.line_color = theme.chart_color
+        if self.filter_widget and hasattr(self.filter_widget, "styles"):
+            self.filter_widget.styles = {
+                "color": theme.style.color,
+            }
 
-        self.filter_widget.styles = {
-            "color": theme.style.color,
-        }
-
-        self.filter_widget.stylesheets = [
-            f"""
-            .noUi-handle {{
-                background-color: {theme.chart_color};
-                border-color: {theme.chart_color};
-            }}
-            .noUi-connect {{
-                background-color: {theme.chart_color} !important;
-            }}
-        """
-        ]
+            self.filter_widget.stylesheets = [
+                f"""
+                .noUi-handle {{
+                    background-color: {theme.chart_color};
+                    border-color: {theme.chart_color};
+                }}
+                .noUi-connect {{
+                    background-color: {theme.chart_color} !important;
+                }}
+            """
+            ]
