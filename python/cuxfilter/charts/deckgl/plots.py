@@ -171,7 +171,12 @@ class Choropleth(BaseChoropleth):
         )
         if self.mapbox_api_key:
             self.deck_spec["mapboxApiAccessToken"] = self.mapbox_api_key
-        self.deck_spec["mapStyle"] = self.map_style
+
+        # set map style to default if not set by user to light mode
+        self.deck_spec["mapStyle"] = (
+            self.map_style
+            or "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+        )
 
         self.deck_spec["layers"] = [self.layer_spec]
 
