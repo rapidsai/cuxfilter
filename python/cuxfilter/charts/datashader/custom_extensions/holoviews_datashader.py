@@ -331,11 +331,8 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.panel(
-            (self.tiles * dmap if self.tiles is not None else dmap).relabel(
-                self.title
-            ),
-            sizing_mode="stretch_both",
+        return (self.tiles * dmap if self.tiles is not None else dmap).relabel(
+            self.title
         )
 
 
@@ -407,10 +404,8 @@ class InteractiveDatashaderLine(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.panel(
-            (self.tiles * dmap if self.tiles is not None else dmap).relabel(
-                self.title
-            )
+        return (self.tiles * dmap if self.tiles is not None else dmap).relabel(
+            self.title
         )
 
 
@@ -497,10 +492,8 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.panel(
-            (self.tiles * dmap if self.tiles is not None else dmap).relabel(
-                self.title
-            )
+        return (self.tiles * dmap if self.tiles is not None else dmap).relabel(
+            self.title
         )
 
 
@@ -647,11 +640,6 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
         if self.unselected_alpha > 0:
             dmap_graph *= self.nodes_chart.get_base_chart()
 
-        return pn.panel(
-            (
-                self.tiles * dmap_graph
-                if self.tiles is not None
-                else dmap_graph
-            ).relabel(self.title),
-            sizing_mode="stretch_both",
-        )
+        return (
+            self.tiles * dmap_graph if self.tiles is not None else dmap_graph
+        ).relabel(self.title)
