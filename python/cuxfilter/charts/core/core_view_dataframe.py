@@ -115,14 +115,14 @@ class ViewDataFrame:
     def reload_chart(self, data, patch_update: bool):
         if isinstance(data, dask_cudf.core.DataFrame):
             if self.force_computation:
-                self.chart[0].object = self._format_data(
+                self.chart.data = self._format_data(
                     data[self.columns].compute()
                 )
             else:
-                self.chart[0].object = self._format_data(
+                self.chart.data = self._format_data(
                     data[self.columns].head(
                         1000, npartitions=data.npartitions, compute=True
                     )
                 )
         else:
-            self.chart[0].object = self._format_data(data[self.columns])
+            self.chart.data = self._format_data(data[self.columns])

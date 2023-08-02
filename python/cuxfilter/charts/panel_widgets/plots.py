@@ -596,14 +596,16 @@ class Card:
     _initialized = True
     # widget is a chart type that can be rendered in a sidebar or main layout
     is_widget = True
+    uid = None
 
     @property
     def name(self):
-        return f"{self.chart_type}_{str(uuid.uuid4())}"
+        return f"{self.chart_type}_{self.uid}"
 
     def __init__(self, content=""):
         self.content = content
         self.chart_type = "card"
+        self.uid = str(uuid.uuid4())
 
     def view(self):
         return self.chart
