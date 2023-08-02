@@ -17,8 +17,8 @@ on:
           Will be ignored if external-project=all
           "
         required: false
-    schedule:
-      - cron: "0 0 * * 1" # Run every Sunday evening Pacific Time (Monday 0:00 UTC)
+  schedule:
+    - cron: "0 0 * * 1" # Run every Sunday evening Pacific Time (Monday 0:00 UTC)
 
 jobs:
   test-external:

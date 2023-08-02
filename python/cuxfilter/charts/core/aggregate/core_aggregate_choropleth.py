@@ -1,11 +1,11 @@
 from typing import Dict
 import os
 import numpy as np
+import panel as pn
 
 from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby
 from ....assets import geo_json_mapper
-from ....layouts import chart_view
 from ....assets.cudf_utils import get_min_max
 from ...constants import CUXF_NAN_COLOR
 
@@ -38,8 +38,6 @@ class BaseChoropleth(BaseChart):
         elevation_aggregate_fn="sum",
         elevation_factor=1,
         add_interaction=True,
-        width=800,
-        height=400,
         geoJSONSource=None,
         geoJSONProperty=None,
         geo_color_palette=None,
@@ -67,8 +65,6 @@ class BaseChoropleth(BaseChart):
             geoJSONProperty
             add_interaction
             geo_color_palette
-            width
-            height
             nan_color
             mapbox_api_key
             map_style
@@ -106,8 +102,6 @@ class BaseChoropleth(BaseChart):
         _, x_range, y_range = geo_json_mapper(
             self.geoJSONSource, self.geoJSONProperty, projection=4326
         )
-        self.height = height
-        self.width = width
         self.stride = 1
         self.mapbox_api_key = mapbox_api_key
         self.map_style = map_style
@@ -152,10 +146,11 @@ class BaseChoropleth(BaseChart):
 
         self.add_events(dashboard_cls)
 
-    def view(self):
-        return chart_view(
-            self.chart.view(), width=self.width, title=self.title
-        )
+    def view(self, width=800, height=400):
+        return pn.WidgetBox(self.chart.pane, width=width, height=height)
+
+    def get_dashboard_view(self):
+        return pn.panel(self.chart.view(), sizing_mode="stretch_both")
 
     def calculate_source(self, data):
         """

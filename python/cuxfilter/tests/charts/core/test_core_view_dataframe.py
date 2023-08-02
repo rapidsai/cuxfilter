@@ -3,7 +3,7 @@ import panel as pn
 import cuxfilter
 
 from cuxfilter.charts.core.core_view_dataframe import ViewDataFrame
-from cuxfilter.layouts import chart_view
+import holoviews as hv
 
 from ..utils import df_equals, initialize_df, df_types
 
@@ -26,8 +26,6 @@ class TestViewDataFrame:
         vd = ViewDataFrame()
 
         vd.columns is None
-        vd._width == 400
-        vd._height == 400
         vd.use_data_tiles is False
         vd.source is None
         vd.chart is None
@@ -40,19 +38,7 @@ class TestViewDataFrame:
 
         vd.initiate_chart(dashboard)
 
-        assert str(vd.chart) == str(
-            pn.pane.HTML(
-                dashboard._cuxfilter_df.data,
-                css_classes=["panel-df"],
-                style={
-                    "width": "100%",
-                    "height": "100%",
-                    "overflow-y": "auto",
-                    "font-size": "0.5vw",
-                    "overflow-x": "auto",
-                },
-            )
-        )
+        assert str(vd.chart) == str(hv.Table(dashboard._cuxfilter_df.data))
         assert vd.columns == list(dashboard._cuxfilter_df.data.columns)
 
     @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
@@ -60,9 +46,7 @@ class TestViewDataFrame:
         vd = ViewDataFrame()
         vd.chart = chart
 
-        assert str(vd.view()) == str(
-            chart_view(_chart, width=vd.width, title="Dataset View")
-        )
+        assert str(vd.view()) == str(pn.panel(_chart, width=600, height=400))
 
     @pytest.mark.parametrize(
         "dashboard, df_duplicate",
@@ -76,24 +60,6 @@ class TestViewDataFrame:
         vd.reload_chart(df_duplicate, patch_update=False)
 
         if drop_duplicates:
-            assert df_equals(
-                vd.chart[0].object, df_duplicate.drop_duplicates()
-            )
+            assert df_equals(vd.chart.data, df_duplicate.drop_duplicates())
         else:
-            assert df_equals(vd.chart[0].object, df_duplicate)
-
-    @pytest.mark.parametrize("dashboard", dashboards)
-    @pytest.mark.parametrize(
-        "width, height, result1, result2",
-        [(400, 400, 400, 400), (None, None, 400, 400)],
-    )
-    def test_update_dimensions(
-        self, dashboard, width, height, result1, result2
-    ):
-        vd = ViewDataFrame()
-        vd.initiate_chart(dashboard)
-        vd.width, vd.height = 400, 400
-        vd.update_dimensions(width=width, height=height)
-
-        assert vd.chart.width == result1
-        assert vd.chart.height == result2
+            assert df_equals(vd.chart.data, df_duplicate)

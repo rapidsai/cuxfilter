@@ -6,7 +6,6 @@ import cudf
 
 
 class TestDashBoard:
-
     df = cudf.DataFrame(
         {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
     )
@@ -21,7 +20,7 @@ class TestDashBoard:
             self.dashboard._dashboard.__class__
             == cuxfilter.layouts.single_feature
         )
-        assert self.dashboard._theme == cuxfilter.themes.light
+        assert self.dashboard._theme == cuxfilter.themes.default
 
         assert list(self.dashboard._sidebar.keys()) == [self._datasize_title]
         assert self.dashboard._query_str_dict == {}
@@ -49,9 +48,9 @@ class TestDashBoard:
             bac.chart_type = "chart_" + str(_ + 1)
             dashboard.add_charts(sidebar=[bac])
 
-        for _ in range(3):
+        for i in range(3):
             dashboard1.add_charts(
-                sidebar=[panel_widgets.card(title=f"test{_}")]
+                sidebar=[panel_widgets.card(content=f"test{i}")]
             )
 
         assert len(dashboard._charts) == 0
@@ -59,12 +58,8 @@ class TestDashBoard:
         assert list(dashboard._sidebar.keys()) == [self._datasize_title]
         assert len(dashboard1._charts) == 0
         assert len(dashboard1._sidebar) == 4
-        assert list(dashboard1._sidebar.keys()) == [
-            self._datasize_title,
-            "test0_card",
-            "test1_card",
-            "test2_card",
-        ]
+        for i in range(3):
+            assert "card" in list(dashboard1._sidebar.keys())[i + 1]
 
     @pytest.mark.parametrize(
         "query, result",

@@ -5,7 +5,6 @@ import holoviews as hv
 from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby, calc_value_counts
 from ...constants import (
-    BOOL_MAP,
     CUDF_DATETIME_TYPES,
 )
 from ....assets.cudf_utils import get_min_max
@@ -66,8 +65,6 @@ class BaseAggregateChart(BaseChart):
         data_points=None,
         add_interaction=True,
         aggregate_fn="count",
-        width=400,
-        height=400,
         step_size=None,
         step_size_type=int,
         title="",
@@ -86,8 +83,6 @@ class BaseAggregateChart(BaseChart):
             data_points
             add_interaction
             aggregate_fn
-            width
-            height
             step_size
             step_size_type
             title
@@ -109,8 +104,6 @@ class BaseAggregateChart(BaseChart):
         self.stride_type = step_size_type
         self.add_interaction = add_interaction
         self.aggregate_fn = aggregate_fn
-        self.height = height
-        self.width = width
         self.title = title if title else self.x
         self.autoscaling = autoscaling
         self.x_axis_tick_formatter = x_axis_tick_formatter
@@ -170,15 +163,15 @@ class BaseAggregateChart(BaseChart):
             self.min_value = 0
             self.max_value = 1
             self.stride = 1
-            # set axis labels:
-            if len(self.x_label_map) == 0:
-                self.x_label_map = BOOL_MAP
-            if (
-                self.y != self.x
-                and self.y is not None
-                and len(self.y_label_map) == 0
-            ):
-                self.y_label_map = BOOL_MAP
+            # # set axis labels:
+            # if len(self.x_label_map) == 0:
+            #     self.x_label_map = BOOL_MAP
+            # if (
+            #     self.y != self.x
+            #     and self.y is not None
+            #     and len(self.y_label_map) == 0
+            # ):
+            #     self.y_label_map = BOOL_MAP
         else:
             self.compute_min_max(dashboard_cls)
             if self.x_dtype in CUDF_DATETIME_TYPES:
@@ -226,6 +219,12 @@ class BaseAggregateChart(BaseChart):
                 dashboard_cls._reload_charts(ignore_cols=[self.name])
 
         return cb
+
+    def get_dashboard_view(self):
+        return pn.Column(
+            self.chart,
+            self.filter_widget,
+        )
 
     def calculate_source(self, data=None):
         """

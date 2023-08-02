@@ -1,7 +1,6 @@
 import pytest
 import cuxfilter
 from cuxfilter.charts.core.aggregate.core_number_chart import BaseNumberChart
-from cuxfilter.layouts import chart_view
 
 from ..utils import initialize_df, df_types
 
@@ -56,4 +55,4 @@ class TestBaseNumberChart:
         bnc.chart = chart
         bnc.title = "title"
 
-        assert str(bnc.view()) == str(chart_view(_chart, title="title"))
+        assert bnc.view() == _chart

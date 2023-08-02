@@ -34,8 +34,6 @@ class BaseLine(BaseNonAggregate):
         color=None,
         step_size=None,
         step_size_type=int,
-        width=800,
-        height=400,
         title="",
         timeout=100,
         x_axis_tick_formatter=None,
@@ -53,14 +51,10 @@ class BaseLine(BaseNonAggregate):
             data_points
             add_interaction
             aggregate_fn
-            width
-            height
             step_size
             step_size_type
             x_label_map
             y_label_map
-            width
-            height
             title
             timeout
             x_axis_tick_formatter
@@ -85,5 +79,3 @@ class BaseLine(BaseNonAggregate):
         self.y_axis_tick_formatter = y_axis_tick_formatter
         self.unselected_alpha = unselected_alpha
         self.library_specific_params = library_specific_params
-        self.width = width
-        self.height = height

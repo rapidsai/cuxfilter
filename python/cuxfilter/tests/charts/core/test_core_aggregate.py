@@ -4,7 +4,6 @@ import panel as pn
 
 from cuxfilter.charts.core.aggregate.core_aggregate import BaseAggregateChart
 import cuxfilter
-from cuxfilter.layouts import chart_view
 
 from ..utils import initialize_df, df_types
 
@@ -30,8 +29,6 @@ class TestBaseAggregateChart:
         assert bb.data_points is None
         assert bb.add_interaction is True
         assert bb.aggregate_fn == "count"
-        assert bb.width == 400
-        assert bb.height == 400
         assert bb.stride is None
         assert bb.stride_type == int
         assert bb.library_specific_params == {}
@@ -51,11 +48,8 @@ class TestBaseAggregateChart:
     def test_view(self, chart, _chart):
         bnac = BaseAggregateChart(x="test_x", add_interaction=False)
         bnac.chart = chart
-        bnac.width = 400
 
-        assert str(bnac.view()) == str(
-            chart_view(_chart, width=bnac.width, title=bnac.title)
-        )
+        assert str(bnac.view()) == str(pn.panel(_chart, width=600, height=400))
 
     @pytest.mark.parametrize("dashboard", dashboards)
     @pytest.mark.parametrize("df", dfs)

@@ -31,10 +31,6 @@ def bar(
 
     aggregate_fn: {'count', 'mean'},  default 'count'
 
-    width: int,  default 400
-
-    height: int,  default 400
-
     step_size: int,  default 1
 
     step_size_type: {int, float},  default int
