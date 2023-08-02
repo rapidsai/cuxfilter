@@ -17,6 +17,7 @@ dependencies:
 - datashader>=0.15
 - geopandas>=0.11.0
 - holoviews>=1.16.0
+- ipykernel
 - ipython
 - jupyter-server-proxy
 - jupyter_sphinx
