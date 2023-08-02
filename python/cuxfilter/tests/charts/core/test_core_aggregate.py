@@ -49,9 +49,7 @@ class TestBaseAggregateChart:
         bnac = BaseAggregateChart(x="test_x", add_interaction=False)
         bnac.chart = chart
 
-        assert str(bnac.view()) == str(
-            pn.panel(_chart, width=600, height=400)
-        )
+        assert str(bnac.view()) == str(pn.panel(_chart, width=600, height=400))
 
     @pytest.mark.parametrize("dashboard", dashboards)
     @pytest.mark.parametrize("df", dfs)
