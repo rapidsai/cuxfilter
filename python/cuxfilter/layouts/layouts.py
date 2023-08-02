@@ -130,8 +130,8 @@ class _LayoutBase:
     def _process_widgets_notebook(self, widgets_list, tmpl):
         tmpl_with_widgets = pn.GridSpec()
         tmpl_with_widgets[:, 2 : self.cols] = tmpl
-        widget_box = pn.WidgetBox(
-            sizing_mode="stretch_width",
+        widget_box = pn.Column(
+            sizing_mode="stretch_width", min_height=self.height - 300
         )
 
         for obj in widgets_list:
