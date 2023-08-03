@@ -33,7 +33,6 @@ dependencies:
 - panel >=1.0
 - pre-commit
 - pydata-sphinx-theme
-- pyppeteer>=0.2.6
 - pyproj>=2.4
 - pytest
 - pytest-cov

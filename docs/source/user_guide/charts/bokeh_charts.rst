@@ -27,5 +27,4 @@ Example
 
     d = cux_df.dashboard([bar_chart_1])
     #view the individual bar chart part of the dashboard d
-    #await d.preview()
     bar_chart_1.view()
