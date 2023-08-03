@@ -1,7 +1,6 @@
 Datashader Charts
 =================
 
-
 .. currentmodule:: cuxfilter.charts
 
 
