@@ -64,14 +64,11 @@ class Bar(BaseAggregateChart):
         generate chart
         """
         self.chart = figure(
-            x_range=(
-                self.source.data[self.data_x_axis]
-                if self.x_dtype == "object"
-                else None
-            ),
             tools="pan, wheel_zoom, reset, save",
             active_scroll="wheel_zoom",
             active_drag="pan",
+            title=self.title,
+            sizing_mode="stretch_both",
         )
         if self.color is None:
             self.sub_chart = self.chart.vbar(
@@ -101,15 +98,6 @@ class Bar(BaseAggregateChart):
             self.chart.yaxis.axis_label = self.y
         else:
             self.chart.yaxis.axis_label = self.aggregate_fn
-
-    def update_dimensions(self, width=None, height=None):
-        """
-        update dimensions
-        """
-        if width is not None:
-            self.chart.plot_width = width
-        if height is not None:
-            self.chart.plot_height = height
 
     def apply_mappers(self):
         """
@@ -151,6 +139,22 @@ class Bar(BaseAggregateChart):
         if self.color is None:
             self.sub_chart.glyph.fill_color = theme.chart_color
             self.sub_chart.glyph.line_color = theme.chart_color
+        if self.filter_widget and hasattr(self.filter_widget, "styles"):
+            self.filter_widget.styles = {
+                "color": theme.style.color,
+            }
+
+            self.filter_widget.stylesheets = [
+                f"""
+                .noUi-handle {{
+                    background-color: {theme.chart_color};
+                    border-color: {theme.chart_color};
+                }}
+                .noUi-connect {{
+                    background-color: {theme.chart_color} !important;
+                }}
+        """
+            ]
 
 
 class Line(BaseAggregateChart):
@@ -211,14 +215,11 @@ class Line(BaseAggregateChart):
         generate chart
         """
         self.chart = figure(
-            x_range=(
-                self.source.data[self.data_x_axis]
-                if self.x_dtype == "object"
-                else None
-            ),
             tools="pan, wheel_zoom, reset, save",
             active_scroll="wheel_zoom",
             active_drag="pan",
+            title=self.title,
+            sizing_mode="stretch_both",
         )
         if self.x_axis_tick_formatter:
             self.chart.xaxis.formatter = self.x_axis_tick_formatter
@@ -242,15 +243,6 @@ class Line(BaseAggregateChart):
                 color=self.color,
                 **self.library_specific_params,
             )
-
-    def update_dimensions(self, width=None, height=None):
-        """
-        update dimensions
-        """
-        if width is not None:
-            self.chart.plot_width = width
-        if height is not None:
-            self.chart.plot_height = height
 
     def apply_mappers(self):
         """
@@ -291,3 +283,19 @@ class Line(BaseAggregateChart):
         """
         if self.color is None:
             self.sub_chart.glyph.line_color = theme.chart_color
+        if self.filter_widget and hasattr(self.filter_widget, "styles"):
+            self.filter_widget.styles = {
+                "color": theme.style.color,
+            }
+
+            self.filter_widget.stylesheets = [
+                f"""
+                .noUi-handle {{
+                    background-color: {theme.chart_color};
+                    border-color: {theme.chart_color};
+                }}
+                .noUi-connect {{
+                    background-color: {theme.chart_color} !important;
+                }}
+            """
+            ]

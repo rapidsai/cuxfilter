@@ -1,7 +1,7 @@
 Charts
 ======
 
-cuxfilter is able to use a wide range of chart types: 
+cuxfilter is able to use a wide range of chart types:
 
 * Bokeh: line and bar
 * Datashader: high density line, stacked line, scatter, geospatial scatter, heatmap, and graph

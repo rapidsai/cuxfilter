@@ -18,10 +18,6 @@ The current version of cuxfilter leverages jupyter notebook and bokeh server to 
 
 ![layout architecture](./docs/_images/RAPIDS_cuxfilter.png)
 
-### What is cuDataTiles?
-
-cuxfilter implements cuDataTiles, a GPU accelerated version of data tiles based on the work of [Falcon](https://github.com/uwdata/falcon). When starting to interact with specific charts in a cuxfilter dashboard, values for the other charts are precomputed to allow for fast slider scrubbing without having to recalculate values.
-
 ### Open Source Projects
 
 cuxfilter wouldn’t be possible without using these great open source projects:
@@ -108,7 +104,7 @@ chart3 = cuxfilter.charts.range_slider('borrower_credit_score',data_points=50)
 chart1 = cuxfilter.charts.drop_down('dti')
 
 #declare dashboard
-d = cux_df.dashboard([chart0, chart2],sidebar=[chart3, chart1], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Mortgage Dashboard')
+d = cux_df.dashboard([chart0, chart2],sidebar=[chart3, chart1], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.default, title='Mortgage Dashboard')
 
 # run the dashboard within the notebook cell
 # Bokeh and Datashader based charts also have a `save` tool on the side toolbar, which can download and save the individual chart when interacting with the dashboard.

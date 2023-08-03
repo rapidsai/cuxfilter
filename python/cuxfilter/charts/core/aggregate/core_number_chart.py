@@ -1,6 +1,5 @@
-from ..core_chart import BaseChart
-from ....layouts import chart_view
-from ....assets import cudf_utils
+from cuxfilter.charts.core import BaseChart
+from cuxfilter.assets import cudf_utils
 
 
 class BaseNumberChart(BaseChart):
@@ -29,8 +28,10 @@ class BaseNumberChart(BaseChart):
         title="",
         widget=True,
         format="{value}",
+        default_color="black",
         colors=[],
         font_size="18pt",
+        title_size="9.75pt",
         **library_specific_params,
     ):
         """
@@ -49,8 +50,10 @@ class BaseNumberChart(BaseChart):
         self.title = title if title else (x or expression)
         self.aggregate_fn = aggregate_fn
         self.format = format
+        self.default_color = default_color
         self.colors = colors
         self.font_size = font_size
+        self.title_size = title_size
         self.library_specific_params = library_specific_params
         self.chart_type = (
             "number_chart" if not widget else "number_chart_widget"
@@ -82,7 +85,7 @@ class BaseNumberChart(BaseChart):
         self.generate_chart()
 
     def view(self):
-        return chart_view(self.chart, title=self.title)
+        return self.chart
 
     def apply_theme(self, theme):
         """

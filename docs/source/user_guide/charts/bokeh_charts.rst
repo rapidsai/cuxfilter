@@ -20,7 +20,7 @@ Example
 
     import cudf
     import cuxfilter
-    
+
 
     cux_df = cuxfilter.DataFrame.from_dataframe(cudf.DataFrame({'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}))
     bar_chart_1 = cuxfilter.charts.bar('key', 'val', data_points=5, add_interaction=False)

@@ -92,7 +92,7 @@ class Scatter(BaseScatter):
             point_shape=self.point_shape,
             max_px=self.point_size,
             unselected_alpha=self.unselected_alpha,
-            height=self.height,
+            title=self.title,
         )
 
     def reload_chart(self, data=None, patch_update=False):
@@ -188,15 +188,16 @@ class Graph(BaseGraph):
         self.inspect_neighbors = CustomInspectTool(
             icon=load_image(impath),
             _active=True,
-            tool_name="Inspect Neighboring Edges",
+            description="Inspect Neighboring Edges",
         )
+
         # loading icon from a url
         impath = (
             "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
             + "branch-0.15/python/cuxfilter/charts/datashader/icons/XPan.png"
         )
         self.display_edges = CustomInspectTool(
-            icon=load_image(impath), _active=True, tool_name="Display Edges"
+            icon=load_image(impath), _active=True, description="Display Edges"
         )
 
         def cb(attr, old, new):
@@ -229,7 +230,7 @@ class Graph(BaseGraph):
             inspect_neighbors=self.inspect_neighbors,
             display_edges=self.display_edges,
             unselected_alpha=self.unselected_alpha,
-            height=self.height,
+            title=self.title,
         )
 
     def reload_chart(self, data, edges=None, patch_update=False):
@@ -347,7 +348,7 @@ class Line(BaseLine):
             color=self.color,
             pixel_shade_type=self.pixel_shade_type,
             unselected_alpha=self.unselected_alpha,
-            height=self.height,
+            title=self.title,
         )
 
     def reload_chart(self, data, patch_update=False):
@@ -469,7 +470,7 @@ class StackedLines(BaseStackedLine):
             colors=self.colors,
             legend=self.compute_legend(),
             unselected_alpha=self.unselected_alpha,
-            height=self.height,
+            title=self.title,
         )
 
     def reload_chart(self, data, patch_update=False):

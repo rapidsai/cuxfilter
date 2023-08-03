@@ -9,7 +9,6 @@ from holoviews.operation.datashader import (
     rasterize,
 )
 import numpy as np
-import panel as pn
 import param
 
 from . import CustomInspectTool
@@ -119,9 +118,8 @@ class dynspread(SpreadingOperation):
 
 
 class InteractiveDatashaderBase(param.Parameterized):
-    width = param.Integer(400)
-    height = param.Integer(400)
     tile_provider = param.String(None)
+    title = param.String("Interactive Datashader Chart")
     box_stream = param.ClassSelector(
         class_=hv.streams.SelectionXY, default=hv.streams.SelectionXY()
     )
@@ -332,10 +330,8 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.panel(
-            self.tiles * dmap if self.tiles is not None else dmap,
-            sizing_mode="stretch_both",
-            height=self.height,
+        return (self.tiles * dmap if self.tiles is not None else dmap).relabel(
+            self.title
         )
 
 
@@ -407,7 +403,9 @@ class InteractiveDatashaderLine(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.panel(self.tiles * dmap if self.tiles is not None else dmap)
+        return (self.tiles * dmap if self.tiles is not None else dmap).relabel(
+            self.title
+        )
 
 
 class InteractiveDatashaderMultiLine(InteractiveDatashader):
@@ -493,7 +491,9 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.panel(self.tiles * dmap if self.tiles is not None else dmap)
+        return (self.tiles * dmap if self.tiles is not None else dmap).relabel(
+            self.title
+        )
 
 
 class InteractiveDatashaderGraph(InteractiveDatashaderBase):
@@ -639,8 +639,6 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
         if self.unselected_alpha > 0:
             dmap_graph *= self.nodes_chart.get_base_chart()
 
-        return pn.panel(
-            self.tiles * dmap_graph if self.tiles is not None else dmap_graph,
-            sizing_mode="stretch_both",
-            height=self.height,
-        )
+        return (
+            self.tiles * dmap_graph if self.tiles is not None else dmap_graph
+        ).relabel(self.title)

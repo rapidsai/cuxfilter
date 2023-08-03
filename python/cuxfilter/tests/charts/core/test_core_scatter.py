@@ -21,8 +21,6 @@ class TestBaseScatter:
         assert bs.pixel_shade_type == "eq_hist"
         assert bs.pixel_density == 0.5
         assert bs.pixel_spread == "dynspread"
-        assert bs.width == 800
-        assert bs.height == 400
         assert bs.library_specific_params == {}
 
         bs1 = BaseScatter(x="test_x", y="test_y")
