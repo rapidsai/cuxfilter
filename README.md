@@ -229,7 +229,7 @@ Currently supported layout templates and example code can be found on the [layou
 
 | Library       | Chart type                                                                                       |
 | ------------- | ------------------------------------------------------------------------------------------------ |
-| bokeh         | bar, line                                                                                        |
+| bokeh         | bar                                                                                              |
 | datashader    | scatter, scatter_geo, line, stacked_lines, heatmap, graph                                        |
 | panel_widgets | range_slider, date_range_slider, float_slider, int_slider, drop_down, multi_select, card, number |
 | custom        | view_dataframe                                                                                   |
