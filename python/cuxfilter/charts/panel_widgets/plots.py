@@ -526,7 +526,8 @@ class NumberChart(BaseNumberChart):
         generate chart float slider
         """
         if "data." not in self.expression:
-            # replace column names with {data.column} names to make it work with eval
+            # replace column names with {data.column} names to make it work
+            # with eval
             for i in data.columns:
                 self.expression = self.expression.replace(i, f"data.{i}")
 

@@ -8,13 +8,12 @@ from bokeh.embed import server_document
 import os
 import urllib
 import warnings
-from IPython.display import Image, display
 from collections import Counter
 
 from cuxfilter.charts.core import BaseChart, BaseWidget, ViewDataFrame
 from cuxfilter.layouts import single_feature
 from cuxfilter.charts.panel_widgets import data_size_indicator
-from cuxfilter.assets import screengrab, get_open_port, cudf_utils
+from cuxfilter.assets import get_open_port, cudf_utils
 from cuxfilter.themes import default
 
 DEFAULT_NOTEBOOK_URL = "http://localhost:8888"

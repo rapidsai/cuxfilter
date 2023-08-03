@@ -1,4 +1,3 @@
-from ctypes import ArgumentError
 from .plots import (
     Card,
     NumberChart,

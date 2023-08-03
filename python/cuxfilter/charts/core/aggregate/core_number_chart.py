@@ -36,7 +36,7 @@ class BaseNumberChart(BaseChart):
 
         """
         self.expression = expression
-        self.title = title if title else (x or expression)
+        self.title = title if title else expression
         self.aggregate_fn = aggregate_fn
         self.format = format
         self.default_color = default_color

@@ -2,7 +2,6 @@ import holoviews as hv
 import param
 from cuxfilter.charts.core.aggregate import BaseAggregateChart
 from cuxfilter.assets.numba_kernels import calc_value_counts
-import cudf
 import panel as pn
 
 
