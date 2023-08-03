@@ -1,16 +1,17 @@
-import cupy as cp
 import holoviews as hv
 import param
 from cuxfilter.charts.core.aggregate import BaseAggregateChart
-from cuxfilter.layouts import chart_view
 from cuxfilter.assets.numba_kernels import calc_groupby
 import panel as pn
+import cudf
 
 
 class InteractiveBar(param.Parameterized):
     x = param.String("x", doc="x axis column name")
     y = param.List(["y"], doc="y axis column names as a list")
-    source_df = param.Tuple(doc="source dataFrame")
+    source_df = param.ClassSelector(
+        class_=cudf.DataFrame, default=cudf.DataFrame(), doc="source dataframe"
+    )
     box_stream = param.ClassSelector(
         class_=hv.streams.SelectionXY, default=hv.streams.SelectionXY()
     )
@@ -36,6 +37,7 @@ class InteractiveBar(param.Parameterized):
     )
 
     library_specific_params = param.Dict({}, doc="library specific params")
+    title = param.String("InteractiveBar", doc="title of the chart")
 
     def __init__(self, **params):
         """
@@ -53,38 +55,38 @@ class InteractiveBar(param.Parameterized):
         self.source_df = data
 
     @param.depends("source_df")
-    def histogram(self, **kwargs):
+    def bars(self, **kwargs):
         return hv.Bars(
             self.source_df,
             kdims=self.x,
-            vdims=self.y,
-        ).opts(
-            tools=self.tools,
-            responsive=True,
-            default_tools=[],
-            nonselection_alpha=0.1,
-            active_tools=["xbox_select"],
-            **self.library_specific_params,
+            **{} if self.y is None else {"vdims": self.y},
         )
 
     def get_base_chart(self):
-        return self.histogram()
+        return self.bars().opts(alpha=self.unselected_alpha)
 
     def view(self):
-        histogram = self.histogram().opts(alpha=0)
-        box = hv.streams.BoundsXY(source=histogram, bounds=(0, 0, 0, 0))
-        bounds = hv.DynamicMap(lambda bounds: hv.Bounds(bounds), streams=[box])
         return (
-            histogram
-            * hv.DynamicMap(
-                self.histogram,
-                streams=[self.box_stream, self.reset_stream],
+            (
+                self.get_base_chart()
+                * hv.DynamicMap(
+                    self.bars,
+                    streams=[self.box_stream, self.reset_stream],
+                ).opts(
+                    tools=self.tools,
+                    responsive=True,
+                    default_tools=[],
+                    nonselection_alpha=1,
+                    active_tools=["xbox_select"],
+                    **self.library_specific_params,
+                )
             )
-        ).opts(shared_axes=False) * bounds
+            .relabel(self.title)
+            .opts(shared_axes=False)
+        )
 
 
 class Bar(BaseAggregateChart):
-    @param.depends("source")
     def generate_chart(self, **kwargs):
         """
         generate chart for the x and y columns, and apply aggregate function
@@ -94,13 +96,14 @@ class Bar(BaseAggregateChart):
             y=[self.y] if isinstance(self.y, str) else self.y,
             source_df=self.calculate_source(),
             library_specific_params=self.library_specific_params,
-            unselected_alpha=0.1,
+            unselected_alpha=self.unselected_alpha,
+            title=self.title,
         )
 
     def calculate_source(self, data=None):
         """
         Description:
-            Calculate the binned counts for the histogram for the x column
+            Calculate the binned counts for the bars for the x column
         -------------------------------------------
         Input:
             data = cudf.DataFrame
@@ -115,20 +118,18 @@ class Bar(BaseAggregateChart):
         """
         reload chart with new data
         """
-        self.source = data
+        self.chart.update_data(self.calculate_source(data))
 
-    def view(self):
-        return chart_view(
-            # self.generate_chart().opts(  # non-selection alpha is set to 0.1
-            #     alpha=0.1,
-            # )*
-            self.chart.view(),
-            title=self.title,
+    def view(self, width=800, height=400):
+        return pn.panel(
+            self.chart.view().opts(
+                width=width, height=height, responsive=False
+            )
         )
 
     def apply_theme(self, theme):
         """
         apply thematic changes to the chart based on the theme
         """
-        if "color" not in self.library_specific_params:
-            self.library_specific_params["color"] = theme.chart_color
+        if "fill_color" not in self.library_specific_params:
+            self.library_specific_params["fill_color"] = theme.chart_color

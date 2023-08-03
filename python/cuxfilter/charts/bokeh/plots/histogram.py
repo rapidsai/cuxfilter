@@ -1,17 +1,14 @@
-import numpy as np
 import holoviews as hv
 import param
 from cuxfilter.charts.core.aggregate import BaseAggregateChart
-from cuxfilter.layouts import chart_view
 from cuxfilter.assets.numba_kernels import calc_value_counts
-import panel as pn
 import cudf
-import dask_cudf
+import panel as pn
 
 
 class InteractiveHistogram(param.Parameterized):
     x = param.String("x", doc="x axis column name")
-    source_df = param.Tuple(doc="source dataFrame")
+    source_df = param.Tuple(doc="source dataframe")
     box_stream = param.ClassSelector(
         class_=hv.streams.SelectionXY, default=hv.streams.SelectionXY()
     )
@@ -38,6 +35,7 @@ class InteractiveHistogram(param.Parameterized):
         class_=hv.DynamicMap,
         doc="bounds of the box select tool",
     )
+    title = param.String("InteractiveBar", doc="title of the chart")
 
     library_specific_params = param.Dict({}, doc="library specific params")
 
@@ -61,26 +59,30 @@ class InteractiveHistogram(param.Parameterized):
         chart_module = hv.Histogram
         if self.source_df[0].dtype == "object":
             chart_module = hv.Bars
-        return chart_module(self.source_df, kdims=self.x).opts(
-            tools=self.tools,
-            responsive=True,
-            active_tools=["box_select"],
-            nonselection_alpha=0.1,
-            ylabel="frequency",
-            **self.library_specific_params,
-        )
+        return chart_module(self.source_df, kdims=self.x)
+
+    def get_base_chart(self):
+        return self.histogram().opts(alpha=self.unselected_alpha)
 
     def view(self):
-        histogram = self.histogram().opts(alpha=0.1)
-        box = hv.streams.BoundsXY(source=histogram, bounds=(0, 0, 0, 0))
-        bounds = hv.DynamicMap(lambda bounds: hv.Bounds(bounds), streams=[box])
         return (
-            histogram
-            * hv.DynamicMap(
-                self.histogram,
-                streams=[self.box_stream, self.reset_stream],
+            (
+                self.get_base_chart()
+                * hv.DynamicMap(
+                    self.histogram,
+                    streams=[self.box_stream, self.reset_stream],
+                ).opts(
+                    tools=self.tools,
+                    responsive=True,
+                    active_tools=["xbox_select"],
+                    nonselection_alpha=1,
+                    ylabel="frequency",
+                    **self.library_specific_params,
+                )
             )
-        ).opts(shared_axes=False) * bounds
+            .relabel(self.title)
+            .opts(shared_axes=False)
+        )
 
 
 class Histogram(BaseAggregateChart):
@@ -95,7 +97,7 @@ class Histogram(BaseAggregateChart):
         self.chart = InteractiveHistogram(
             x=self.x,
             source_df=self.calculate_source(),
-            unselected_alpha=0.1,
+            unselected_alpha=self.unselected_alpha,
             library_specific_params=self.library_specific_params,
         )
 
@@ -124,18 +126,16 @@ class Histogram(BaseAggregateChart):
         """
         self.chart.update_data(self.calculate_source(data))
 
-    def view(self):
-        return chart_view(
-            # self.generate_chart().opts(  # non-selection alpha is set to 0.1
-            #     alpha=0.1,
-            # )*
-            self.chart.view(),
-            title=self.title,
+    def view(self, width=800, height=400):
+        return pn.panel(
+            self.chart.view().opts(
+                width=width, height=height, responsive=False
+            )
         )
 
     def apply_theme(self, theme):
         """
         apply thematic changes to the chart based on the theme
         """
-        if "color" not in self.library_specific_params:
-            self.library_specific_params["color"] = theme.chart_color
+        if "fill_color" not in self.library_specific_params:
+            self.library_specific_params["fill_color"] = theme.chart_color

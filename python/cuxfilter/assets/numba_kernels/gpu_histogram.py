@@ -31,6 +31,7 @@ def calc_value_counts(a_gpu, stride, min_value, custom_binning=False):
                 .value_counts()
             )
         val_count = val_count.compute().sort_index()
+
     else:
         if not custom_binning:
             val_count = a_gpu.value_counts().sort_index()
@@ -42,8 +43,11 @@ def calc_value_counts(a_gpu, stride, min_value, custom_binning=False):
                 .value_counts()
                 .sort_index()
             )
+    val_index = val_count.index.values_host
+    if custom_binning:
+        val_index = val_count.index.values_host * stride + min_value
 
-    return (val_count.index.values_host, val_count.values_host)
+    return (val_index, val_count.values_host)
 
 
 def calc_groupby(chart: Type[BaseChart], data, agg=None):

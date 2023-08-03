@@ -126,18 +126,18 @@ class Choropleth(BaseChoropleth):
             .dropna(subset=["coordinates"])
             .reset_index(drop=True)
         )
-        # if patch_update is False:
-        self.source = source_temp
-        self.compute_colors()
-        # else:
-        #     self.source.loc[
-        #         :, [self.color_column, self.elevation_column]
-        #     ] = np.nan
-        #     self.source.loc[
-        #         self.source[self.x].isin(source_temp[self.x]),
-        #         [self.color_column, self.elevation_column],
-        #     ] = source_temp[[self.color_column, self.elevation_column]].values
-        #     self.compute_colors()
+        if self.source is None:
+            self.source = source_temp
+            self.compute_colors()
+        else:
+            self.source.loc[
+                :, [self.color_column, self.elevation_column]
+            ] = np.nan
+            self.source.loc[
+                self.source[self.x].isin(source_temp[self.x]),
+                [self.color_column, self.elevation_column],
+            ] = source_temp[[self.color_column, self.elevation_column]].values
+            self.compute_colors()
 
         if self.chart:
             self.chart.data = self.source

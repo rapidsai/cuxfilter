@@ -12,6 +12,7 @@ def bar(
     step_size_type=int,
     title="",
     autoscaling=True,
+    unselected_alpha=0.1,
     **library_specific_params,
 ):
     """
@@ -30,7 +31,7 @@ def bar(
 
     aggregate_fn: {'count', 'mean'},  default 'count'
 
-    step_size: int,  default 1
+    step_size: int,  default None
 
     step_size_type: {int, float},  default int
 
@@ -42,6 +43,8 @@ def bar(
 
         set whether chart scale is updated automatically for
         y_axis when data updates
+
+    unselected_alpha: float, default 0.1
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to
@@ -63,6 +66,7 @@ def bar(
             step_size_type=step_size_type,
             title=title,
             autoscaling=autoscaling,
+            unselected_alpha=unselected_alpha,
             **library_specific_params,
         )
         plot.chart_type = "bar"
@@ -80,6 +84,7 @@ def bar(
             step_size_type=step_size_type,
             title=title,
             autoscaling=autoscaling,
+            unselected_alpha=unselected_alpha,
             **library_specific_params,
         )
         plot.chart_type = "histogram"

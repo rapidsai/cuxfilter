@@ -137,7 +137,7 @@ class DashBoard:
         }
         if len(selected_indices) > 0:
             result = (
-                df_module.concat(list(selected_indices.values()))
+                df_module.concat(list(selected_indices.values()), axis=1)
                 .fillna(False)
                 .all(axis=1)
             )

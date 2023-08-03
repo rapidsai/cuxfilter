@@ -1,9 +1,8 @@
-import panel as pn
 import numpy as np
 from bokeh.models import DatetimeTickFormatter
 import holoviews as hv
 from ..core_chart import BaseChart
-from ....assets.numba_kernels import calc_groupby, calc_value_counts
+from ....assets.numba_kernels import calc_value_counts
 from ...constants import (
     CUDF_DATETIME_TYPES,
 )
@@ -71,6 +70,7 @@ class BaseAggregateChart(BaseChart):
         autoscaling=True,
         x_axis_tick_formatter=None,
         y_axis_tick_formatter=None,
+        unselected_alpha=0.1,
         **library_specific_params,
     ):
         """
@@ -108,6 +108,7 @@ class BaseAggregateChart(BaseChart):
         self.autoscaling = autoscaling
         self.x_axis_tick_formatter = x_axis_tick_formatter
         self.y_axis_tick_formatter = y_axis_tick_formatter
+        self.unselected_alpha = unselected_alpha
         self.library_specific_params = library_specific_params
 
     def _compute_array_all_bins(self, source_x, update_data_x, update_data_y):
@@ -163,15 +164,6 @@ class BaseAggregateChart(BaseChart):
             self.min_value = 0
             self.max_value = 1
             self.stride = 1
-            # # set axis labels:
-            # if len(self.x_label_map) == 0:
-            #     self.x_label_map = BOOL_MAP
-            # if (
-            #     self.y != self.x
-            #     and self.y is not None
-            #     and len(self.y_label_map) == 0
-            # ):
-            #     self.y_label_map = BOOL_MAP
         else:
             self.compute_min_max(dashboard_cls)
             if self.x_dtype in CUDF_DATETIME_TYPES:
@@ -196,7 +188,6 @@ class BaseAggregateChart(BaseChart):
     def get_box_select_callback(self, dashboard_cls):
         def cb(bounds, x_selection, y_selection):
             self.box_selected_range, self.selected_indices = None, None
-
             if type(x_selection) == tuple:
                 self.box_selected_range = {
                     self.x + "_min": x_selection[0],
@@ -207,8 +198,7 @@ class BaseAggregateChart(BaseChart):
                     dashboard_cls._cuxfilter_df.data[self.x]
                     .isin(x_selection)
                     .reset_index()
-                    .drop(columns="index")
-                )
+                )[[self.x]]
 
             if self.box_selected_range or self.selected_indices is not None:
                 self.compute_query_dict(
@@ -216,15 +206,12 @@ class BaseAggregateChart(BaseChart):
                     dashboard_cls._query_local_variables_dict,
                 )
                 # reload all charts with new queried data (cudf.DataFrame only)
-                dashboard_cls._reload_charts(ignore_cols=[self.name])
+                dashboard_cls._reload_charts()
 
         return cb
 
     def get_dashboard_view(self):
-        return pn.Column(
-            self.chart,
-            self.filter_widget,
-        )
+        return self.chart.view()
 
     def calculate_source(self, data=None):
         """
@@ -279,7 +266,8 @@ class BaseAggregateChart(BaseChart):
 
     def add_events(self, dashboard_cls):
         """
-        Description: add events to the chart, for the filter function to facilitate interaction behavior,
+        Description: add events to the chart, for the filter function to
+            facilitate interaction behavior,
         that updates the rest of the charts on the page
         -------------------------------------------
         Input:

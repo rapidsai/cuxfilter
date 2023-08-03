@@ -16,6 +16,7 @@ class BaseChoropleth(BaseChart):
     reset_event = None
     geo_mapper: Dict[str, str] = {}
     use_data_tiles = True
+    source = None
 
     @property
     def name(self):
