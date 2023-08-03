@@ -1,3 +1,4 @@
+from argparse import ArgumentError
 from .plots import Bar, Histogram
 
 
@@ -7,8 +8,6 @@ def bar(
     data_points=None,
     add_interaction=True,
     aggregate_fn=None,
-    width=400,
-    height=400,
     step_size=None,
     step_size_type=int,
     title="",
@@ -60,8 +59,6 @@ def bar(
             data_points=data_points,
             add_interaction=add_interaction,
             aggregate_fn=aggregate_fn or "mean",
-            width=width,
-            height=height,
             step_size=step_size,
             step_size_type=step_size_type,
             title=title,
@@ -79,8 +76,6 @@ def bar(
             x=x,
             data_points=data_points,
             add_interaction=add_interaction,
-            width=width,
-            height=height,
             step_size=step_size,
             step_size_type=step_size_type,
             title=title,

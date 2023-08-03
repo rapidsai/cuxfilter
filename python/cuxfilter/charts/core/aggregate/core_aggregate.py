@@ -249,7 +249,6 @@ class BaseAggregateChart(BaseChart):
                 self.custom_binning,
             )
             data.columns = [self.x, "count"]
-
         return data
 
     def compute_query_dict(self, query_str_dict, query_local_variables_dict):
