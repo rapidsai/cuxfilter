@@ -173,8 +173,8 @@ class BaseStackedLine(BaseChart):
         self.format_source_data(data)
 
     def get_box_select_callback(self, dashboard_cls):
-        def cb(boundsx):
-            self.x_range = self._xaxis_dt_transform(boundsx)
+        def cb(bounds, x_selection, y_selection):
+            self.x_range = self._xaxis_dt_transform(x_selection)
 
             self.box_selected_range = {
                 self.x + "_min": self.x_range[0],
