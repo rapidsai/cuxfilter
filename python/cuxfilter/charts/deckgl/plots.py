@@ -195,21 +195,6 @@ class Choropleth(BaseChoropleth):
         """
         self.calculate_source(data)
 
-    def reset_chart(self, data: np.array = np.array([]), column=None):
-        """
-        if len(data) is 0, reset the chart using self.source_backup
-
-        Parameters:
-        -----------
-        data:  list()
-            update self.data_y_axis in self.source
-        """
-        if column is not None:
-            self.source[column] = data
-            if column == self.color_column:
-                self.compute_colors()
-            self.chart.data = self.source
-
     def map_indices_to_values(self, indices: list):
         """
         map index values to column values

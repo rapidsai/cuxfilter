@@ -533,7 +533,7 @@ class NumberChart(BaseNumberChart):
 
         self.chart = pn.layout.Card(
             pn.indicators.Number(
-                value=int(self.value),
+                value=int(getattr(eval(self.expression), self.aggregate_fn)()),
                 format=self.format,
                 default_color=self.default_color,
                 colors=self.colors,
@@ -546,21 +546,6 @@ class NumberChart(BaseNumberChart):
             sizing_mode="stretch_width",
             css_classes=["card", "number-card"],
         )
-
-    def reset_chart(self, data: float = -1):
-        """
-        Description:
-            if len(data) is 0, reset the chart using self.source_backup
-
-        Parameters:
-        -----------
-            data: float, default -1
-
-        """
-        if data == -1:
-            self.chart[0].value = self.source_backup
-        else:
-            self.chart[0].value = data
 
     def apply_theme(self, theme):
         """
