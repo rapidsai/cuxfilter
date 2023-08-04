@@ -98,6 +98,7 @@ class Histogram(BaseAggregateChart):
             source_df=self.calculate_source(),
             unselected_alpha=self.unselected_alpha,
             library_specific_params=self.library_specific_params,
+            title=self.title,
         )
 
     def calculate_source(self, data=None):
