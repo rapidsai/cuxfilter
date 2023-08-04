@@ -30,10 +30,9 @@ dependencies:
 - numpydoc
 - packaging
 - pandoc<=2.0.0
-- panel >=1.0
+- panel>=1.0
 - pre-commit
 - pydata-sphinx-theme
-- pyproj>=2.4
 - pytest
 - pytest-cov
 - pytest-xdist
