@@ -8,25 +8,18 @@ class BaseNumberChart(BaseChart):
     is_widget = True
 
     @property
-    def use_data_tiles(self):
-        return self.expression is None
-
-    @property
     def is_datasize_indicator(self):
-        return not (self.x or self.expression)
+        return False
 
     @property
     def name(self):
-        value = (self.x or self.expression) or ""
-        return f"{value}_{self.chart_type}_{self.title}"
+        return f"{self.chart_type}_{self.title}"
 
     def __init__(
         self,
-        x=None,
         expression=None,
         aggregate_fn="count",
         title="",
-        widget=True,
         format="{value}",
         default_color="black",
         colors=[],
@@ -45,9 +38,8 @@ class BaseNumberChart(BaseChart):
         Ouput:
 
         """
-        self.x = x
         self.expression = expression
-        self.title = title if title else (x or expression)
+        self.title = title if title else expression
         self.aggregate_fn = aggregate_fn
         self.format = format
         self.default_color = default_color
@@ -55,9 +47,7 @@ class BaseNumberChart(BaseChart):
         self.font_size = font_size
         self.title_size = title_size
         self.library_specific_params = library_specific_params
-        self.chart_type = (
-            "number_chart" if not widget else "number_chart_widget"
-        )
+        self.chart_type = "base_number_chart"
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -71,18 +61,10 @@ class BaseNumberChart(BaseChart):
         Ouput:
 
         """
-        if self.is_datasize_indicator:
-            # datasize indicator
-            self.min_value = 0
-            self.max_value = len(dashboard_cls._cuxfilter_df.data)
-        elif self.x:
-            self.expression = f"data.{self.x}"
-        elif self.expression:
-            for i in dashboard_cls._cuxfilter_df.data.columns:
-                self.expression = self.expression.replace(i, f"data.{i}")
+        self.generate_chart(dashboard_cls._cuxfilter_df.data)
 
-        self.calculate_source(dashboard_cls._cuxfilter_df.data)
-        self.generate_chart()
+    def generate_chart(self, data):
+        pass
 
     def view(self):
         return self.chart
@@ -93,11 +75,11 @@ class BaseNumberChart(BaseChart):
         """
         pass
 
-    def reload_chart(self, data, patch_update=True):
+    def reload_chart(self, data):
         """
         reload chart
         """
-        self.calculate_source(data, patch_update=patch_update)
+        pass
 
     def _compute_source(self, query, local_dict, indices):
         """

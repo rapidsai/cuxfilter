@@ -1,4 +1,3 @@
-from ctypes import ArgumentError
 from .plots import (
     Card,
     NumberChart,
@@ -228,11 +227,9 @@ def data_size_indicator(**library_specific_params):
 
 
 def number(
-    x=None,
-    expression=None,
+    expression,
     aggregate_fn="mean",
     title="",
-    widget=True,
     format="{value}",
     default_color="black",
     colors=[],
@@ -248,9 +245,6 @@ def number(
 
     Parameters
     ----------
-    x: str
-        column name from gpu dataframe
-
     expression:
         string containing computable expression containing column names
         e.g: "(x+y)/2" will result in number value = (df.x + df.y)/2
@@ -259,10 +253,6 @@ def number(
 
     title: str,
         chart title
-
-    widget: bool, default True
-        if widget is True, the chart gets placed on the side navbar,
-        else its placed in the main dashboard
 
     format: str, default='{value}'
         A formatter string which accepts a {value}.
@@ -286,22 +276,17 @@ def number(
         documentation for more info
 
     """
-    if not (x or expression):
-        raise ArgumentError(
-            "Atleast one of x or expression arg should be provided"
-        )
     plot = NumberChart(
-        x,
-        expression,
-        aggregate_fn,
-        title,
-        widget,
-        format,
-        default_color,
-        colors,
-        font_size,
+        expression=expression,
+        aggregate_fn=aggregate_fn,
+        title=title,
+        format=format,
+        default_color=default_color,
+        colors=colors,
+        font_size=font_size,
         **library_specific_params,
     )
+    plot.chart_type = "number"
     return plot
 
 

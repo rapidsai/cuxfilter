@@ -1,7 +1,7 @@
-from .bokeh import bar, line
+from .bokeh import bar
 from .core import view_dataframe
 from .constants import *
-from .datashader import scatter, stacked_lines, heatmap, graph
+from .datashader import line, scatter, stacked_lines, heatmap, graph
 from .deckgl import choropleth
 from .panel_widgets import (
     card,

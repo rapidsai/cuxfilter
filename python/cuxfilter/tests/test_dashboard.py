@@ -11,7 +11,7 @@ class TestDashBoard:
     )
     cux_df = cuxfilter.DataFrame.from_dataframe(df)
     dashboard = cux_df.dashboard(charts=[], title="test_title")
-    _datasize_title = "_datasize_indicator_Datapoints Selected"
+    _datasize_title = "datasize_indicator_Datapoints Selected"
 
     def test_variables(self):
         assert self.dashboard._cuxfilter_df.data.equals(self.df)
@@ -21,7 +21,6 @@ class TestDashBoard:
             == cuxfilter.layouts.single_feature
         )
         assert self.dashboard._theme == cuxfilter.themes.default
-
         assert list(self.dashboard._sidebar.keys()) == [self._datasize_title]
         assert self.dashboard._query_str_dict == {}
 
@@ -97,6 +96,12 @@ class TestDashBoard:
         bac = bokeh.bar("key")
         bac.chart_type = "chart_1"
         dashboard.add_charts([bac])
-        bac.filter_widget.value = (0, 3)
+        bac.box_selected_range = {
+            bac.x + "_min": 0,
+            bac.x + "_max": 3,
+        }
+        bac.compute_query_dict(
+            dashboard._query_str_dict, dashboard._query_local_variables_dict
+        )
 
         assert dashboard.export().equals(self.df[self.df.key.between(0, 3)])

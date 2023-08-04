@@ -144,9 +144,7 @@ class InteractiveDatashaderBase(param.Parameterized):
     unselected_alpha = param.Number(
         0.2,
         bounds=(0, 1),
-        doc=(
-            "display unselected data as the same color palette but transparent"
-        ),
+        doc=("Transparency of the unselected points. "),
     )
 
     def __init__(self, **params):
@@ -422,7 +420,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         default=[
             "pan",
             "reset",
-            "box_select",
+            "xbox_select",
             "wheel_zoom",
             "xwheel_zoom",
             "save",
@@ -434,9 +432,6 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         doc="legend to be added on top of the multi-line chart",
         default=None,
     )
-    box_stream = param.ClassSelector(
-        class_=hv.streams.BoundsX, default=hv.streams.BoundsX()
-    )
 
     def __init__(self, **params):
         super(InteractiveDatashaderMultiLine, self).__init__(**params)
@@ -445,7 +440,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         self.source_df = data
 
     def add_box_select_callback(self, callback_fn):
-        self.box_stream = hv.streams.BoundsX(subscribers=[callback_fn])
+        self.box_stream = hv.streams.SelectionXY(subscribers=[callback_fn])
 
     @param.depends("source_df")
     def lines(self, **kwargs):
@@ -481,7 +476,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         ).opts(
             responsive=True,
             tools=self.tools,
-            active_tools=["xwheel_zoom", "pan"],
+            active_tools=["xbox_select"],
             default_tools=[],
         )
 

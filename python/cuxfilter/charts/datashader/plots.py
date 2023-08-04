@@ -95,7 +95,7 @@ class Scatter(BaseScatter):
             title=self.title,
         )
 
-    def reload_chart(self, data=None, patch_update=False):
+    def reload_chart(self, data=None):
         """
         Description:
 
@@ -233,7 +233,7 @@ class Graph(BaseGraph):
             title=self.title,
         )
 
-    def reload_chart(self, data, edges=None, patch_update=False):
+    def reload_chart(self, data, edges=None):
         """
         Description:
 
@@ -351,7 +351,7 @@ class Line(BaseLine):
             title=self.title,
         )
 
-    def reload_chart(self, data, patch_update=False):
+    def reload_chart(self, data):
         """
         Description:
 
@@ -473,7 +473,7 @@ class StackedLines(BaseStackedLine):
             title=self.title,
         )
 
-    def reload_chart(self, data, patch_update=False):
+    def reload_chart(self, data):
         """
         Description:
 

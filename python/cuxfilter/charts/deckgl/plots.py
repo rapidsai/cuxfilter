@@ -110,14 +110,13 @@ class Choropleth(BaseChoropleth):
                 color_map
             ).tolist()
 
-    def format_source_data(self, data, patch_update=False):
+    def format_source_data(self, data):
         """
         format source
 
         Parameters:
         -----------
         data: cudf.DataFrame or dask_cudf.DataFrame
-        patch_update: boolean
 
         returns a pandas.DataFrame merged with geojson polygon coordinates
         """
@@ -127,7 +126,7 @@ class Choropleth(BaseChoropleth):
             .dropna(subset=["coordinates"])
             .reset_index(drop=True)
         )
-        if patch_update is False:
+        if self.source is None:
             self.source = source_temp
             self.compute_colors()
         else:
@@ -194,22 +193,7 @@ class Choropleth(BaseChoropleth):
         reload chart
         ---
         """
-        self.calculate_source(data, patch_update=patch_update)
-
-    def reset_chart(self, data: np.array = np.array([]), column=None):
-        """
-        if len(data) is 0, reset the chart using self.source_backup
-
-        Parameters:
-        -----------
-        data:  list()
-            update self.data_y_axis in self.source
-        """
-        if column is not None:
-            self.source[column] = data
-            if column == self.color_column:
-                self.compute_colors()
-            self.chart.data = self.source
+        self.calculate_source(data)
 
     def map_indices_to_values(self, indices: list):
         """

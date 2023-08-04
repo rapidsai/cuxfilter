@@ -438,44 +438,37 @@ class DataSizeIndicator(BaseNumberChart):
 
     title = "Datapoints Selected"
 
+    @property
+    def is_datasize_indicator(self):
+        return True
+
+    @property
+    def name(self):
+        return f"{self.chart_type}_{self.title}"
+
     def get_df_size(self, df):
         if isinstance(df, dask_cudf.DataFrame):
             return df.shape[0].compute()
         return df.shape[0]
 
-    def calculate_source(self, data, patch_update=False):
+    def reload_chart(self, data):
         """
-        calculate source
-
-        Parameters:
-        -----------
-            data: cudf.DataFrame
-            patch_update: bool, default False
+        reload chart
         """
         source_dict = {"X": list([1]), "Y": list([self.get_df_size(data)])}
+        self.chart[0].value = int(source_dict["Y"][0])
+        self.chart[1].value = int((self.chart[0].value / self.max_value) * 100)
 
-        if patch_update:
-            self.chart[0].value = int(source_dict["Y"][0])
-            self.chart[1].value = int(
-                (self.chart[0].value / self.max_value) * 100
-            )
-        else:
-            self.source = int(source_dict["Y"][0])
-            self.source_backup = int(self.source)
-
-    def get_source_y_axis(self):
-        """
-        get y axis column values
-        """
-        return self.chart[0].value
-
-    def generate_chart(self):
+    def generate_chart(self, data):
         """
         generate chart float slider
         """
+        self.min_value = 0
+        self.max_value = len(data)
+
         self.chart = pn.WidgetBox(
             pn.indicators.Number(
-                value=int(self.max_value),
+                value=int(self.get_df_size(data)),
                 format="{value:,}",
                 font_size="18pt",
                 name=self.title,
@@ -504,21 +497,6 @@ class DataSizeIndicator(BaseNumberChart):
             "border-color": theme.style.neutral_focus,
         }
 
-    def reset_chart(self, data: int = -1):
-        """
-        Description:
-            if len(data) is 0, reset the chart using self.source_backup
-        -------------------------------------------
-        Input:
-        data = list() --> update self.data_y_axis in self.source
-        -------------------------------------------
-        """
-        if data == -1:
-            self.chart[0].value = self.source_backup
-        else:
-            self.chart[0].value = int(data)
-        self.chart[1].value = int((self.chart[0].value / self.max_value) * 100)
-
 
 class NumberChart(BaseNumberChart):
     """
@@ -526,7 +504,13 @@ class NumberChart(BaseNumberChart):
     dashboard or side navbar.
     """
 
-    def calculate_source(self, data, patch_update=False):
+    expression = ""
+
+    @property
+    def name(self):
+        return f"{self.expression}_{self.chart_type}_{self.title}"
+
+    def reload_chart(self, data):
         """
         calculate source
 
@@ -535,22 +519,21 @@ class NumberChart(BaseNumberChart):
             data: cudf.DataFrame
             patch_update: bool, default False
         """
-        self.value = getattr(eval(self.expression), self.aggregate_fn)()
+        self.chart.value = getattr(eval(self.expression), self.aggregate_fn)()
 
-        if patch_update:
-            self.chart[0].value = self.value
-        else:
-            self.source = data
-            self.source_backup = self.value
-
-    def generate_chart(self):
+    def generate_chart(self, data):
         """
         generate chart float slider
         """
+        if "data." not in self.expression:
+            # replace column names with {data.column} names to make it work
+            # with eval
+            for i in data.columns:
+                self.expression = self.expression.replace(i, f"data.{i}")
 
         self.chart = pn.layout.Card(
             pn.indicators.Number(
-                value=int(self.value),
+                value=int(getattr(eval(self.expression), self.aggregate_fn)()),
                 format=self.format,
                 default_color=self.default_color,
                 colors=self.colors,
@@ -563,21 +546,6 @@ class NumberChart(BaseNumberChart):
             sizing_mode="stretch_width",
             css_classes=["card", "number-card"],
         )
-
-    def reset_chart(self, data: float = -1):
-        """
-        Description:
-            if len(data) is 0, reset the chart using self.source_backup
-
-        Parameters:
-        -----------
-            data: float, default -1
-
-        """
-        if data == -1:
-            self.chart[0].value = self.source_backup
-        else:
-            self.chart[0].value = data
 
     def apply_theme(self, theme):
         """

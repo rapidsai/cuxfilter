@@ -35,7 +35,12 @@ test_arr3 = [
     [
         (
             True,
-            np.array([[0, 1, 2, 3, 7, 8], [100, 150, 300, 100, 50, 150]]),
+            np.array(
+                [
+                    [1.0, 14.5, 28.0, 41.5, 95.5, 109.0],
+                    [100, 150, 300, 100, 50, 150],
+                ]
+            ),
         ),
         (
             False,
@@ -48,8 +53,8 @@ def test_calc_value_counts(custom_binning, result):
     bins = 8
     stride = (x.max() - x.min()) / bins
 
-    _result, data_points = gpu_histogram.calc_value_counts(
-        x, stride, x.min(), None, custom_binning=custom_binning
+    _result = gpu_histogram.calc_value_counts(
+        x, stride, x.min(), custom_binning=custom_binning
     )
     assert np.array_equal(_result, result)
 

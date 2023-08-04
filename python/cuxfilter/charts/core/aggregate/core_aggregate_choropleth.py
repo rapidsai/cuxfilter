@@ -16,6 +16,7 @@ class BaseChoropleth(BaseChart):
     reset_event = None
     geo_mapper: Dict[str, str] = {}
     use_data_tiles = True
+    source = None
 
     @property
     def name(self):
@@ -152,7 +153,7 @@ class BaseChoropleth(BaseChart):
     def get_dashboard_view(self):
         return pn.panel(self.chart.view(), sizing_mode="stretch_both")
 
-    def calculate_source(self, data, patch_update=False):
+    def calculate_source(self, data):
         """
         Description:
 
@@ -164,7 +165,7 @@ class BaseChoropleth(BaseChart):
         Ouput:
         """
         self.format_source_data(
-            calc_groupby(self, data, agg=self.aggregate_dict), patch_update
+            calc_groupby(self, data, agg=self.aggregate_dict)
         )
 
     def get_selection_callback(self, dashboard_cls):

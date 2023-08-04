@@ -161,7 +161,6 @@ dependencies:
           - numpy>=1.21
           - packaging
           - panel >=1.0
-          - pyppeteer>=0.2.6
       - output_types: conda
         packages:
           - cupy>=12.0.0

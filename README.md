@@ -178,15 +178,6 @@ See [build instructions](CONTRIBUTING.md#setting-up-your-build-environment).
 
 ## Troubleshooting
 
-**libxcomposite.so.1 not found error**
-
-If the `await d.preview()` throws a libxcomposite.so.1 not found error, execute the following commands:
-
-```bash
-apt-get update
-apt-get install libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxrandr2 libxtst6 libcups2 libxss1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libatk1.0-0 libgtk-3-0 libgdk-pixbuf2.0-0
-```
-
 **bokeh server in jupyter lab**
 
 To run the bokeh server in a jupyter lab, install jupyterlab dependencies
@@ -229,11 +220,11 @@ Currently supported layout templates and example code can be found on the [layou
 
 | Library       | Chart type                                                                                       |
 | ------------- | ------------------------------------------------------------------------------------------------ |
-| bokeh         | bar, line                                                                                        |
+| bokeh         | bar                                                                                              |
 | datashader    | scatter, scatter_geo, line, stacked_lines, heatmap, graph                                        |
 | panel_widgets | range_slider, date_range_slider, float_slider, int_slider, drop_down, multi_select, card, number |
 | custom        | view_dataframe                                                                                   |
-| pydeck        | choropleth(3d and 2d)                                                                            |
+| deckgl        | choropleth(3d and 2d)                                                                            |
 
 ## Contributing Developers Guide
 

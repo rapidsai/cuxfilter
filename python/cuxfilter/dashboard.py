@@ -8,13 +8,12 @@ from bokeh.embed import server_document
 import os
 import urllib
 import warnings
-from IPython.display import Image, display
 from collections import Counter
 
 from cuxfilter.charts.core import BaseChart, BaseWidget, ViewDataFrame
 from cuxfilter.layouts import single_feature
 from cuxfilter.charts.panel_widgets import data_size_indicator
-from cuxfilter.assets import screengrab, get_open_port, cudf_utils
+from cuxfilter.assets import get_open_port, cudf_utils
 from cuxfilter.themes import default
 
 DEFAULT_NOTEBOOK_URL = "http://localhost:8888"
@@ -137,7 +136,7 @@ class DashBoard:
         }
         if len(selected_indices) > 0:
             result = (
-                df_module.concat(list(selected_indices.values()))
+                df_module.concat(list(selected_indices.values()), axis=1)
                 .fillna(False)
                 .all(axis=1)
             )
@@ -177,10 +176,7 @@ class DashBoard:
 
         # add data_size_indicator to sidebar if data_size_widget=True
         if data_size_widget:
-            chart = data_size_indicator(title_size="14pt")
-            chart.initiate_chart(self)
-            chart._initialized = True
-            self._sidebar[chart.name] = chart
+            sidebar.insert(0, data_size_indicator(title_size="14pt"))
 
         # process all sidebar widgets
         for chart in sidebar:
@@ -419,75 +415,6 @@ class DashBoard:
         server_document(websocket_origin, resources=None)
         return server
 
-    async def preview(self, sidebar_width=280, height=800):
-        """
-        Preview(Async) all the charts in a jupyter cell, non interactive(no
-        backend server). Mostly intended to save notebook state for blogs,
-        documentation while still rendering the dashboard.
-
-        Notes
-        -----
-        - Png format
-        - Bokeh and Datashader based charts also have a `save` tool
-        on the side toolbar, which can download and save the individual
-        chart when interacting with the dashboard.
-
-        Examples
-        --------
-
-        >>> import cudf
-        >>> import cuxfilter
-        >>> from cuxfilter.charts import bokeh
-        >>> df = cudf.DataFrame(
-        >>>     {
-        >>>         'key': [0, 1, 2, 3, 4],
-        >>>         'val':[float(i + 10) for i in range(5)]
-        >>>     }
-        >>> )
-        >>> cux_df = cuxfilter.DataFrame.from_dataframe(df)
-        >>> line_chart_1 = bokeh.line(
-        >>>     'key', 'val', data_points=5, add_interaction=False
-        >>> )
-        >>> line_chart_2 = bokeh.bar(
-        >>>     'val', 'key', data_points=5, add_interaction=False
-        >>> )
-        >>> d = cux_df.dashboard(
-        >>>    [line_chart_1, line_chart_2],
-        >>>    layout=cuxfilter.layouts.double_feature
-        >>> )
-        >>> await d.preview()
-        displays charts in the dashboard
-        """
-        if self.server is not None:
-            if self.server._started:
-                self.stop()
-            self._reinit_all_charts()
-            port = self.server.port
-        else:
-            port = get_open_port()
-        url = "localhost:" + str(port)
-
-        self.server = self._get_server(
-            panel=self._dashboard.generate_dashboard(
-                title=self.title,
-                charts=self._charts,
-                sidebar=self._sidebar,
-                theme=self._theme,
-                layout_array=self._layout_array,
-                render_location="web-app",
-                sidebar_width=sidebar_width,
-                height=height,
-            ),
-            port=port,
-            websocket_origin=url,
-            show=False,
-            start=True,
-        )
-        await screengrab("http://" + url)
-        self.stop()
-
-        display(Image("temp.png"))
-
     def app(self, sidebar_width=280, width=1200, height=800):
         """
         Run the dashboard with a bokeh backend server within the notebook.
@@ -527,6 +454,46 @@ class DashBoard:
             width=width,
             height=height,
         )
+
+    def servable(self, sidebar_width=280):
+        """
+        Run the dashboard with a bokeh backend server within the notebook.
+        Parameters
+        ----------
+        Examples
+        --------
+
+        >>> import cudf
+        >>> import cuxfilter
+        >>> from cuxfilter.charts import bokeh
+        >>> df = cudf.DataFrame(
+        >>>     {
+        >>>         'key': [0, 1, 2, 3, 4],
+        >>>         'val':[float(i + 10) for i in range(5)]
+        >>>     }
+        >>> )
+        >>> cux_df = cuxfilter.DataFrame.from_dataframe(df)
+        >>> line_chart_1 = bokeh.line(
+        >>>     'key', 'val', data_points=5, add_interaction=False
+        >>> )
+        >>> d = cux_df.dashboard([line_chart_1])
+        >>> d.app()
+
+        """
+        self._reinit_all_charts()
+        self._current_server_type = "servable"
+
+        self._dashboard.generate_dashboard(
+            self.title,
+            self._charts,
+            self._sidebar,
+            self._theme,
+            self._layout_array,
+            "web-app",
+            sidebar_width,
+        ).servable()
+
+        print("click panel logo to launch dashboard")
 
     def show(
         self,
@@ -650,4 +617,4 @@ class DashBoard:
         # reloading charts as per current data state
         for chart in self.charts.values():
             if chart.name not in ignore_cols and chart.name in include_cols:
-                chart.reload_chart(data, patch_update=True)
+                chart.reload_chart(data)

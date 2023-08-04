@@ -47,7 +47,7 @@ class ViewDataFrame:
 
     @property
     def name(self):
-        return self.chart_type
+        return f"{self.chart_type}_{self.columns}"
 
     def initiate_chart(self, dashboard_cls):
         data = dashboard_cls._cuxfilter_df.data
@@ -112,7 +112,7 @@ class ViewDataFrame:
     def get_dashboard_view(self):
         return pn.panel(self.chart, sizing_mode="stretch_both")
 
-    def reload_chart(self, data, patch_update: bool):
+    def reload_chart(self, data):
         if isinstance(data, dask_cudf.core.DataFrame):
             if self.force_computation:
                 self.chart.data = self._format_data(

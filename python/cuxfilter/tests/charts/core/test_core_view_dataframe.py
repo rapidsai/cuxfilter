@@ -57,7 +57,7 @@ class TestViewDataFrame:
         vd = ViewDataFrame(drop_duplicates=drop_duplicates)
         vd.initiate_chart(dashboard)
 
-        vd.reload_chart(df_duplicate, patch_update=False)
+        vd.reload_chart(df_duplicate)
 
         if drop_duplicates:
             assert df_equals(vd.chart.data, df_duplicate.drop_duplicates())
