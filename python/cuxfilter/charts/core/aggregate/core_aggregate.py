@@ -1,4 +1,5 @@
 import numpy as np
+from typing import Union
 from bokeh.models import DatetimeTickFormatter
 import holoviews as hv
 from ..core_chart import BaseChart
@@ -14,7 +15,7 @@ class BaseAggregateChart(BaseChart):
     y_axis_tick_formatter = None
     use_data_tiles = True
     stride = None
-    data_points: int | None = None
+    data_points: Union[int, None] = None
     _x_dtype = float
     box_stream = hv.streams.SelectionXY()
     reset_stream = hv.streams.PlotReset()
