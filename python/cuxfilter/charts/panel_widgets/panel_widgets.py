@@ -230,7 +230,6 @@ def number(
     expression,
     aggregate_fn="mean",
     title="",
-    widget=True,
     format="{value}",
     default_color="black",
     colors=[],
@@ -254,10 +253,6 @@ def number(
 
     title: str,
         chart title
-
-    widget: bool, default True
-        if widget is True, the chart gets placed on the side navbar,
-        else its placed in the main dashboard
 
     format: str, default='{value}'
         A formatter string which accepts a {value}.
@@ -285,7 +280,6 @@ def number(
         expression=expression,
         aggregate_fn=aggregate_fn,
         title=title,
-        widget=widget,
         format=format,
         default_color=default_color,
         colors=colors,

@@ -174,7 +174,6 @@ class BaseAggregateChart(BaseChart):
         self.source = dashboard_cls._cuxfilter_df.data
         self.generate_chart()
         self.add_events(dashboard_cls)
-        # self.apply_mappers()
 
     def get_reset_callback(self, dashboard_cls):
         def reset_callback(resetting):
@@ -212,31 +211,6 @@ class BaseAggregateChart(BaseChart):
 
     def get_dashboard_view(self):
         return self.chart.view()
-
-    def calculate_source(self, data=None):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-        data = data or self.source
-        if self.y == self.x or self.y is None:
-            if self.x_dtype != "object" and self.data_points is not None:
-                self.compute_stride()
-            # if y is None or y == x, then compute histogram on x
-            data = calc_value_counts(
-                data[self.x],
-                self.stride,
-                self.min_value,
-                self.custom_binning,
-            )
-            data.columns = [self.x, "count"]
-        return data
 
     def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """

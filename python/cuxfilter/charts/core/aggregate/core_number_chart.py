@@ -11,12 +11,15 @@ class BaseNumberChart(BaseChart):
     def is_datasize_indicator(self):
         return False
 
+    @property
+    def name(self):
+        return f"{self.chart_type}_{self.title}"
+
     def __init__(
         self,
         expression=None,
         aggregate_fn="count",
         title="",
-        widget=True,
         format="{value}",
         default_color="black",
         colors=[],
@@ -59,6 +62,9 @@ class BaseNumberChart(BaseChart):
 
         """
         self.generate_chart(dashboard_cls._cuxfilter_df.data)
+
+    def generate_chart(self, data):
+        pass
 
     def view(self):
         return self.chart

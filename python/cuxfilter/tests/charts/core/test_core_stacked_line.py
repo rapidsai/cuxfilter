@@ -113,7 +113,7 @@ class TestBaseStackedLine:
         dashboard._active_view = bsl
 
         t = bsl.get_box_select_callback(dashboard)
-        t(boundsx=(1, 2))
+        t(bounds=(1, 2), x_selection=(1, 2), y_selection=(3, 4))
 
         result_query = dashboard._generate_query_str()
         query_variables = dashboard._query_local_variables_dict

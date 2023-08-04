@@ -191,7 +191,7 @@ class BaseChart:
         print("base calc source function, to over-ridden by delegated classes")
         return -1
 
-    def generate_chart(self):
+    def generate_chart(self, **kwargs):
         print("base calc source function, to over-ridden by delegated classes")
         return -1
 

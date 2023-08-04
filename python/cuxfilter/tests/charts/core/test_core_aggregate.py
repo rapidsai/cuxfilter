@@ -3,9 +3,11 @@ from bokeh.events import ButtonClick
 import panel as pn
 
 from cuxfilter.charts.core.aggregate.core_aggregate import BaseAggregateChart
+from cuxfilter.charts.bokeh.plots.bar import InteractiveBar
 import cuxfilter
-
 from ..utils import initialize_df, df_types
+from unittest import mock
+import numpy as np
 
 df_args = {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
 dfs = [initialize_df(type, df_args) for type in df_types]
@@ -21,9 +23,6 @@ class TestBaseAggregateChart:
         bb = BaseAggregateChart(x="test_x")
 
         assert bb.chart_type is None
-        assert bb.reset_event is None
-        assert bb.filter_widget is None
-        assert bb.use_data_tiles is True
         assert bb.x == "test_x"
         assert bb.y is None
         assert bb.data_points is None
@@ -36,61 +35,20 @@ class TestBaseAggregateChart:
     @pytest.mark.parametrize("dashboard", dashboards)
     def test_initiate_chart(self, dashboard):
         bb = BaseAggregateChart(x="key")
+        bb.add_events = mock.Mock()
         bb.initiate_chart(dashboard)
-
         assert bb.min_value == 0.0
         assert bb.max_value == 4.0
-        assert bb.data_points == 5
-        assert bb.stride == 1
+        assert bb.stride is None
         assert bb.stride_type == int
 
     @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
     def test_view(self, chart, _chart):
-        bnac = BaseAggregateChart(x="test_x", add_interaction=False)
-        bnac.chart = chart
+        bac = BaseAggregateChart(x="test_x", add_interaction=False)
+        bac.add_events = mock.Mock()
+        bac.chart = chart
 
-        assert str(bnac.view()) == str(pn.panel(_chart, width=600, height=400))
-
-    @pytest.mark.parametrize("dashboard", dashboards)
-    @pytest.mark.parametrize("df", dfs)
-    @pytest.mark.parametrize(
-        "bb, result",
-        [
-            (
-                BaseAggregateChart(x="key", y="val"),
-                {
-                    "X": [0.0, 1.0, 2.0, 3.0, 4.0],
-                    "Y": [10.0, 11.0, 12.0, 13.0, 14.0],
-                },
-            ),
-            (
-                BaseAggregateChart(x="key"),
-                {
-                    "X": [0.0, 1.0, 2.0, 3.0, 4.0],
-                    "Y": [1.0, 1.0, 1.0, 1.0, 1.0],
-                },
-            ),
-        ],
-    )
-    def test_calculate_source(self, dashboard, df, bb, result):
-        bb.initiate_chart(dashboard)
-        self.result = None
-
-        def func1(dict_temp, patch_update=False):
-            self.result = dict_temp
-
-        bb.format_source_data = func1
-        bb.calculate_source(df)
-        assert all(result["X"] == self.result["X"])
-        assert all(result["Y"] == self.result["Y"])
-
-    @pytest.mark.parametrize("dashboard", dashboards)
-    def test_add_range_slider_filter(self, dashboard):
-        bb = BaseAggregateChart(x="key")
-        bb.chart_type = "bar"
-        dashboard.add_charts([bb])
-        assert isinstance(bb.filter_widget, pn.widgets.RangeSlider)
-        assert bb.filter_widget.value == (0, 4)
+        assert str(bac.view()) == str(pn.panel(_chart, width=600, height=400))
 
     @pytest.mark.parametrize("dashboard", dashboards)
     @pytest.mark.parametrize(
@@ -98,21 +56,22 @@ class TestBaseAggregateChart:
         [
             (
                 (3, 4),
-                "@key_min <= key <= @key_max",
+                "@key_min<=key<=@key_max",
                 {"key_min": 3, "key_max": 4},
             ),
             (
                 (0, 0),
-                "@key_min <= key <= @key_max",
+                "@key_min<=key<=@key_max",
                 {"key_min": 0, "key_max": 0},
             ),
         ],
     )
     def test_compute_query_dict(self, dashboard, range, query, local_dict):
         bb = BaseAggregateChart(x="key")
+        bb.add_events = mock.Mock()
         bb.chart_type = "bar"
         dashboard.add_charts([bb])
-        bb.filter_widget.value = range
+        bb.box_selected_range = {"key_min": range[0], "key_max": range[1]}
         # test the following function behavior
         bb.compute_query_dict(
             dashboard._query_str_dict,
@@ -127,45 +86,33 @@ class TestBaseAggregateChart:
 
     @pytest.mark.parametrize("dashboard", dashboards)
     @pytest.mark.parametrize(
-        "event, result", [(None, None), (ButtonClick, "func_Called")]
+        "event_1, event_2",
+        [
+            ("cb", "reset_callback"),
+        ],
     )
-    def test_add_events(self, dashboard, event, result):
-        bb = BaseAggregateChart(x="key")
-        self.result = None
+    def test_add_events(
+        self,
+        dashboard,
+        event_1,
+        event_2,
+    ):
+        bnac = BaseAggregateChart(x="key")
+        bnac.chart = InteractiveBar()
 
-        def test_func(cls):
-            self.result = "func_Called"
+        self.event_1 = None
+        self.event_2 = None
 
-        bb.add_reset_event = test_func
-        bb.reset_event = event
-        # test the following function behavior
-        bb.add_events(dashboard)
+        def t_func(fn):
+            self.event_1 = fn.__name__
 
-        assert self.result == result
+        def t_func1(fn):
+            self.event_2 = fn.__name__
 
-    @pytest.mark.parametrize("dashboard", dashboards)
-    def test_add_reset_event(self, dashboard):
-        bb = BaseAggregateChart(x="key")
-        self.result = None
+        bnac.chart.add_box_select_callback = t_func
+        bnac.chart.add_reset_callback = t_func1
 
-        def test_func(event, callback):
-            self.result = callback
+        bnac.add_events(dashboard)
 
-        class chart:
-            on_event = test_func
-
-        bb.chart = chart
-        # test the following function behavior
-        bb.add_reset_event(dashboard)
-        assert self.result.__name__ == "reset_callback"
-
-    def test_label_mappers(self):
-        bac = BaseAggregateChart(x="test_x")
-        library_specific_params = {
-            "x_label_map": {"a": 1, "b": 2},
-            "y_label_map": {"a": 1, "b": 2},
-        }
-        bac.library_specific_params = library_specific_params
-
-        assert bac.x_label_map == {"a": 1, "b": 2}
-        assert bac.y_label_map == {"a": 1, "b": 2}
+        assert self.event_1 == event_1
+        assert self.event_2 == event_2
