@@ -616,5 +616,9 @@ class DashBoard:
             include_cols = self.charts.keys()
         # reloading charts as per current data state
         for chart in self.charts.values():
-            if chart.name not in ignore_cols and chart.name in include_cols:
+            if (
+                chart.name not in ignore_cols
+                and chart.name in include_cols
+                and hasattr(chart, "reload_chart")
+            ):
                 chart.reload_chart(data)

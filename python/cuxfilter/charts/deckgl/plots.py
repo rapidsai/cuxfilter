@@ -130,13 +130,14 @@ class Choropleth(BaseChoropleth):
             self.source = source_temp
             self.compute_colors()
         else:
-            self.source.loc[
-                :, [self.color_column, self.elevation_column]
-            ] = np.nan
+            columns = [self.color_column]
+            if self.elevation_column is not None:
+                columns.append(self.elevation_column)
+            self.source.loc[:, columns] = np.nan
             self.source.loc[
                 self.source[self.x].isin(source_temp[self.x]),
-                [self.color_column, self.elevation_column],
-            ] = source_temp[[self.color_column, self.elevation_column]].values
+                columns,
+            ] = source_temp[columns].values
             self.compute_colors()
 
         if self.chart:
