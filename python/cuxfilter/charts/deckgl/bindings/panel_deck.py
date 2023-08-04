@@ -39,8 +39,6 @@ class PanelDeck(param.Parameterized):
     spec = param.Dict()
     default_color = param.List([211, 211, 211, 50])
     sizing_mode = param.String("stretch_both")
-    height = param.Integer(400)
-    width = param.Integer(400)
     tooltip_include_cols = param.List(
         [], doc="list of columns to include in tooltip"
     )
@@ -73,7 +71,6 @@ class PanelDeck(param.Parameterized):
         self.pane = pn.pane.DeckGL(
             self.spec,
             sizing_mode=self.sizing_mode,
-            height=self.height,
             tooltips={self.spec["layers"][0]["id"]: self.get_tooltip_html()},
             css_classes=["deck-chart"],
         )
@@ -139,7 +136,6 @@ class PanelDeck(param.Parameterized):
         """
         x = pn.Column(
             self.param.multi_select,
-            sizing_mode=self.sizing_mode,
             css_classes=["multi-select"],
         )
 
@@ -147,7 +143,5 @@ class PanelDeck(param.Parameterized):
             x,
             self.click_event,
             self.pane,
-            width=self.width,
-            height=self.height,
             sizing_mode=self.sizing_mode,
         )

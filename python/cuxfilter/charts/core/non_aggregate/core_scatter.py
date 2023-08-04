@@ -36,8 +36,6 @@ class BaseScatter(BaseNonAggregate):
         pixel_shade_type="eq_hist",
         pixel_density=0.5,
         pixel_spread="dynspread",
-        width=800,
-        height=400,
         tile_provider=None,
         title="",
         timeout=100,
@@ -64,8 +62,6 @@ class BaseScatter(BaseNonAggregate):
             pixel_shade_type
             pixel_density
             pixel_spread
-            width
-            height
             title
             timeout
             **library_specific_params
@@ -82,8 +78,6 @@ class BaseScatter(BaseNonAggregate):
         self.aggregate_col = aggregate_col or y
         self._color_palette_input = color_palette
         self.aggregate_fn = aggregate_fn
-        self.width = width
-        self.height = height
         self.tile_provider = tile_provider
         self.point_shape = point_shape
         self.point_size = point_size

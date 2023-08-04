@@ -15,8 +15,6 @@ class BaseChart:
     y: str = None
     aggregate_fn: str = "count"
     color: str = None
-    _height: int = 0
-    _width: int = 0
     add_interaction: bool = True
     chart = None
     source = None
@@ -28,8 +26,8 @@ class BaseChart:
     stride_type = int
     min_value: float = 0.0
     max_value: float = 0.0
-    x_label_map = {}
-    y_label_map = {}
+    x_label_map = None
+    y_label_map = None
     _initialized = False
     # widget=False can only be rendered the main layout
     is_widget = False
@@ -54,28 +52,6 @@ class BaseChart:
     def name(self):
         chart_type = self.chart_type if self.chart_type else "chart"
         return f"{self.x}_{chart_type}_{self.title}"
-
-    @property
-    def width(self):
-        return self._width
-
-    @width.setter
-    def width(self, value):
-        self._width = value
-        if self.chart is not None:
-            self.update_dimensions(width=value)
-        if self.filter_widget is not None:
-            self.filter_widget.width = value
-
-    @property
-    def height(self):
-        return self._height
-
-    @height.setter
-    def height(self, value):
-        self._height = value
-        if self.chart is not None:
-            self.update_dimensions(height=value)
 
     @property
     def library_specific_params(self):
@@ -205,18 +181,17 @@ class BaseChart:
         """
         return dt.transform_stride_type(stride_type, self.y_dtype)
 
-    def view(self):
-        return self.chart
+    def view(self, width=600, height=400):
+        return pn.panel(self.chart, width=width, height=height)
 
-    def update_dimensions(self, width=None, height=None):
-        print("base calc source function, to over-ridden by delegated classes")
-        return -1
+    def get_dashboard_view(self):
+        return self.view()
 
     def calculate_source(self, data):
         print("base calc source function, to over-ridden by delegated classes")
         return -1
 
-    def generate_chart(self):
+    def generate_chart(self, **kwargs):
         print("base calc source function, to over-ridden by delegated classes")
         return -1
 
@@ -232,18 +207,14 @@ class BaseChart:
         print("base calc source function, to over-ridden by delegated classes")
         return -1
 
-    def reload_chart(self, data, patch_update: bool):
+    def reload_chart(self, data):
         print("base calc source function, to over-ridden by delegated classes")
         return -1
 
-    def format_source_data(self, source_dict, patch_update=False):
+    def format_source_data(self, source_dict):
         """"""
         # print('function to be overridden by library specific extensions')
         return -1
-
-    def get_source_y_axis(self):
-        # print('function to be overridden by library specific extensions')
-        return []
 
     def apply_mappers(self):
         """"""

@@ -10,7 +10,7 @@ cuxfilter enables GPU accelerated cross-filtering dashboards from notebooks, in 
    user_guide/index
    api_reference/dataframe
 
-   
+
 Indices and tables
 ==================
 

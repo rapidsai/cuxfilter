@@ -1,1 +1,1 @@
-from .bokeh import bar, line
+from .bokeh import bar

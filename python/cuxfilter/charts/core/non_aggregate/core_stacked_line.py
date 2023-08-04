@@ -1,9 +1,9 @@
 import cudf
 import dask_cudf
 from typing import Tuple
+import panel as pn
 
 from ..core_chart import BaseChart
-from ....layouts import chart_view
 
 
 class BaseStackedLine(BaseChart):
@@ -62,8 +62,6 @@ class BaseStackedLine(BaseChart):
         colors=[],
         step_size=None,
         step_size_type=int,
-        width=800,
-        height=400,
         title="",
         timeout=100,
         legend=True,
@@ -85,8 +83,6 @@ class BaseStackedLine(BaseChart):
             colors
             step_size
             step_size_type
-            width
-            height
             title
             timeout
             legend
@@ -123,8 +119,6 @@ class BaseStackedLine(BaseChart):
         self.y_axis_tick_formatter = y_axis_tick_formatter
         self.unselected_alpha = unselected_alpha
         self.library_specific_params = library_specific_params
-        self.width = width
-        self.height = height
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -155,10 +149,15 @@ class BaseStackedLine(BaseChart):
         self.generate_chart()
         self.add_events(dashboard_cls)
 
-    def view(self):
-        return chart_view(
-            self.chart.view(), width=self.width, title=self.title
+    def view(self, width=800, height=400):
+        return pn.panel(
+            self.chart.view().opts(
+                width=width, height=height, responsive=False
+            )
         )
+
+    def get_dashboard_view(self):
+        return pn.panel(self.chart.view(), sizing_mode="stretch_both")
 
     def calculate_source(self, data):
         """
@@ -174,8 +173,8 @@ class BaseStackedLine(BaseChart):
         self.format_source_data(data)
 
     def get_box_select_callback(self, dashboard_cls):
-        def cb(boundsx):
-            self.x_range = self._xaxis_dt_transform(boundsx)
+        def cb(bounds, x_selection, y_selection):
+            self.x_range = self._xaxis_dt_transform(x_selection)
 
             self.box_selected_range = {
                 self.x + "_min": self.x_range[0],

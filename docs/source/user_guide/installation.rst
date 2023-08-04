@@ -47,17 +47,6 @@ Install jupyterlab dependencies
     jupyter labextension install @bokeh/jupyter_bokeh
 
 
-libxcomposite.so.1 not found error
-*************************************
-
-If using **await d.preview()** throws a **libxcomposite.so.1 not found error**, execute the following commands:
-
-.. code-block:: bash
-
-    apt-get update
-    apt-get install libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxrandr2 libxtst6 libcups2 libxss1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libatk1.0-0 libgtk-3-0 libgdk-pixbuf2.0-0
-
-
 Download datasets
 -----------------
 

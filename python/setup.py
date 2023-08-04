@@ -7,6 +7,5 @@ setup(
         include=["cuxfilter", "cuxfilter.*"],
         exclude=("tests", "docs", "notebooks"),
     ),
-    package_data={"cuxfilter.themes.assets": ["*.css", "*.html"]},
     zip_safe=False,
 )

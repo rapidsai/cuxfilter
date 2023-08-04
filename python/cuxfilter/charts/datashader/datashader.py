@@ -16,8 +16,6 @@ def scatter(
     pixel_density=0.5,
     pixel_spread="dynspread",
     tile_provider=None,
-    width=800,
-    height=400,
     title="",
     timeout=100,
     legend=True,
@@ -73,10 +71,6 @@ def scatter(
         Underlying map type.See
         https://holoviews.org/reference/elements/bokeh/Tiles.html
 
-    width: int,  default 800
-
-    height: int,  default 400
-
     title: str,
 
         chart title
@@ -123,8 +117,6 @@ def scatter(
         pixel_shade_type,
         pixel_density,
         pixel_spread,
-        width,
-        height,
         tile_provider=tile_provider,
         title=title,
         timeout=timeout,
@@ -162,8 +154,6 @@ def graph(
     edge_transparency=0,
     curve_params=dict(strokeWidth=1, curve_total_steps=100),
     tile_provider=None,
-    width=800,
-    height=400,
     title="",
     timeout=100,
     legend=True,
@@ -252,10 +242,6 @@ def graph(
         Underlying map type.See
         https://holoviews.org/reference/elements/bokeh/Tiles.html
 
-    width: int,  default 800
-
-    height: int,  default 400
-
     title: str,
 
         chart title
@@ -312,8 +298,6 @@ def graph(
         edge_transparency,
         curve_params,
         tile_provider,
-        width,
-        height,
         title,
         timeout,
         legend=legend,
@@ -337,8 +321,6 @@ def heatmap(
     aggregate_fn="mean",
     point_size=15,
     point_shape="rect_vertical",
-    width=800,
-    height=400,
     title="",
     timeout=100,
     legend=True,
@@ -389,10 +371,6 @@ def heatmap(
         density.
         spread: Spread pixels in an image.
 
-    width: int,  default 800
-
-    height: int,  default 400
-
     title: str,
 
         chart title
@@ -438,8 +416,6 @@ def heatmap(
         "linear",
         1,
         "spread",
-        width,
-        height,
         tile_provider=None,
         title=title,
         timeout=timeout,
@@ -461,8 +437,6 @@ def line(
     color=None,
     step_size=None,
     step_size_type=int,
-    width=800,
-    height=400,
     title="",
     timeout=100,
     unselected_alpha=0.2,
@@ -497,10 +471,6 @@ def line(
     step_size_type: type, default int
         for the range_slider below the chart
 
-    width: int,  default 800
-
-    height: int,  default 400
-
     title: str,
 
         chart title
@@ -533,8 +503,6 @@ def line(
         color,
         step_size,
         step_size_type,
-        width,
-        height,
         title,
         timeout,
         unselected_alpha=unselected_alpha,
@@ -552,8 +520,6 @@ def stacked_lines(
     colors=[],
     step_size=None,
     step_size_type=int,
-    width=800,
-    height=400,
     title="",
     timeout=100,
     legend=True,
@@ -581,10 +547,6 @@ def stacked_lines(
 
     step_size_type: type, default int
         for the range_slider below the chart
-
-    width: int,  default 800
-
-    height: int,  default 400
 
     title: str,
 
@@ -628,8 +590,6 @@ def stacked_lines(
         colors,
         step_size,
         step_size_type,
-        width,
-        height,
         title,
         timeout,
         legend=legend,
