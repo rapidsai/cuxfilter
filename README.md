@@ -52,6 +52,7 @@ cux_df = cuxfilter.DataFrame.from_arrow(DATA_DIR+'/auto_accidents.arrow')
 cux_df.data['ST_CASE'] = cux_df.data['ST_CASE'].astype('float64')
 
 label_map = {1: 'Sunday',    2: 'Monday',    3: 'Tuesday',    4: 'Wednesday',   5: 'Thursday',    6: 'Friday',    7: 'Saturday',    9: 'Unknown'}
+cux_df.data['DAY_WEEK_STR'] = cux_df.data.DAY_WEEK.map(label_map)
 gtc_demo_red_blue_palette = [ "#3182bd", "#6baed6", "#7b8ed8", "#e26798", "#ff0068" , "#323232" ]
 
 #declare charts
@@ -59,7 +60,7 @@ chart1 = cuxfilter.charts.scatter(x='dropoff_x', y='dropoff_y', aggregate_col='D
                                 color_palette=gtc_demo_red_blue_palette, tile_provider='CartoLight', unselected_alpha=0.2,
                                 pixel_shade_type='linear')
 chart2 = cuxfilter.charts.multi_select('YEAR')
-chart3 = cuxfilter.charts.bar('DAY_WEEK', x_label_map=label_map)
+chart3 = cuxfilter.charts.bar('DAY_WEEK_STR')
 chart4 = cuxfilter.charts.bar('MONTH')
 
 #declare dashboard
@@ -92,26 +93,26 @@ datasets_check('mortgage', base_dir=DATA_DIR)
 
 cux_df = cuxfilter.DataFrame.from_arrow(DATA_DIR + '/146M_predictions_v2.arrow')
 
-MAPBOX_API_KEY= "<mapbox-api-key>"
 geoJSONSource='https://raw.githubusercontent.com/rapidsai/cuxfilter/GTC-2018-mortgage-visualization/javascript/demos/GTC%20demo/src/data/zip3-ms-rhs-lessprops.json'
 
 chart0 = cuxfilter.charts.choropleth( x='zip', color_column='delinquency_12_prediction', color_aggregate_fn='mean',
             elevation_column='current_actual_upb', elevation_factor=0.00001, elevation_aggregate_fn='sum',
-            geoJSONSource=geoJSONSource, mapbox_api_key=MAPBOX_API_KEY, data_points=1000
+            geoJSONSource=geoJSONSource, data_points=1000
 )
 chart2 = cuxfilter.charts.bar('delinquency_12_prediction',data_points=50)
 chart3 = cuxfilter.charts.range_slider('borrower_credit_score',data_points=50)
 chart1 = cuxfilter.charts.drop_down('dti')
 
 #declare dashboard
-d = cux_df.dashboard([chart0, chart2],sidebar=[chart3, chart1], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.default, title='Mortgage Dashboard')
+d = cux_df.dashboard([chart0, chart2],sidebar=[chart3, chart1], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.dark, title='Mortgage Dashboard')
 
 # run the dashboard within the notebook cell
 # Bokeh and Datashader based charts also have a `save` tool on the side toolbar, which can download and save the individual chart when interacting with the dashboard.
 # d.app()
 
 #run the dashboard as a webapp:
-d.show('jupyter-notebook/lab-url')
+# if running on a port other than localhost:8888, run d.show(jupyter-notebook-lab-url:port)
+d.show()
 
 ```
 
