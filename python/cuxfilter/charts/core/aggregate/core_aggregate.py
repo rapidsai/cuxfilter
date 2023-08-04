@@ -2,7 +2,6 @@ import numpy as np
 from bokeh.models import DatetimeTickFormatter
 import holoviews as hv
 from ..core_chart import BaseChart
-from ....assets.numba_kernels import calc_value_counts
 from ...constants import (
     CUDF_DATETIME_TYPES,
 )

@@ -1,5 +1,4 @@
 import pytest
-from bokeh.events import ButtonClick
 import panel as pn
 
 from cuxfilter.charts.core.aggregate.core_aggregate import BaseAggregateChart
@@ -7,7 +6,6 @@ from cuxfilter.charts.bokeh.plots.bar import InteractiveBar
 import cuxfilter
 from ..utils import initialize_df, df_types
 from unittest import mock
-import numpy as np
 
 df_args = {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
 dfs = [initialize_df(type, df_args) for type in df_types]
