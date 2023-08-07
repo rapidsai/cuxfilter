@@ -39,7 +39,7 @@ Example 3d-Choropleth
     chart0.view()
 
 
-    
+
 Example 2d-Choropleth
 ~~~~~~~~~~~~~~~~~~~~~
 .. jupyter-execute::

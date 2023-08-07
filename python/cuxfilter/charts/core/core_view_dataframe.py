@@ -1,8 +1,8 @@
 import panel as pn
+import holoviews as hv
 import logging
 import dask_cudf
 from panel.config import panel_extension
-from ...layouts import chart_view
 
 css = """
 .dataframe table{
@@ -25,9 +25,7 @@ pn.config.raw_css += [css]
 
 
 class ViewDataFrame:
-    _height: int = 0
     columns = None
-    _width: int = 0
     chart = None
     source = None
     use_data_tiles = False
@@ -35,44 +33,21 @@ class ViewDataFrame:
     _initialized = False
     # widget=False can only be rendered the main layout
     is_widget = False
+    title = "Dataset View"
 
     def __init__(
         self,
         columns=None,
         drop_duplicates=False,
-        width=400,
-        height=400,
         force_computation=False,
     ):
         self.columns = columns
-        self._width = width
-        self._height = height
         self.drop_duplicates = drop_duplicates
         self.force_computation = force_computation
 
     @property
     def name(self):
-        return self.chart_type
-
-    @property
-    def width(self):
-        return self._width
-
-    @width.setter
-    def width(self, value):
-        self._width = value
-        if self.chart is not None:
-            self.update_dimensions(width=value)
-
-    @property
-    def height(self):
-        return self._height
-
-    @height.setter
-    def height(self, value):
-        self._height = value
-        if self.chart is not None:
-            self.update_dimensions(height=value)
+        return f"{self.chart_type}_{self.columns}"
 
     def initiate_chart(self, dashboard_cls):
         data = dashboard_cls._cuxfilter_df.data
@@ -98,25 +73,16 @@ class ViewDataFrame:
             self.generate_chart(data)
 
     def _format_data(self, data):
+        if not self.force_computation:
+            data = data.head(1000)
         if self.drop_duplicates:
-            return data.drop_duplicates()
+            data = data.drop_duplicates()
         return data
 
     def generate_chart(self, data):
         if self.columns is None:
             self.columns = list(data.columns)
-        style = {
-            "width": "100%",
-            "height": "100%",
-            "overflow-y": "auto",
-            "font-size": "0.5vw",
-            "overflow-x": "auto",
-        }
-        self.chart = pn.pane.HTML(
-            self._format_data(data[self.columns]),
-            style=style,
-            css_classes=["panel-df"],
-        )
+        self.chart = hv.Table(self._format_data(data[self.columns]))
 
     def _repr_mimebundle_(self, include=None, exclude=None):
         view = self.view()
@@ -140,33 +106,23 @@ class ViewDataFrame:
                 return view.pprint()
         return None
 
-    def view(self):
-        return chart_view(self.chart, width=self.width, title="Dataset View")
+    def view(self, width=600, height=400):
+        return pn.panel(self.chart, width=width, height=height)
 
-    def reload_chart(self, data, patch_update: bool):
+    def get_dashboard_view(self):
+        return pn.panel(self.chart, sizing_mode="stretch_both")
+
+    def reload_chart(self, data):
         if isinstance(data, dask_cudf.core.DataFrame):
             if self.force_computation:
-                self.chart[0].object = self._format_data(
+                self.chart.data = self._format_data(
                     data[self.columns].compute()
                 )
             else:
-                self.chart[0].object = self._format_data(
+                self.chart.data = self._format_data(
                     data[self.columns].head(
                         1000, npartitions=data.npartitions, compute=True
                     )
                 )
         else:
-            self.chart[0].object = self._format_data(data[self.columns])
-
-    def update_dimensions(self, width=None, height=None):
-        """
-        Parameters
-        ----------
-
-        Ouput
-        -----
-        """
-        if width is not None:
-            self.chart.width = width
-        if height is not None:
-            self.chart.height = height
+            self.chart.data = self._format_data(data[self.columns])

@@ -6,7 +6,7 @@ channels:
 - conda-forge
 - nvidia
 dependencies:
-- bokeh>=2.4.2,<=2.5
+- bokeh>=3.1
 - cuda-version=11.8
 - cudatoolkit
 - cudf==23.10.*
@@ -17,7 +17,8 @@ dependencies:
 - dask-cudf==23.10.*
 - datashader>=0.15
 - geopandas>=0.11.0
-- holoviews>=1.15.0,<=1.15.4
+- holoviews>=1.16.0
+- ipykernel
 - ipython
 - jupyter-server-proxy
 - jupyter_sphinx
@@ -30,12 +31,9 @@ dependencies:
 - numpydoc
 - packaging
 - pandoc<=2.0.0
-- panel>=0.14.0,<=0.14.1
+- panel>=1.0
 - pre-commit
 - pydata-sphinx-theme
-- pydeck>=0.3,<=0.5.0
-- pyppeteer>=0.2.6
-- pyproj>=2.4,<=3.4
 - pytest
 - pytest-cov
 - pytest-xdist

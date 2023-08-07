@@ -8,18 +8,13 @@ from bokeh.embed import server_document
 import os
 import urllib
 import warnings
-from IPython.display import Image, display
 from collections import Counter
 
 from cuxfilter.charts.core import BaseChart, BaseWidget, ViewDataFrame
-from cuxfilter.charts.constants import (
-    CUSTOM_DIST_PATH_THEMES,
-    STATIC_DIR_THEMES,
-)
 from cuxfilter.layouts import single_feature
 from cuxfilter.charts.panel_widgets import data_size_indicator
-from cuxfilter.assets import screengrab, get_open_port, cudf_utils
-from cuxfilter.themes import light
+from cuxfilter.assets import get_open_port, cudf_utils
+from cuxfilter.themes import default
 
 DEFAULT_NOTEBOOK_URL = "http://localhost:8888"
 
@@ -141,7 +136,7 @@ class DashBoard:
         }
         if len(selected_indices) > 0:
             result = (
-                df_module.concat(list(selected_indices.values()))
+                df_module.concat(list(selected_indices.values()), axis=1)
                 .fillna(False)
                 .all(axis=1)
             )
@@ -154,7 +149,7 @@ class DashBoard:
         sidebar=[],
         dataframe=None,
         layout=single_feature,
-        theme=light,
+        theme=default,
         title="Dashboard",
         data_size_widget=True,
         show_warnings=False,
@@ -181,10 +176,7 @@ class DashBoard:
 
         # add data_size_indicator to sidebar if data_size_widget=True
         if data_size_widget:
-            chart = data_size_indicator()
-            chart.initiate_chart(self)
-            chart._initialized = True
-            self._sidebar[chart.name] = chart
+            sidebar.insert(0, data_size_indicator(title_size="14pt"))
 
         # process all sidebar widgets
         for chart in sidebar:
@@ -376,11 +368,11 @@ class DashBoard:
 
     def __repr__(self):
         template_obj = self._dashboard.generate_dashboard(
-            self.title,
-            self._charts,
-            self._sidebar,
-            self._theme,
-            self._layout_array,
+            title=self.title,
+            charts=self._charts,
+            sidebar=self._sidebar,
+            theme=self._theme,
+            layout_array=self._layout_array,
         )
         cls = "#### cuxfilter " + type(self).__name__
         spacer = "\n    "
@@ -402,6 +394,7 @@ class DashBoard:
 
     def _get_server(
         self,
+        panel=None,
         port=0,
         websocket_origin=None,
         loop=None,
@@ -410,41 +403,23 @@ class DashBoard:
         **kwargs,
     ):
         server = get_server(
-            panel=self._dashboard.generate_dashboard(
-                self.title,
-                self._charts,
-                self._sidebar,
-                self._theme,
-                self._layout_array,
-                render_location="web-app",
-            ),
+            panel=panel,
             port=port,
             websocket_origin=websocket_origin,
             loop=loop,
             show=show,
             start=start,
             title=self.title,
-            static_dirs={
-                CUSTOM_DIST_PATH_THEMES: STATIC_DIR_THEMES,
-            },
             **kwargs,
         )
         server_document(websocket_origin, resources=None)
         return server
 
-    async def preview(self):
+    def app(self, sidebar_width=280, width=1200, height=800):
         """
-        Preview(Async) all the charts in a jupyter cell, non interactive(no
-        backend server). Mostly intended to save notebook state for blogs,
-        documentation while still rendering the dashboard.
-
-        Notes
-        -----
-        - Png format
-        - Bokeh and Datashader based charts also have a `save` tool
-        on the side toolbar, which can download and save the individual
-        chart when interacting with the dashboard.
-
+        Run the dashboard with a bokeh backend server within the notebook.
+        Parameters
+        ----------
         Examples
         --------
 
@@ -461,33 +436,26 @@ class DashBoard:
         >>> line_chart_1 = bokeh.line(
         >>>     'key', 'val', data_points=5, add_interaction=False
         >>> )
-        >>> line_chart_2 = bokeh.bar(
-        >>>     'val', 'key', data_points=5, add_interaction=False
-        >>> )
-        >>> d = cux_df.dashboard(
-        >>>    [line_chart_1, line_chart_2],
-        >>>    layout=cuxfilter.layouts.double_feature
-        >>> )
-        >>> await d.preview()
-        displays charts in the dashboard
+        >>> d = cux_df.dashboard([line_chart_1])
+        >>> d.app(sidebar_width=200, width=1000, height=450)
+
         """
-        if self.server is not None:
-            if self.server._started:
-                self.stop()
-            self._reinit_all_charts()
-            port = self.server.port
-        else:
-            port = get_open_port()
-        url = "localhost:" + str(port)
-        self.server = self._get_server(
-            port=port, websocket_origin=url, show=False, start=True
+        self._reinit_all_charts()
+        self._current_server_type = "app"
+
+        return self._dashboard.generate_dashboard(
+            title=self.title,
+            charts=self._charts,
+            sidebar=self._sidebar,
+            theme=default if self._theme is not None else None,
+            layout_array=self._layout_array,
+            render_location="notebook",
+            sidebar_width=sidebar_width,
+            width=width,
+            height=height,
         )
-        await screengrab("http://" + url)
-        self.stop()
 
-        display(Image("temp.png"))
-
-    def app(self, sidebar_width=280):
+    def servable(self, sidebar_width=280):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
@@ -513,17 +481,19 @@ class DashBoard:
 
         """
         self._reinit_all_charts()
-        self._current_server_type = "app"
+        self._current_server_type = "servable"
 
-        return self._dashboard.generate_dashboard(
+        self._dashboard.generate_dashboard(
             self.title,
             self._charts,
             self._sidebar,
             self._theme,
             self._layout_array,
-            "notebook",
+            "web-app",
             sidebar_width,
-        )
+        ).servable()
+
+        print("click panel logo to launch dashboard")
 
     def show(
         self,
@@ -531,6 +501,8 @@ class DashBoard:
         port=0,
         threaded=False,
         service_proxy=None,
+        sidebar_width=280,
+        height=800,
         **kwargs,
     ):
         """
@@ -581,18 +553,32 @@ class DashBoard:
         )
         print("Dashboard running at port " + str(port))
 
+        panel = self._dashboard.generate_dashboard(
+            title=self.title,
+            charts=self._charts,
+            sidebar=self._sidebar,
+            theme=self._theme,
+            layout_array=self._layout_array,
+            render_location="web-app",
+            sidebar_width=sidebar_width,
+            height=height,
+        )
         try:
             self.server = self._get_server(
+                panel=panel,
                 port=port,
                 websocket_origin=self._notebook_url.netloc,
                 show=False,
                 start=True,
                 threaded=threaded,
+                sidebar_width=sidebar_width,
+                height=height,
                 **kwargs,
             )
         except OSError:
             self.server.stop()
             self.server = self._get_server(
+                panel=panel,
                 port=port,
                 websocket_origin=self._notebook_url.netloc,
                 show=False,
@@ -630,5 +616,9 @@ class DashBoard:
             include_cols = self.charts.keys()
         # reloading charts as per current data state
         for chart in self.charts.values():
-            if chart.name not in ignore_cols and chart.name in include_cols:
-                chart.reload_chart(data, patch_update=True)
+            if (
+                chart.name not in ignore_cols
+                and chart.name in include_cols
+                and hasattr(chart, "reload_chart")
+            ):
+                chart.reload_chart(data)

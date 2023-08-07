@@ -9,7 +9,6 @@ from holoviews.operation.datashader import (
     rasterize,
 )
 import numpy as np
-import panel as pn
 import param
 
 from . import CustomInspectTool
@@ -119,9 +118,8 @@ class dynspread(SpreadingOperation):
 
 
 class InteractiveDatashaderBase(param.Parameterized):
-    width = param.Integer(400)
-    height = param.Integer(400)
     tile_provider = param.String(None)
+    title = param.String("Interactive Datashader Chart")
     box_stream = param.ClassSelector(
         class_=hv.streams.SelectionXY, default=hv.streams.SelectionXY()
     )
@@ -146,9 +144,7 @@ class InteractiveDatashaderBase(param.Parameterized):
     unselected_alpha = param.Number(
         0.2,
         bounds=(0, 1),
-        doc=(
-            "display unselected data as the same color palette but transparent"
-        ),
+        doc=("Transparency of the unselected points. "),
     )
 
     def __init__(self, **params):
@@ -332,10 +328,8 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.panel(
-            self.tiles * dmap if self.tiles is not None else dmap,
-            sizing_mode="stretch_both",
-            height=self.height,
+        return (self.tiles * dmap if self.tiles is not None else dmap).relabel(
+            self.title
         )
 
 
@@ -407,7 +401,9 @@ class InteractiveDatashaderLine(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.panel(self.tiles * dmap if self.tiles is not None else dmap)
+        return (self.tiles * dmap if self.tiles is not None else dmap).relabel(
+            self.title
+        )
 
 
 class InteractiveDatashaderMultiLine(InteractiveDatashader):
@@ -424,7 +420,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         default=[
             "pan",
             "reset",
-            "box_select",
+            "xbox_select",
             "wheel_zoom",
             "xwheel_zoom",
             "save",
@@ -436,9 +432,6 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         doc="legend to be added on top of the multi-line chart",
         default=None,
     )
-    box_stream = param.ClassSelector(
-        class_=hv.streams.BoundsX, default=hv.streams.BoundsX()
-    )
 
     def __init__(self, **params):
         super(InteractiveDatashaderMultiLine, self).__init__(**params)
@@ -447,7 +440,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         self.source_df = data
 
     def add_box_select_callback(self, callback_fn):
-        self.box_stream = hv.streams.BoundsX(subscribers=[callback_fn])
+        self.box_stream = hv.streams.SelectionXY(subscribers=[callback_fn])
 
     @param.depends("source_df")
     def lines(self, **kwargs):
@@ -483,7 +476,7 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         ).opts(
             responsive=True,
             tools=self.tools,
-            active_tools=["xwheel_zoom", "pan"],
+            active_tools=["xbox_select"],
             default_tools=[],
         )
 
@@ -493,7 +486,9 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
 
-        return pn.panel(self.tiles * dmap if self.tiles is not None else dmap)
+        return (self.tiles * dmap if self.tiles is not None else dmap).relabel(
+            self.title
+        )
 
 
 class InteractiveDatashaderGraph(InteractiveDatashaderBase):
@@ -639,8 +634,6 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
         if self.unselected_alpha > 0:
             dmap_graph *= self.nodes_chart.get_base_chart()
 
-        return pn.panel(
-            self.tiles * dmap_graph if self.tiles is not None else dmap_graph,
-            sizing_mode="stretch_both",
-            height=self.height,
-        )
+        return (
+            self.tiles * dmap_graph if self.tiles is not None else dmap_graph
+        ).relabel(self.title)

@@ -138,7 +138,7 @@ Example 1
     from cuxfilter import charts, DataFrame
 
     cux_df = DataFrame.from_dataframe(cudf.DataFrame({'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}))
-    number_chart = charts.number(x='val', aggregate_fn="mean", format="{value}%")
+    number_chart = charts.number(expression='val', aggregate_fn="mean", format="{value}%")
 
     d = cux_df.dashboard([number_chart])
     # view the individual number_chart chart part of the dashboard d

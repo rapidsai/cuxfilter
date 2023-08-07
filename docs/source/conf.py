@@ -1,5 +1,4 @@
 # Copyright (c) 2019-2023, NVIDIA CORPORATION.
-import pydata_sphinx_theme
 
 # -- Project information -----------------------------------------------------
 project = "cuxfilter"
@@ -63,9 +62,7 @@ html_static_path = ["_static"]
 # Removes sidebar
 htmlhelp_basename = "cuxfilterdoc"
 
-html_sidebars = {
-  "user_guide/index": []
-}
+html_sidebars = {"user_guide/index": []}
 
 html_theme_options = {
     "external_links": [],
@@ -79,4 +76,6 @@ html_theme_options = {
 
 def setup(app):
     app.add_css_file("https://docs.rapids.ai/assets/css/custom.css")
-    app.add_js_file("https://docs.rapids.ai/assets/js/custom.js", loading_method="defer")
+    app.add_js_file(
+        "https://docs.rapids.ai/assets/js/custom.js", loading_method="defer"
+    )
