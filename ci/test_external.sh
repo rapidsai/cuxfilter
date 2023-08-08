@@ -8,8 +8,7 @@ rapids-logger "Create test_external conda environment"
 
 RAPIDS_VERSION=23.10.*
 
-rapids-mamba-retry create -n test_external -c rapidsai -c conda-forge -c nvidia  \
-    cudf=${RAPIDS_VERSION} dask-cudf=${RAPIDS_VERSION} python=3.10 cudatoolkit=11.8
+rapids-mamba-retry create -n test_external --force -f ./ci/utils/external_dependencies.yaml
 
 conda activate test_external
 

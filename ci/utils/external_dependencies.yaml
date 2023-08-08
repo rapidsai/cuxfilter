@@ -1,0 +1,17 @@
+name: test_external
+RAPIDS_VERSION: 23.10.*
+channels:
+  - rapidsai-nightly
+  - conda-forge
+  - nvidia
+dependencies:
+  - cudf=${RAPIDS_VERSION}
+  - dask-cudf=${RAPIDS_VERSION}
+  - python=3.10
+  - cudatoolkit=11.8
+  - tensorflow
+  - xarray-spatial
+  - pycaret
+  - graphistry
+  - dash
+  - dask-sql
