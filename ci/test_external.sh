@@ -8,7 +8,7 @@ rapids-logger "Create test_external conda environment"
 
 RAPIDS_VERSION=23.10.*
 
-rapids-mamba-retry create -n test_external --force -f ./ci/utils/external_dependencies.yaml
+rapids-mamba-retry create -n test_external --force -f ./utils/external_dependencies.yaml
 
 conda activate test_external
 
