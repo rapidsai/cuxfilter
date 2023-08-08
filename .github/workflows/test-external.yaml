@@ -1,7 +1,9 @@
 name: GPU testing for external party dependencies
 
 on:
-  pull_request: # Temporary fix to test the workflow within the PR
+  push:
+    branches:
+      - "pull-request/[0-9]+" # Temporary fix to test the workflow within the PR
   workflow_dispatch:
     inputs:
       external-project:
