@@ -1,3 +1,34 @@
+# cuXfilter 23.08.00 (9 Aug 2023)
+
+## 🐛 Bug Fixes
+
+- Fix dependencies - pyproj ([#514](https://github.com/rapidsai/cuxfilter/pull/514)) [@AjayThorve](https://github.com/AjayThorve)
+- Fix nightly wheel testing workflow. ([#507](https://github.com/rapidsai/cuxfilter/pull/507)) [@bdice](https://github.com/bdice)
+- Fix broken symlink ([#502](https://github.com/rapidsai/cuxfilter/pull/502)) [@raydouglass](https://github.com/raydouglass)
+- Fix GHA: external dependencies tests ([#498](https://github.com/rapidsai/cuxfilter/pull/498)) [@AjayThorve](https://github.com/AjayThorve)
+- Fix scheduled GHA workflow issue ([#493](https://github.com/rapidsai/cuxfilter/pull/493)) [@AjayThorve](https://github.com/AjayThorve)
+- fix incorrect xy-coordinate issue in graphs ([#487](https://github.com/rapidsai/cuxfilter/pull/487)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 📖 Documentation
+
+- Doc updates ([#516](https://github.com/rapidsai/cuxfilter/pull/516)) [@AjayThorve](https://github.com/AjayThorve)
+- Switch Docs to PyData Theme ([#500](https://github.com/rapidsai/cuxfilter/pull/500)) [@exactlyallan](https://github.com/exactlyallan)
+- Added visualization guide notebook ([#496](https://github.com/rapidsai/cuxfilter/pull/496)) [@exactlyallan](https://github.com/exactlyallan)
+- fix Auto-merge: Branch 23.08 merge 23.06 ([#482](https://github.com/rapidsai/cuxfilter/pull/482)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- Switch to new wheels pipeline ([#506](https://github.com/rapidsai/cuxfilter/pull/506)) [@divyegala](https://github.com/divyegala)
+- Followup: Revert CUDA 12.0 CI workflows to branch-23.08 ([#504](https://github.com/rapidsai/cuxfilter/pull/504)) [@AjayThorve](https://github.com/AjayThorve)
+- Revert CUDA 12.0 CI workflows to branch-23.08. ([#503](https://github.com/rapidsai/cuxfilter/pull/503)) [@bdice](https://github.com/bdice)
+- cuxfilter: Build CUDA 12 packages ([#499](https://github.com/rapidsai/cuxfilter/pull/499)) [@AjayThorve](https://github.com/AjayThorve)
+- Add wheel builds to cuxfilter ([#497](https://github.com/rapidsai/cuxfilter/pull/497)) [@AjayThorve](https://github.com/AjayThorve)
+- Refactor to use holoviews powered bar charts ([#494](https://github.com/rapidsai/cuxfilter/pull/494)) [@AjayThorve](https://github.com/AjayThorve)
+- Improvement/add panel 1.0+, holoviews 1.16+, bokeh 3.1+ support ([#492](https://github.com/rapidsai/cuxfilter/pull/492)) [@AjayThorve](https://github.com/AjayThorve)
+- use rapids-upload-docs script ([#489](https://github.com/rapidsai/cuxfilter/pull/489)) [@AyodeAwe](https://github.com/AyodeAwe)
+- [Review] Remove Datatiles support ([#488](https://github.com/rapidsai/cuxfilter/pull/488)) [@AjayThorve](https://github.com/AjayThorve)
+- Remove documentation build scripts for Jenkins ([#483](https://github.com/rapidsai/cuxfilter/pull/483)) [@ajschmidt8](https://github.com/ajschmidt8)
+
 # cuXfilter 23.06.00 (7 Jun 2023)
 
 ## 🚨 Breaking Changes
