@@ -8,12 +8,14 @@ rapids-logger "Create test_external conda environment"
 
 RAPIDS_VERSION=23.10.*
 
-pushd ./ci/utils
-rapids-logger "Current directory: $(pwd)"
-rapids-logger "Current directory contents:"
-ls
+rapids-mamba-retry create -n test_external -c rapidsai-nightly -c nvidia -c conda-forge \
+    cuxfilter=${RAPIDS_VERSION} cudf=${RAPIDS_VERSION} dask-cudf=${RAPIDS_VERSION} \
+    python=${RAPIDS_PY_VERSION} cuda-version=${RAPIDS_CUDA_VERSION}
 
-rapids-mamba-retry create -n test_external --force -f external_dependencies.yaml
+# Install external dependencies into test_external conda environment
+pushd ./ci/utils
+rapids-mamba-retry env update -n test_external -f external_dependencies.yaml
+popd
 
 conda activate test_external
 
@@ -21,8 +23,6 @@ conda activate test_external
 PROJECT=$1
 PR_NUMBER=$2
 LIBRARIES=("datashader" "holoviews")
-
-popd
 
 # Change directory to /tmp
 pushd /tmp
