@@ -1,12 +1,13 @@
 import pytest
+import panel as pn
 from bokeh.events import ButtonClick
 
 import cuxfilter
 from cuxfilter.charts.core.non_aggregate.core_line import BaseLine
-from cuxfilter.layouts import chart_view
 from cuxfilter.charts.datashader.custom_extensions import (
-    holoviews_datashader as hv,
+    holoviews_datashader as hv_dt,
 )
+import holoviews as hv
 from unittest import mock
 
 from ..utils import initialize_df, df_types
@@ -20,6 +21,10 @@ dashboards = [
 ]
 
 
+def hv_test_cb():
+    return pn.pane.HoloViews(hv.Curve([1, 2, 3]))
+
+
 class TestNonAggregateBaseLine:
     def test_variables(self):
         bl = BaseLine(x="test_x", y="test_y", color="#8735fb")
@@ -28,8 +33,6 @@ class TestNonAggregateBaseLine:
         assert bl.filter_widget is None
         assert bl.stride is None
         assert bl.stride_type == int
-        assert bl.width == 800
-        assert bl.height == 400
         assert bl.pixel_shade_type == "linear"
         assert bl.color == "#8735fb"
         assert bl.library_specific_params == {}
@@ -37,13 +40,13 @@ class TestNonAggregateBaseLine:
         assert bl.add_interaction is True
         assert bl.chart_type is None
 
-    @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
-    def test_view(self, chart, _chart):
+    def test_view(self):
         bl = BaseLine(x="test_x", y="test_y")
-        bl.chart = mock.Mock(**{"view.return_value": chart})
-        bl.width = 400
+        bl.chart = mock.Mock(
+            **{"view.return_value": hv.DynamicMap(hv_test_cb)}
+        )
 
-        assert str(bl.view()) == str(chart_view(_chart, width=bl.width))
+        assert isinstance(bl.view(), pn.pane.HoloViews)
 
     @pytest.mark.parametrize("dashboard", dashboards)
     @pytest.mark.parametrize(
@@ -69,7 +72,7 @@ class TestNonAggregateBaseLine:
         bl = BaseLine(x="x", y="y", title="custom_title")
         bl.chart_type = "non_aggregate_line"
         bl.box_selected_range = local_dict
-        bl.chart = hv.InteractiveDatashader()
+        bl.chart = hv_dt.InteractiveDatashader()
         bl.x_range = x_range
         bl.y_range = y_range
 
@@ -95,7 +98,7 @@ class TestNonAggregateBaseLine:
     )
     def test_add_events(self, dashboard, event, result):
         bl = BaseLine(x="key", y="val")
-        bl.chart = hv.InteractiveDatashader()
+        bl.chart = hv_dt.InteractiveDatashader()
         self.result = None
 
         def test_func(cls):
@@ -111,7 +114,7 @@ class TestNonAggregateBaseLine:
     @pytest.mark.parametrize("dashboard", dashboards)
     def test_add_reset_event(self, dashboard):
         bl = BaseLine(x="key", y="val")
-        bl.chart = hv.InteractiveDatashader()
+        bl.chart = hv_dt.InteractiveDatashader()
         self.result = None
 
         def test_func(event, callback):

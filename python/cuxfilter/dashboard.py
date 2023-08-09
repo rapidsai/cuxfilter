@@ -1,4 +1,4 @@
-from typing import Dict, Type, Union
+from typing import Dict, Union
 import bokeh.embed.util as u
 import cudf
 import dask_cudf
@@ -8,23 +8,15 @@ from bokeh.embed import server_document
 import os
 import urllib
 import warnings
-from IPython.display import Image, display
 from collections import Counter
 
-from .charts.core import BaseChart, BaseWidget, ViewDataFrame
-from .charts.constants import (
-    CUSTOM_DIST_PATH_THEMES,
-    STATIC_DIR_THEMES,
-)
-from .datatile import DataTile
-from .layouts import single_feature
-from .charts.panel_widgets import data_size_indicator
-from .assets import screengrab, get_open_port, cudf_utils
-from .themes import light
+from cuxfilter.charts.core import BaseChart, BaseWidget, ViewDataFrame
+from cuxfilter.layouts import single_feature
+from cuxfilter.charts.panel_widgets import data_size_indicator
+from cuxfilter.assets import get_open_port, cudf_utils
+from cuxfilter.themes import default
 
 DEFAULT_NOTEBOOK_URL = "http://localhost:8888"
-
-CUXF_BASE_CHARTS = (BaseChart, BaseWidget, ViewDataFrame)
 
 
 def _get_host(url):
@@ -112,11 +104,9 @@ class DashBoard:
     do some visual querying/ crossfiltering
     """
 
-    _charts: Dict[str, Union[CUXF_BASE_CHARTS]]
-    _data_tiles: Dict[str, Type[DataTile]]
+    _charts: Dict[str, Union[BaseChart, BaseWidget, ViewDataFrame]]
     _query_str_dict: Dict[str, str]
     _query_local_variables_dict = {}
-    _active_view = None
     _dashboard = None
     _theme = None
     _notebook_url = DEFAULT_NOTEBOOK_URL
@@ -146,7 +136,7 @@ class DashBoard:
         }
         if len(selected_indices) > 0:
             result = (
-                df_module.concat(list(selected_indices.values()))
+                df_module.concat(list(selected_indices.values()), axis=1)
                 .fillna(False)
                 .all(axis=1)
             )
@@ -159,7 +149,7 @@ class DashBoard:
         sidebar=[],
         dataframe=None,
         layout=single_feature,
-        theme=light,
+        theme=default,
         title="Dashboard",
         data_size_widget=True,
         show_warnings=False,
@@ -168,7 +158,6 @@ class DashBoard:
         self._cuxfilter_df = dataframe
         self._charts = dict()
         self._sidebar = dict()
-        self._data_tiles = dict()
         self._query_str_dict = dict()
 
         # check if charts and sidebar lists contain cuxfilter.charts with
@@ -187,10 +176,7 @@ class DashBoard:
 
         # add data_size_indicator to sidebar if data_size_widget=True
         if data_size_widget:
-            chart = data_size_indicator()
-            chart.initiate_chart(self)
-            chart._initialized = True
-            self._sidebar[chart.name] = chart
+            sidebar.insert(0, data_size_indicator(title_size="14pt"))
 
         # process all sidebar widgets
         for chart in sidebar:
@@ -262,11 +248,6 @@ class DashBoard:
         >>> d.add_charts(charts=[], sidebar=[panel_widgets.card("test")])
 
         """
-        self._data_tiles = {}
-        if self._active_view is not None:
-            self._active_view.datatile_loaded_state = False
-            self._active_view = None
-
         if len(charts) > 0 or len(sidebar) > 0:
             for chart in charts:
                 if chart not in self._charts:
@@ -291,22 +272,16 @@ class DashBoard:
             chart.initiate_chart(self)
             chart._initialized = True
 
-    def _query(self, query_str, local_dict=None, local_indices=None):
+    def _query(self, query_str):
         """
-        Query the cudf.DataFrame, inplace or create a copy based on the
-        value of inplace.
+        Query the cudf.DataFrame
         """
-        if local_dict is None:
-            local_dict = self._query_local_variables_dict
-        if local_indices is None:
-            local_indices = self.queried_indices
-
         # filter the source data with current queries: indices and query strs
         return cudf_utils.query_df(
             self._cuxfilter_df.data,
             query_str,
-            local_dict,
-            local_indices,
+            self._query_local_variables_dict,
+            self.queried_indices,
         )
 
     def _generate_query_str(self, query_dict=None, ignore_chart=""):
@@ -317,7 +292,7 @@ class DashBoard:
         popped_value = None
         query_dict = query_dict or self._query_str_dict
         if (
-            isinstance(ignore_chart, CUXF_BASE_CHARTS)
+            isinstance(ignore_chart, (BaseChart, BaseWidget, ViewDataFrame))
             and len(ignore_chart.name) > 0
             and ignore_chart.name in query_dict
         ):
@@ -376,39 +351,28 @@ class DashBoard:
 
 
         """
-        # Compute query for currently active chart, and consider its
-        # current state as final state
-        if self._active_view is None:
-            print("no querying done, returning original dataframe")
-            # return self._backup_data
-            return self._cuxfilter_df.data
+        if (
+            len(self._generate_query_str()) > 0
+            or self.queried_indices is not None
+        ):
+            print("final query", self._generate_query_str())
+            if self.queried_indices is not None:
+                print("polygon selected using lasso selection tool")
+            return self._query(self._generate_query_str())
         else:
-            self._active_view.compute_query_dict(
-                self._query_str_dict, self._query_local_variables_dict
-            )
-
-            if (
-                len(self._generate_query_str()) > 0
-                or self.queried_indices is not None
-            ):
-                print("final query", self._generate_query_str())
-                if self.queried_indices is not None:
-                    print("polygon selected using lasso selection tool")
-                return self._query(self._generate_query_str())
-            else:
-                print("no querying done, returning original dataframe")
-                return self._cuxfilter_df.data
+            print("no querying done, returning original dataframe")
+            return self._cuxfilter_df.data
 
     def __str__(self):
         return self.__repr__()
 
     def __repr__(self):
         template_obj = self._dashboard.generate_dashboard(
-            self.title,
-            self._charts,
-            self._sidebar,
-            self._theme,
-            self._layout_array,
+            title=self.title,
+            charts=self._charts,
+            sidebar=self._sidebar,
+            theme=self._theme,
+            layout_array=self._layout_array,
         )
         cls = "#### cuxfilter " + type(self).__name__
         spacer = "\n    "
@@ -430,6 +394,7 @@ class DashBoard:
 
     def _get_server(
         self,
+        panel=None,
         port=0,
         websocket_origin=None,
         loop=None,
@@ -438,41 +403,23 @@ class DashBoard:
         **kwargs,
     ):
         server = get_server(
-            panel=self._dashboard.generate_dashboard(
-                self.title,
-                self._charts,
-                self._sidebar,
-                self._theme,
-                self._layout_array,
-                render_location="web-app",
-            ),
+            panel=panel,
             port=port,
             websocket_origin=websocket_origin,
             loop=loop,
             show=show,
             start=start,
             title=self.title,
-            static_dirs={
-                CUSTOM_DIST_PATH_THEMES: STATIC_DIR_THEMES,
-            },
             **kwargs,
         )
         server_document(websocket_origin, resources=None)
         return server
 
-    async def preview(self):
+    def app(self, sidebar_width=280, width=1200, height=800):
         """
-        Preview(Async) all the charts in a jupyter cell, non interactive(no
-        backend server). Mostly intended to save notebook state for blogs,
-        documentation while still rendering the dashboard.
-
-        Notes
-        -----
-        - Png format
-        - Bokeh and Datashader based charts also have a `save` tool
-        on the side toolbar, which can download and save the individual
-        chart when interacting with the dashboard.
-
+        Run the dashboard with a bokeh backend server within the notebook.
+        Parameters
+        ----------
         Examples
         --------
 
@@ -489,33 +436,26 @@ class DashBoard:
         >>> line_chart_1 = bokeh.line(
         >>>     'key', 'val', data_points=5, add_interaction=False
         >>> )
-        >>> line_chart_2 = bokeh.bar(
-        >>>     'val', 'key', data_points=5, add_interaction=False
-        >>> )
-        >>> d = cux_df.dashboard(
-        >>>    [line_chart_1, line_chart_2],
-        >>>    layout=cuxfilter.layouts.double_feature
-        >>> )
-        >>> await d.preview()
-        displays charts in the dashboard
+        >>> d = cux_df.dashboard([line_chart_1])
+        >>> d.app(sidebar_width=200, width=1000, height=450)
+
         """
-        if self.server is not None:
-            if self.server._started:
-                self.stop()
-            self._reinit_all_charts()
-            port = self.server.port
-        else:
-            port = get_open_port()
-        url = "localhost:" + str(port)
-        self.server = self._get_server(
-            port=port, websocket_origin=url, show=False, start=True
+        self._reinit_all_charts()
+        self._current_server_type = "app"
+
+        return self._dashboard.generate_dashboard(
+            title=self.title,
+            charts=self._charts,
+            sidebar=self._sidebar,
+            theme=default if self._theme is not None else None,
+            layout_array=self._layout_array,
+            render_location="notebook",
+            sidebar_width=sidebar_width,
+            width=width,
+            height=height,
         )
-        await screengrab("http://" + url)
-        self.stop()
 
-        display(Image("temp.png"))
-
-    def app(self, sidebar_width=280):
+    def servable(self, sidebar_width=280):
         """
         Run the dashboard with a bokeh backend server within the notebook.
         Parameters
@@ -541,17 +481,19 @@ class DashBoard:
 
         """
         self._reinit_all_charts()
-        self._current_server_type = "app"
+        self._current_server_type = "servable"
 
-        return self._dashboard.generate_dashboard(
+        self._dashboard.generate_dashboard(
             self.title,
             self._charts,
             self._sidebar,
             self._theme,
             self._layout_array,
-            "notebook",
+            "web-app",
             sidebar_width,
-        )
+        ).servable()
+
+        print("click panel logo to launch dashboard")
 
     def show(
         self,
@@ -559,6 +501,8 @@ class DashBoard:
         port=0,
         threaded=False,
         service_proxy=None,
+        sidebar_width=280,
+        height=800,
         **kwargs,
     ):
         """
@@ -609,18 +553,32 @@ class DashBoard:
         )
         print("Dashboard running at port " + str(port))
 
+        panel = self._dashboard.generate_dashboard(
+            title=self.title,
+            charts=self._charts,
+            sidebar=self._sidebar,
+            theme=self._theme,
+            layout_array=self._layout_array,
+            render_location="web-app",
+            sidebar_width=sidebar_width,
+            height=height,
+        )
         try:
             self.server = self._get_server(
+                panel=panel,
                 port=port,
                 websocket_origin=self._notebook_url.netloc,
                 show=False,
                 start=True,
                 threaded=threaded,
+                sidebar_width=sidebar_width,
+                height=height,
                 **kwargs,
             )
         except OSError:
             self.server.stop()
             self.server = self._get_server(
+                panel=panel,
                 port=port,
                 websocket_origin=self._notebook_url.netloc,
                 show=False,
@@ -658,138 +616,9 @@ class DashBoard:
             include_cols = self.charts.keys()
         # reloading charts as per current data state
         for chart in self.charts.values():
-            if chart.name not in ignore_cols and chart.name in include_cols:
-                chart.reload_chart(data, patch_update=True)
-
-    def _calc_data_tiles(self, cumsum=True):
-        """
-        Calculate data tiles for all aggregate type charts.
-        """
-        # NO DATATILES for scatter types, as they are essentially all
-        # points in the dataset
-        query = self._generate_query_str(ignore_chart=self._active_view)
-
-        for chart in self.charts.values():
-            if chart.use_data_tiles and (self._active_view != chart):
-                self._data_tiles[chart.name] = DataTile(
-                    self._active_view,
-                    chart,
-                    dtype="pandas",
-                    cumsum=cumsum,
-                ).calc_data_tile(self._query(query).copy())
-
-        self._active_view.datatile_loaded_state = True
-
-    def _query_datatiles_by_range(self, query_tuple):
-        """
-        Update each chart using the updated values after querying
-        the datatiles using query_tuple.
-        Parameters
-        ----------
-        query_tuple: tuple
-            (min_val, max_val) of the query
-
-        """
-        for chart in self.charts.values():
-            if self._active_view != chart and hasattr(
-                chart, "query_chart_by_range"
+            if (
+                chart.name not in ignore_cols
+                and chart.name in include_cols
+                and hasattr(chart, "reload_chart")
             ):
-                if chart.chart_type == "view_dataframe":
-                    chart.query_chart_by_range(
-                        self._active_view,
-                        query_tuple,
-                        data=self._cuxfilter_df.data,
-                        query=self._generate_query_str(
-                            ignore_chart=self._active_view
-                        ),
-                        local_dict=self._query_local_variables_dict,
-                        indices=self.queried_indices,
-                    )
-                elif not chart.use_data_tiles:
-                    # if the chart does not use datatiles, pass the query_dict
-                    # & queried_indices for a one-time cudf.query() computation
-                    chart.query_chart_by_range(
-                        self._active_view,
-                        query_tuple,
-                        datatile=None,
-                        query=self._generate_query_str(
-                            ignore_chart=self._active_view
-                        ),
-                        local_dict=self._query_local_variables_dict,
-                        indices=self.queried_indices,
-                    )
-                else:
-                    chart.query_chart_by_range(
-                        self._active_view,
-                        query_tuple,
-                        datatile=self._data_tiles[chart.name],
-                    )
-
-    def _query_datatiles_by_indices(self, old_indices, new_indices):
-        """
-        Update each chart using the updated values after querying the
-        datatiles using new_indices.
-        """
-        for chart in self.charts.values():
-            if self._active_view != chart and hasattr(
-                chart, "query_chart_by_range"
-            ):
-                if chart.chart_type == "view_dataframe":
-                    chart.query_chart_by_indices(
-                        self._active_view,
-                        old_indices,
-                        new_indices,
-                        data=self._cuxfilter_df.data,
-                        query=self._generate_query_str(
-                            ignore_chart=self._active_view
-                        ),
-                        local_dict=self._query_local_variables_dict,
-                        indices=self.queried_indices,
-                    )
-                elif not chart.use_data_tiles:
-                    chart.query_chart_by_indices(
-                        self._active_view,
-                        old_indices,
-                        new_indices,
-                        datatile=None,
-                        query=self._generate_query_str(
-                            ignore_chart=self._active_view
-                        ),
-                        local_dict=self._query_local_variables_dict,
-                        indices=self.queried_indices,
-                    )
-                else:
-                    chart.query_chart_by_indices(
-                        self._active_view,
-                        old_indices,
-                        new_indices,
-                        datatile=self._data_tiles[chart.name],
-                    )
-
-    def _reset_current_view(self, new_active_view: CUXF_BASE_CHARTS):
-        """
-        Reset current view and assign new view as the active view.
-        """
-        if self._active_view is None:
-            self._active_view = new_active_view
-            return -1
-
-        self._active_view.compute_query_dict(
-            self._query_str_dict, self._query_local_variables_dict
-        )
-
-        # resetting the loaded state
-        self._active_view.datatile_loaded_state = False
-
-        # switching the active view
-        self._active_view = new_active_view
-
-        self._query_str_dict.pop(self._active_view.name, None)
-
-        if not self._active_view.is_widget:
-            self._active_view.reload_chart(
-                data=self._query(
-                    self._generate_query_str(ignore_chart=self._active_view)
-                ),
-                patch_update=True,
-            )
+                chart.reload_chart(data)

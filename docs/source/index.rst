@@ -1,26 +1,18 @@
-Welcome to cuxfilter's documentation!
+Welcome to cuxfilter's documentation
 =====================================
 
-cuxfilter acts as a connector library, which provides the connections between different visualization libraries and a GPU dataframe without much hassle. This also allows the user to use charts from different libraries in a single dashboard, while also providing the interaction.
+cuxfilter enables GPU accelerated cross-filtering dashboards from notebooks, in just a few lines of Python code. Well integrated with the HoloViz ecosystem, it also incorporates other outstanding visualization libraries. RAPIDS cuxfilter is ideal for multi-chart exploratory data analysis and dashboard prototyping within the RAPIDS ecosystem. 
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-    
-   ./installation.rst
-   ./dataframe.rst
-   ./deployment.rst
-   ./10_minutes_to_cuxfilter.ipynb
-   ./Dask-cudf-support.rst
-   ./charts/charts.rst
-   ./layouts/Layouts.ipynb
-   ./themes/Themes.ipynb
-   ./examples/examples.rst
-   
+   user_guide/index
+   api_reference/dataframe
+
+
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`

@@ -31,13 +31,14 @@ class TestDeckGL:
                 "/master/GeoJSON/5m/2018/state.json"
             ),
             geoJSONProperty="STATEFP",
+            map_style="testMap",
         )
 
         cux_df.dashboard([choropleth3d_chart])
 
         assert isinstance(choropleth3d_chart, charts.deckgl.plots.Choropleth)
         assert choropleth3d_chart.deck_spec == {
-            "mapStyle": None,
+            "mapStyle": "testMap",
             "initialViewState": {
                 "latitude": 28.400005999999998,
                 "longitude": 0.31556500000000653,

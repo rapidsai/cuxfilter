@@ -1,20 +1,25 @@
 import dask_cudf
 import pytest
+import panel as pn
 import cudf
 import numpy as np
 
 from cuxfilter.charts.core.non_aggregate.core_graph import BaseGraph
 from cuxfilter.charts.datashader.custom_extensions import (
-    holoviews_datashader as hv,
+    holoviews_datashader as hv_dt,
 )
+import holoviews as hv
 from cuxfilter.dashboard import DashBoard
 from cuxfilter.charts.datashader.custom_extensions import CustomInspectTool
 from cuxfilter import DataFrame
-from cuxfilter.layouts import chart_view
 from cuxfilter.charts import constants
 from unittest import mock
 
 from ..utils import df_equals, df_types, initialize_df
+
+
+def hv_test_cb():
+    return pn.pane.HoloViews(hv.Curve([1, 2, 3]))
 
 
 class TestCoreGraph:
@@ -42,24 +47,19 @@ class TestCoreGraph:
         assert bg.node_pixel_density == 0.5
         assert bg.node_pixel_spread == "dynspread"
         assert bg.tile_provider == "CARTODBPOSITRON"
-        assert bg.width == 800
-        assert bg.height == 400
         assert bg.title == ""
         assert bg.timeout == 100
         assert bg.chart_type is None
         assert bg.use_data_tiles is False
         assert bg.reset_event is None
 
-    @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
-    def test_view(self, chart, _chart):
+    def test_view(self):
         bg = BaseGraph()
-        bg.chart = mock.Mock(**{"view.return_value": chart})
-        bg.width = 400
-        bg.title = "test"
-
-        assert str(bg.view()) == str(
-            chart_view(_chart, width=bg.width, title=bg.title)
+        bg.chart = mock.Mock(
+            **{"view.return_value": hv.DynamicMap(hv_test_cb)}
         )
+
+        assert isinstance(bg.view(), pn.pane.HoloViews)
 
     @pytest.mark.parametrize("df_type", df_types)
     def test_get_selection_geometry_callback(self, df_type):
@@ -240,7 +240,7 @@ class TestCoreGraph:
         bg = BaseGraph()
         bg.add_interaction = add_interaction
         bg.reset_event = reset_event
-        bg.chart = hv.InteractiveDatashader()
+        bg.chart = hv_dt.InteractiveDatashader()
 
         df = initialize_df(df_type, {"x": [1, 2, 2], "y": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
@@ -270,7 +270,7 @@ class TestCoreGraph:
         bg.x = "a"
         bg.x_range = (0, 2)
         bg.y_range = (3, 5)
-        bg.chart = hv.InteractiveDatashader()
+        bg.chart = hv_dt.InteractiveDatashader()
 
         df = initialize_df(df_type, {"a": [1, 2, 2], "b": [3, 4, 5]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
@@ -287,78 +287,3 @@ class TestCoreGraph:
         bg.add_reset_event(dashboard)
 
         assert bg.selected_indices is None
-
-    @pytest.mark.parametrize("df_type", df_types)
-    def test_query_chart_by_range(self, df_type):
-        bg = BaseGraph()
-        bg.chart_type = "test"
-        bg.x = "a"
-
-        bg_1 = BaseGraph()
-        bg_1.chart_type = "test"
-        bg_1.x = "b"
-
-        query_tuple = (4, 5)
-
-        df = initialize_df(df_type, {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
-        bg.nodes = df
-
-        self.result = None
-
-        def t_func(data):
-            self.result = data
-
-        # creating a dummy reload chart fn as its not implemented in core
-        # non aggregate chart class
-        bg.reload_chart = t_func
-
-        bg.query_chart_by_range(
-            active_chart=bg_1, query_tuple=query_tuple, datatile=None
-        )
-
-        assert df_equals(
-            self.result,
-            initialize_df(df_type, {"a": [2, 3], "b": [4, 5]}, [1, 2]),
-        )
-
-    @pytest.mark.parametrize("df_type", df_types)
-    @pytest.mark.parametrize(
-        "new_indices, result, index",
-        [
-            ([4, 5], {"a": [2, 3], "b": [4, 5]}, [1, 2]),
-            ([], {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]}, [0, 1, 2, 3]),
-            ([3], {"a": [1], "b": [3]}, [0]),
-        ],
-    )
-    def test_query_chart_by_indices(self, df_type, new_indices, result, index):
-        bg = BaseGraph()
-        bg.chart_type = "test"
-        bg.x = "a"
-
-        bg_1 = BaseGraph()
-        bg_1.chart_type = "test"
-        bg_1.x = "b"
-
-        new_indices = new_indices
-
-        df = initialize_df(df_type, {"a": [1, 2, 3, 4], "b": [3, 4, 5, 6]})
-        bg.nodes = df
-
-        self.result = None
-
-        def t_func(data):
-            self.result = data
-
-        # creating a dummy reload chart fn as its not implemented in core
-        # non aggregate chart class
-        bg.reload_chart = t_func
-
-        bg.query_chart_by_indices(
-            active_chart=bg_1,
-            old_indices=[],
-            new_indices=new_indices,
-            datatile=None,
-        )
-        result = initialize_df(df_type, result, index)
-
-        assert df_equals(self.result, result)

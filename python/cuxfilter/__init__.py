@@ -1,7 +1,6 @@
-from .dataframe import DataFrame
+# Copyright (c) 2019-2023, NVIDIA CORPORATION.
 
-from .assets import load_notebook_assets
-from ._version import get_versions
+from cuxfilter.dataframe import DataFrame
+from cuxfilter.dashboard import DashBoard
 
-__version__ = get_versions()["version"]
-del get_versions
+__version__ = "23.08.00"

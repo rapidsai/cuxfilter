@@ -164,7 +164,7 @@ def control_point_compute_kernel(
 
 
 def curved_connect_edges(
-    edges, edge_source, edge_target, connected_edge_columns, curve_params
+    edges, x, y, edge_source, edge_target, connected_edge_columns, curve_params
 ):
     """
     edges: cudf DataFrame(x_src, y_src, x_dst, y_dst)
@@ -176,12 +176,22 @@ def curved_connect_edges(
         ...
     ) as the input to datashader.line
     """
-    bundled_edges = bundle_edges(edges, src=edge_source, dst=edge_target)
+    bundled_edges = bundle_edges(
+        edges, src=edge_source, dst=edge_target
+    ).rename(
+        columns={
+            f"{x}_src": "x_src",
+            f"{y}_src": "y_src",
+            f"{x}_dst": "x_dst",
+            f"{y}_dst": "y_dst",
+        }
+    )
+
     curve_total_steps = curve_params.pop("curve_total_steps")
     # if aggregate column exists, ignore it for bundled edges compute
     fin_df_ = bundled_edges.apply_rows(
         control_point_compute_kernel,
-        incols=connected_edge_columns[:4] + ["count", "_index"],
+        incols=["x_src", "y_src", "x_dst", "y_dst", "count", "_index"],
         outcols=dict(ctrl_point_x=cp.float32, ctrl_point_y=cp.float32),
         kwargs=curve_params,
     )
@@ -197,7 +207,7 @@ def curved_connect_edges(
     # Make sure no control points are added for rows with source==destination
     fin_df_ = fin_df_.query(edge_source + "!=" + edge_target)
     compute_curves[cuda_args(fin_df_.shape[0])](
-        fin_df_[connected_edge_columns].to_cupy(),
+        fin_df_[["x_src", "y_src", "x_dst", "y_dst"]].to_cupy(),
         fin_df_[["ctrl_point_x", "ctrl_point_y"]].to_cupy(),
         result,
         steps,
@@ -206,14 +216,14 @@ def curved_connect_edges(
     if len(connected_edge_columns) == 5:
         return cudf.DataFrame(
             {
-                "x": result[:, 0].flatten(),
-                "y": result[:, 1].flatten(),
+                x: result[:, 0].flatten(),
+                y: result[:, 1].flatten(),
                 connected_edge_columns[-1]: result[:, 2].flatten(),
             }
         ).fillna(cp.nan)
     else:
         return cudf.DataFrame(
-            {"x": result[:, 0].flatten(), "y": result[:, 1].flatten()}
+            {x: result[:, 0].flatten(), y: result[:, 1].flatten()}
         ).fillna(cp.nan)
 
 
@@ -314,16 +324,22 @@ def calc_connected_edges(
     nodes[node_x] = dt.to_int64_if_datetime(nodes[node_x], node_x_dtype)
     nodes[node_y] = dt.to_int64_if_datetime(nodes[node_y], node_y_dtype)
 
-    connected_edges_df = edges.merge(
-        nodes, left_on=edge_source, right_on=node_id
-    )[edges_columns].reset_index(drop=True)
+    connected_edges_df = (
+        edges.merge(nodes, left_on=edge_source, right_on=node_id)
+        .drop_duplicates(subset=[edge_source, edge_target])[edges_columns]
+        .reset_index(drop=True)
+    )
 
-    connected_edges_df = connected_edges_df.merge(
-        nodes,
-        left_on=edge_target,
-        right_on=node_id,
-        suffixes=("_src", "_dst"),
-    ).reset_index(drop=True)
+    connected_edges_df = (
+        connected_edges_df.merge(
+            nodes,
+            left_on=edge_target,
+            right_on=node_id,
+            suffixes=("_src", "_dst"),
+        )
+        .drop_duplicates(subset=[edge_source, edge_target])
+        .reset_index(drop=True)
+    )
 
     result = cudf.DataFrame()
 
@@ -364,6 +380,8 @@ def calc_connected_edges(
                 )
             result = curved_connect_edges(
                 connected_edges_df,
+                node_x,
+                node_y,
                 edge_source,
                 edge_target,
                 connected_edge_columns,
@@ -371,7 +389,7 @@ def calc_connected_edges(
             )
 
     if get_df_size(result) == 0:
-        result = cudf.DataFrame({k: cp.nan for k in ["x", "y"]})
+        result = cudf.DataFrame({k: cp.nan for k in [node_x, node_y]})
         if edge_aggregate_col is not None:
             result[edge_aggregate_col] = cp.nan
 

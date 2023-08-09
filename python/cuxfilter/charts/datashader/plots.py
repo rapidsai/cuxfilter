@@ -92,10 +92,10 @@ class Scatter(BaseScatter):
             point_shape=self.point_shape,
             max_px=self.point_size,
             unselected_alpha=self.unselected_alpha,
-            height=self.height,
+            title=self.title,
         )
 
-    def reload_chart(self, data=None, patch_update=False):
+    def reload_chart(self, data=None):
         """
         Description:
 
@@ -188,24 +188,23 @@ class Graph(BaseGraph):
         self.inspect_neighbors = CustomInspectTool(
             icon=load_image(impath),
             _active=True,
-            tool_name="Inspect Neighboring Edges",
+            description="Inspect Neighboring Edges",
         )
+
         # loading icon from a url
         impath = (
             "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
             + "branch-0.15/python/cuxfilter/charts/datashader/icons/XPan.png"
         )
         self.display_edges = CustomInspectTool(
-            icon=load_image(impath), _active=True, tool_name="Display Edges"
+            icon=load_image(impath), _active=True, description="Display Edges"
         )
 
         def cb(attr, old, new):
             if not new:
-                self.chart.edges_chart.update_data(
-                    self.connected_edges.head(0)
-                )
+                self.chart.update_data(edges=self.connected_edges.head(0))
             else:
-                self.chart.edges_chart.update_data(self.connected_edges)
+                self.chart.update_data(edges=self.connected_edges)
 
         self.display_edges.on_change("_active", cb)
 
@@ -224,17 +223,17 @@ class Graph(BaseGraph):
             node_spread_threshold=self.node_pixel_density,
             node_point_shape=self.node_point_shape,
             node_max_px=self.node_point_size,
-            edge_source="x",
-            edge_target="y",
+            edge_source=self.node_x,
+            edge_target=self.node_y,
             edge_color=self.edge_color_palette[0],
             edge_transparency=self.edge_transparency,
             inspect_neighbors=self.inspect_neighbors,
             display_edges=self.display_edges,
             unselected_alpha=self.unselected_alpha,
-            height=self.height,
+            title=self.title,
         )
 
-    def reload_chart(self, data, edges=None, patch_update=False):
+    def reload_chart(self, data, edges=None):
         """
         Description:
 
@@ -349,10 +348,10 @@ class Line(BaseLine):
             color=self.color,
             pixel_shade_type=self.pixel_shade_type,
             unselected_alpha=self.unselected_alpha,
-            height=self.height,
+            title=self.title,
         )
 
-    def reload_chart(self, data, patch_update=False):
+    def reload_chart(self, data):
         """
         Description:
 
@@ -471,10 +470,10 @@ class StackedLines(BaseStackedLine):
             colors=self.colors,
             legend=self.compute_legend(),
             unselected_alpha=self.unselected_alpha,
-            height=self.height,
+            title=self.title,
         )
 
-    def reload_chart(self, data, patch_update=False):
+    def reload_chart(self, data):
         """
         Description:
 

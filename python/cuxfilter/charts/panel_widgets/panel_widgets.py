@@ -1,4 +1,3 @@
-from ctypes import ArgumentError
 from .plots import (
     Card,
     NumberChart,
@@ -6,8 +5,7 @@ from .plots import (
     DateRangeSlider,
     IntSlider,
     FloatSlider,
-    DropDown,
-    MultiSelect,
+    MultiChoice,
     DataSizeIndicator,
 )
 from ..constants import CUDF_TIMEDELTA_TYPE
@@ -15,8 +13,6 @@ from ..constants import CUDF_TIMEDELTA_TYPE
 
 def range_slider(
     x,
-    width=400,
-    height=20,
     data_points=None,
     step_size=None,
     step_size_type=int,
@@ -34,10 +30,6 @@ def range_slider(
     x: str
         column name from gpu dataframe
 
-    width: int,  default 400
-
-    height: int,  default 20
-
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
         data_points will default to df[self.x].nunique()
@@ -52,17 +44,13 @@ def range_slider(
 
 
     """
-    plot = RangeSlider(
-        x, width, height, data_points, step_size, step_size_type, **params
-    )
+    plot = RangeSlider(x, data_points, step_size, step_size_type, **params)
     plot.chart_type = "range_slider"
     return plot
 
 
 def date_range_slider(
     x,
-    width=400,
-    height=20,
     data_points=None,
     **params,
 ):
@@ -78,10 +66,6 @@ def date_range_slider(
     x: str
         column name from gpu dataframe
 
-    width: int,  default 400
-
-    height: int,  default 20
-
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
         data_points will default to df[self.x].nunique()
@@ -95,8 +79,6 @@ def date_range_slider(
     """
     plot = DateRangeSlider(
         x,
-        width,
-        height,
         data_points,
         step_size=None,
         step_size_type=CUDF_TIMEDELTA_TYPE,
@@ -106,9 +88,7 @@ def date_range_slider(
     return plot
 
 
-def int_slider(
-    x, width=400, height=40, data_points=None, step_size=1, **params
-):
+def int_slider(x, data_points=None, step_size=1, **params):
     """
 
     Widget in the navbar of the cuxfilter dashboard.
@@ -120,10 +100,6 @@ def int_slider(
 
     x: str
         column name from gpu dataframe
-
-    width: int,  default 400
-
-    height: int,  default 40
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -137,16 +113,12 @@ def int_slider(
 
 
     """
-    plot = IntSlider(
-        x, width, height, data_points, step_size, step_size_type=int, **params
-    )
+    plot = IntSlider(x, data_points, step_size, step_size_type=int, **params)
     plot.chart_type = "int_slider"
     return plot
 
 
-def float_slider(
-    x, width=400, height=40, data_points=None, step_size=None, **params
-):
+def float_slider(x, data_points=None, step_size=None, **params):
     """
 
     Widget in the navbar of the cuxfilter dashboard.
@@ -158,10 +130,6 @@ def float_slider(
 
     x: str
         column name from gpu dataframe
-
-    width: int,  default 400
-
-    height: int,  default 40
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -177,8 +145,6 @@ def float_slider(
     """
     plot = FloatSlider(
         x,
-        width,
-        height,
         data_points,
         step_size,
         step_size_type=float,
@@ -188,7 +154,7 @@ def float_slider(
     return plot
 
 
-def drop_down(x, width=400, height=50, **params):
+def drop_down(x, **params):
     """
 
     Widget in the navbar of the cuxfilter dashboard.
@@ -201,10 +167,6 @@ def drop_down(x, width=400, height=50, **params):
     x: str
         column name from gpu dataframe
 
-    width: int,  default 400
-
-    height: int,  default 50
-
     data_points: int,  default number of unique values
 
     **params:
@@ -212,17 +174,17 @@ def drop_down(x, width=400, height=50, **params):
         documentation for more info
 
     """
-    plot = DropDown(x, width, height, **params)
+    plot = MultiChoice(x, max_items=1, **params)
     plot.chart_type = "dropdown"
     return plot
 
 
-def multi_select(x, width=400, height=200, **params):
+def multi_select(x, **params):
     """
 
     Widget in the navbar of the cuxfilter dashboard.
 
-    Type: multi_select
+    Type: multi_choice
 
     Parameters
     ----------
@@ -230,10 +192,6 @@ def multi_select(x, width=400, height=200, **params):
     x: str
         column name from gpu dataframe
 
-    width: int,  default 400
-
-    height: int,  default 200
-
     data_points: int,  default number of unique values
 
     **params:
@@ -241,8 +199,8 @@ def multi_select(x, width=400, height=200, **params):
         documentation for more info
 
     """
-    plot = MultiSelect(x, width, height, **params)
-    plot.chart_type = "multi_select"
+    plot = MultiChoice(x, **params)
+    plot.chart_type = "multi_choice"
     return plot
 
 
@@ -269,12 +227,11 @@ def data_size_indicator(**library_specific_params):
 
 
 def number(
-    x=None,
-    expression=None,
+    expression,
     aggregate_fn="mean",
     title="",
-    widget=True,
     format="{value}",
+    default_color="black",
     colors=[],
     font_size="18pt",
     **library_specific_params,
@@ -288,9 +245,6 @@ def number(
 
     Parameters
     ----------
-    x: str
-        column name from gpu dataframe
-
     expression:
         string containing computable expression containing column names
         e.g: "(x+y)/2" will result in number value = (df.x + df.y)/2
@@ -300,12 +254,12 @@ def number(
     title: str,
         chart title
 
-    widget: bool, default True
-        if widget is True, the chart gets placed on the side navbar,
-        else its placed in the main dashboard
-
     format: str, default='{value}'
         A formatter string which accepts a {value}.
+
+    default_color: str, default 'black'
+        A color string to use as the default color if no thresholds are passed
+        via the colors argument.
 
     colors: list
         Color thresholds for the Number indicator,
@@ -315,26 +269,24 @@ def number(
 
     font_size: str, default '18pt'
 
+    title_size: str, default '14pt'
+
     **params:
         additional arguments to be passed to the function. See panel
         documentation for more info
 
     """
-    if not (x or expression):
-        raise ArgumentError(
-            "Atleast one of x or expression arg should be provided"
-        )
     plot = NumberChart(
-        x,
-        expression,
-        aggregate_fn,
-        title,
-        widget,
-        format,
-        colors,
-        font_size,
+        expression=expression,
+        aggregate_fn=aggregate_fn,
+        title=title,
+        format=format,
+        default_color=default_color,
+        colors=colors,
+        font_size=font_size,
         **library_specific_params,
     )
+    plot.chart_type = "number"
     return plot
 
 
@@ -344,22 +296,15 @@ def card(content="", title="", widget=True, **library_specific_params):
     Card chart contating markdown content and can be located in either
     the main dashboard or side navbar.
 
-    Type: number_chart or number_chart_widget
+    Type: number_chart
 
     Parameters
     ----------
     content: {str, markdown static content}, default ""
-
-    title: str,
-        chart title
-
-    widget: bool, default True
-        if widget is True, the chart gets placed on the side navbar,
-        else its placed in the main dashboard
 
     **params:
         additional arguments to be passed to the function. See panel
         documentation for more info
 
     """
-    return Card(content, title, widget, **library_specific_params)
+    return Card(content, **library_specific_params)
