@@ -8,6 +8,10 @@ rapids-logger "Create test_external conda environment"
 
 RAPIDS_VERSION=23.10.*
 
+rapids-logger "Current directory: $(pwd)"
+rapids-logger "Current directory contents:"
+ls
+
 rapids-mamba-retry create -n test_external --force -f ./utils/external_dependencies.yaml
 
 conda activate test_external
