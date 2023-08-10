@@ -36,6 +36,8 @@ function sed_runner() {
 # RTD update
 sed_runner 's/version = .*/version = '"'${NEXT_SHORT_TAG}'"'/g' docs/source/conf.py
 sed_runner 's/release = .*/release = '"'${NEXT_FULL_TAG}'"'/g' docs/source/conf.py
+# docs update
+sed_runner "s/cuxfilter=${CURRENT_SHORT_TAG}/cuxfilter=${NEXT_SHORT_TAG}/g" docs/source/user_guide/installation.rst
 
 # Python __init__.py updates
 sed_runner "s/__version__ = .*/__version__ = \"${NEXT_FULL_TAG}\"/g" python/cuxfilter/__init__.py
@@ -53,10 +55,10 @@ for FILE in dependencies.yaml conda/environments/*.yaml; do
   done
 done
 
-
 # README.md update
 sed_runner "s/version == ${CURRENT_SHORT_TAG}/version == ${NEXT_SHORT_TAG}/g" README.md
 sed_runner "s/cuxfilter=${CURRENT_SHORT_TAG}/cuxfilter=${NEXT_SHORT_TAG}/g" README.md
+
 
 # CI files
 for FILE in .github/workflows/*.yaml; do
