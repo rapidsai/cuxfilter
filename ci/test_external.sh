@@ -8,9 +8,14 @@ rapids-logger "Create test_external conda environment"
 
 RAPIDS_VERSION=23.10.*
 
-rapids-mamba-retry create -n test_external -c rapidsai-nightly -c nvidia -c conda-forge \
-    cuxfilter=${RAPIDS_VERSION} cudf=${RAPIDS_VERSION} dask-cudf=${RAPIDS_VERSION} \
-    python=${RAPIDS_PY_VERSION} cuda-version=${RAPIDS_CUDA_VERSION}
+rapids-mamba-retry create \
+    -n test_external \
+    --override-channels \
+    -c rapidsai-nightly \
+    -c nvidia \
+    -c conda-forge \
+    cuxfilter="${RAPIDS_VERSION}" cudf="${RAPIDS_VERSION}" dask-cudf="${RAPIDS_VERSION}" \
+    python="${RAPIDS_PY_VERSION}" cuda-version="${RAPIDS_CUDA_VERSION}"
 
 # Install external dependencies into test_external conda environment
 pushd ./ci/utils
