@@ -171,6 +171,18 @@ conda install -c rapidsai-nightly -c numba -c conda-forge -c nvidia \
 
 Note: cuxfilter is supported only on Linux, and with Python versions 3.8 and later.
 
+### Pypi
+
+Install cuxfilter from pypi using pip:
+
+```bash
+# for CUDA 12.0
+pip install cuxfilter-cu12 -extra-index-url=https://pypi.nvidia.com
+
+# for CUDA 11.8
+pip install cuxfilter-cu11 -extra-index-url=https://pypi.nvidia.com
+```
+
 See the [Get RAPIDS version picker](https://rapids.ai/start.html) for more OS and version info.
 
 ### Build/Install from Source
