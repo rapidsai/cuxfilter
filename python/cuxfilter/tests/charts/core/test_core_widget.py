@@ -31,7 +31,7 @@ class TestBaseWidget:
         bw = BaseWidget("test_x")
         bw.chart = chart
 
-        assert str(bw.view()) == str(pn.panel(_chart, width=400, height=10))
+        assert str(bw.view()) == str(pn.Column(_chart, width=400, height=10))
 
     def test_add_event(self):
         bw = BaseWidget("test_x")
