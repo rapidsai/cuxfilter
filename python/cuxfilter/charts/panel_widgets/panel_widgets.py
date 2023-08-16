@@ -28,7 +28,7 @@ def range_slider(
     ----------
 
     x: str
-        column name from gpu dataframe
+        column name from gpu dataframe, dtype should be int or float
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -64,7 +64,7 @@ def date_range_slider(
     ----------
 
     x: str
-        column name from gpu dataframe
+        column name from gpu dataframe, dtype should be datetime
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -99,7 +99,7 @@ def int_slider(x, data_points=None, step_size=1, **params):
     ----------
 
     x: str
-        column name from gpu dataframe
+        column name from gpu dataframe, dtype should be int
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -129,7 +129,7 @@ def float_slider(x, data_points=None, step_size=None, **params):
     ----------
 
     x: str
-        column name from gpu dataframe
+        column name from gpu dataframe, dtype should be float
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -165,7 +165,7 @@ def drop_down(x, **params):
     ----------
 
     x: str
-        column name from gpu dataframe
+        column name from gpu dataframe, dtype [str, int, float]
 
     data_points: int,  default number of unique values
 
@@ -190,7 +190,7 @@ def multi_select(x, **params):
     ----------
 
     x: str
-        column name from gpu dataframe
+        column name from gpu dataframe, dtype [str, int, float]
 
     data_points: int,  default number of unique values
 

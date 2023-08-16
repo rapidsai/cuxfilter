@@ -319,7 +319,7 @@ class FloatSlider(BaseWidget):
 
 
 class MultiChoice(BaseWidget):
-    value = None
+    source = None
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -328,16 +328,11 @@ class MultiChoice(BaseWidget):
         self.min_value, self.max_value = get_min_max(
             dashboard_cls._cuxfilter_df.data, self.x
         )
-
-        if self.stride is None:
-            if self.max_value < 1 and self.stride_type == int:
-                self.stride_type = float
-            self.stride = self.stride_type(1)
-
+        self.source = dashboard_cls._cuxfilter_df.data[self.x].reset_index(
+            drop=True
+        )
         self.calc_list_of_values(dashboard_cls._cuxfilter_df.data)
-
         self.generate_widget()
-
         self.add_events(dashboard_cls)
 
     def calc_list_of_values(self, data):
@@ -398,13 +393,21 @@ class MultiChoice(BaseWidget):
         query_dict:
             reference to dashboard.__cls__.query_dict
         """
-        if len(self.chart.value) == 0 or self.chart.value == [""]:
+        if len(self.chart.value) == 0:
             query_str_dict.pop(self.name, None)
-        elif len(self.chart.value) == 1:
-            query_str_dict[self.name] = f"{self.x}=={self.chart.value[0]}"
         else:
-            indices_string = ",".join(map(str, self.chart.value))
-            query_str_dict[self.name] = f"{self.x} in ({indices_string})"
+            df_module = (
+                cudf if isinstance(self.source, cudf.Series) else dask_cudf
+            )
+
+            if self.source.dtype == "object":
+                query_str_dict[self.name] = df_module.DataFrame(
+                    self.source.str.contains("|".join(self.chart.value))
+                )
+            else:
+                query_str_dict[self.name] = df_module.DataFrame(
+                    self.source.isin(self.chart.value)
+                )
 
     def apply_theme(self, theme):
         """
