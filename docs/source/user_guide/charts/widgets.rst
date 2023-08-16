@@ -99,12 +99,12 @@ Example
     import cudf
     from cuxfilter import charts, DataFrame
 
-    cux_df = DataFrame.from_dataframe(cudf.DataFrame({'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}))
-    drop_down = charts.drop_down('val')
+    cux_df = DataFrame.from_dataframe(cudf.DataFrame({'val': ['A', 'B', 'C', 'D', 'E']}))
+    multi_select = charts.drop_down('val')
 
-    d = cux_df.dashboard([drop_down])
-    #view the individual drop_down chart part of the dashboard d
-    drop_down.view()
+    d = cux_df.dashboard([multi_select])
+    # View the individual multi_select chart part of the dashboard d
+    multi_select.view(height=200)
 
 
 Multiselect
@@ -118,12 +118,12 @@ Example
     import cudf
     from cuxfilter import charts, DataFrame
 
-    cux_df = DataFrame.from_dataframe(cudf.DataFrame({'key': [0, 1, 2, 3, 4], 'val':[float(i + 10) for i in range(5)]}))
+    cux_df = DataFrame.from_dataframe(cudf.DataFrame({'val': ['A', 'B', 'C', 'D', 'E']}))
     multi_select = charts.multi_select('val')
 
     d = cux_df.dashboard([multi_select])
-    #view the individual multi_select chart part of the dashboard d
-    multi_select.view()
+    # View the individual multi_select chart part of the dashboard d
+    multi_select.view(height=200)
 
 
 Number Chart
