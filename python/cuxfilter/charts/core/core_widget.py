@@ -110,7 +110,7 @@ class BaseWidget:
         return None
 
     def view(self, width=400, height=10):
-        return pn.panel(self.chart, width=width, height=10)
+        return pn.Column(self.chart, width=width, height=height)
 
     def get_dashboard_view(self):
         return pn.panel(self.chart, sizing_mode="stretch_width")
