@@ -153,10 +153,10 @@ class Choropleth(BaseChoropleth):
 
         self.layer_spec["id"] = f"PolygonLayer-{self.name}"
 
-        if "opacity" in self.library_specific_params:
-            self.layer_spec["opacity"] = self.library_specific_params[
-                "opacity"
-            ]
+        if self.opacity:
+            self.layer_spec["opacity"] = self.opacity
+
+        self.layer_spec.update(self.input_layer_spec)
 
         if self.elevation_column is not None:
             self.layer_spec[
@@ -164,10 +164,10 @@ class Choropleth(BaseChoropleth):
             ] = f"@@={self.elevation_column}*{self.elevation_factor}"
 
         self.deck_spec["initialViewState"]["latitude"] = self.get_mean(
-            self.library_specific_params["y_range"]
+            self.y_range
         )
         self.deck_spec["initialViewState"]["longitude"] = self.get_mean(
-            self.library_specific_params["x_range"]
+            self.x_range
         )
         if self.mapbox_api_key:
             self.deck_spec["mapboxApiAccessToken"] = self.mapbox_api_key

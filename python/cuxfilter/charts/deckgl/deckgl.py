@@ -20,7 +20,11 @@ def choropleth(
     tooltip=True,
     tooltip_include_cols=[],
     nan_color=CUXF_NAN_COLOR,
-    **library_specific_params,
+    title="",
+    x_range=None,
+    y_range=None,
+    opacity=None,
+    layer_spec={},  # deck.gl layer spec
 ):
     """
 
@@ -86,16 +90,26 @@ def choropleth(
 
 
     title: str,
-
         chart title
 
-    **library_specific_params:
-        additional library specific keyword arguments to be passed to
-        the function
+    x_range: tuple, default None (it's calculated automatically)
+        tuple of min and max values for x-axis
+
+    y_range: tuple, default None (it's calculated automatically)
+        tuple of min and max values for y-axis
+
+    opacity: float, default None
+        opacity of the chart
+
+    layer_spec: dict, default {}
+        deck.gl layer spec dictionary to override the default layer spec. For
+        more information,
+        see https://deck.gl/docs/api-reference/layers/polygon-layer
 
     Returns
     -------
-    A bokeh chart object of type 3dchoropleth
+    A bokeh chart object of type choropleth (2d or 3d depending on the value
+        of elevation_column)
     """
     plot = plots.Choropleth(
         x,
@@ -114,7 +128,11 @@ def choropleth(
         tooltip,
         tooltip_include_cols,
         nan_color,
-        **library_specific_params,
+        title,
+        x_range,
+        y_range,
+        opacity,
+        layer_spec,
     )
     plot.chart_type = "choropleth"
     return plot

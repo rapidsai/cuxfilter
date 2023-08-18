@@ -23,7 +23,6 @@ class TestDeckGL:
             elevation_column="val_t",
             color_aggregate_fn="mean",
             elevation_aggregation_fn="count",
-            data_points=57,
             add_interaction=False,
             elevation_factor=100000,
             geoJSONSource=(

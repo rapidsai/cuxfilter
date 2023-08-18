@@ -28,8 +28,8 @@ Example 3d-Choropleth
     )
 
     chart0 = cuxfilter.charts.choropleth( x='zip', color_column='color', color_aggregate_fn='mean',
-                elevation_column='elevation', elevation_factor=1000, elevation_aggregate_fn='mean', 
-            geoJSONSource=geoJSONSource, data_points=size, add_interaction=True
+                elevation_column='elevation', elevation_factor=1000, elevation_aggregate_fn='mean',
+            geoJSONSource=geoJSONSource, add_interaction=True
     )
 
     #declare dashboard
@@ -60,7 +60,7 @@ Example 2d-Choropleth
     )
 
     chart0 = cuxfilter.charts.choropleth( x='zip', color_column='color', color_aggregate_fn='mean',
-            geoJSONSource=geoJSONSource, data_points=size, add_interaction=True
+            geoJSONSource=geoJSONSource, add_interaction=True
     )
 
     #declare dashboard

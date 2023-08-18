@@ -97,7 +97,7 @@ geoJSONSource='https://raw.githubusercontent.com/rapidsai/cuxfilter/GTC-2018-mor
 
 chart0 = cuxfilter.charts.choropleth( x='zip', color_column='delinquency_12_prediction', color_aggregate_fn='mean',
             elevation_column='current_actual_upb', elevation_factor=0.00001, elevation_aggregate_fn='sum',
-            geoJSONSource=geoJSONSource, data_points=1000
+            geoJSONSource=geoJSONSource
 )
 chart2 = cuxfilter.charts.bar('delinquency_12_prediction',data_points=50)
 chart3 = cuxfilter.charts.range_slider('borrower_credit_score',data_points=50)

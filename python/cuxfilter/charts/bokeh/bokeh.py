@@ -48,7 +48,12 @@ def bar(
 
     **library_specific_params:
         additional library specific keyword arguments to be passed to
-        the function
+        the function, a list of all the supported arguments can be found by
+        running
+        ```python
+            >>> import holoviews as hv
+            >>> hv.help(hv.Bars)
+        ````
 
     Returns
     -------

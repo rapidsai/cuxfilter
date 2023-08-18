@@ -187,7 +187,7 @@ Example
                 ### Emphasis
 
                 Emphasis, aka italics, with *asterisks* or _underscores_.
-                """), title="Test Markdown title")
+                """))
 
     d = cux_df.dashboard([card_chart])
     # view the individual card_chart chart part of the dashboard d
