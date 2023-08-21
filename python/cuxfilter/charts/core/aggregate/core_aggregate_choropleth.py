@@ -48,7 +48,10 @@ class BaseChoropleth(BaseChart):
         tooltip_include_cols=[],
         nan_color=CUXF_NAN_COLOR,
         title="",
-        **library_specific_params,
+        x_range=None,
+        y_range=None,
+        opacity=None,
+        layer_spec={},  # deck.gl layer spec
     ):
         """
         Description:
@@ -100,22 +103,24 @@ class BaseChoropleth(BaseChart):
 
         self.geo_color_palette = geo_color_palette
         self.geoJSONProperty = geoJSONProperty
-        _, x_range, y_range = geo_json_mapper(
-            self.geoJSONSource, self.geoJSONProperty, projection=4326
-        )
+        if not (x_range and y_range):
+            # get default x_range and y_range from geoJSONSource
+            default_x_range, default_y_range = geo_json_mapper(
+                self.geoJSONSource, self.geoJSONProperty, projection=4326
+            )[1:]
+            x_range = x_range or default_x_range
+            y_range = y_range or default_y_range
+        self.x_range = x_range
+        self.y_range = y_range
         self.stride = 1
         self.mapbox_api_key = mapbox_api_key
         self.map_style = map_style
-        self.library_specific_params = library_specific_params
         self.tooltip = tooltip
         self.tooltip_include_cols = tooltip_include_cols
         self.nan_color = nan_color
         self.title = title or f"{self.x}"
-        if "x_range" not in self.library_specific_params:
-            self.library_specific_params["x_range"] = x_range
-
-        if "y_range" not in self.library_specific_params:
-            self.library_specific_params["y_range"] = y_range
+        self.opacity = opacity
+        self.input_layer_spec = layer_spec
 
     def initiate_chart(self, dashboard_cls):
         """

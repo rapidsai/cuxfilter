@@ -97,7 +97,7 @@ geoJSONSource='https://raw.githubusercontent.com/rapidsai/cuxfilter/GTC-2018-mor
 
 chart0 = cuxfilter.charts.choropleth( x='zip', color_column='delinquency_12_prediction', color_aggregate_fn='mean',
             elevation_column='current_actual_upb', elevation_factor=0.00001, elevation_aggregate_fn='sum',
-            geoJSONSource=geoJSONSource, data_points=1000
+            geoJSONSource=geoJSONSource
 )
 chart2 = cuxfilter.charts.bar('delinquency_12_prediction',data_points=50)
 chart3 = cuxfilter.charts.range_slider('borrower_credit_score',data_points=50)
@@ -170,6 +170,18 @@ conda install -c rapidsai-nightly -c numba -c conda-forge -c nvidia \
 ```
 
 Note: cuxfilter is supported only on Linux, and with Python versions 3.8 and later.
+
+### PyPI
+
+Install cuxfilter from PyPI using pip:
+
+```bash
+# for CUDA 12.0
+pip install cuxfilter-cu12 -extra-index-url=https://pypi.nvidia.com
+
+# for CUDA 11.8
+pip install cuxfilter-cu11 -extra-index-url=https://pypi.nvidia.com
+```
 
 See the [Get RAPIDS version picker](https://rapids.ai/start.html) for more OS and version info.
 
