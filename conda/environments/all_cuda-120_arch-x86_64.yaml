@@ -38,8 +38,8 @@ dependencies:
 - pytest-xdist
 - python>=3.9,<3.11
 - recommonmark
-- sphinx
 - sphinx-markdown-tables
+- sphinx>=7.2.5
 - sphinx_rtd_theme
 - sphinxcontrib-websupport
 name: all_cuda-120_arch-x86_64

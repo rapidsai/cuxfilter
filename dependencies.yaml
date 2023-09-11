@@ -115,7 +115,7 @@ dependencies:
           - pandoc<=2.0.0 # We should check and fix all "<=" pinnings
           - pydata-sphinx-theme
           - recommonmark
-          - sphinx
+          - sphinx>=7.2.5
           - sphinx_rtd_theme
           - sphinx-markdown-tables
           - sphinxcontrib-websupport
