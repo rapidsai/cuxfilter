@@ -122,6 +122,8 @@ class DashBoard:
         as a cudf.Series.
 
         Returns None if no index columns are present.
+
+        :meta private:
         """
         result = None
         df_module = (
@@ -207,6 +209,7 @@ class DashBoard:
     def add_charts(self, charts=[], sidebar=[]):
         """
         Adding more charts to the dashboard, after it has been initialized.
+
         Parameters
         ----------
         charts: list
@@ -217,11 +220,9 @@ class DashBoard:
 
         Notes
         -----
-            After adding the charts, refresh the dashboard app
-            tab to see the updated charts.
-
-            Charts of type widget cannot be added to sidebar but
-            widgets can be added to charts(main layout)
+        After adding the charts, refresh the dashboard app
+        tab to see the updated charts. Charts of type widget cannot be added
+        to sidebar but widgets can be added to charts(main layout)
 
         Examples
         --------
@@ -315,9 +316,10 @@ class DashBoard:
         the dashboard.
 
         Also prints the query string of the current state of the dashboard.
+
         Returns
         -------
-        cudf.DataFrame
+        cudf.DataFrame based on the current filtered state of the dashboard.
 
         Examples
         --------
@@ -418,8 +420,18 @@ class DashBoard:
     def app(self, sidebar_width=280, width=1200, height=800):
         """
         Run the dashboard with a bokeh backend server within the notebook.
+
         Parameters
         ----------
+        sidebar_width: int, optional, default 280
+            width of the sidebar in pixels
+
+        width: int, optional, default 1200
+            width of the dashboard in pixels
+
+        height: int, optional, default 800
+            height of the dashboard in pixels
+
         Examples
         --------
 
@@ -455,46 +467,6 @@ class DashBoard:
             height=height,
         )
 
-    def servable(self, sidebar_width=280):
-        """
-        Run the dashboard with a bokeh backend server within the notebook.
-        Parameters
-        ----------
-        Examples
-        --------
-
-        >>> import cudf
-        >>> import cuxfilter
-        >>> from cuxfilter.charts import bokeh
-        >>> df = cudf.DataFrame(
-        >>>     {
-        >>>         'key': [0, 1, 2, 3, 4],
-        >>>         'val':[float(i + 10) for i in range(5)]
-        >>>     }
-        >>> )
-        >>> cux_df = cuxfilter.DataFrame.from_dataframe(df)
-        >>> line_chart_1 = bokeh.line(
-        >>>     'key', 'val', data_points=5, add_interaction=False
-        >>> )
-        >>> d = cux_df.dashboard([line_chart_1])
-        >>> d.app()
-
-        """
-        self._reinit_all_charts()
-        self._current_server_type = "servable"
-
-        self._dashboard.generate_dashboard(
-            self.title,
-            self._charts,
-            self._sidebar,
-            self._theme,
-            self._layout_array,
-            "web-app",
-            sidebar_width,
-        ).servable()
-
-        print("click panel logo to launch dashboard")
-
     def show(
         self,
         notebook_url=DEFAULT_NOTEBOOK_URL,
@@ -507,17 +479,33 @@ class DashBoard:
     ):
         """
         Run the dashboard with a bokeh backend server within the notebook.
+
         Parameters
         ----------
+
         notebook_url: str, optional, default localhost:8888
             - URL where you want to run the dashboard as a web-app,
             including the port number.
+
             - Can use localhost instead of ip if running locally.
-        port: int,
-            optional- Has to be an open port
+
+        port: int, optional
+            Has to be an open port
 
         service_proxy: str, optional, default None,
             available options: jupyterhub
+
+        threaded: boolean, optional, default False
+            whether to run the server in threaded mode
+
+        sidebar_width: int, optional, default 280
+            width of the sidebar in pixels
+
+        height: int, optional, default 800
+            height of the dashboard in pixels
+
+        **kwargs: dict, optional
+            additional keyword arguments to pass to the server
 
         Examples
         --------
