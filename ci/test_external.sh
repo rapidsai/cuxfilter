@@ -15,7 +15,7 @@ rapids-mamba-retry create \
     -c nvidia \
     -c conda-forge \
     cuxfilter="${RAPIDS_VERSION}" cudf="${RAPIDS_VERSION}" dask-cudf="${RAPIDS_VERSION}" \
-    python="${RAPIDS_PY_VERSION}" cuda-version="${RAPIDS_CUDA_VERSION}"
+    python="${RAPIDS_PY_VERSION}" cuda-version="12.0"
 
 # Install external dependencies into test_external conda environment
 pushd ./ci/utils
