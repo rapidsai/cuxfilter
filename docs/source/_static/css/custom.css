@@ -1,0 +1,62 @@
+/* RAPIDS Custom Docs css */
+/* https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/styling.html#custom-css */
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* RAPIDS custom colors primary */
+
+html[data-theme="light"] {
+    --pst-color-primary: #7306ff;
+    --pst-color-secondary: #984dfb;
+    --pst-color-info: #ffb500;
+    --pst-color-danger: #d216d2;
+    --pst-color-target: #37c9dd;
+}
+
+html[data-theme="dark"] {
+    --pst-color-primary: #7306ff;
+    --pst-color-secondary: #984dfb;
+    --pst-color-info: #ffb500;
+    --pst-color-danger: #d216d2;
+    --pst-color-target: #37c9dd;
+}
+
+/* PyData Overrides */
+.bd-header-announcement {
+    background-color: #7400ff !important;
+    position: fixed;
+    padding: 0;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    max-height: 3rem;
+}
+
+.bd-header {
+    top: 3rem;
+    z-index: 4000;
+}
+
+.bd-sidebar-primary {
+    margin-top: 3rem;
+}
+
+.bd-header-announcement:after {
+    background-color: #7400ff;
+    z-index: 4000;
+}
+
+/* RAPIDS Nav Bar Styles */
+.rapids-nav-logo-container {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+
+}
+
+.rapids-nav-logo {
+    height: 2.5rem;
+    max-width: 100%;
+}
