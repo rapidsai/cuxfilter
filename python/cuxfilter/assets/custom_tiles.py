@@ -74,7 +74,7 @@ Attributes:
             /tiles/14/2627/6331@2x?access_token=<access_token>" />
 
     STAMEN_TONER_LABELS
-        Tile Source for MAPBOX with a light theme
+        Tile Source for MAPBOX with a default(light) theme
 
         Warns:
             BokehDeprecationWarning: Deprecated in bokeh 1.1.0. Use

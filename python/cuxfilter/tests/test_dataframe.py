@@ -28,4 +28,4 @@ class TestDataFrame:
         assert (
             dashboard._dashboard.__class__ == cuxfilter.layouts.single_feature
         )
-        assert dashboard._theme == cuxfilter.themes.light
+        assert dashboard._theme == cuxfilter.themes.default

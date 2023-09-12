@@ -1,12 +1,9 @@
-import panel as pn
 import numpy as np
+from typing import Union
 from bokeh.models import DatetimeTickFormatter
-
+import holoviews as hv
 from ..core_chart import BaseChart
-from ....assets.numba_kernels import calc_groupby, calc_value_counts
-from ....layouts import chart_view
 from ...constants import (
-    BOOL_MAP,
     CUDF_DATETIME_TYPES,
 )
 from ....assets.cudf_utils import get_min_max
@@ -14,14 +11,14 @@ from ....assets.cudf_utils import get_min_max
 
 class BaseAggregateChart(BaseChart):
     reset_event = None
-    filter_widget = None
     x_axis_tick_formatter = None
     y_axis_tick_formatter = None
     use_data_tiles = True
-    custom_binning = False
     stride = None
-    data_points = None
+    data_points: Union[int, None] = None
     _x_dtype = float
+    box_stream = hv.streams.SelectionXY()
+    reset_stream = hv.streams.PlotReset()
 
     @property
     def name(self):
@@ -67,14 +64,13 @@ class BaseAggregateChart(BaseChart):
         data_points=None,
         add_interaction=True,
         aggregate_fn="count",
-        width=400,
-        height=400,
         step_size=None,
         step_size_type=int,
         title="",
         autoscaling=True,
         x_axis_tick_formatter=None,
         y_axis_tick_formatter=None,
+        unselected_alpha=0.1,
         **library_specific_params,
     ):
         """
@@ -87,8 +83,6 @@ class BaseAggregateChart(BaseChart):
             data_points
             add_interaction
             aggregate_fn
-            width
-            height
             step_size
             step_size_type
             title
@@ -110,12 +104,11 @@ class BaseAggregateChart(BaseChart):
         self.stride_type = step_size_type
         self.add_interaction = add_interaction
         self.aggregate_fn = aggregate_fn
-        self.height = height
-        self.width = width
         self.title = title if title else self.x
         self.autoscaling = autoscaling
         self.x_axis_tick_formatter = x_axis_tick_formatter
         self.y_axis_tick_formatter = y_axis_tick_formatter
+        self.unselected_alpha = unselected_alpha
         self.library_specific_params = library_specific_params
 
     def _compute_array_all_bins(self, source_x, update_data_x, update_data_y):
@@ -147,7 +140,7 @@ class BaseAggregateChart(BaseChart):
             stride = (
                 round(raw_stride) if self.stride_type == int else raw_stride
             )
-            self.stride = self.stride_type(stride)
+            self.stride = stride
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -155,7 +148,7 @@ class BaseAggregateChart(BaseChart):
 
         -------------------------------------------
         Input:
-        data: cudf DataFrame
+
         -------------------------------------------
 
         Ouput:
@@ -171,149 +164,53 @@ class BaseAggregateChart(BaseChart):
             self.min_value = 0
             self.max_value = 1
             self.stride = 1
-            # set axis labels:
-            if len(self.x_label_map) == 0:
-                self.x_label_map = BOOL_MAP
-            if (
-                self.y != self.x
-                and self.y is not None
-                and len(self.y_label_map) == 0
-            ):
-                self.y_label_map = BOOL_MAP
         else:
             self.compute_min_max(dashboard_cls)
             if self.x_dtype in CUDF_DATETIME_TYPES:
                 self.x_axis_tick_formatter = DatetimeTickFormatter()
             if self.x_dtype != "object":
                 self.compute_stride()
-            else:
-                self.use_data_tiles = False
 
-        self.calculate_source(dashboard_cls._cuxfilter_df.data)
+        self.source = dashboard_cls._cuxfilter_df.data
         self.generate_chart()
-        self.apply_mappers()
-
-        if self.add_interaction and self.x_dtype != "object":
-            self.add_range_slider_filter(dashboard_cls)
         self.add_events(dashboard_cls)
 
-    def view(self):
-        return chart_view(
-            self.chart, self.filter_widget, width=self.width, title=self.title
-        )
-
-    def calculate_source(self, data, patch_update=False):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-        if self.y == self.x or self.y is None:
-            # it's a histogram
-            df, self.data_points = calc_value_counts(
-                data[self.x],
-                self.stride,
-                self.min_value,
-                self.data_points,
-                self.custom_binning,
-            )
-            if self.data_points > 50_000:
-                print(
-                    "number of x-values for a bar chart ",
-                    "exceeds 50,000 points.",
-                    "Performance may be laggy, its recommended ",
-                    "to use custom data_points parameter to ",
-                    "enforce custom binning for smooth crossfiltering",
-                )
-        else:
-            self.aggregate_fn = "mean"
-            df = calc_groupby(self, data).to_pandas().to_numpy().transpose()
-            if self.data_points is None:
-                self.data_points = len(df[0])
-
-        if self.stride is None and self.x_dtype != "object":
-            self.compute_stride()
-
-        if self.custom_binning:
-            if len(self.x_label_map) == 0:
-                temp_mapper_index = np.array(df[0])
-                temp_mapper_value = np.round(
-                    (temp_mapper_index * self.stride) + self.min_value,
-                    4,
-                ).astype("str")
-                temp_mapper_index = temp_mapper_index.astype("str")
-                self.x_label_map = dict(
-                    zip(temp_mapper_index, temp_mapper_value)
-                )
-        dict_temp = {
-            "X": df[0],
-            "Y": df[1],
-        }
-
-        if patch_update and len(dict_temp["X"]) < len(
-            self._transformed_source_data(self.data_x_axis)
-        ):
-            # if not all X axis bins are provided, filling bins not updated
-            # with zeros
-            y_axis_data = self._compute_array_all_bins(
-                self._transformed_source_data(self.data_x_axis),
-                dict_temp["X"],
-                dict_temp["Y"],
-            )
-
-            dict_temp = {
-                "X": self._transformed_source_data(self.data_x_axis),
-                "Y": y_axis_data,
-            }
-
-        self.format_source_data(dict_temp, patch_update)
-
-    def add_range_slider_filter(self, dashboard_cls):
-        """
-        Description: add range slider to the bottom of the chart,
-                    for the filter function to facilitate interaction behavior,
-                    that updates the rest of the charts on the page
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-        if self.x_dtype in CUDF_DATETIME_TYPES:
-            self.filter_widget = pn.widgets.DateRangeSlider(
-                start=self.min_value,
-                end=self.max_value,
-                value=(self.min_value, self.max_value),
-                width=self.width,
-                sizing_mode="scale_width",
-            )
-        else:
-            self.filter_widget = pn.widgets.RangeSlider(
-                start=self.min_value,
-                end=self.max_value,
-                value=(self.min_value, self.max_value),
-                step=self.stride,
-                width=self.width,
-                sizing_mode="scale_width",
-            )
-
-        def filter_widget_callback(event):
-            self.compute_query_dict(
-                dashboard_cls._query_str_dict,
-                dashboard_cls._query_local_variables_dict,
-            )
+    def get_reset_callback(self, dashboard_cls):
+        def reset_callback(resetting):
+            self.box_selected_range = None
+            self.selected_indices = None
+            dashboard_cls._query_str_dict.pop(self.name, None)
             dashboard_cls._reload_charts()
 
-        # add callback to filter_Widget on value change
-        self.filter_widget.param.watch(
-            filter_widget_callback, ["value"], onlychanged=False
-        )
+        return reset_callback
+
+    def get_box_select_callback(self, dashboard_cls):
+        def cb(bounds, x_selection, y_selection):
+            self.box_selected_range, self.selected_indices = None, None
+            if type(x_selection) == tuple:
+                self.box_selected_range = {
+                    self.x + "_min": x_selection[0],
+                    self.x + "_max": x_selection[1],
+                }
+            elif type(x_selection) == list:
+                self.selected_indices = (
+                    dashboard_cls._cuxfilter_df.data[self.x]
+                    .isin(x_selection)
+                    .reset_index()
+                )[[self.x]]
+
+            if self.box_selected_range or self.selected_indices is not None:
+                self.compute_query_dict(
+                    dashboard_cls._query_str_dict,
+                    dashboard_cls._query_local_variables_dict,
+                )
+                # reload all charts with new queried data (cudf.DataFrame only)
+                dashboard_cls._reload_charts()
+
+        return cb
+
+    def get_dashboard_view(self):
+        return self.chart.view()
 
     def compute_query_dict(self, query_str_dict, query_local_variables_dict):
         """
@@ -327,52 +224,30 @@ class BaseAggregateChart(BaseChart):
         Ouput:
         """
 
-        if self.filter_widget.value != (
-            self.filter_widget.start,
-            self.filter_widget.end,
-        ):
-            min_temp, max_temp = self.filter_widget.value
-            query = f"@{self.x}_min <= {self.x} <= @{self.x}_max"
-            query_str_dict[self.name] = query
-            query_local_variables_dict[self.x + "_min"] = min_temp
-            query_local_variables_dict[self.x + "_max"] = max_temp
+        if self.box_selected_range:
+            query_str_dict[
+                self.name
+            ] = f"@{self.x}_min<={self.x}<=@{self.x}_max"
+            query_local_variables_dict.update(self.box_selected_range)
         else:
-            query_str_dict.pop(self.name, None)
+            if self.selected_indices is not None:
+                query_str_dict[self.name] = self.selected_indices
+            else:
+                query_str_dict.pop(self.name, None)
+
             query_local_variables_dict.pop(self.x + "_min", None)
             query_local_variables_dict.pop(self.x + "_max", None)
 
     def add_events(self, dashboard_cls):
         """
-        Description:
-
+        Description: add events to the chart, for the filter function to
+            facilitate interaction behavior,
+        that updates the rest of the charts on the page
         -------------------------------------------
         Input:
-
-        -------------------------------------------
-
-        Ouput:
+        - dashboard_cls = current dashboard class reference
         """
-        if self.reset_event is not None:
-            self.add_reset_event(dashboard_cls)
-
-    def add_reset_event(self, dashboard_cls):
-        """
-        Description:
-
-        -------------------------------------------
-        Input:
-
-        -------------------------------------------
-
-        Ouput:
-        """
-
-        def reset_callback(event):
-            if self.add_interaction and self.x_dtype != "object":
-                self.filter_widget.value = (
-                    self.filter_widget.start,
-                    self.filter_widget.end,
-                )
-
-        # add callback to reset chart button
-        self.chart.on_event(self.reset_event, reset_callback)
+        self.chart.add_box_select_callback(
+            self.get_box_select_callback(dashboard_cls)
+        )
+        self.chart.add_reset_callback(self.get_reset_callback(dashboard_cls))

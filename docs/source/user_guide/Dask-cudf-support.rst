@@ -15,7 +15,7 @@ Cuxfilter with Dask-cudf
 
 Using cuxfilter with Dask-cudf is a very seamless experience, and passing in a `dask_cudf.DataFrame` object, instead of `cudf.DataFrame` object should just work, without any other modifications. The `dask_cudf.DataFrame` should however be initialized with it's partitions set, before passing it the the `cuxfilter.DataFrame.from_dataframe` function.
 
-For more information and examples, please visit the cuxfilter repository with `dask_cudf notebooks <https://github.com/rapidsai/cuxfilter/tree/branch-22.06/notebooks/notebooks/cuxfilter%20with%20dask_cudf>`_
+For more information and examples, please visit the cuxfilter repository with `dask_cudf notebooks <https://github.com/rapidsai/cuxfilter/tree/HEAD/notebooks/cuxfilter_with_dask_cudf>`_
 
 
 .. list-table:: Currently Supported Charts

@@ -16,14 +16,11 @@ def scatter(
     pixel_density=0.5,
     pixel_spread="dynspread",
     tile_provider=None,
-    width=800,
-    height=400,
     title="",
     timeout=100,
     legend=True,
     legend_position="top_right",
     unselected_alpha=0.2,
-    **library_specific_params,
 ):
     """
     Parameters
@@ -73,10 +70,6 @@ def scatter(
         Underlying map type.See
         https://holoviews.org/reference/elements/bokeh/Tiles.html
 
-    width: int,  default 800
-
-    height: int,  default 400
-
     title: str,
 
         chart title
@@ -100,10 +93,6 @@ def scatter(
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2)
 
-    **library_specific_params:
-        additional library specific keyword arguments to be passed to the
-        function
-
     Returns
     -------
     A cudashader scatter plot of type:
@@ -123,15 +112,12 @@ def scatter(
         pixel_shade_type,
         pixel_density,
         pixel_spread,
-        width,
-        height,
         tile_provider=tile_provider,
         title=title,
         timeout=timeout,
         legend=legend,
         legend_position=legend_position,
         unselected_alpha=unselected_alpha,
-        **library_specific_params,
     )
 
     plot.chart_type = "scatter"
@@ -162,16 +148,12 @@ def graph(
     edge_transparency=0,
     curve_params=dict(strokeWidth=1, curve_total_steps=100),
     tile_provider=None,
-    width=800,
-    height=400,
     title="",
     timeout=100,
     legend=True,
     legend_position="top_right",
     unselected_alpha=0.2,
-    **library_specific_params,
 ):
-
     """
     Parameters
     ----------
@@ -253,10 +235,6 @@ def graph(
         Underlying map type.See
         https://holoviews.org/reference/elements/bokeh/Tiles.html
 
-    width: int,  default 800
-
-    height: int,  default 400
-
     title: str,
 
         chart title
@@ -279,10 +257,6 @@ def graph(
     unselected_alpha: float [0, 1], default 0.2
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2) (nodes only)
-
-    **library_specific_params:
-        additional library specific keyword arguments to be passed to the
-        function
 
     Returns
     -------
@@ -313,14 +287,11 @@ def graph(
         edge_transparency,
         curve_params,
         tile_provider,
-        width,
-        height,
         title,
         timeout,
         legend=legend,
         legend_position=legend_position,
         unselected_alpha=unselected_alpha,
-        **library_specific_params,
     )
 
     plot.chart_type = "graph"
@@ -338,14 +309,11 @@ def heatmap(
     aggregate_fn="mean",
     point_size=15,
     point_shape="rect_vertical",
-    width=800,
-    height=400,
     title="",
     timeout=100,
     legend=True,
     legend_position="top_right",
     unselected_alpha=0.2,
-    **library_specific_params,
 ):
     """
     Heatmap using default datashader.scatter plot with slight modifications.
@@ -390,10 +358,6 @@ def heatmap(
         density.
         spread: Spread pixels in an image.
 
-    width: int,  default 800
-
-    height: int,  default 400
-
     title: str,
 
         chart title
@@ -416,10 +380,6 @@ def heatmap(
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2)
 
-    **library_specific_params:
-        additional library specific keyword arguments to be passed to the
-        function
-
     Returns
     -------
     A cudashader heatmap (scatter object) of type:
@@ -439,15 +399,12 @@ def heatmap(
         "linear",
         1,
         "spread",
-        width,
-        height,
         tile_provider=None,
         title=title,
         timeout=timeout,
         legend=legend,
         legend_position=legend_position,
         unselected_alpha=unselected_alpha,
-        **library_specific_params,
     )
     plot.chart_type = "heatmap"
     return plot
@@ -462,12 +419,9 @@ def line(
     color=None,
     step_size=None,
     step_size_type=int,
-    width=800,
-    height=400,
     title="",
     timeout=100,
     unselected_alpha=0.2,
-    **library_specific_params,
 ):
     """
 
@@ -498,10 +452,6 @@ def line(
     step_size_type: type, default int
         for the range_slider below the chart
 
-    width: int,  default 800
-
-    height: int,  default 400
-
     title: str,
 
         chart title
@@ -515,10 +465,6 @@ def line(
     unselected_alpha: float [0, 1], default 0.2
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2)
-
-    **library_specific_params:
-        additional library specific keyword arguments to be passed to the
-        function
 
     Returns
     -------
@@ -534,12 +480,9 @@ def line(
         color,
         step_size,
         step_size_type,
-        width,
-        height,
         title,
         timeout,
         unselected_alpha=unselected_alpha,
-        **library_specific_params,
     )
     plot.chart_type = "non_aggregate_line"
     return plot
@@ -553,14 +496,11 @@ def stacked_lines(
     colors=[],
     step_size=None,
     step_size_type=int,
-    width=800,
-    height=400,
     title="",
     timeout=100,
     legend=True,
     legend_position="top_right",
     unselected_alpha=0.2,
-    **library_specific_params,
 ):
     """
     stacked lines chart
@@ -582,10 +522,6 @@ def stacked_lines(
 
     step_size_type: type, default int
         for the range_slider below the chart
-
-    width: int,  default 800
-
-    height: int,  default 400
 
     title: str,
 
@@ -610,10 +546,6 @@ def stacked_lines(
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2)
 
-    **library_specific_params:
-        additional library specific keyword arguments to be passed to the
-        function
-
     Returns
     -------
     A cudashader stacked_lines plot of type:
@@ -629,14 +561,11 @@ def stacked_lines(
         colors,
         step_size,
         step_size_type,
-        width,
-        height,
         title,
         timeout,
         legend=legend,
         legend_position=legend_position,
         unselected_alpha=unselected_alpha,
-        **library_specific_params,
     )
     plot.chart_type = "stacked_lines"
     return plot

@@ -5,23 +5,39 @@ Conda
 -----
 For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the RAPIDS `Install Page <https://docs.rapids.ai/install>`_.
 
-cuxfilter conda example installation:
+.. code-block:: bash
+
+    # for CUDA 12.0
+    conda install -c rapidsai -c conda-forge -c nvidia \
+        cuxfilter=23.10 python=3.10 cuda-version=12.0
+
+    # for CUDA 11.8
+    conda install -c rapidsai -c conda-forge -c nvidia \
+        cuxfilter=23.10 python=3.10 cuda-version=11.8
+
+PyPI
+----
+Install cuxfilter from PyPI using pip:
 
 .. code-block:: bash
 
-    conda install -c rapidsai -c conda-forge -c nvidia \
-        cuxfilter=23.6 python=3.10 cudatoolkit=11.8
+    # for CUDA 12.0
+    pip install cuxfilter-cu12 -extra-index-url=https://pypi.nvidia.com
+
+    # for CUDA 11.8
+    pip install cuxfilter-cu11 -extra-index-url=https://pypi.nvidia.com
+
 
 Docker container
 ----------------
 For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the RAPIDS `Install Page <https://docs.rapids.ai/install>`_.
 
-cuxfilter docker example installation:
+cuxfilter docker example installation for cuda 12.0, ubuntu 20.04:
 
 .. code-block:: bash
 
     # ex. for CUDA 11.8
-    docker pull rapidsai/rapidsai:cuda11.8-runtime-ubuntu20.04
+    docker pull rapidsai/rapidsai:cuda12.0-runtime-ubuntu20.04
     docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 \
         rapidsai/rapidsai:cuda11.8-runtime-ubuntu20.04
 
@@ -30,15 +46,19 @@ cuxfilter docker example installation:
 Build/Install from Source
 -------------------------
 
-See `build instructions <https://github.com/rapidsai/cuxfilter/blob/main/CONTRIBUTING.md#setting-up-your-build-environment>` on our GitHub.
+See `build instructions <https://github.com/rapidsai/cuxfilter/blob/HEAD/CONTRIBUTING.md#script-to-build-cuxfilter-from-source>`_ on our GitHub.
 
 
 
 Troubleshooting
 ---------------
 
+If the guide below doesn't help you resolve your issue, please `file an issue <https://github.com/rapidsai/cuxfilter/issues/new/choose>`_ on our GitHub.
+
 Install jupyterlab dependencies
-**********************************
+********************************
+
+If you have issues with charts not rendering in the jupyterlab notebook, please make sure you have the following installed in your environment:
 
 .. code-block:: bash
 
@@ -47,22 +67,12 @@ Install jupyterlab dependencies
     jupyter labextension install @bokeh/jupyter_bokeh
 
 
-libxcomposite.so.1 not found error
-*************************************
-
-If using **await d.preview()** throws a **libxcomposite.so.1 not found error**, execute the following commands:
-
-.. code-block:: bash
-
-    apt-get update
-    apt-get install libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxrandr2 libxtst6 libcups2 libxss1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libatk1.0-0 libgtk-3-0 libgdk-pixbuf2.0-0
-
 
 Download datasets
 -----------------
 
 1. Automatically download datasets
-*************************
+***********************************
 
 The notebooks inside `python/notebooks` already have a check function which verifies whether the example dataset is downloaded, and downloads if not present.
 

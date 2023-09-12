@@ -6,10 +6,21 @@ set -e
 rapids-logger "Create test_external conda environment"
 . /opt/conda/etc/profile.d/conda.sh
 
-RAPIDS_VERSION=23.06.*
+RAPIDS_VERSION=23.10.*
 
-rapids-mamba-retry create -n test_external -c rapidsai -c conda-forge -c nvidia  \
-    cudf=${RAPIDS_VERSION} dask-cudf=${RAPIDS_VERSION} python=3.10 cudatoolkit=11.8
+rapids-mamba-retry create \
+    -n test_external \
+    --override-channels \
+    -c rapidsai-nightly \
+    -c nvidia \
+    -c conda-forge \
+    cuxfilter="${RAPIDS_VERSION}" cudf="${RAPIDS_VERSION}" dask-cudf="${RAPIDS_VERSION}" \
+    python="${RAPIDS_PY_VERSION}" cuda-version="12.0"
+
+# Install external dependencies into test_external conda environment
+pushd ./ci/utils
+rapids-mamba-retry env update -n test_external -f external_dependencies.yaml
+popd
 
 conda activate test_external
 
@@ -18,6 +29,7 @@ PROJECT=$1
 PR_NUMBER=$2
 LIBRARIES=("datashader" "holoviews")
 
+# Change directory to /tmp
 pushd /tmp
 
 # Clone the specified Python libraries

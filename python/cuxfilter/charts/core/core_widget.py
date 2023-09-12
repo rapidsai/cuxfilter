@@ -3,16 +3,13 @@ import panel as pn
 from panel.config import panel_extension
 from typing import Dict
 
-from ...layouts import chart_view
-from ...assets import datetime as dt
+from cuxfilter.assets import datetime as dt
 
 
 class BaseWidget:
     chart_type: str = None
     x: str = None
     color: str = None
-    height: int = None
-    width: int = None
     chart = None
     data_points = None
     start: float = None
@@ -61,8 +58,6 @@ class BaseWidget:
     def __init__(
         self,
         x,
-        width=400,
-        height=10,
         data_points=None,
         step_size=None,
         step_size_type=int,
@@ -79,8 +74,6 @@ class BaseWidget:
         Ouput:
         """
         self.x = x
-        self.width = width
-        self.height = height
         self.params = params
         self.data_points = data_points
         self.stride_type = step_size_type
@@ -116,8 +109,11 @@ class BaseWidget:
                 return view.pprint()
         return None
 
-    def view(self):
-        return chart_view(self.chart, width=self.width, title=self.name)
+    def view(self, width=400, height=10):
+        return pn.Column(self.chart, width=width, height=height)
+
+    def get_dashboard_view(self):
+        return pn.panel(self.chart, sizing_mode="stretch_width")
 
     def add_event(self, event, callback):
         self.chart.on_event(event, callback)
@@ -129,3 +125,24 @@ class BaseWidget:
         # No reload functionality, added function for consistency
         # with other charts
         return -1
+
+    def apply_theme(self, theme):
+        """
+        apply thematic changes to the chart based on the theme
+        """
+        if hasattr(self.chart, "styles"):
+            self.chart.styles = {
+                "color": theme.style.color,
+            }
+        if hasattr(self.chart, "stylesheets"):
+            self.chart.stylesheets = [
+                f"""
+                .noUi-handle {{
+                    background-color: {theme.chart_color};
+                    border-color: {theme.chart_color};
+                }}
+                .noUi-connect {{
+                    background-color: {theme.chart_color} !important;
+                }}
+            """
+            ]

@@ -22,8 +22,7 @@ class TestDeckGL:
             color_column="val",
             elevation_column="val_t",
             color_aggregate_fn="mean",
-            elevation_aggregation_fn="count",
-            data_points=57,
+            elevation_aggregate_fn="count",
             add_interaction=False,
             elevation_factor=100000,
             geoJSONSource=(
@@ -31,13 +30,14 @@ class TestDeckGL:
                 "/master/GeoJSON/5m/2018/state.json"
             ),
             geoJSONProperty="STATEFP",
+            map_style="testMap",
         )
 
         cux_df.dashboard([choropleth3d_chart])
 
         assert isinstance(choropleth3d_chart, charts.deckgl.plots.Choropleth)
         assert choropleth3d_chart.deck_spec == {
-            "mapStyle": None,
+            "mapStyle": "testMap",
             "initialViewState": {
                 "latitude": 28.400005999999998,
                 "longitude": 0.31556500000000653,

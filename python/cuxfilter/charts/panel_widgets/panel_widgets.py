@@ -1,4 +1,3 @@
-from ctypes import ArgumentError
 from .plots import (
     Card,
     NumberChart,
@@ -6,8 +5,7 @@ from .plots import (
     DateRangeSlider,
     IntSlider,
     FloatSlider,
-    DropDown,
-    MultiSelect,
+    MultiChoice,
     DataSizeIndicator,
 )
 from ..constants import CUDF_TIMEDELTA_TYPE
@@ -15,8 +13,6 @@ from ..constants import CUDF_TIMEDELTA_TYPE
 
 def range_slider(
     x,
-    width=400,
-    height=20,
     data_points=None,
     step_size=None,
     step_size_type=int,
@@ -32,11 +28,7 @@ def range_slider(
     ----------
 
     x: str
-        column name from gpu dataframe
-
-    width: int,  default 400
-
-    height: int,  default 20
+        column name from gpu dataframe, dtype should be int or float
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -47,22 +39,19 @@ def range_slider(
     step_size_type: {int, float},  default int
 
     **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/widgets/RangeSlider.html#parameters
 
 
     """
-    plot = RangeSlider(
-        x, width, height, data_points, step_size, step_size_type, **params
-    )
+    plot = RangeSlider(x, data_points, step_size, step_size_type, **params)
     plot.chart_type = "range_slider"
     return plot
 
 
 def date_range_slider(
     x,
-    width=400,
-    height=20,
     data_points=None,
     **params,
 ):
@@ -76,11 +65,7 @@ def date_range_slider(
     ----------
 
     x: str
-        column name from gpu dataframe
-
-    width: int,  default 400
-
-    height: int,  default 20
+        column name from gpu dataframe, dtype should be datetime
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -89,14 +74,13 @@ def date_range_slider(
     step_size: np.timedelta64, default np.timedelta64(days=1)
 
     **params:
-        additional arguments to be passed to the function. See bokeh
-        DateRangeSlider documentation for more info
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/widgets/DateRangeSlider.html#parameters
 
     """
     plot = DateRangeSlider(
         x,
-        width,
-        height,
         data_points,
         step_size=None,
         step_size_type=CUDF_TIMEDELTA_TYPE,
@@ -106,9 +90,7 @@ def date_range_slider(
     return plot
 
 
-def int_slider(
-    x, width=400, height=40, data_points=None, step_size=1, **params
-):
+def int_slider(x, data_points=None, step_size=1, **params):
     """
 
     Widget in the navbar of the cuxfilter dashboard.
@@ -119,11 +101,7 @@ def int_slider(
     ----------
 
     x: str
-        column name from gpu dataframe
-
-    width: int,  default 400
-
-    height: int,  default 40
+        column name from gpu dataframe, dtype should be int
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -132,21 +110,17 @@ def int_slider(
     step_size: int,  default 1
 
     **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
-
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/widgets/IntSlider.html#parameters
 
     """
-    plot = IntSlider(
-        x, width, height, data_points, step_size, step_size_type=int, **params
-    )
+    plot = IntSlider(x, data_points, step_size, step_size_type=int, **params)
     plot.chart_type = "int_slider"
     return plot
 
 
-def float_slider(
-    x, width=400, height=40, data_points=None, step_size=None, **params
-):
+def float_slider(x, data_points=None, step_size=None, **params):
     """
 
     Widget in the navbar of the cuxfilter dashboard.
@@ -157,11 +131,7 @@ def float_slider(
     ----------
 
     x: str
-        column name from gpu dataframe
-
-    width: int,  default 400
-
-    height: int,  default 40
+        column name from gpu dataframe, dtype should be float
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -170,15 +140,13 @@ def float_slider(
     step_size: float,  default float((max - min)/datapoints)
 
     **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
-
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/widgets/FloatSlider.html#parameters
 
     """
     plot = FloatSlider(
         x,
-        width,
-        height,
         data_points,
         step_size,
         step_size_type=float,
@@ -188,7 +156,7 @@ def float_slider(
     return plot
 
 
-def drop_down(x, width=400, height=50, **params):
+def drop_down(x, **params):
     """
 
     Widget in the navbar of the cuxfilter dashboard.
@@ -199,82 +167,69 @@ def drop_down(x, width=400, height=50, **params):
     ----------
 
     x: str
-        column name from gpu dataframe
-
-    width: int,  default 400
-
-    height: int,  default 50
+        column name from gpu dataframe, dtype [str, int, float]
 
     data_points: int,  default number of unique values
 
     **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/widgets/MultiChoice.html#parameters
 
     """
-    plot = DropDown(x, width, height, **params)
+    plot = MultiChoice(x, max_items=1, **params)
     plot.chart_type = "dropdown"
     return plot
 
 
-def multi_select(x, width=400, height=200, **params):
+def multi_select(x, **params):
     """
 
     Widget in the navbar of the cuxfilter dashboard.
 
-    Type: multi_select
+    Type: multi_choice
 
     Parameters
     ----------
 
     x: str
-        column name from gpu dataframe
-
-    width: int,  default 400
-
-    height: int,  default 200
+        column name from gpu dataframe, dtype [str, int, float]
 
     data_points: int,  default number of unique values
 
     **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/widgets/MultiChoice.html#parameters
 
     """
-    plot = MultiSelect(x, width, height, **params)
-    plot.chart_type = "multi_select"
+    plot = MultiChoice(x, **params)
+    plot.chart_type = "multi_choice"
     return plot
 
 
-def data_size_indicator(**library_specific_params):
+def data_size_indicator(title_size="14pt"):
     """
 
-    Widget in the navbar of the cuxfilter dashboard.
+    Data size indicator widget in the navbar of the cuxfilter dashboard.
+    Returns a DataSizeIndicator widget, which is used display the current data
+    size. For custom number widget, use the cuxfilter.widgets.number.
 
     Type: data_size_indicator
-
-    Parameters
-    ----------
-
-    **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
-
     """
     plot = DataSizeIndicator(
-        title="Datapoints Selected", widget=True, **library_specific_params
+        title="Datapoints Selected", widget=True, title_size=title_size
     )
     plot.chart_type = "datasize_indicator"
     return plot
 
 
 def number(
-    x=None,
-    expression=None,
+    expression,
     aggregate_fn="mean",
     title="",
-    widget=True,
     format="{value}",
+    default_color="black",
     colors=[],
     font_size="18pt",
     **library_specific_params,
@@ -288,9 +243,6 @@ def number(
 
     Parameters
     ----------
-    x: str
-        column name from gpu dataframe
-
     expression:
         string containing computable expression containing column names
         e.g: "(x+y)/2" will result in number value = (df.x + df.y)/2
@@ -300,12 +252,12 @@ def number(
     title: str,
         chart title
 
-    widget: bool, default True
-        if widget is True, the chart gets placed on the side navbar,
-        else its placed in the main dashboard
-
     format: str, default='{value}'
         A formatter string which accepts a {value}.
+
+    default_color: str, default 'black'
+        A color string to use as the default color if no thresholds are passed
+        via the colors argument.
 
     colors: list
         Color thresholds for the Number indicator,
@@ -315,51 +267,43 @@ def number(
 
     font_size: str, default '18pt'
 
-    **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
+    title_size: str, default '14pt'
 
+    **params:
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/indicators/Number.html#parameters
     """
-    if not (x or expression):
-        raise ArgumentError(
-            "Atleast one of x or expression arg should be provided"
-        )
     plot = NumberChart(
-        x,
-        expression,
-        aggregate_fn,
-        title,
-        widget,
-        format,
-        colors,
-        font_size,
+        expression=expression,
+        aggregate_fn=aggregate_fn,
+        title=title,
+        format=format,
+        default_color=default_color,
+        colors=colors,
+        font_size=font_size,
         **library_specific_params,
     )
+    plot.chart_type = "number"
     return plot
 
 
-def card(content="", title="", widget=True, **library_specific_params):
+def card(content="", **library_specific_params):
     """
 
     Card chart contating markdown content and can be located in either
     the main dashboard or side navbar.
 
-    Type: number_chart or number_chart_widget
+    Type: number_chart
 
     Parameters
     ----------
     content: {str, markdown static content}, default ""
 
-    title: str,
-        chart title
-
-    widget: bool, default True
-        if widget is True, the chart gets placed on the side navbar,
-        else its placed in the main dashboard
-
     **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/layouts/Card.html#parameters
 
     """
-    return Card(content, title, widget, **library_specific_params)
+    return Card(content, **library_specific_params)

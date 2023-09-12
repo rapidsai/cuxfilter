@@ -18,10 +18,6 @@ The current version of cuxfilter leverages jupyter notebook and bokeh server to 
 
 ![layout architecture](./docs/_images/RAPIDS_cuxfilter.png)
 
-### What is cuDataTiles?
-
-cuxfilter implements cuDataTiles, a GPU accelerated version of data tiles based on the work of [Falcon](https://github.com/uwdata/falcon). When starting to interact with specific charts in a cuxfilter dashboard, values for the other charts are precomputed to allow for fast slider scrubbing without having to recalculate values.
-
 ### Open Source Projects
 
 cuxfilter wouldn’t be possible without using these great open source projects:
@@ -56,6 +52,7 @@ cux_df = cuxfilter.DataFrame.from_arrow(DATA_DIR+'/auto_accidents.arrow')
 cux_df.data['ST_CASE'] = cux_df.data['ST_CASE'].astype('float64')
 
 label_map = {1: 'Sunday',    2: 'Monday',    3: 'Tuesday',    4: 'Wednesday',   5: 'Thursday',    6: 'Friday',    7: 'Saturday',    9: 'Unknown'}
+cux_df.data['DAY_WEEK_STR'] = cux_df.data.DAY_WEEK.map(label_map)
 gtc_demo_red_blue_palette = [ "#3182bd", "#6baed6", "#7b8ed8", "#e26798", "#ff0068" , "#323232" ]
 
 #declare charts
@@ -63,7 +60,7 @@ chart1 = cuxfilter.charts.scatter(x='dropoff_x', y='dropoff_y', aggregate_col='D
                                 color_palette=gtc_demo_red_blue_palette, tile_provider='CartoLight', unselected_alpha=0.2,
                                 pixel_shade_type='linear')
 chart2 = cuxfilter.charts.multi_select('YEAR')
-chart3 = cuxfilter.charts.bar('DAY_WEEK', x_label_map=label_map)
+chart3 = cuxfilter.charts.bar('DAY_WEEK_STR')
 chart4 = cuxfilter.charts.bar('MONTH')
 
 #declare dashboard
@@ -96,26 +93,26 @@ datasets_check('mortgage', base_dir=DATA_DIR)
 
 cux_df = cuxfilter.DataFrame.from_arrow(DATA_DIR + '/146M_predictions_v2.arrow')
 
-MAPBOX_API_KEY= "<mapbox-api-key>"
 geoJSONSource='https://raw.githubusercontent.com/rapidsai/cuxfilter/GTC-2018-mortgage-visualization/javascript/demos/GTC%20demo/src/data/zip3-ms-rhs-lessprops.json'
 
 chart0 = cuxfilter.charts.choropleth( x='zip', color_column='delinquency_12_prediction', color_aggregate_fn='mean',
             elevation_column='current_actual_upb', elevation_factor=0.00001, elevation_aggregate_fn='sum',
-            geoJSONSource=geoJSONSource, mapbox_api_key=MAPBOX_API_KEY, data_points=1000
+            geoJSONSource=geoJSONSource
 )
 chart2 = cuxfilter.charts.bar('delinquency_12_prediction',data_points=50)
 chart3 = cuxfilter.charts.range_slider('borrower_credit_score',data_points=50)
 chart1 = cuxfilter.charts.drop_down('dti')
 
 #declare dashboard
-d = cux_df.dashboard([chart0, chart2],sidebar=[chart3, chart1], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.light, title='Mortgage Dashboard')
+d = cux_df.dashboard([chart0, chart2],sidebar=[chart3, chart1], layout=cuxfilter.layouts.feature_and_double_base,theme = cuxfilter.themes.dark, title='Mortgage Dashboard')
 
 # run the dashboard within the notebook cell
 # Bokeh and Datashader based charts also have a `save` tool on the side toolbar, which can download and save the individual chart when interacting with the dashboard.
 # d.app()
 
 #run the dashboard as a webapp:
-d.show('jupyter-notebook/lab-url')
+# if running on a port other than localhost:8888, run d.show(jupyter-notebook-lab-url:port)
+d.show()
 
 ```
 
@@ -156,23 +153,43 @@ Please see the [Demo Docker Repository](https://hub.docker.com/r/rapidsai/rapids
 
 cuxfilter can be installed with conda ([miniconda](https://conda.io/miniconda.html), or the full [Anaconda distribution](https://www.anaconda.com/download)) from the `rapidsai` channel:
 
-For `cuxfilter version == 23.08` :
+For nightly version `cuxfilter version == 23.10` :
 
 ```bash
+# for CUDA 12.0
+conda install -c rapidsai-nightly -c conda-forge -c nvidia \
+    cuxfilter=23.10 python=3.10 cuda-version=12.0
+
 # for CUDA 11.8
-conda install -c rapidsai -c numba -c conda-forge -c nvidia \
-    cuxfilter=23.08 python=3.10 cudatoolkit=11.8
+conda install -c rapidsai-nightly -c conda-forge -c nvidia \
+    cuxfilter=23.10 python=3.10 cuda-version=11.8
 ```
 
-For the nightly version of `cuxfilter` :
+For the stable version of `cuxfilter` :
 
 ```bash
+# for CUDA 12.0
+conda install -c rapidsai -c conda-forge -c nvidia \
+    cuxfilter python=3.10 cuda-version=12.0
+
 # for CUDA 11.8
-conda install -c rapidsai-nightly -c numba -c conda-forge -c nvidia \
-    cuxfilter python=3.10 cudatoolkit=11.8
+conda install -c rapidsai -c conda-forge -c nvidia \
+    cuxfilter python=3.10 cuda-version=11.8
 ```
 
 Note: cuxfilter is supported only on Linux, and with Python versions 3.8 and later.
+
+### PyPI
+
+Install cuxfilter from PyPI using pip:
+
+```bash
+# for CUDA 12.0
+pip install cuxfilter-cu12 -extra-index-url=https://pypi.nvidia.com
+
+# for CUDA 11.8
+pip install cuxfilter-cu11 -extra-index-url=https://pypi.nvidia.com
+```
 
 See the [Get RAPIDS version picker](https://rapids.ai/start.html) for more OS and version info.
 
@@ -181,15 +198,6 @@ See the [Get RAPIDS version picker](https://rapids.ai/start.html) for more OS an
 See [build instructions](CONTRIBUTING.md#setting-up-your-build-environment).
 
 ## Troubleshooting
-
-**libxcomposite.so.1 not found error**
-
-If the `await d.preview()` throws a libxcomposite.so.1 not found error, execute the following commands:
-
-```bash
-apt-get update
-apt-get install libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxrandr2 libxtst6 libcups2 libxss1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libatk1.0-0 libgtk-3-0 libgdk-pixbuf2.0-0
-```
 
 **bokeh server in jupyter lab**
 
@@ -233,11 +241,11 @@ Currently supported layout templates and example code can be found on the [layou
 
 | Library       | Chart type                                                                                       |
 | ------------- | ------------------------------------------------------------------------------------------------ |
-| bokeh         | bar, line                                                                                        |
+| bokeh         | bar                                                                                              |
 | datashader    | scatter, scatter_geo, line, stacked_lines, heatmap, graph                                        |
 | panel_widgets | range_slider, date_range_slider, float_slider, int_slider, drop_down, multi_select, card, number |
 | custom        | view_dataframe                                                                                   |
-| pydeck        | choropleth(3d and 2d)                                                                            |
+| deckgl        | choropleth(3d and 2d)                                                                            |
 
 ## Contributing Developers Guide
 

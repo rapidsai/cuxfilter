@@ -1,11 +1,11 @@
 from typing import Dict
 import os
 import numpy as np
+import panel as pn
 
 from ..core_chart import BaseChart
 from ....assets.numba_kernels import calc_groupby
 from ....assets import geo_json_mapper
-from ....layouts import chart_view
 from ....assets.cudf_utils import get_min_max
 from ...constants import CUXF_NAN_COLOR
 
@@ -16,6 +16,7 @@ class BaseChoropleth(BaseChart):
     reset_event = None
     geo_mapper: Dict[str, str] = {}
     use_data_tiles = True
+    source = None
 
     @property
     def name(self):
@@ -38,8 +39,6 @@ class BaseChoropleth(BaseChart):
         elevation_aggregate_fn="sum",
         elevation_factor=1,
         add_interaction=True,
-        width=800,
-        height=400,
         geoJSONSource=None,
         geoJSONProperty=None,
         geo_color_palette=None,
@@ -49,7 +48,10 @@ class BaseChoropleth(BaseChart):
         tooltip_include_cols=[],
         nan_color=CUXF_NAN_COLOR,
         title="",
-        **library_specific_params,
+        x_range=None,
+        y_range=None,
+        opacity=None,
+        layer_spec={},  # deck.gl layer spec
     ):
         """
         Description:
@@ -67,8 +69,6 @@ class BaseChoropleth(BaseChart):
             geoJSONProperty
             add_interaction
             geo_color_palette
-            width
-            height
             nan_color
             mapbox_api_key
             map_style
@@ -103,24 +103,24 @@ class BaseChoropleth(BaseChart):
 
         self.geo_color_palette = geo_color_palette
         self.geoJSONProperty = geoJSONProperty
-        _, x_range, y_range = geo_json_mapper(
-            self.geoJSONSource, self.geoJSONProperty, projection=4326
-        )
-        self.height = height
-        self.width = width
+        if not (x_range and y_range):
+            # get default x_range and y_range from geoJSONSource
+            default_x_range, default_y_range = geo_json_mapper(
+                self.geoJSONSource, self.geoJSONProperty, projection=4326
+            )[1:]
+            x_range = x_range or default_x_range
+            y_range = y_range or default_y_range
+        self.x_range = x_range
+        self.y_range = y_range
         self.stride = 1
         self.mapbox_api_key = mapbox_api_key
         self.map_style = map_style
-        self.library_specific_params = library_specific_params
         self.tooltip = tooltip
         self.tooltip_include_cols = tooltip_include_cols
         self.nan_color = nan_color
         self.title = title or f"{self.x}"
-        if "x_range" not in self.library_specific_params:
-            self.library_specific_params["x_range"] = x_range
-
-        if "y_range" not in self.library_specific_params:
-            self.library_specific_params["y_range"] = y_range
+        self.opacity = opacity
+        self.input_layer_spec = layer_spec
 
     def initiate_chart(self, dashboard_cls):
         """
@@ -152,12 +152,13 @@ class BaseChoropleth(BaseChart):
 
         self.add_events(dashboard_cls)
 
-    def view(self):
-        return chart_view(
-            self.chart.view(), width=self.width, title=self.title
-        )
+    def view(self, width=800, height=400):
+        return pn.WidgetBox(self.chart.pane, width=width, height=height)
 
-    def calculate_source(self, data, patch_update=False):
+    def get_dashboard_view(self):
+        return pn.panel(self.chart.view(), sizing_mode="stretch_both")
+
+    def calculate_source(self, data):
         """
         Description:
 
@@ -169,7 +170,7 @@ class BaseChoropleth(BaseChart):
         Ouput:
         """
         self.format_source_data(
-            calc_groupby(self, data, agg=self.aggregate_dict), patch_update
+            calc_groupby(self, data, agg=self.aggregate_dict)
         )
 
     def get_selection_callback(self, dashboard_cls):

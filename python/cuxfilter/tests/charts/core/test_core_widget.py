@@ -1,7 +1,6 @@
 import pytest
-
+import panel as pn
 from cuxfilter.charts.core.core_widget import BaseWidget
-from cuxfilter.layouts import chart_view
 
 
 class TestBaseWidget:
@@ -11,8 +10,6 @@ class TestBaseWidget:
         assert bw.chart_type is None
         assert bw.x == "test_x"
         assert bw.color is None
-        assert bw.height == 10
-        assert bw.width == 400
         assert bw.chart is None
         assert bw.data_points is None
         assert bw.start is None
@@ -34,9 +31,7 @@ class TestBaseWidget:
         bw = BaseWidget("test_x")
         bw.chart = chart
 
-        assert str(bw.view()) == str(
-            chart_view(_chart, width=bw.width, title="test_x_widget")
-        )
+        assert str(bw.view()) == str(pn.Column(_chart, width=400, height=10))
 
     def test_add_event(self):
         bw = BaseWidget("test_x")

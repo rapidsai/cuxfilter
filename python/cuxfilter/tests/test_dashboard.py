@@ -6,13 +6,12 @@ import cudf
 
 
 class TestDashBoard:
-
     df = cudf.DataFrame(
         {"key": [0, 1, 2, 3, 4], "val": [float(i + 10) for i in range(5)]}
     )
     cux_df = cuxfilter.DataFrame.from_dataframe(df)
     dashboard = cux_df.dashboard(charts=[], title="test_title")
-    _datasize_title = "_datasize_indicator_Datapoints Selected"
+    _datasize_title = "datasize_indicator_Datapoints Selected"
 
     def test_variables(self):
         assert self.dashboard._cuxfilter_df.data.equals(self.df)
@@ -21,8 +20,7 @@ class TestDashBoard:
             self.dashboard._dashboard.__class__
             == cuxfilter.layouts.single_feature
         )
-        assert self.dashboard._theme == cuxfilter.themes.light
-
+        assert self.dashboard._theme == cuxfilter.themes.default
         assert list(self.dashboard._sidebar.keys()) == [self._datasize_title]
         assert self.dashboard._query_str_dict == {}
 
@@ -49,9 +47,9 @@ class TestDashBoard:
             bac.chart_type = "chart_" + str(_ + 1)
             dashboard.add_charts(sidebar=[bac])
 
-        for _ in range(3):
+        for i in range(3):
             dashboard1.add_charts(
-                sidebar=[panel_widgets.card(title=f"test{_}")]
+                sidebar=[panel_widgets.card(content=f"test{i}")]
             )
 
         assert len(dashboard._charts) == 0
@@ -59,12 +57,8 @@ class TestDashBoard:
         assert list(dashboard._sidebar.keys()) == [self._datasize_title]
         assert len(dashboard1._charts) == 0
         assert len(dashboard1._sidebar) == 4
-        assert list(dashboard1._sidebar.keys()) == [
-            self._datasize_title,
-            "test0_card",
-            "test1_card",
-            "test2_card",
-        ]
+        for i in range(3):
+            assert "card" in list(dashboard1._sidebar.keys())[i + 1]
 
     @pytest.mark.parametrize(
         "query, result",
@@ -102,6 +96,12 @@ class TestDashBoard:
         bac = bokeh.bar("key")
         bac.chart_type = "chart_1"
         dashboard.add_charts([bac])
-        bac.filter_widget.value = (0, 3)
+        bac.box_selected_range = {
+            bac.x + "_min": 0,
+            bac.x + "_max": 3,
+        }
+        bac.compute_query_dict(
+            dashboard._query_str_dict, dashboard._query_local_variables_dict
+        )
 
         assert dashboard.export().equals(self.df[self.df.key.between(0, 3)])

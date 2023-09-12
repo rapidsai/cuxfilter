@@ -8,18 +8,13 @@ from bokeh.embed import server_document
 import os
 import urllib
 import warnings
-from IPython.display import Image, display
 from collections import Counter
 
 from cuxfilter.charts.core import BaseChart, BaseWidget, ViewDataFrame
-from cuxfilter.charts.constants import (
-    CUSTOM_DIST_PATH_THEMES,
-    STATIC_DIR_THEMES,
-)
 from cuxfilter.layouts import single_feature
 from cuxfilter.charts.panel_widgets import data_size_indicator
-from cuxfilter.assets import screengrab, get_open_port, cudf_utils
-from cuxfilter.themes import light
+from cuxfilter.assets import get_open_port, cudf_utils
+from cuxfilter.themes import default
 
 DEFAULT_NOTEBOOK_URL = "http://localhost:8888"
 
@@ -127,6 +122,8 @@ class DashBoard:
         as a cudf.Series.
 
         Returns None if no index columns are present.
+
+        :meta private:
         """
         result = None
         df_module = (
@@ -141,7 +138,7 @@ class DashBoard:
         }
         if len(selected_indices) > 0:
             result = (
-                df_module.concat(list(selected_indices.values()))
+                df_module.concat(list(selected_indices.values()), axis=1)
                 .fillna(False)
                 .all(axis=1)
             )
@@ -154,7 +151,7 @@ class DashBoard:
         sidebar=[],
         dataframe=None,
         layout=single_feature,
-        theme=light,
+        theme=default,
         title="Dashboard",
         data_size_widget=True,
         show_warnings=False,
@@ -181,10 +178,7 @@ class DashBoard:
 
         # add data_size_indicator to sidebar if data_size_widget=True
         if data_size_widget:
-            chart = data_size_indicator()
-            chart.initiate_chart(self)
-            chart._initialized = True
-            self._sidebar[chart.name] = chart
+            sidebar.insert(0, data_size_indicator(title_size="14pt"))
 
         # process all sidebar widgets
         for chart in sidebar:
@@ -215,6 +209,7 @@ class DashBoard:
     def add_charts(self, charts=[], sidebar=[]):
         """
         Adding more charts to the dashboard, after it has been initialized.
+
         Parameters
         ----------
         charts: list
@@ -225,11 +220,9 @@ class DashBoard:
 
         Notes
         -----
-            After adding the charts, refresh the dashboard app
-            tab to see the updated charts.
-
-            Charts of type widget cannot be added to sidebar but
-            widgets can be added to charts(main layout)
+        After adding the charts, refresh the dashboard app
+        tab to see the updated charts. Charts of type widget cannot be added
+        to sidebar but widgets can be added to charts(main layout)
 
         Examples
         --------
@@ -323,9 +316,10 @@ class DashBoard:
         the dashboard.
 
         Also prints the query string of the current state of the dashboard.
+
         Returns
         -------
-        cudf.DataFrame
+        cudf.DataFrame based on the current filtered state of the dashboard.
 
         Examples
         --------
@@ -376,11 +370,11 @@ class DashBoard:
 
     def __repr__(self):
         template_obj = self._dashboard.generate_dashboard(
-            self.title,
-            self._charts,
-            self._sidebar,
-            self._theme,
-            self._layout_array,
+            title=self.title,
+            charts=self._charts,
+            sidebar=self._sidebar,
+            theme=self._theme,
+            layout_array=self._layout_array,
         )
         cls = "#### cuxfilter " + type(self).__name__
         spacer = "\n    "
@@ -402,6 +396,7 @@ class DashBoard:
 
     def _get_server(
         self,
+        panel=None,
         port=0,
         websocket_origin=None,
         loop=None,
@@ -410,88 +405,33 @@ class DashBoard:
         **kwargs,
     ):
         server = get_server(
-            panel=self._dashboard.generate_dashboard(
-                self.title,
-                self._charts,
-                self._sidebar,
-                self._theme,
-                self._layout_array,
-                render_location="web-app",
-            ),
+            panel=panel,
             port=port,
             websocket_origin=websocket_origin,
             loop=loop,
             show=show,
             start=start,
             title=self.title,
-            static_dirs={
-                CUSTOM_DIST_PATH_THEMES: STATIC_DIR_THEMES,
-            },
             **kwargs,
         )
         server_document(websocket_origin, resources=None)
         return server
 
-    async def preview(self):
-        """
-        Preview(Async) all the charts in a jupyter cell, non interactive(no
-        backend server). Mostly intended to save notebook state for blogs,
-        documentation while still rendering the dashboard.
-
-        Notes
-        -----
-        - Png format
-        - Bokeh and Datashader based charts also have a `save` tool
-        on the side toolbar, which can download and save the individual
-        chart when interacting with the dashboard.
-
-        Examples
-        --------
-
-        >>> import cudf
-        >>> import cuxfilter
-        >>> from cuxfilter.charts import bokeh
-        >>> df = cudf.DataFrame(
-        >>>     {
-        >>>         'key': [0, 1, 2, 3, 4],
-        >>>         'val':[float(i + 10) for i in range(5)]
-        >>>     }
-        >>> )
-        >>> cux_df = cuxfilter.DataFrame.from_dataframe(df)
-        >>> line_chart_1 = bokeh.line(
-        >>>     'key', 'val', data_points=5, add_interaction=False
-        >>> )
-        >>> line_chart_2 = bokeh.bar(
-        >>>     'val', 'key', data_points=5, add_interaction=False
-        >>> )
-        >>> d = cux_df.dashboard(
-        >>>    [line_chart_1, line_chart_2],
-        >>>    layout=cuxfilter.layouts.double_feature
-        >>> )
-        >>> await d.preview()
-        displays charts in the dashboard
-        """
-        if self.server is not None:
-            if self.server._started:
-                self.stop()
-            self._reinit_all_charts()
-            port = self.server.port
-        else:
-            port = get_open_port()
-        url = "localhost:" + str(port)
-        self.server = self._get_server(
-            port=port, websocket_origin=url, show=False, start=True
-        )
-        await screengrab("http://" + url)
-        self.stop()
-
-        display(Image("temp.png"))
-
-    def app(self, sidebar_width=280):
+    def app(self, sidebar_width=280, width=1200, height=800):
         """
         Run the dashboard with a bokeh backend server within the notebook.
+
         Parameters
         ----------
+        sidebar_width: int, optional, default 280
+            width of the sidebar in pixels
+
+        width: int, optional, default 1200
+            width of the dashboard in pixels
+
+        height: int, optional, default 800
+            height of the dashboard in pixels
+
         Examples
         --------
 
@@ -509,20 +449,22 @@ class DashBoard:
         >>>     'key', 'val', data_points=5, add_interaction=False
         >>> )
         >>> d = cux_df.dashboard([line_chart_1])
-        >>> d.app()
+        >>> d.app(sidebar_width=200, width=1000, height=450)
 
         """
         self._reinit_all_charts()
         self._current_server_type = "app"
 
         return self._dashboard.generate_dashboard(
-            self.title,
-            self._charts,
-            self._sidebar,
-            self._theme,
-            self._layout_array,
-            "notebook",
-            sidebar_width,
+            title=self.title,
+            charts=self._charts,
+            sidebar=self._sidebar,
+            theme=default if self._theme is not None else None,
+            layout_array=self._layout_array,
+            render_location="notebook",
+            sidebar_width=sidebar_width,
+            width=width,
+            height=height,
         )
 
     def show(
@@ -531,21 +473,39 @@ class DashBoard:
         port=0,
         threaded=False,
         service_proxy=None,
+        sidebar_width=280,
+        height=800,
         **kwargs,
     ):
         """
         Run the dashboard with a bokeh backend server within the notebook.
+
         Parameters
         ----------
+
         notebook_url: str, optional, default localhost:8888
             - URL where you want to run the dashboard as a web-app,
             including the port number.
+
             - Can use localhost instead of ip if running locally.
-        port: int,
-            optional- Has to be an open port
+
+        port: int, optional
+            Has to be an open port
 
         service_proxy: str, optional, default None,
             available options: jupyterhub
+
+        threaded: boolean, optional, default False
+            whether to run the server in threaded mode
+
+        sidebar_width: int, optional, default 280
+            width of the sidebar in pixels
+
+        height: int, optional, default 800
+            height of the dashboard in pixels
+
+        **kwargs: dict, optional
+            additional keyword arguments to pass to the server
 
         Examples
         --------
@@ -581,18 +541,32 @@ class DashBoard:
         )
         print("Dashboard running at port " + str(port))
 
+        panel = self._dashboard.generate_dashboard(
+            title=self.title,
+            charts=self._charts,
+            sidebar=self._sidebar,
+            theme=self._theme,
+            layout_array=self._layout_array,
+            render_location="web-app",
+            sidebar_width=sidebar_width,
+            height=height,
+        )
         try:
             self.server = self._get_server(
+                panel=panel,
                 port=port,
                 websocket_origin=self._notebook_url.netloc,
                 show=False,
                 start=True,
                 threaded=threaded,
+                sidebar_width=sidebar_width,
+                height=height,
                 **kwargs,
             )
         except OSError:
             self.server.stop()
             self.server = self._get_server(
+                panel=panel,
                 port=port,
                 websocket_origin=self._notebook_url.netloc,
                 show=False,
@@ -630,5 +604,9 @@ class DashBoard:
             include_cols = self.charts.keys()
         # reloading charts as per current data state
         for chart in self.charts.values():
-            if chart.name not in ignore_cols and chart.name in include_cols:
-                chart.reload_chart(data, patch_update=True)
+            if (
+                chart.name not in ignore_cols
+                and chart.name in include_cols
+                and hasattr(chart, "reload_chart")
+            ):
+                chart.reload_chart(data)
