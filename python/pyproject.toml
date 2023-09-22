@@ -19,10 +19,10 @@ license = { text = "Apache 2.0" }
 requires-python = ">=3.9"
 dependencies = [
     "bokeh>=3.1",
-    "cudf==23.10.*",
+    "cudf==23.12.*",
     "cupy-cuda11x>=12.0.0",
-    "cuspatial==23.10.*",
-    "dask-cudf==23.10.*",
+    "cuspatial==23.12.*",
+    "dask-cudf==23.12.*",
     "datashader>=0.15",
     "geopandas>=0.11.0",
     "holoviews>=1.16.0",

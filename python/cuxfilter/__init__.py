@@ -3,4 +3,4 @@
 from cuxfilter.dataframe import DataFrame
 from cuxfilter.dashboard import DashBoard
 
-__version__ = "23.10.00"
+__version__ = "23.12.00"

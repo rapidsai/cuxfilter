@@ -6,7 +6,7 @@ set -e
 rapids-logger "Create test_external conda environment"
 . /opt/conda/etc/profile.d/conda.sh
 
-RAPIDS_VERSION=23.10.*
+RAPIDS_VERSION=23.12.*
 
 rapids-mamba-retry create \
     -n test_external \
