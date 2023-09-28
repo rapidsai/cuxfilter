@@ -1,0 +1,30 @@
+/* RAPIDS Custom Docs css */
+/* https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/styling.html#custom-css */
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* RAPIDS custom colors primary */
+
+html[data-theme="light"] {
+    --pst-color-primary: #7306ff;
+    --pst-color-secondary: #984dfb;
+    --pst-color-info: #ffb500;
+    --pst-color-danger: #d216d2;
+    --pst-color-target: #37c9dd;
+}
+
+html[data-theme="dark"] {
+    --pst-color-primary: #7306ff;
+    --pst-color-secondary: #984dfb;
+    --pst-color-info: #ffb500;
+    --pst-color-danger: #d216d2;
+    --pst-color-target: #37c9dd;
+}
+
+/* PyData Overrides */
+.bd-header {
+    background-color: #7400ff;
+}
