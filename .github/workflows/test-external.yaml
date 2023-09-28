@@ -1,0 +1,32 @@
+name: GPU testing for external party dependencies
+
+on:
+  workflow_dispatch:
+    inputs:
+      external-project:
+        description: "Project:"
+        required: true
+        type: choice
+        options:
+          - datashader
+          - holoviews
+          - all
+      pr_number:
+        description: "
+          The number of the pull request to check out, else checks out default branch.
+          Will be ignored if external-project=all
+          "
+        required: false
+  schedule:
+    - cron: "0 0 * * 1" # Run every Sunday evening Pacific Time (Monday 0:00 UTC)
+
+jobs:
+  test-external:
+    secrets: inherit
+    uses: rapidsai/shared-action-workflows/.github/workflows/custom-job.yaml@branch-23.10
+    with:
+      build_type: branch
+      node_type: "gpu-v100-latest-1"
+      arch: "amd64"
+      container_image: "rapidsai/ci-conda:latest"
+      run_script: "./ci/test_external.sh ${{ inputs.external-project || 'all' }} ${{ inputs.pr_number }}"
