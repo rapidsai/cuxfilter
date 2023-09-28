@@ -1,6 +1,0 @@
-{
-    "bar":"bokeh",
-    "line":"altair",
-    "scatter": "datashader",
-    "choropleth": "bokeh"
-}
