@@ -72,11 +72,11 @@ htmlhelp_basename = "cuxfilterdoc"
 
 # -- Options for HTML output -------------------------------------------------
 
-# PyData Theme Options
+# PyData Theme Options RAPIDS style
 # https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html
-#
+
 html_theme = "pydata_sphinx_theme"
-html_logo= "_static/rapids_logo.png"
+html_logo= "_static/RAPIDS-logo-sm.png"
 html_static_path = ["_static"]
 html_css_files = ['custom.css'] # temp, link out to theme github eventually 
 
@@ -86,18 +86,15 @@ html_theme_options = {
         "link": "https://rapids.ai/"
             },
     "external_links": [
+        {"name": "GitHub", "url": f"https://github.com/rapidsai/{project}"},
         {"name": "Ecosystem", "url": "https://rapids.ai/ecosystem"},
         {"name": "Learn More", "url": "https://rapids.ai/learn-more"},
         {"name": "News", "url": "https://rapids.ai/news"},
         {"name": "User Guides", "url": "https://rapids.ai/user-guides"},
-        {"name": "API Docs", "url": "https://rapids.ai/api"},
+        {"name": "API Docs", "url": "https://rapids.ai/api-docs"},
         {"name": "Install", "url": "https://rapids.ai/install"}
     ],
-    "header_links_before_dropdown": 3, # note: change based on number of top level directories
-    # "announcement": "https://raw.githubusercontent.com/rapidsai/sphinx-theme/main/_static/rapids-nav.html", # static
-    "icon_links": [],
-    "github_url": f"https://github.com/rapidsai/{project}",
-    "twitter_url": "https://twitter.com/rapidsai",
+    "header_links_before_dropdown": 2, # note: change based on number of top level directories
     "show_toc_level": 2,
     "navbar_align": "left",
     "navbar_start": ["navbar-logo", "version-switcher"],
@@ -109,6 +106,3 @@ html_theme_options = {
     }
 }
 
-
-# NOTE TO DO:
-# works well, but need to fix scroll behavior and z index
