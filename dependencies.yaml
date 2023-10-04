@@ -30,6 +30,7 @@ files:
     output: none
     includes:
       - checks
+      - py_version
   docs:
     output: none
     includes:
