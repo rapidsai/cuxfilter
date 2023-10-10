@@ -15,7 +15,7 @@ rapids-mamba-retry create \
     -c nvidia \
     -c conda-forge \
     cuxfilter="${RAPIDS_VERSION}" cudf="${RAPIDS_VERSION}" dask-cudf="${RAPIDS_VERSION}" \
-    python="${RAPIDS_PY_VERSION}" cuda-version="12.0"
+    python="${RAPIDS_PY_VERSION}" cuda-version="12.0" cupy="12.0"
 
 # Install external dependencies into test_external conda environment
 pushd ./ci/utils
@@ -93,7 +93,7 @@ trap "EXITCODE=1" ERR
 set +e
 
 rapids-logger "running all gathered tests"
-DATASHADER_TEST_GPU=1 pytest $FILES
+DATASHADER_TEST_GPU=1 pytest --numprocesses=8 $FILES
 
 rapids-logger "Test script exiting with value: $EXITCODE"
 exit ${EXITCODE}

@@ -8,3 +8,4 @@ dependencies:
   - graphistry
   - dash
   - dask-sql
+  - pytest-benchmark
