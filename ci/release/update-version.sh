@@ -49,7 +49,7 @@ DEPENDENCIES=(
   cugraph
   cuspatial
 )
-for FILE in dependencies.yaml conda/environments/*.yaml; do
+for FILE in dependencies.yaml conda/environments/*.yaml ci/utils/external_dependencies.yaml; do
   for DEP in "${DEPENDENCIES[@]}"; do
     sed_runner "/-.* ${DEP}==/ s/==.*/==${NEXT_SHORT_TAG_PEP440}.*/g" ${FILE};
   done
