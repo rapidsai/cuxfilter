@@ -1,3 +1,24 @@
+# cuXfilter 23.10.00 (11 Oct 2023)
+
+## 🐛 Bug Fixes
+
+- fix external workflow ([#537](https://github.com/rapidsai/cuxfilter/pull/537)) [@AjayThorve](https://github.com/AjayThorve)
+- Use `conda mambabuild` not `mamba mambabuild` ([#535](https://github.com/rapidsai/cuxfilter/pull/535)) [@bdice](https://github.com/bdice)
+
+## 📖 Documentation
+
+- Update docs ([#530](https://github.com/rapidsai/cuxfilter/pull/530)) [@AjayThorve](https://github.com/AjayThorve)
+- Add str support to dropdown ([#529](https://github.com/rapidsai/cuxfilter/pull/529)) [@AjayThorve](https://github.com/AjayThorve)
+- Manually merge Branch 23.08 into 23.10 ([#518](https://github.com/rapidsai/cuxfilter/pull/518)) [@AjayThorve](https://github.com/AjayThorve)
+- Branch 23.10 merge 23.08 ([#510](https://github.com/rapidsai/cuxfilter/pull/510)) [@vyasr](https://github.com/vyasr)
+
+## 🛠️ Improvements
+
+- Update image names ([#540](https://github.com/rapidsai/cuxfilter/pull/540)) [@AyodeAwe](https://github.com/AyodeAwe)
+- Simplify wheel build scripts and allow alphas of RAPIDS dependencies ([#534](https://github.com/rapidsai/cuxfilter/pull/534)) [@divyegala](https://github.com/divyegala)
+- Use `copy-pr-bot` ([#531](https://github.com/rapidsai/cuxfilter/pull/531)) [@ajschmidt8](https://github.com/ajschmidt8)
+- Improve external tests ([#520](https://github.com/rapidsai/cuxfilter/pull/520)) [@AjayThorve](https://github.com/AjayThorve)
+
 # cuXfilter 23.08.00 (9 Aug 2023)
 
 ## 🐛 Bug Fixes
