@@ -1,4 +1,5 @@
 # Copyright (c) 2019-2023, NVIDIA CORPORATION.
+import pydata_sphinx_theme
 
 # -- Project information -----------------------------------------------------
 project = "cuxfilter"
@@ -50,32 +51,58 @@ source_suffix = {".rst": "restructuredtext"}
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
-# -- Options for HTML output -------------------------------------------------
+# Add any paths that contain templates here, relative to this directory.
+templates_path = ["_templates"]
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
+# The suffix(es) of source filenames.
+# You can specify multiple suffix as a list of string:
 #
-html_theme = "pydata_sphinx_theme"
-html_logo = "_static/rapids_logo.png"
-html_static_path = ["_static"]
+# source_suffix = ['.rst', '.md']
+source_suffix = {".rst": "restructuredtext"}
 
-# Removes sidebar
+# List of patterns, relative to source directory, that match files and
+# directories to ignore when looking for source files.
+# This pattern also affects html_static_path and html_extra_path.
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+
+
+# Output file base name for HTML help builder. Default is 'pydoc'
+#
 htmlhelp_basename = "cuxfilterdoc"
 
-html_sidebars = {"user_guide/index": []}
+# -- Options for HTML output -------------------------------------------------
+
+# PyData Theme Options RAPIDS style
+# https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html
+
+html_theme = "pydata_sphinx_theme"
+html_logo= "_static/RAPIDS-logo-sm.png"
+html_static_path = ["_static"]
+html_css_files = ['custom.css'] # temp, link out to theme github eventually 
 
 html_theme_options = {
-    "external_links": [],
-    "icon_links": [],
-    "github_url": "https://github.com/rapidsai/cuxfilter",
-    "twitter_url": "https://twitter.com/rapidsai",
-    "show_toc_level": 1,
-    "navbar_align": "right",
+    "logo": {
+        "text": project,
+        "link": "https://rapids.ai/"
+            },
+    "external_links": [
+        {"name": "GitHub", "url": f"https://github.com/rapidsai/{project}"},
+        {"name": "Ecosystem", "url": "https://rapids.ai/ecosystem"},
+        {"name": "Learn More", "url": "https://rapids.ai/learn-more"},
+        {"name": "News", "url": "https://rapids.ai/news"},
+        {"name": "User Guides", "url": "https://rapids.ai/user-guides"},
+        {"name": "API Docs", "url": "https://rapids.ai/api-docs"},
+        {"name": "Install", "url": "https://rapids.ai/install"}
+    ],
+    "header_links_before_dropdown": 2, # note: change based on number of top level directories
+    "show_toc_level": 2,
+    "navbar_align": "left",
+    "navbar_start": ["navbar-logo", "version-switcher"],
+    "navbar_center": ["navbar-nav"],
+    "navbar_end": ["theme-switcher.html","navbar-icon-links.html"],
+    "switcher": { 
+        "version_match": version,
+        "json_url": f"https://raw.githubusercontent.com/rapidsai/sphinx-theme/main/_static/versions/{project}-doc-versions.json" #theme github source
+    }
 }
 
-
-def setup(app):
-    app.add_css_file("https://docs.rapids.ai/assets/css/custom.css")
-    app.add_js_file(
-        "https://docs.rapids.ai/assets/js/custom.js", loading_method="defer"
-    )
