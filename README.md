@@ -97,7 +97,7 @@ geoJSONSource='https://raw.githubusercontent.com/rapidsai/cuxfilter/GTC-2018-mor
 
 chart0 = cuxfilter.charts.choropleth( x='zip', color_column='delinquency_12_prediction', color_aggregate_fn='mean',
             elevation_column='current_actual_upb', elevation_factor=0.00001, elevation_aggregate_fn='sum',
-            geoJSONSource=geoJSONSource, data_points=1000
+            geoJSONSource=geoJSONSource
 )
 chart2 = cuxfilter.charts.bar('delinquency_12_prediction',data_points=50)
 chart3 = cuxfilter.charts.range_slider('borrower_credit_score',data_points=50)
@@ -153,23 +153,43 @@ Please see the [Demo Docker Repository](https://hub.docker.com/r/rapidsai/rapids
 
 cuxfilter can be installed with conda ([miniconda](https://conda.io/miniconda.html), or the full [Anaconda distribution](https://www.anaconda.com/download)) from the `rapidsai` channel:
 
-For `cuxfilter version == 23.08` :
+For nightly version `cuxfilter version == 23.10` :
 
 ```bash
+# for CUDA 12.0
+conda install -c rapidsai-nightly -c conda-forge -c nvidia \
+    cuxfilter=23.10 python=3.10 cuda-version=12.0
+
 # for CUDA 11.8
-conda install -c rapidsai -c numba -c conda-forge -c nvidia \
-    cuxfilter=23.08 python=3.10 cudatoolkit=11.8
+conda install -c rapidsai-nightly -c conda-forge -c nvidia \
+    cuxfilter=23.10 python=3.10 cuda-version=11.8
 ```
 
-For the nightly version of `cuxfilter` :
+For the stable version of `cuxfilter` :
 
 ```bash
+# for CUDA 12.0
+conda install -c rapidsai -c conda-forge -c nvidia \
+    cuxfilter python=3.10 cuda-version=12.0
+
 # for CUDA 11.8
-conda install -c rapidsai-nightly -c numba -c conda-forge -c nvidia \
-    cuxfilter python=3.10 cudatoolkit=11.8
+conda install -c rapidsai -c conda-forge -c nvidia \
+    cuxfilter python=3.10 cuda-version=11.8
 ```
 
 Note: cuxfilter is supported only on Linux, and with Python versions 3.8 and later.
+
+### PyPI
+
+Install cuxfilter from PyPI using pip:
+
+```bash
+# for CUDA 12.0
+pip install cuxfilter-cu12 -extra-index-url=https://pypi.nvidia.com
+
+# for CUDA 11.8
+pip install cuxfilter-cu11 -extra-index-url=https://pypi.nvidia.com
+```
 
 See the [Get RAPIDS version picker](https://rapids.ai/start.html) for more OS and version info.
 

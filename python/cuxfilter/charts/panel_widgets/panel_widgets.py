@@ -28,7 +28,7 @@ def range_slider(
     ----------
 
     x: str
-        column name from gpu dataframe
+        column name from gpu dataframe, dtype should be int or float
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -39,8 +39,9 @@ def range_slider(
     step_size_type: {int, float},  default int
 
     **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/widgets/RangeSlider.html#parameters
 
 
     """
@@ -64,7 +65,7 @@ def date_range_slider(
     ----------
 
     x: str
-        column name from gpu dataframe
+        column name from gpu dataframe, dtype should be datetime
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -73,8 +74,9 @@ def date_range_slider(
     step_size: np.timedelta64, default np.timedelta64(days=1)
 
     **params:
-        additional arguments to be passed to the function. See bokeh
-        DateRangeSlider documentation for more info
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/widgets/DateRangeSlider.html#parameters
 
     """
     plot = DateRangeSlider(
@@ -99,7 +101,7 @@ def int_slider(x, data_points=None, step_size=1, **params):
     ----------
 
     x: str
-        column name from gpu dataframe
+        column name from gpu dataframe, dtype should be int
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -108,9 +110,9 @@ def int_slider(x, data_points=None, step_size=1, **params):
     step_size: int,  default 1
 
     **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
-
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/widgets/IntSlider.html#parameters
 
     """
     plot = IntSlider(x, data_points, step_size, step_size_type=int, **params)
@@ -129,7 +131,7 @@ def float_slider(x, data_points=None, step_size=None, **params):
     ----------
 
     x: str
-        column name from gpu dataframe
+        column name from gpu dataframe, dtype should be float
 
     data_points: int,  default None
         when None, it means no custom number of bins are provided and
@@ -138,9 +140,9 @@ def float_slider(x, data_points=None, step_size=None, **params):
     step_size: float,  default float((max - min)/datapoints)
 
     **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
-
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/widgets/FloatSlider.html#parameters
 
     """
     plot = FloatSlider(
@@ -165,13 +167,14 @@ def drop_down(x, **params):
     ----------
 
     x: str
-        column name from gpu dataframe
+        column name from gpu dataframe, dtype [str, int, float]
 
     data_points: int,  default number of unique values
 
     **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/widgets/MultiChoice.html#parameters
 
     """
     plot = MultiChoice(x, max_items=1, **params)
@@ -190,13 +193,14 @@ def multi_select(x, **params):
     ----------
 
     x: str
-        column name from gpu dataframe
+        column name from gpu dataframe, dtype [str, int, float]
 
     data_points: int,  default number of unique values
 
     **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/widgets/MultiChoice.html#parameters
 
     """
     plot = MultiChoice(x, **params)
@@ -204,23 +208,17 @@ def multi_select(x, **params):
     return plot
 
 
-def data_size_indicator(**library_specific_params):
+def data_size_indicator(title_size="14pt"):
     """
 
-    Widget in the navbar of the cuxfilter dashboard.
+    Data size indicator widget in the navbar of the cuxfilter dashboard.
+    Returns a DataSizeIndicator widget, which is used display the current data
+    size. For custom number widget, use the cuxfilter.widgets.number.
 
     Type: data_size_indicator
-
-    Parameters
-    ----------
-
-    **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
-
     """
     plot = DataSizeIndicator(
-        title="Datapoints Selected", widget=True, **library_specific_params
+        title="Datapoints Selected", widget=True, title_size=title_size
     )
     plot.chart_type = "datasize_indicator"
     return plot
@@ -272,9 +270,9 @@ def number(
     title_size: str, default '14pt'
 
     **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
-
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/indicators/Number.html#parameters
     """
     plot = NumberChart(
         expression=expression,
@@ -290,7 +288,7 @@ def number(
     return plot
 
 
-def card(content="", title="", widget=True, **library_specific_params):
+def card(content="", **library_specific_params):
     """
 
     Card chart contating markdown content and can be located in either
@@ -303,8 +301,9 @@ def card(content="", title="", widget=True, **library_specific_params):
     content: {str, markdown static content}, default ""
 
     **params:
-        additional arguments to be passed to the function. See panel
-        documentation for more info
+        additional arguments to be passed to the function. See panel widgets
+        documentation for more info,
+        https://panel.holoviz.org/reference/layouts/Card.html#parameters
 
     """
     return Card(content, **library_specific_params)

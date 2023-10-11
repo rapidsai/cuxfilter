@@ -21,7 +21,6 @@ def scatter(
     legend=True,
     legend_position="top_right",
     unselected_alpha=0.2,
-    **library_specific_params,
 ):
     """
     Parameters
@@ -94,10 +93,6 @@ def scatter(
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2)
 
-    **library_specific_params:
-        additional library specific keyword arguments to be passed to the
-        function
-
     Returns
     -------
     A cudashader scatter plot of type:
@@ -123,7 +118,6 @@ def scatter(
         legend=legend,
         legend_position=legend_position,
         unselected_alpha=unselected_alpha,
-        **library_specific_params,
     )
 
     plot.chart_type = "scatter"
@@ -159,7 +153,6 @@ def graph(
     legend=True,
     legend_position="top_right",
     unselected_alpha=0.2,
-    **library_specific_params,
 ):
     """
     Parameters
@@ -265,10 +258,6 @@ def graph(
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2) (nodes only)
 
-    **library_specific_params:
-        additional library specific keyword arguments to be passed to the
-        function
-
     Returns
     -------
     A cudashader graph plot of type:
@@ -303,7 +292,6 @@ def graph(
         legend=legend,
         legend_position=legend_position,
         unselected_alpha=unselected_alpha,
-        **library_specific_params,
     )
 
     plot.chart_type = "graph"
@@ -326,7 +314,6 @@ def heatmap(
     legend=True,
     legend_position="top_right",
     unselected_alpha=0.2,
-    **library_specific_params,
 ):
     """
     Heatmap using default datashader.scatter plot with slight modifications.
@@ -393,10 +380,6 @@ def heatmap(
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2)
 
-    **library_specific_params:
-        additional library specific keyword arguments to be passed to the
-        function
-
     Returns
     -------
     A cudashader heatmap (scatter object) of type:
@@ -422,7 +405,6 @@ def heatmap(
         legend=legend,
         legend_position=legend_position,
         unselected_alpha=unselected_alpha,
-        **library_specific_params,
     )
     plot.chart_type = "heatmap"
     return plot
@@ -440,7 +422,6 @@ def line(
     title="",
     timeout=100,
     unselected_alpha=0.2,
-    **library_specific_params,
 ):
     """
 
@@ -485,10 +466,6 @@ def line(
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2)
 
-    **library_specific_params:
-        additional library specific keyword arguments to be passed to the
-        function
-
     Returns
     -------
     A cudashader scatter plot of type:
@@ -506,7 +483,6 @@ def line(
         title,
         timeout,
         unselected_alpha=unselected_alpha,
-        **library_specific_params,
     )
     plot.chart_type = "non_aggregate_line"
     return plot
@@ -525,7 +501,6 @@ def stacked_lines(
     legend=True,
     legend_position="top_right",
     unselected_alpha=0.2,
-    **library_specific_params,
 ):
     """
     stacked lines chart
@@ -571,10 +546,6 @@ def stacked_lines(
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2)
 
-    **library_specific_params:
-        additional library specific keyword arguments to be passed to the
-        function
-
     Returns
     -------
     A cudashader stacked_lines plot of type:
@@ -595,7 +566,6 @@ def stacked_lines(
         legend=legend,
         legend_position=legend_position,
         unselected_alpha=unselected_alpha,
-        **library_specific_params,
     )
     plot.chart_type = "stacked_lines"
     return plot

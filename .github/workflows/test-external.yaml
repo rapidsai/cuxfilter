@@ -23,10 +23,10 @@ on:
 jobs:
   test-external:
     secrets: inherit
-    uses: rapidsai/shared-action-workflows/.github/workflows/custom-job.yaml@branch-23.08
+    uses: rapidsai/shared-action-workflows/.github/workflows/custom-job.yaml@branch-23.10
     with:
       build_type: branch
       node_type: "gpu-v100-latest-1"
       arch: "amd64"
-      container_image: "rapidsai/ci:latest"
+      container_image: "rapidsai/ci-conda:latest"
       run_script: "./ci/test_external.sh ${{ inputs.external-project || 'all' }} ${{ inputs.pr_number }}"

@@ -1,0 +1,10 @@
+name: test_external
+channels:
+  - conda-forge
+dependencies:
+  - tensorflow
+  - xarray-spatial
+  - pycaret
+  - graphistry
+  - dash
+  - dask-sql

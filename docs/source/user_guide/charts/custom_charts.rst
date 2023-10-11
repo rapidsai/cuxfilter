@@ -1,12 +1,10 @@
-Custom Charts
-=============
+Table View
+===========
 
 .. currentmodule:: cuxfilter.charts
 
-Table View Chart
-----------------
 
-.. automethod:: view_dataframe
+.. automethod:: core.view_dataframe
 
 .. jupyter-execute::
     :hide-code:

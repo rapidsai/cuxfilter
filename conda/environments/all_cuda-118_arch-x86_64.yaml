@@ -9,12 +9,12 @@ dependencies:
 - bokeh>=3.1
 - cuda-version=11.8
 - cudatoolkit
-- cudf==23.8.*
-- cugraph==23.8.*
+- cudf==23.10.*
+- cugraph==23.10.*
 - cupy>=12.0.0
-- cuspatial==23.8.*
-- dask-cuda==23.8.*
-- dask-cudf==23.8.*
+- cuspatial==23.10.*
+- dask-cuda==23.10.*
+- dask-cudf==23.10.*
 - datashader>=0.15
 - geopandas>=0.11.0
 - holoviews>=1.16.0
@@ -31,17 +31,16 @@ dependencies:
 - numpydoc
 - packaging
 - pandoc<=2.0.0
-- panel >=1.0
+- panel>=1.0
 - pre-commit
 - pydata-sphinx-theme
-- pyproj>=2.4
 - pytest
 - pytest-cov
 - pytest-xdist
 - python>=3.9,<3.11
 - recommonmark
-- sphinx
 - sphinx-markdown-tables
+- sphinx>=7.2.5
 - sphinx_rtd_theme
 - sphinxcontrib-websupport
 name: all_cuda-118_arch-x86_64
