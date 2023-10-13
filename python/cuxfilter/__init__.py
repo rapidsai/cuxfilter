@@ -2,5 +2,4 @@
 
 from cuxfilter.dataframe import DataFrame
 from cuxfilter.dashboard import DashBoard
-
-__version__ = "23.12.00"
+from cuxfilter._version import __git_commit__, __version__
