@@ -40,7 +40,8 @@ sed_runner 's/release = .*/release = '"'${NEXT_FULL_TAG}'"'/g' docs/source/conf.
 sed_runner "/cuxfilter=[0-9]\{2\}.[0-9]\{2\}/ s/=[0-9]\{2\}.[0-9]\{2\}/=${NEXT_SHORT_TAG}/g" docs/source/user_guide/installation.rst
 
 # Python __init__.py updates
-sed_runner "s/__version__ = .*/__version__ = \"${NEXT_FULL_TAG}\"/g" python/cuxfilter/__init__.py
+sed_runner "/__version__ / s/= .*/= \"${NEXT_FULL_TAG}\"/g" python/cuxfilter/_version.py
+
 
 DEPENDENCIES=(
   cudf
