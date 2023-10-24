@@ -58,4 +58,4 @@ Documentation = "https://docs.rapids.ai/api/cuxfilter/stable/"
 license-files = ["LICENSE"]
 
 [tool.setuptools.dynamic]
-version = {attr = "cuxfilter._version.__version__"}
+version = {file = "cuxfilter/VERSION"}
