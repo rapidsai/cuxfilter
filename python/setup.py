@@ -2,7 +2,7 @@
 
 from setuptools import find_packages, setup
 
-packages = packages=find_packages(
+packages = find_packages(
     include=["cuxfilter", "cuxfilter.*"],
     exclude=("tests", "docs", "notebooks"),
 )
