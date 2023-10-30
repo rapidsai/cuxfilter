@@ -40,7 +40,7 @@ sed_runner 's/release = .*/release = '"'${NEXT_FULL_TAG}'"'/g' docs/source/conf.
 sed_runner "/cuxfilter=[0-9]\{2\}.[0-9]\{2\}/ s/=[0-9]\{2\}.[0-9]\{2\}/=${NEXT_SHORT_TAG}/g" docs/source/user_guide/installation.rst
 
 # Centralized version file update
-echo "${NEXT_FULL_TAG}" | tr -d '"' > VERSION
+echo "${NEXT_FULL_TAG}" > VERSION
 
 
 DEPENDENCIES=(
