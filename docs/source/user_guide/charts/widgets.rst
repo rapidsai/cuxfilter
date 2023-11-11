@@ -42,7 +42,7 @@ Example
     import cudf
     from cuxfilter import charts, DataFrame
 
-    cux_df = DataFrame.from_dataframe(cudf.DataFrame({'time':['2020-01-01', '2020-01-10 01', '2020-02-20 22']}))
+    cux_df = DataFrame.from_dataframe(cudf.DataFrame({'time':['2020-01-01', '2020-01-10', '2020-02-20']}))
     cux_df.data['time'] = cudf.to_datetime(cux_df.data['time'])
 
     date_range_slider = charts.date_range_slider('time')
