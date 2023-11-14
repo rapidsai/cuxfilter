@@ -45,14 +45,18 @@ echo "${NEXT_FULL_TAG}" > VERSION
 
 DEPENDENCIES=(
   cudf
+  cuxfilter
   dask-cuda
   dask-cudf
   cugraph
   cuspatial
 )
-for FILE in dependencies.yaml conda/environments/*.yaml ci/utils/external_dependencies.yaml; do
-  for DEP in "${DEPENDENCIES[@]}"; do
-    sed_runner "/-.* ${DEP}==/ s/==.*/==${NEXT_SHORT_TAG_PEP440}.*/g" ${FILE};
+for DEP in "${DEPENDENCIES[@]}"; do
+  for FILE in dependencies.yaml conda/environments/*.yaml ci/utils/external_dependencies.yaml; do
+    sed_runner "/-.* ${DEP}==/ s/==.*/==${NEXT_SHORT_TAG_PEP440}.*/g" ${FILE}
+  done
+  for FILE in python/pyproject.toml; do
+    sed_runner "/\"${DEP}==/ s/==.*\"/==${NEXT_SHORT_TAG_PEP440}.*\"/g" ${FILE}
   done
 done
 
