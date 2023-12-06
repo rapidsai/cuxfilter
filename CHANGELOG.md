@@ -1,3 +1,23 @@
+# cuXfilter 23.12.00 (6 Dec 2023)
+
+## 🐛 Bug Fixes
+
+- Update actions/labeler to v4 ([#556](https://github.com/rapidsai/cuxfilter/pull/556)) [@raydouglass](https://github.com/raydouglass)
+- updates to external tests ([#547](https://github.com/rapidsai/cuxfilter/pull/547)) [@AjayThorve](https://github.com/AjayThorve)
+- fix workflow ([#543](https://github.com/rapidsai/cuxfilter/pull/543)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 📖 Documentation
+
+- Consistent datestring format to fix parsing error ([#551](https://github.com/rapidsai/cuxfilter/pull/551)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- Build concurrency for nightly and merge triggers ([#552](https://github.com/rapidsai/cuxfilter/pull/552)) [@bdice](https://github.com/bdice)
+- Fix Release Script: Update all references to release versions ([#550](https://github.com/rapidsai/cuxfilter/pull/550)) [@AjayThorve](https://github.com/AjayThorve)
+- Update versioning strategy ([#548](https://github.com/rapidsai/cuxfilter/pull/548)) [@vyasr](https://github.com/vyasr)
+- Use branch-23.12 workflows. ([#546](https://github.com/rapidsai/cuxfilter/pull/546)) [@bdice](https://github.com/bdice)
+- Build CUDA 12.0 ARM conda packages. ([#542](https://github.com/rapidsai/cuxfilter/pull/542)) [@bdice](https://github.com/bdice)
+
 # cuXfilter 23.10.00 (11 Oct 2023)
 
 ## 🐛 Bug Fixes
