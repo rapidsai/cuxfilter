@@ -6,21 +6,8 @@ set -e
 rapids-logger "Create test_external conda environment"
 . /opt/conda/etc/profile.d/conda.sh
 
-RAPIDS_VERSION=23.10.*
-
-rapids-mamba-retry create \
-    -n test_external \
-    --override-channels \
-    -c rapidsai-nightly \
-    -c nvidia \
-    -c conda-forge \
-    cuxfilter="${RAPIDS_VERSION}" cudf="${RAPIDS_VERSION}" dask-cudf="${RAPIDS_VERSION}" \
-    python="${RAPIDS_PY_VERSION}" cuda-version="12.0"
-
 # Install external dependencies into test_external conda environment
-pushd ./ci/utils
-rapids-mamba-retry env update -n test_external -f external_dependencies.yaml
-popd
+rapids-mamba-retry env update -f ./ci/utils/external_dependencies.yaml
 
 conda activate test_external
 
@@ -78,8 +65,8 @@ if [ "$PROJECT" = "all" ]; then
     do
         rapids-logger "gathering GPU tests for $LIBRARY"
         TEST_DIR="$LIBRARY/$LIBRARY/tests"
-        # Find all Python scripts containing the keywords cudf or dask_cudf
-        FILES+=" $(grep -l -R -e 'cudf' --include='*.py' "$TEST_DIR")"
+        # Find all Python scripts containing the keywords cudf or dask_cudf except test_quadmesh.py
+        FILES+=" $(grep -l -R -e 'cudf' --include='*.py' "$TEST_DIR" | grep -v test_quadmesh.py)"
     done
 else
     rapids-logger "gathering GPU tests for $PROJECT"
@@ -93,7 +80,13 @@ trap "EXITCODE=1" ERR
 set +e
 
 rapids-logger "running all gathered tests"
-DATASHADER_TEST_GPU=1 pytest $FILES
+DATASHADER_TEST_GPU=1 pytest --numprocesses=8 $FILES
+
+if [[ "$PROJECT" = "all" ]] || [[ "$PROJECT" = "datashader" ]]; then
+    # run test_quadmesh.py separately as dask.array tests fail with numprocesses
+    rapids-logger "running test_quadmesh.py"
+    DATASHADER_TEST_GPU=1 pytest datashader/datashader/tests/test_quadmesh.py
+fi
 
 rapids-logger "Test script exiting with value: $EXITCODE"
 exit ${EXITCODE}

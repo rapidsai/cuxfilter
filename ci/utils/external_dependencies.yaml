@@ -1,10 +1,18 @@
 name: test_external
 channels:
+  - rapidsai-nightly
   - conda-forge
+  - nvidia
 dependencies:
+  - cudf==23.12.*
+  - dask-cudf==23.12.*
+  - cuxfilter==23.12.*
+  - cuda-version=12.0
+  - python=3.10
   - tensorflow
   - xarray-spatial
   - pycaret
   - graphistry
   - dash
   - dask-sql
+  - pytest-benchmark

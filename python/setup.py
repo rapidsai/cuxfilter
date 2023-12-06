@@ -2,10 +2,13 @@
 
 from setuptools import find_packages, setup
 
+packages = find_packages(
+    include=["cuxfilter", "cuxfilter.*"],
+    exclude=("tests", "docs", "notebooks"),
+)
+
 setup(
-    packages=find_packages(
-        include=["cuxfilter", "cuxfilter.*"],
-        exclude=("tests", "docs", "notebooks"),
-    ),
+    packages=packages,
+    package_data={key: ["VERSION"] for key in packages},
     zip_safe=False,
 )
