@@ -9,7 +9,6 @@ dependencies:
   - cuxfilter==24.2.*
   - cuda-version=11.8
   - python>=3.9,<3.11
-  - tensorflow
   - xarray-spatial
   - pycaret
   - graphistry
