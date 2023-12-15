@@ -1,9 +1,6 @@
 name: GPU testing for external party dependencies
 
 on:
-  push:
-    branches:
-      - "pull-request/[0-9]+"
   workflow_dispatch:
     inputs:
       external-project:
