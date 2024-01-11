@@ -18,6 +18,7 @@ files:
   test_python:
     output: none
     includes:
+      - cuda
       - cuda_version
       - py_version
       - test_python
