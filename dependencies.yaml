@@ -137,8 +137,8 @@ dependencies:
           - notebook>=0.5.0
       - output_types: [conda]
         packages:
-          - cugraph==24.2.*
-          - dask-cuda==24.2.*
+          - cugraph==24.4.*
+          - dask-cuda==24.4.*
   py_version:
     specific:
       - output_types: conda
@@ -159,9 +159,9 @@ dependencies:
       - output_types: [conda, requirements, pyproject]
         packages:
           - bokeh>=3.1
-          - cudf==24.2.*
-          - cuspatial==24.2.*
-          - dask-cudf==24.2.*
+          - cudf==24.4.*
+          - cuspatial==24.4.*
+          - dask-cudf==24.4.*
           - datashader>=0.15
           - geopandas>=0.11.0
           - holoviews>=1.16.0

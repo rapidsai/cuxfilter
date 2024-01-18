@@ -8,12 +8,12 @@ channels:
 dependencies:
 - bokeh>=3.1
 - cuda-version=12.0
-- cudf==24.2.*
-- cugraph==24.2.*
+- cudf==24.4.*
+- cugraph==24.4.*
 - cupy>=12.0.0
-- cuspatial==24.2.*
-- dask-cuda==24.2.*
-- dask-cudf==24.2.*
+- cuspatial==24.4.*
+- dask-cuda==24.4.*
+- dask-cudf==24.4.*
 - datashader>=0.15
 - geopandas>=0.11.0
 - holoviews>=1.16.0
