@@ -45,7 +45,7 @@ class PanelDeck(param.Parameterized):
 
     @property
     def valid_indices(self):
-        return self.indices.intersection(self.data.index)
+        return list(self.indices.intersection(self.data.index))
 
     def get_tooltip_html(self):
         """
@@ -110,7 +110,8 @@ class PanelDeck(param.Parameterized):
             temp_colors = self.colors.copy()
             if len(self.indices) > 0:
                 temp_colors.loc[
-                    set(self.data.index) - self.indices, self.colors.columns
+                    list(set(self.data.index) - self.indices),
+                    self.colors.columns,
                 ] = self.default_color
             self.data[self.colors.columns] = temp_colors
         self._update_layer_data(self.data)
