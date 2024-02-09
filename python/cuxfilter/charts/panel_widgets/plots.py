@@ -1,3 +1,4 @@
+import datetime
 from ..core import BaseWidget
 from ..core.aggregate import BaseNumberChart
 from ..constants import (
@@ -160,7 +161,7 @@ class DateRangeSlider(BaseWidget):
             reference to dashboard.__cls__.query_dict
         """
         if self.chart.value != (self.chart.start, self.chart.end):
-            min_temp, max_temp = self.chart.value
+            min_temp, max_temp = (datetime.datetime.fromordinal(x.toordinal()) for x in self.chart.value)
             query = f"@{self.x}_min<={self.x}<=@{self.x}_max"
             query_str_dict[self.name] = query
             query_local_variables_dict[self.x + "_min"] = min_temp
