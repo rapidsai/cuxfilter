@@ -1,6 +1,7 @@
 from urllib.request import urlopen
 import geopandas as gpd
 import pandas as pd
+from io import StringIO
 
 
 def geo_json_mapper(
@@ -16,7 +17,7 @@ def geo_json_mapper(
 
     temp_gpd_df = gpd.read_file(data).to_crs(epsg=projection)
 
-    df = pd.read_json(temp_gpd_df.to_json())
+    df = pd.read_json(StringIO(temp_gpd_df.to_json()))
 
     x_range = (
         temp_gpd_df.geometry.bounds.minx.min(),

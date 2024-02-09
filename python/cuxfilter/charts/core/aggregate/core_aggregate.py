@@ -187,12 +187,12 @@ class BaseAggregateChart(BaseChart):
     def get_box_select_callback(self, dashboard_cls):
         def cb(bounds, x_selection, y_selection):
             self.box_selected_range, self.selected_indices = None, None
-            if type(x_selection) == tuple:
+            if isinstance(x_selection, tuple):
                 self.box_selected_range = {
                     self.x + "_min": x_selection[0],
                     self.x + "_max": x_selection[1],
                 }
-            elif type(x_selection) == list:
+            elif isinstance(x_selection, list):
                 self.selected_indices = (
                     dashboard_cls._cuxfilter_df.data[self.x]
                     .isin(x_selection)
