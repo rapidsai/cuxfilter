@@ -81,6 +81,7 @@ class TestDeckGL:
         )
 
         assert choropleth3d_chart.chart.indices == set()
+        assert choropleth3d_chart.chart.valid_indices == list()
 
         assert choropleth3d_chart.chart.multi_select is False
 
