@@ -111,7 +111,7 @@ class Bar(BaseAggregateChart):
         Output:
             cudf.DataFrame
         """
-        data = data or self.source
+        data = self.source if data is None else data
         return calc_groupby(self, data)
 
     def reload_chart(self, data):
