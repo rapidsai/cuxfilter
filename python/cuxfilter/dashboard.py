@@ -136,6 +136,8 @@ class DashBoard:
             for (key, value) in self._query_str_dict.items()
             if type(value)
             in [
+                cudf.DataFrame,
+                dask_cudf.DataFrame,
                 cudf.Series,
                 dask_cudf.Series,
             ]
