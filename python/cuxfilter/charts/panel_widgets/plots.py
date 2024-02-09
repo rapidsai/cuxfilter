@@ -161,7 +161,10 @@ class DateRangeSlider(BaseWidget):
             reference to dashboard.__cls__.query_dict
         """
         if self.chart.value != (self.chart.start, self.chart.end):
-            min_temp, max_temp = (datetime.datetime.fromordinal(x.toordinal()) for x in self.chart.value)
+            min_temp, max_temp = (
+                datetime.datetime.fromordinal(x.toordinal())
+                for x in self.chart.value
+            )
             query = f"@{self.x}_min<={self.x}<=@{self.x}_max"
             query_str_dict[self.name] = query
             query_local_variables_dict[self.x + "_min"] = min_temp
@@ -397,18 +400,12 @@ class MultiChoice(BaseWidget):
         if len(self.chart.value) == 0:
             query_str_dict.pop(self.name, None)
         else:
-            df_module = (
-                cudf if isinstance(self.source, cudf.Series) else dask_cudf
-            )
-
             if self.source.dtype == "object":
-                query_str_dict[self.name] = df_module.DataFrame(
-                    self.source.str.contains("|".join(self.chart.value))
+                query_str_dict[self.name] = self.source.str.contains(
+                    "|".join(self.chart.value)
                 )
             else:
-                query_str_dict[self.name] = df_module.DataFrame(
-                    self.source.isin(self.chart.value)
-                )
+                query_str_dict[self.name] = self.source.isin(self.chart.value)
 
     def apply_theme(self, theme):
         """
