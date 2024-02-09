@@ -132,12 +132,10 @@ class DashBoard:
             else dask_cudf
         )
         selected_indices = {
-            key: value
+            key: value.reset_index(drop=True)
             for (key, value) in self._query_str_dict.items()
             if type(value)
             in [
-                cudf.DataFrame,
-                dask_cudf.DataFrame,
                 cudf.Series,
                 dask_cudf.Series,
             ]
