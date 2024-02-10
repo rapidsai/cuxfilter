@@ -119,7 +119,7 @@ class DashBoard:
         """
         Read-only propery queried_indices returns a merged index
         of all queried index columns present in self._query_str_dict
-        as a cudf.Series.
+        as a `cudf.Series` or `dask_cudf.Series`.
 
         Returns None if no index columns are present.
 
@@ -132,13 +132,20 @@ class DashBoard:
             else dask_cudf
         )
         selected_indices = {
-            key: value
+            key: value.reset_index(drop=True)
             for (key, value) in self._query_str_dict.items()
-            if type(value) in [cudf.DataFrame, dask_cudf.DataFrame]
+            if type(value)
+            in [
+                cudf.DataFrame,
+                dask_cudf.DataFrame,
+                cudf.Series,
+                dask_cudf.Series,
+            ]
         }
         if len(selected_indices) > 0:
             result = (
                 df_module.concat(list(selected_indices.values()), axis=1)
+                .set_index(self._cuxfilter_df.data.index)
                 .fillna(False)
                 .all(axis=1)
             )

@@ -112,7 +112,7 @@ class Histogram(BaseAggregateChart):
         Output:
             cudf.DataFrame
         """
-        data = data or self.source
+        data = self.source if data is None else data
         return calc_value_counts(
             data[self.x],
             self.stride,
