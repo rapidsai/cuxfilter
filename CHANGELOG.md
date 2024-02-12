@@ -1,3 +1,15 @@
+# cuXfilter 24.02.00 (12 Feb 2024)
+
+## 🐛 Bug Fixes
+
+- External workflow - remove tensorflow ([#559](https://github.com/rapidsai/cuxfilter/pull/559)) [@AjayThorve](https://github.com/AjayThorve)
+- change cuda 12 -&gt; 11.8, to support tensorflow ([#555](https://github.com/rapidsai/cuxfilter/pull/555)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 🛠️ Improvements
+
+- Remove usages of rapids-env-update ([#564](https://github.com/rapidsai/cuxfilter/pull/564)) [@KyleFromNVIDIA](https://github.com/KyleFromNVIDIA)
+- refactor CUDA versions in dependencies.yaml ([#562](https://github.com/rapidsai/cuxfilter/pull/562)) [@jameslamb](https://github.com/jameslamb)
+
 # cuXfilter 23.12.00 (6 Dec 2023)
 
 ## 🐛 Bug Fixes
