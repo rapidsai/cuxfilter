@@ -7,7 +7,7 @@ rapids-logger "Create test_external conda environment"
 . /opt/conda/etc/profile.d/conda.sh
 
 # Install external dependencies into test_external conda environment
-rapids-mamba-retry env update -f ./ci/utils/external_dependencies.yaml
+rapids-conda-retry env update -f ./ci/utils/external_dependencies.yaml
 
 conda activate test_external
 

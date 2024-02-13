@@ -9,12 +9,12 @@ dependencies:
 - bokeh>=3.1
 - cuda-version=11.8
 - cudatoolkit
-- cudf==23.12.*
-- cugraph==23.12.*
+- cudf==24.2.*
+- cugraph==24.2.*
 - cupy>=12.0.0
-- cuspatial==23.12.*
-- dask-cuda==23.12.*
-- dask-cudf==23.12.*
+- cuspatial==24.2.*
+- dask-cuda==24.2.*
+- dask-cudf==24.2.*
 - datashader>=0.15
 - geopandas>=0.11.0
 - holoviews>=1.16.0
@@ -32,6 +32,7 @@ dependencies:
 - packaging
 - pandoc<=2.0.0
 - panel>=1.0
+- panel>=1.0,<=1.3.4
 - pre-commit
 - pydata-sphinx-theme
 - pytest
