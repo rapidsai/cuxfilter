@@ -38,7 +38,7 @@ dependencies:
 - pytest
 - pytest-cov
 - pytest-xdist
-- python>=3.9,<3.11
+- python>=3.9,<3.12
 - recommonmark
 - sphinx-markdown-tables
 - sphinx>=7.2.5
