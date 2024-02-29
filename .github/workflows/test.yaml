@@ -31,4 +31,5 @@ jobs:
       date: ${{ inputs.date }}
       sha: ${{ inputs.sha }}
       script: ci/test_wheel.sh
-      matrix_filter: map(select(.ARCH == "amd64" and .PY_VER == "3.11" and (.CUDA_VER == "11.8.0" or .CUDA_VER == "12.2.2")))
+      # This selects "ARCH=amd64 + the latest supported Python + CUDA".
+      matrix_filter: map(select(.ARCH == "amd64")) | max_by([(.PY_VER|split(".")|map(tonumber)), (.CUDA_VER|split(".")|map(tonumber))]) | [.]
