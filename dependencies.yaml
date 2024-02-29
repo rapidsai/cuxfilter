@@ -175,7 +175,7 @@ dependencies:
           - holoviews>=1.16.0
           - jupyter-server-proxy
           - numba>=0.57
-          - numpy>=1.21
+          - numpy>=1.23
           - packaging
           - panel>=1.0
       - output_types: conda
