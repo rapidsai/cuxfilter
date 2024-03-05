@@ -81,6 +81,7 @@ set +e
 
 rapids-logger "running all gathered tests"
 DATASHADER_TEST_GPU=1 pytest --numprocesses=8 $FILES
+ --dist=worksteal \
 
 if [[ "$PROJECT" = "all" ]] || [[ "$PROJECT" = "datashader" ]]; then
     # run test_quadmesh.py separately as dask.array tests fail with numprocesses
