@@ -44,6 +44,7 @@ pytest \
   --cache-clear \
   --junitxml="${RAPIDS_TESTS_DIR}/junit-cuxfilter.xml" \
    --numprocesses=8 \
+   --dist=worksteal \
   --cov-config=.coveragerc \
   --cov=cuxfilter \
   --cov-report=xml:"${RAPIDS_COVERAGE_DIR}/cuxfilter-coverage.xml" \

@@ -80,7 +80,10 @@ trap "EXITCODE=1" ERR
 set +e
 
 rapids-logger "running all gathered tests"
-DATASHADER_TEST_GPU=1 pytest --numprocesses=8 $FILES
+DATASHADER_TEST_GPU=1 pytest \
+  --numprocesses=8 \
+  --dist=worksteal \
+  $FILES
 
 if [[ "$PROJECT" = "all" ]] || [[ "$PROJECT" = "datashader" ]]; then
     # run test_quadmesh.py separately as dask.array tests fail with numprocesses
