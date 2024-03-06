@@ -229,7 +229,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
     def _compute_clims(self):
         if not isinstance(
             self.source_df[self.aggregate_col].dtype,
-            cudf.core.dtypes.CategoricalDtype,
+            cudf.CategoricalDtype,
         ):
             self.clims = get_min_max(self.source_df, self.aggregate_col)
 
@@ -238,7 +238,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
         self.cmap = {"cmap": self.color_palette}
         if isinstance(
             self.source_df[self.aggregate_col].dtype,
-            cudf.core.dtypes.CategoricalDtype,
+            cudf.CategoricalDtype,
         ):
             self.cmap = {
                 "color_key": {

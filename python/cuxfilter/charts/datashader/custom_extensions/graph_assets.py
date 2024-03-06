@@ -82,7 +82,7 @@ def bundle_edges(edges, src="src", dst="dst"):
     # Determine each edge's index relative to its bundle
     edges = edges.sort_values(by="bid").reset_index(drop=True)
     edges["_index"] = (
-        cudf.core.index.RangeIndex(0, len(edges)) - edges["start"]
+        cudf.RangeIndex(0, len(edges)) - edges["start"]
     ).astype("int32")
 
     # Re-sort the edgelist by edge id and cleanup
