@@ -1,5 +1,9 @@
 # Copyright (c) 2019-2023, NVIDIA CORPORATION.
 
+from packaging.version import Version
+
+import cuxfilter
+
 # -- Project information -----------------------------------------------------
 project = "cuxfilter"
 copyright = "2018-2023, NVIDIA Corporation"
@@ -9,10 +13,11 @@ author = "NVIDIA Corporation"
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
+CUXFILTER_VERSION = Version(cuxfilter.__version__)
 # The short X.Y version.
-version = '24.04'
+version = f"{CUXFILTER_VERSION.major:02}.{CUXFILTER_VERSION.minor:02}"
 # The full version, including alpha/beta/rc tags
-release = '24.04.00'
+release = f"{CUXFILTER_VERSION.major:02}.{CUXFILTER_VERSION.minor:02}.{CUXFILTER_VERSION.micro:02}"
 
 nbsphinx_allow_errors = True
 
