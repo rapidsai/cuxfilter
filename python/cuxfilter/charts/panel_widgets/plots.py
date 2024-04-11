@@ -1,3 +1,4 @@
+import datetime
 from ..core import BaseWidget
 from ..core.aggregate import BaseNumberChart
 from ..constants import (
@@ -160,7 +161,10 @@ class DateRangeSlider(BaseWidget):
             reference to dashboard.__cls__.query_dict
         """
         if self.chart.value != (self.chart.start, self.chart.end):
-            min_temp, max_temp = self.chart.value
+            min_temp, max_temp = (
+                datetime.datetime.fromordinal(x.toordinal())
+                for x in self.chart.value
+            )
             query = f"@{self.x}_min<={self.x}<=@{self.x}_max"
             query_str_dict[self.name] = query
             query_local_variables_dict[self.x + "_min"] = min_temp
@@ -328,9 +332,7 @@ class MultiChoice(BaseWidget):
         self.min_value, self.max_value = get_min_max(
             dashboard_cls._cuxfilter_df.data, self.x
         )
-        self.source = dashboard_cls._cuxfilter_df.data[self.x].reset_index(
-            drop=True
-        )
+        self.source = dashboard_cls._cuxfilter_df.data[self.x]
         self.calc_list_of_values(dashboard_cls._cuxfilter_df.data)
         self.generate_widget()
         self.add_events(dashboard_cls)
@@ -396,17 +398,20 @@ class MultiChoice(BaseWidget):
         if len(self.chart.value) == 0:
             query_str_dict.pop(self.name, None)
         else:
-            df_module = (
-                cudf if isinstance(self.source, cudf.Series) else dask_cudf
-            )
 
-            if self.source.dtype == "object":
-                query_str_dict[self.name] = df_module.DataFrame(
-                    self.source.str.contains("|".join(self.chart.value))
+            def filter_source(s: cudf.Series, v: list):
+                if s.dtype == "object":
+                    return s.str.contains("|".join(v))
+                else:
+                    return s.isin(v)
+
+            if isinstance(self.source, dask_cudf.Series):
+                query_str_dict[self.name] = self.source.map_partitions(
+                    filter_source, self.chart.value
                 )
-            else:
-                query_str_dict[self.name] = df_module.DataFrame(
-                    self.source.isin(self.chart.value)
+            elif isinstance(self.source, cudf.Series):
+                query_str_dict[self.name] = filter_source(
+                    self.source, self.chart.value
                 )
 
     def apply_theme(self, theme):

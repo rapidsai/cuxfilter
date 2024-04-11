@@ -33,9 +33,6 @@ function sed_runner() {
     sed -i.bak ''"$1"'' $2 && rm -f ${2}.bak
 }
 
-# RTD update
-sed_runner 's/version = .*/version = '"'${NEXT_SHORT_TAG}'"'/g' docs/source/conf.py
-sed_runner 's/release = .*/release = '"'${NEXT_FULL_TAG}'"'/g' docs/source/conf.py
 # docs update
 sed_runner "/cuxfilter=[0-9]\{2\}.[0-9]\{2\}/ s/=[0-9]\{2\}.[0-9]\{2\}/=${NEXT_SHORT_TAG}/g" docs/source/user_guide/installation.rst
 
@@ -53,10 +50,10 @@ DEPENDENCIES=(
 )
 for DEP in "${DEPENDENCIES[@]}"; do
   for FILE in dependencies.yaml conda/environments/*.yaml ci/utils/external_dependencies.yaml; do
-    sed_runner "/-.* ${DEP}==/ s/==.*/==${NEXT_SHORT_TAG_PEP440}.*/g" ${FILE}
+    sed_runner "/-.* ${DEP}\(-cu[[:digit:]]\{2\}\)\{0,1\}==/ s/==.*/==${NEXT_SHORT_TAG_PEP440}.*/g" "${FILE}"
   done
   for FILE in python/pyproject.toml; do
-    sed_runner "/\"${DEP}==/ s/==.*\"/==${NEXT_SHORT_TAG_PEP440}.*\"/g" ${FILE}
+    sed_runner "/\"${DEP}\(-cu[[:digit:]]\{2\}\)\{0,1\}==/ s/==.*\"/==${NEXT_SHORT_TAG_PEP440}.*\"/g" "${FILE}"
   done
 done
 
@@ -69,6 +66,3 @@ sed_runner "/cuxfilter=[0-9]\{2\}.[0-9]\{2\}/ s/=[0-9]\{2\}.[0-9]\{2\}/=${NEXT_S
 for FILE in .github/workflows/*.yaml; do
   sed_runner "/shared-workflows/ s/@.*/@branch-${NEXT_SHORT_TAG}/g" ${FILE};
 done
-
-sed_runner "s/RAPIDS_VERSION_NUMBER=\".*/RAPIDS_VERSION_NUMBER=\"${NEXT_SHORT_TAG}\"/g" ci/build_docs.sh
-sed_runner "s/RAPIDS_VERSION=.*/RAPIDS_VERSION=${NEXT_SHORT_TAG}.*/g" ci/test_external.sh

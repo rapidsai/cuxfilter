@@ -3,7 +3,7 @@ files:
   all:
     output: conda
     matrix:
-      cuda: ["11.8", "12.0"]
+      cuda: ["11.8", "12.2"]
       arch: [x86_64]
     includes:
       - build_wheels
@@ -97,6 +97,10 @@ dependencies:
               cuda: "12.0"
             packages:
               - cuda-version=12.0
+          - matrix:
+              cuda: "12.2"
+            packages:
+              - cuda-version=12.2
   cuda:
     specific:
       - output_types: conda
@@ -137,8 +141,8 @@ dependencies:
           - notebook>=0.5.0
       - output_types: [conda]
         packages:
-          - cugraph==24.2.*
-          - dask-cuda==24.2.*
+          - cugraph==24.4.*
+          - dask-cuda==24.4.*
   py_version:
     specific:
       - output_types: conda
@@ -152,28 +156,32 @@ dependencies:
             packages:
               - python=3.10
           - matrix:
+              py: "3.11"
             packages:
-              - python>=3.9,<3.11
+              - python=3.11
+          - matrix:
+            packages:
+              - python>=3.9,<3.12
   run:
     common:
       - output_types: [conda, requirements, pyproject]
         packages:
           - bokeh>=3.1
-          - cudf==24.2.*
-          - cuspatial==24.2.*
-          - dask-cudf==24.2.*
+          - cudf==24.4.*
+          - cuspatial==24.4.*
+          - dask-cudf==24.4.*
           - datashader>=0.15
           - geopandas>=0.11.0
           - holoviews>=1.16.0
           - jupyter-server-proxy
           - numba>=0.57
-          - numpy>=1.21
+          - numpy>=1.23,<2.0a0
           - packaging
           - panel>=1.0
       - output_types: conda
         packages:
           - cupy>=12.0.0
-          - nodejs>=14
+          - nodejs>=18
           - libwebp
       - output_types: [requirements, pyproject]
         packages:

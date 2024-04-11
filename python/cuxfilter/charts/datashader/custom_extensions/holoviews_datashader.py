@@ -221,6 +221,8 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
     )
     max_px = param.Integer(10)
     clims = param.Tuple(default=(None, None))
+    xaxis = param.Boolean(default=False, doc="display the xaxis with labels")
+    yaxis = param.Boolean(default=False, doc="display the yaxis with labels")
 
     def __init__(self, **params):
         super(InteractiveDatashaderPoints, self).__init__(**params)
@@ -229,7 +231,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
     def _compute_clims(self):
         if not isinstance(
             self.source_df[self.aggregate_col].dtype,
-            cudf.core.dtypes.CategoricalDtype,
+            cudf.CategoricalDtype,
         ):
             self.clims = get_min_max(self.source_df, self.aggregate_col)
 
@@ -238,7 +240,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
         self.cmap = {"cmap": self.color_palette}
         if isinstance(
             self.source_df[self.aggregate_col].dtype,
-            cudf.core.dtypes.CategoricalDtype,
+            cudf.CategoricalDtype,
         ):
             self.cmap = {
                 "color_key": {
@@ -306,6 +308,15 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
         return dmap
 
     def view(self):
+        parameters = dict(
+            responsive=True,
+            tools=self.tools,
+            active_tools=["wheel_zoom", "pan"],
+        )
+        if self.xaxis is False:
+            parameters["xaxis"] = None
+        if self.yaxis is False:
+            parameters["yaxis"] = None
         dmap = dynspread(
             self.get_chart(
                 streams=[
@@ -317,13 +328,7 @@ class InteractiveDatashaderPoints(InteractiveDatashader):
             threshold=self.spread_threshold,
             shape=self.point_shape,
             max_px=self.max_px,
-        ).opts(
-            xaxis=None,
-            yaxis=None,
-            responsive=True,
-            tools=self.tools,
-            active_tools=["wheel_zoom", "pan"],
-        )
+        ).opts(**parameters)
 
         if self.unselected_alpha > 0:
             dmap *= self.get_base_chart()
@@ -548,6 +553,8 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
         class_=CustomInspectTool,
         doc="tool to select whether to display edges or not",
     )
+    xaxis = param.Boolean(default=False, doc="display the xaxis with labels")
+    yaxis = param.Boolean(default=False, doc="display the yaxis with labels")
 
     @property
     def df_type(self):
@@ -604,6 +611,19 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
                 plot.state.add_tools(self.inspect_neighbors)
                 plot.state.add_tools(self.display_edges)
 
+        parameters = dict(
+            responsive=True,
+            default_tools=[],
+            active_tools=["wheel_zoom", "pan"],
+            tools=self.tools,
+            hooks=[set_tools],
+        )
+
+        if self.xaxis is False:
+            parameters["xaxis"] = None
+        if self.yaxis is False:
+            parameters["yaxis"] = None
+
         dmap_nodes = dynspread(
             self.nodes_chart.get_chart(
                 streams=[
@@ -615,15 +635,7 @@ class InteractiveDatashaderGraph(InteractiveDatashaderBase):
             threshold=self.node_spread_threshold,
             shape=self.node_point_shape,
             max_px=self.node_max_px,
-        ).opts(
-            xaxis=None,
-            yaxis=None,
-            responsive=True,
-            default_tools=[],
-            active_tools=["wheel_zoom", "pan"],
-            tools=self.tools,
-            hooks=[set_tools],
-        )
+        ).opts(**parameters)
 
         dmap_edges = dynspread(
             self.edges_chart.get_chart().opts(default_tools=[])

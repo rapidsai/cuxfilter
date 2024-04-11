@@ -21,6 +21,8 @@ def scatter(
     legend=True,
     legend_position="top_right",
     unselected_alpha=0.2,
+    xaxis=False,
+    yaxis=False,
 ):
     """
     Parameters
@@ -93,6 +95,12 @@ def scatter(
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2)
 
+    xaxis: bool, default False
+        if True, displays the xaxis with labels
+
+    yaxis: bool, default False
+        if True, displays the yaxis with labels
+
     Returns
     -------
     A cudashader scatter plot of type:
@@ -118,6 +126,8 @@ def scatter(
         legend=legend,
         legend_position=legend_position,
         unselected_alpha=unselected_alpha,
+        xaxis=xaxis,
+        yaxis=yaxis,
     )
 
     plot.chart_type = "scatter"
@@ -153,6 +163,8 @@ def graph(
     legend=True,
     legend_position="top_right",
     unselected_alpha=0.2,
+    xaxis=False,
+    yaxis=False,
 ):
     """
     Parameters
@@ -258,6 +270,12 @@ def graph(
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2) (nodes only)
 
+    xaxis: bool, default False
+        if True, displays the xaxis with labels
+
+    yaxis: bool, default False
+        if True, displays the yaxis with labels
+
     Returns
     -------
     A cudashader graph plot of type:
@@ -292,6 +310,8 @@ def graph(
         legend=legend,
         legend_position=legend_position,
         unselected_alpha=unselected_alpha,
+        xaxis=xaxis,
+        yaxis=yaxis,
     )
 
     plot.chart_type = "graph"
@@ -314,6 +334,8 @@ def heatmap(
     legend=True,
     legend_position="top_right",
     unselected_alpha=0.2,
+    xaxis=True,
+    yaxis=True,
 ):
     """
     Heatmap using default datashader.scatter plot with slight modifications.
@@ -380,6 +402,12 @@ def heatmap(
         if True, displays unselected data in the same color_palette
         but transparent(alpha=0.2)
 
+    xaxis: bool, default True
+        if True, displays the xaxis with labels
+
+    yaxis: bool, default True
+        if True, displays the yaxis with labels
+
     Returns
     -------
     A cudashader heatmap (scatter object) of type:
@@ -405,6 +433,8 @@ def heatmap(
         legend=legend,
         legend_position=legend_position,
         unselected_alpha=unselected_alpha,
+        xaxis=xaxis,
+        yaxis=yaxis,
     )
     plot.chart_type = "heatmap"
     return plot

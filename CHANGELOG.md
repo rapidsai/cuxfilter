@@ -1,3 +1,32 @@
+# cuXfilter 24.04.00 (10 Apr 2024)
+
+## 🐛 Bug Fixes
+
+- [Ready for Review] Pandas 2.0 compatibility ([#569](https://github.com/rapidsai/cuxfilter/pull/569)) [@AjayThorve](https://github.com/AjayThorve)
+- handle more RAPIDS version formats in update-version.sh ([#566](https://github.com/rapidsai/cuxfilter/pull/566)) [@jameslamb](https://github.com/jameslamb)
+
+## 📖 Documentation
+
+- Remove hard-coding of RAPIDS version where possible ([#579](https://github.com/rapidsai/cuxfilter/pull/579)) [@KyleFromNVIDIA](https://github.com/KyleFromNVIDIA)
+
+## 🚀 New Features
+
+- Support CUDA 12.2 ([#563](https://github.com/rapidsai/cuxfilter/pull/563)) [@jameslamb](https://github.com/jameslamb)
+
+## 🛠️ Improvements
+
+- Use `conda env create --yes` instead of `--force` ([#584](https://github.com/rapidsai/cuxfilter/pull/584)) [@bdice](https://github.com/bdice)
+- add option to enable/disable axes ([#581](https://github.com/rapidsai/cuxfilter/pull/581)) [@AjayThorve](https://github.com/AjayThorve)
+- Add upper bound to prevent usage of NumPy 2 ([#580](https://github.com/rapidsai/cuxfilter/pull/580)) [@bdice](https://github.com/bdice)
+- Use public cudf APIs where possible ([#578](https://github.com/rapidsai/cuxfilter/pull/578)) [@mroeschke](https://github.com/mroeschke)
+- Treat cuxfilter CI artifacts as pure wheels ([#577](https://github.com/rapidsai/cuxfilter/pull/577)) [@bdice](https://github.com/bdice)
+- Switch `pytest-xdist` algorithm to `worksteal` ([#576](https://github.com/rapidsai/cuxfilter/pull/576)) [@bdice](https://github.com/bdice)
+- Generalize GHA selectors for pure Python testing ([#575](https://github.com/rapidsai/cuxfilter/pull/575)) [@jakirkham](https://github.com/jakirkham)
+- Requre NumPy 1.23+ ([#574](https://github.com/rapidsai/cuxfilter/pull/574)) [@jakirkham](https://github.com/jakirkham)
+- Add support for Python 3.11 ([#572](https://github.com/rapidsai/cuxfilter/pull/572)) [@jameslamb](https://github.com/jameslamb)
+- target branch-24.04 for GitHub Actions workflows ([#571](https://github.com/rapidsai/cuxfilter/pull/571)) [@jameslamb](https://github.com/jameslamb)
+- Update ops-bot.yaml ([#568](https://github.com/rapidsai/cuxfilter/pull/568)) [@AyodeAwe](https://github.com/AyodeAwe)
+
 # cuXfilter 24.02.00 (12 Feb 2024)
 
 ## 🐛 Bug Fixes

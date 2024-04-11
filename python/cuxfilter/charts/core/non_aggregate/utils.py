@@ -10,4 +10,4 @@ def point_in_polygon(df, x, y, polygons):
     polygons = cuspatial.GeoSeries(
         gpd.GeoSeries(Polygon(polygons)), index=["selection"]
     )
-    return cuspatial.point_in_polygon(points, polygons)
+    return cuspatial.point_in_polygon(points, polygons).selection

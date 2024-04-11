@@ -93,6 +93,8 @@ class Scatter(BaseScatter):
             max_px=self.point_size,
             unselected_alpha=self.unselected_alpha,
             title=self.title,
+            xaxis=self.library_specific_params["xaxis"],
+            yaxis=self.library_specific_params["yaxis"],
         )
 
     def reload_chart(self, data=None):
@@ -231,6 +233,8 @@ class Graph(BaseGraph):
             display_edges=self.display_edges,
             unselected_alpha=self.unselected_alpha,
             title=self.title,
+            xaxis=self.library_specific_params["xaxis"],
+            yaxis=self.library_specific_params["yaxis"],
         )
 
     def reload_chart(self, data, edges=None):
