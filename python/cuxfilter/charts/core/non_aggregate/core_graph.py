@@ -211,9 +211,7 @@ class BaseGraph(BaseChart):
                 dashboard_cls._cuxfilter_df.data[self.node_y].min(),
                 dashboard_cls._cuxfilter_df.data[self.node_y].max(),
             )
-        if isinstance(
-            dashboard_cls._cuxfilter_df.data, dask_cudf.core.DataFrame
-        ):
+        if isinstance(dashboard_cls._cuxfilter_df.data, dask_cudf.DataFrame):
             self.x_range = dd.compute(*self.x_range)
             self.y_range = dd.compute(*self.y_range)
 

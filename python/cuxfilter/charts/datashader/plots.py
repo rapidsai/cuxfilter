@@ -324,7 +324,7 @@ class Line(BaseLine):
         self.x_range = (self.source[self.x].min(), self.source[self.x].max())
         self.y_range = (self.source[self.y].min(), self.source[self.y].max())
 
-        if isinstance(data, dask_cudf.core.DataFrame):
+        if isinstance(data, dask_cudf.DataFrame):
             self.x_range = dd.compute(*self.x_range)
             self.y_range = dd.compute(*self.y_range)
 
@@ -449,7 +449,7 @@ class StackedLines(BaseStackedLine):
                 self.source[self.y].min().min(),
                 self.source[self.y].max().max(),
             )
-        if isinstance(data, dask_cudf.core.DataFrame):
+        if isinstance(data, dask_cudf.DataFrame):
             self.x_range = dd.compute(*self.x_range)
             self.y_range = dd.compute(*self.y_range)
 
