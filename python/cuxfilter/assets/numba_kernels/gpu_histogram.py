@@ -76,7 +76,7 @@ def calc_groupby(chart: Type[BaseChart], data, agg=None):
     else:
         for key, agg_fn in agg.items():
             temp_df[key] = data[key]
-        if isinstance(data, dask_cudf.core.DataFrame):
+        if isinstance(data, dask_cudf.DataFrame):
             groupby_res = None
             for key, agg_fn in agg.items():
                 groupby_res_temp = getattr(
