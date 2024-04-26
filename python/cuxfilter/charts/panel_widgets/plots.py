@@ -114,7 +114,7 @@ class DateRangeSlider(BaseWidget):
             _series = dashboard_cls._cuxfilter_df.data[self.x].value_counts()
             self.data_points = (
                 _series.compute().shape[0]
-                if isinstance(_series, dask_cudf.core.Series)
+                if isinstance(_series, dask_cudf.Series)
                 else _series.shape[0]
             )
             del _series
@@ -343,7 +343,7 @@ class MultiChoice(BaseWidget):
         """
         if self.label_map is None:
             self.list_of_values = data[self.x].unique()
-            if isinstance(data, dask_cudf.core.DataFrame):
+            if isinstance(data, dask_cudf.DataFrame):
                 self.list_of_values = self.list_of_values.compute()
 
             self.list_of_values = self.list_of_values.to_pandas().tolist()

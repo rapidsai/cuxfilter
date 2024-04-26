@@ -1,8 +1,8 @@
-import dask_cudf
 import pytest
 import cudf
 import cupy as cp
 from cuxfilter.charts.datashader.custom_extensions import graph_assets
+from dask.dataframe import assert_eq
 
 from ..utils import initialize_df, df_types
 
@@ -50,15 +50,4 @@ class TestGraphAssets:
             node_y_dtype=cp.float32,
         ).reset_index(drop=True)
 
-        res = (
-            res.compute().reset_index(drop=True)
-            if isinstance(res, dask_cudf.DataFrame)
-            else res
-        )
-        result = (
-            result.compute()
-            if isinstance(result, dask_cudf.DataFrame)
-            else result
-        )
-
-        assert res.to_pandas().equals(result.to_pandas())
+        assert_eq(res, result, check_divisions=False, check_index=False)
