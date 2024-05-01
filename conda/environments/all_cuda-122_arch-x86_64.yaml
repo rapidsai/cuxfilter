@@ -21,7 +21,7 @@ dependencies:
 - ipython
 - jupyter-server-proxy
 - jupyter_sphinx
-- libwebp
+- libwebp-base
 - nbsphinx
 - nodejs>=18
 - notebook>=0.5.0
