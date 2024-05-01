@@ -33,7 +33,7 @@ requirements:
     - geopandas >=0.11.0
     - holoviews>=1.16
     - jupyter-server-proxy
-    - libwebp
+    - libwebp-base
     - nodejs >=14
     - numba >=0.57
     - numpy >=1.23,<2.0a0
