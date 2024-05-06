@@ -60,3 +60,9 @@ license-files = ["LICENSE"]
 
 [tool.setuptools.dynamic]
 version = {file = "cuxfilter/VERSION"}
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error::FutureWarning",
+    "error::DeprecationWarning",
+]
