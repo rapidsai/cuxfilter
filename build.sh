@@ -111,6 +111,7 @@ if (( ${NUMARGS} == 0 )) || hasArg cuxfilter; then
     echo "8"
     if [[ ${INSTALL_TARGET} != "" ]]; then
         python setup.py build_ext --inplace
+        RAPIDS_DISABLE_CUDA=true \
         python setup.py install --single-version-externally-managed --record=record.txt
     else
         python setup.py build_ext --inplace --library-dir=${LIBCUXFILTER_BUILD_DIR}
