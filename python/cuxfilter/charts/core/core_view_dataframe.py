@@ -51,7 +51,7 @@ class ViewDataFrame:
 
     def initiate_chart(self, dashboard_cls):
         data = dashboard_cls._cuxfilter_df.data
-        if isinstance(data, dask_cudf.core.DataFrame):
+        if isinstance(data, dask_cudf.DataFrame):
             if self.force_computation:
                 self.generate_chart(data.compute())
             else:
@@ -113,7 +113,7 @@ class ViewDataFrame:
         return pn.panel(self.chart, sizing_mode="stretch_both")
 
     def reload_chart(self, data):
-        if isinstance(data, dask_cudf.core.DataFrame):
+        if isinstance(data, dask_cudf.DataFrame):
             if self.force_computation:
                 self.chart.data = self._format_data(
                     data[self.columns].compute()

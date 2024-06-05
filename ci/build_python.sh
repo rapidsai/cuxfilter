@@ -22,6 +22,7 @@ sed -i "/^__git_commit__/ s/= .*/= \"${commit}\"/g" "${package_dir}/${package_na
 
 rapids-logger "Begin py build"
 
+conda config --set path_conflict prevent
 # TODO: Remove `--no-test` flag once importing on a CPU
 # node works correctly
 RAPIDS_PACKAGE_VERSION=${version} rapids-conda-retry mambabuild \
