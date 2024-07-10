@@ -97,12 +97,12 @@ def test_calc_groupby(aggregate_fn, result):
 @pytest.mark.parametrize(
     "x, y, aggregate_fn, result",
     [
-        ("key", "val", "mean", np.array([[1.0, 2.0], [np.NaN, 3.0]])),
+        ("key", "val", "mean", np.array([[1.0, 2.0], [np.nan, 3.0]])),
         ("val", "key", "mean", np.array([[3.0], [2.0]])),
     ],
 )
 def test_calc_groupby_for_nulls(x, y, aggregate_fn, result):
-    df = cudf.DataFrame({"key": [1, 2], "val": [np.NaN, 3]})
+    df = cudf.DataFrame({"key": [1, 2], "val": [np.nan, 3]})
     bc = BaseChart()
     bc.x = x
     bc.y = y
