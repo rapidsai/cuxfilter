@@ -7,9 +7,9 @@ For the most customized way of installing RAPIDS and cuxfilter, visit the select
 
 .. code-block:: bash
 
-    # for CUDA 12.0
+    # for CUDA 12.5
     conda install -c rapidsai -c conda-forge -c nvidia \
-        cuxfilter=24.08 python=3.10 cuda-version=12.0
+        cuxfilter=24.08 python=3.10 cuda-version=12.5
 
     # for CUDA 11.8
     conda install -c rapidsai -c conda-forge -c nvidia \
@@ -21,7 +21,7 @@ Install cuxfilter from PyPI using pip:
 
 .. code-block:: bash
 
-    # for CUDA 12.0
+    # for CUDA 12.5
     pip install cuxfilter-cu12 -extra-index-url=https://pypi.nvidia.com
 
     # for CUDA 11.8
