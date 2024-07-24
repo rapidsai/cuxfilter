@@ -204,18 +204,42 @@ dependencies:
     specific:
       - output_types: [requirements, pyproject]
         matrices:
-          - matrix: {cuda: "12.*"}
+          - matrix:
+              cuda: "12.*"
+              cuda_suffixed: "true"
             packages:
               - cudf-cu12==24.8.*,>=0.0.0a0
-              - cupy-cuda12x>=12.0.0
+              - &cupy_cu12 cupy-cuda12x>=12.0.0
               - cuspatial-cu12==24.8.*,>=0.0.0a0
               - dask-cudf-cu12==24.8.*,>=0.0.0a0
-          - matrix: {cuda: "11.*"}
+          - matrix:
+              cuda: "12.*"
+              cuda_suffixed: "false"
+            packages:
+              - *cudf_conda
+              # NOTE: cupy still has a "-cuda12x" suffix here, because it's suffixed
+              #       in DLFW builds
+              - *cupy_cu12
+              - *cuspatial_conda
+              - *dask_cudf_conda
+          - matrix:
+              cuda: "11.*"
+              cuda_suffixed: "true"
             packages:
               - cudf-cu11==24.8.*,>=0.0.0a0
               - &cupy_cu11 cupy-cuda11x>=12.0.0
               - cuspatial-cu11==24.8.*,>=0.0.0a0
               - dask-cudf-cu11==24.8.*,>=0.0.0a0
+          - matrix:
+              cuda: "11.*"
+              cuda_suffixed: "false"
+            packages:
+              - *cudf_conda
+              # NOTE: cupy still has a "-cuda11x" suffix here, because it's suffixed
+              #       in DLFW builds
+              - *cupy_cu11
+              - *cuspatial_conda
+              - *dask_cudf_conda
           - matrix:
             packages:
               - *cudf_conda
