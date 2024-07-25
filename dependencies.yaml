@@ -195,33 +195,57 @@ dependencies:
           - panel>=1.0
       - output_types: conda
         packages:
-          - &cudf_conda cudf==24.8.*,>=0.0.0a0
+          - &cudf_unsuffixed cudf==24.8.*,>=0.0.0a0
           - cupy>=12.0.0
-          - &cuspatial_conda cuspatial==24.8.*,>=0.0.0a0
-          - &dask_cudf_conda dask-cudf==24.8.*,>=0.0.0a0
+          - &cuspatial_unsuffixed cuspatial==24.8.*,>=0.0.0a0
+          - &dask_cudf_unsuffixed dask-cudf==24.8.*,>=0.0.0a0
           - nodejs>=18
           - libwebp-base
     specific:
       - output_types: [requirements, pyproject]
         matrices:
-          - matrix: {cuda: "12.*"}
+          - matrix:
+              cuda: "12.*"
+              cuda_suffixed: "true"
             packages:
               - cudf-cu12==24.8.*,>=0.0.0a0
-              - cupy-cuda12x>=12.0.0
+              - &cupy_cu12 cupy-cuda12x>=12.0.0
               - cuspatial-cu12==24.8.*,>=0.0.0a0
               - dask-cudf-cu12==24.8.*,>=0.0.0a0
-          - matrix: {cuda: "11.*"}
+          - matrix:
+              cuda: "12.*"
+              cuda_suffixed: "false"
+            packages:
+              - *cudf_unsuffixed
+              # NOTE: cupy still has a "-cuda12x" suffix here, because it's suffixed
+              #       in DLFW builds
+              - *cupy_cu12
+              - *cuspatial_unsuffixed
+              - *dask_cudf_unsuffixed
+          - matrix:
+              cuda: "11.*"
+              cuda_suffixed: "true"
             packages:
               - cudf-cu11==24.8.*,>=0.0.0a0
               - &cupy_cu11 cupy-cuda11x>=12.0.0
               - cuspatial-cu11==24.8.*,>=0.0.0a0
               - dask-cudf-cu11==24.8.*,>=0.0.0a0
           - matrix:
+              cuda: "11.*"
+              cuda_suffixed: "false"
             packages:
-              - *cudf_conda
+              - *cudf_unsuffixed
+              # NOTE: cupy still has a "-cuda11x" suffix here, because it's suffixed
+              #       in DLFW builds
               - *cupy_cu11
-              - *cuspatial_conda
-              - *dask_cudf_conda
+              - *cuspatial_unsuffixed
+              - *dask_cudf_unsuffixed
+          - matrix:
+            packages:
+              - *cudf_unsuffixed
+              - *cupy_cu11
+              - *cuspatial_unsuffixed
+              - *dask_cudf_unsuffixed
   test_python:
     common:
       - output_types: [conda, requirements, pyproject]
