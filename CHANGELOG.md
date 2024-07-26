@@ -1,3 +1,15 @@
+# cuxfilter 24.06.00 (5 Jun 2024)
+
+## 🐛 Bug Fixes
+
+- Avoid importing from `dask_cudf.core` ([#593](https://github.com/rapidsai/cuxfilter/pull/593)) [@rjzamora](https://github.com/rjzamora)
+
+## 🛠️ Improvements
+
+- Enable FutureWarnings/DeprecationWarnings as errors ([#595](https://github.com/rapidsai/cuxfilter/pull/595)) [@mroeschke](https://github.com/mroeschke)
+- Fix libwebp dependency ([#594](https://github.com/rapidsai/cuxfilter/pull/594)) [@AjayThorve](https://github.com/AjayThorve)
+- Prevent path conflict in builds ([#583](https://github.com/rapidsai/cuxfilter/pull/583)) [@AyodeAwe](https://github.com/AyodeAwe)
+
 # cuXfilter 24.04.00 (10 Apr 2024)
 
 ## 🐛 Bug Fixes
