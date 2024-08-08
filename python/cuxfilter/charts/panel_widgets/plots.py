@@ -7,6 +7,7 @@ from ..constants import (
 from ...assets.cudf_utils import get_min_max
 from bokeh.models import ColumnDataSource
 import cudf
+import pandas as pd
 import dask_cudf
 import panel as pn
 import uuid
@@ -88,7 +89,7 @@ class DateRangeSlider(BaseWidget):
     def x_dtype(self):
         if isinstance(self.source, ColumnDataSource):
             return self.source.data[self.data_x_axis].dtype
-        elif isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
+        elif isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame)):
             return self.source[self.x].dtype
         return None
 

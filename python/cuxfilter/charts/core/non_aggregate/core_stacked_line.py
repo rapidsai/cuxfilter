@@ -1,4 +1,5 @@
 import cudf
+import pandas as pd
 import dask_cudf
 from typing import Tuple
 import panel as pn
@@ -30,7 +31,7 @@ class BaseStackedLine(BaseChart):
         overwriting the y_dtype property from BaseChart for stackedLines where
         self.y is a list of columns
         """
-        if isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
+        if isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame)):
             return self.source[self.y[0]].dtype
         return None
 
