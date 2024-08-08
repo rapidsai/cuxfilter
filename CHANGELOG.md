@@ -1,3 +1,18 @@
+# cuxfilter 24.08.00 (7 Aug 2024)
+
+## 🛠️ Improvements
+
+- Merge branch-24.06 into branch-24.08 ([#612](https://github.com/rapidsai/cuxfilter/pull/612)) [@jameslamb](https://github.com/jameslamb)
+- split up CUDA-suffixed dependencies in dependencies.yaml ([#609](https://github.com/rapidsai/cuxfilter/pull/609)) [@jameslamb](https://github.com/jameslamb)
+- Use workflow branch 24.08 again ([#608](https://github.com/rapidsai/cuxfilter/pull/608)) [@KyleFromNVIDIA](https://github.com/KyleFromNVIDIA)
+- Build and test with CUDA 12.5.1 ([#607](https://github.com/rapidsai/cuxfilter/pull/607)) [@KyleFromNVIDIA](https://github.com/KyleFromNVIDIA)
+- Run NumPy 2 ruff fixes (changing NaN to nan) ([#606](https://github.com/rapidsai/cuxfilter/pull/606)) [@seberg](https://github.com/seberg)
+- Use verify-alpha-spec hook ([#604](https://github.com/rapidsai/cuxfilter/pull/604)) [@KyleFromNVIDIA](https://github.com/KyleFromNVIDIA)
+- remove .gitattributes ([#603](https://github.com/rapidsai/cuxfilter/pull/603)) [@jameslamb](https://github.com/jameslamb)
+- Adopt CI/packaging codeowners ([#602](https://github.com/rapidsai/cuxfilter/pull/602)) [@bdice](https://github.com/bdice)
+- Remove text builds of documentation ([#601](https://github.com/rapidsai/cuxfilter/pull/601)) [@vyasr](https://github.com/vyasr)
+- use rapids-build-backend ([#600](https://github.com/rapidsai/cuxfilter/pull/600)) [@jameslamb](https://github.com/jameslamb)
+
 # cuxfilter 24.06.00 (5 Jun 2024)
 
 ## 🐛 Bug Fixes

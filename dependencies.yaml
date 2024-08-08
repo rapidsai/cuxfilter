@@ -3,7 +3,7 @@ files:
   all:
     output: conda
     matrix:
-      cuda: ["11.8", "12.2"]
+      cuda: ["11.8", "12.5"]
       arch: [x86_64]
     includes:
       - build_wheels
@@ -13,6 +13,7 @@ files:
       - docs
       - notebook
       - py_version
+      - rapids_build_setuptools
       - run
       - test_python
   test_python:
@@ -45,6 +46,14 @@ files:
     extras:
       table: build-system
     includes:
+      - rapids_build_setuptools
+  py_rapids_build:
+    output: pyproject
+    pyproject_dir: python
+    extras:
+      table: tool.rapids-build-backend
+      key: requires
+    includes:
       - build_wheels
   py_run:
     output: pyproject
@@ -72,7 +81,6 @@ dependencies:
       - output_types: pyproject
         packages:
           - wheel
-          - setuptools
   cuda_version:
     specific:
       - output_types: conda
@@ -101,6 +109,10 @@ dependencies:
               cuda: "12.2"
             packages:
               - cuda-version=12.2
+          - matrix:
+              cuda: "12.5"
+            packages:
+              - cuda-version=12.5
   cuda:
     specific:
       - output_types: conda
@@ -141,8 +153,8 @@ dependencies:
           - notebook>=0.5.0
       - output_types: [conda]
         packages:
-          - cugraph==24.6.*
-          - dask-cuda==24.6.*
+          - cugraph==24.8.*
+          - dask-cuda==24.8.*
   py_version:
     specific:
       - output_types: conda
@@ -162,14 +174,17 @@ dependencies:
           - matrix:
             packages:
               - python>=3.9,<3.12
+  rapids_build_setuptools:
+    common:
+      - output_types: [conda, requirements, pyproject]
+        packages:
+          - rapids-build-backend>=0.3.0,<0.4.0.dev0
+          - setuptools
   run:
     common:
       - output_types: [conda, requirements, pyproject]
         packages:
           - bokeh>=3.1
-          - cudf==24.6.*
-          - cuspatial==24.6.*
-          - dask-cudf==24.6.*
           - datashader>=0.15
           - geopandas>=0.11.0
           - holoviews>=1.16.0
@@ -180,12 +195,57 @@ dependencies:
           - panel>=1.0
       - output_types: conda
         packages:
+          - &cudf_unsuffixed cudf==24.8.*
           - cupy>=12.0.0
+          - &cuspatial_unsuffixed cuspatial==24.8.*
+          - &dask_cudf_unsuffixed dask-cudf==24.8.*
           - nodejs>=18
           - libwebp-base
+    specific:
       - output_types: [requirements, pyproject]
-        packages:
-          - cupy-cuda11x>=12.0.0
+        matrices:
+          - matrix:
+              cuda: "12.*"
+              cuda_suffixed: "true"
+            packages:
+              - cudf-cu12==24.8.*
+              - &cupy_cu12 cupy-cuda12x>=12.0.0
+              - cuspatial-cu12==24.8.*
+              - dask-cudf-cu12==24.8.*
+          - matrix:
+              cuda: "12.*"
+              cuda_suffixed: "false"
+            packages:
+              - *cudf_unsuffixed
+              # NOTE: cupy still has a "-cuda12x" suffix here, because it's suffixed
+              #       in DLFW builds
+              - *cupy_cu12
+              - *cuspatial_unsuffixed
+              - *dask_cudf_unsuffixed
+          - matrix:
+              cuda: "11.*"
+              cuda_suffixed: "true"
+            packages:
+              - cudf-cu11==24.8.*
+              - &cupy_cu11 cupy-cuda11x>=12.0.0
+              - cuspatial-cu11==24.8.*
+              - dask-cudf-cu11==24.8.*
+          - matrix:
+              cuda: "11.*"
+              cuda_suffixed: "false"
+            packages:
+              - *cudf_unsuffixed
+              # NOTE: cupy still has a "-cuda11x" suffix here, because it's suffixed
+              #       in DLFW builds
+              - *cupy_cu11
+              - *cuspatial_unsuffixed
+              - *dask_cudf_unsuffixed
+          - matrix:
+            packages:
+              - *cudf_unsuffixed
+              - *cupy_cu11
+              - *cuspatial_unsuffixed
+              - *dask_cudf_unsuffixed
   test_python:
     common:
       - output_types: [conda, requirements, pyproject]

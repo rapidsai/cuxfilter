@@ -9,12 +9,12 @@ dependencies:
 - bokeh>=3.1
 - cuda-version=11.8
 - cudatoolkit
-- cudf==24.6.*
-- cugraph==24.6.*
+- cudf==24.8.*
+- cugraph==24.8.*
 - cupy>=12.0.0
-- cuspatial==24.6.*
-- dask-cuda==24.6.*
-- dask-cudf==24.6.*
+- cuspatial==24.8.*
+- dask-cuda==24.8.*
+- dask-cudf==24.8.*
 - datashader>=0.15
 - geopandas>=0.11.0
 - holoviews>=1.16.0
@@ -39,7 +39,9 @@ dependencies:
 - pytest-cov
 - pytest-xdist
 - python>=3.9,<3.12
+- rapids-build-backend>=0.3.0,<0.4.0.dev0
 - recommonmark
+- setuptools
 - sphinx-markdown-tables
 - sphinx>=7.2.5
 - sphinx_rtd_theme
