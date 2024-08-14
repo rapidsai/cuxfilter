@@ -70,6 +70,10 @@ files:
       key: test
     includes:
       - test_python
+  test_external:
+    output: none
+    includes:
+      - test_external
 channels:
   - rapidsai
   - rapidsai-nightly
@@ -257,3 +261,21 @@ dependencies:
       - output_types: conda
         packages:
           - panel>=1.0,<=1.3.4
+  test_external:
+    common:
+      - output_types: [conda]
+        packages:
+          - coverage
+          - *cudf_unsuffixed
+          - cupy>=12.0.0
+          - *cuspatial_unsuffixed
+          - *dask_cudf_unsuffixed
+          - cuxfilter==24.10.*,>=0.0.0a0
+          - python>=3.9,<3.12
+          - xarray-spatial
+          - pycaret
+          - graphistry
+          - dash
+          - dask-sql
+          - pytest-benchmark
+          - pytest-xdist
