@@ -38,7 +38,7 @@ if [ "$PROJECT" = "all" ]; then
         # Change directory to the library
         pushd $LIBRARY
         # Run setup.py with test dependencies
-        python -m pip install -e .[tests]
+        python -m pip install .[tests]
 
         rapids-logger "Run GPU tests for $LIBRARY"
 
@@ -62,7 +62,7 @@ else
     # Change directory to the specified project
     pushd $PROJECT
     # Run setup.py with test dependencies
-    python -m pip install -e .[tests]
+    python -m pip install .[tests]
 
 
     rapids-logger "Run GPU tests for $LIBRARY"
