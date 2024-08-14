@@ -9,7 +9,7 @@ rapids-logger "Create test_external conda environment"
 # Install external dependencies into test_external conda environment
 rapids-dependency-file-generator \
   --output conda \
-  --file-key test_notebooks \
+  --file-key test_external \
   --matrix "cuda=${RAPIDS_CUDA_VERSION%.*};arch=$(arch);py=${RAPIDS_PY_VERSION}" | tee env.yaml
 
 rapids-mamba-retry env create --yes -f env.yaml -n test_external
