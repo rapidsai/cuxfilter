@@ -50,7 +50,7 @@ class BaseGraph(BaseChart):
 
     @property
     def node_columns(self):
-        if self.node_aggregate_col:
+        if self.node_aggregate_col != self.node_id:
             return [
                 self.node_id,
                 self.node_x,
