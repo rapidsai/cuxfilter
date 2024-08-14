@@ -19,6 +19,11 @@ LIBRARIES=("datashader" "holoviews")
 # Change directory to /tmp
 pushd /tmp
 
+
+EXITCODE=0
+trap "EXITCODE=1" ERR
+set +e
+
 # Clone the specified Python libraries
 if [ "$PROJECT" = "all" ]; then
     # Loop through each library and install dependencies
@@ -34,6 +39,10 @@ if [ "$PROJECT" = "all" ]; then
         pushd $LIBRARY
         # Run setup.py with test dependencies
         python -m pip install -e .[tests]
+
+        rapids-logger "Run GPU tests for $LIBRARY"
+
+        pytest --numprocesses=8 --dist=worksteal $LIBRARY/$LIBRARY/tests --benchmark-skip --gpu
 
         popd
     done
@@ -54,41 +63,13 @@ else
     pushd $PROJECT
     # Run setup.py with test dependencies
     python -m pip install -e .[tests]
+
+
+    rapids-logger "Run GPU tests for $LIBRARY"
+
+    pytest --numprocesses=8 --dist=worksteal $LIBRARY/$LIBRARY/tests --benchmark-skip --gpu
+
     popd
-fi
-
-FILES=""
-# Install and run tests
-if [ "$PROJECT" = "all" ]; then
-    # Loop through each library and install dependencies
-    for LIBRARY in "${LIBRARIES[@]}"
-    do
-        rapids-logger "gathering GPU tests for $LIBRARY"
-        TEST_DIR="$LIBRARY/$LIBRARY/tests"
-        # Find all Python scripts containing the keywords cudf or dask_cudf except test_quadmesh.py
-        FILES+=" $(grep -l -R -e 'cudf' --include='*.py' "$TEST_DIR" | grep -v test_quadmesh.py)"
-    done
-else
-    rapids-logger "gathering GPU tests for $PROJECT"
-    TEST_DIR="$PROJECT/$PROJECT/tests"
-    # Find all Python scripts containing the keywords cudf or dask_cudf
-    FILES+=$(grep -l -R -e 'cudf' --include='*.py' "$TEST_DIR")
-fi
-
-EXITCODE=0
-trap "EXITCODE=1" ERR
-set +e
-
-rapids-logger "running all gathered tests"
-DATASHADER_TEST_GPU=1 pytest \
-  --numprocesses=8 \
-  --dist=worksteal \
-  $FILES
-
-if [[ "$PROJECT" = "all" ]] || [[ "$PROJECT" = "datashader" ]]; then
-    # run test_quadmesh.py separately as dask.array tests fail with numprocesses
-    rapids-logger "running test_quadmesh.py"
-    DATASHADER_TEST_GPU=1 pytest datashader/datashader/tests/test_quadmesh.py
 fi
 
 rapids-logger "Test script exiting with value: $EXITCODE"
