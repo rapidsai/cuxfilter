@@ -42,7 +42,7 @@ if [ "$PROJECT" = "all" ]; then
 
         rapids-logger "Run GPU tests for $LIBRARY"
 
-        pytest --numprocesses=8 --dist=worksteal $LIBRARY/$LIBRARY/tests --benchmark-skip --gpu
+        python -m pytest $LIBRARY/tests/ --numprocesses=8 --dist=worksteal --gpu
 
         popd
     done
@@ -67,7 +67,7 @@ else
 
     rapids-logger "Run GPU tests for $LIBRARY"
 
-    pytest --numprocesses=8 --dist=worksteal $LIBRARY/$LIBRARY/tests --benchmark-skip --gpu
+    python -m pytest $LIBRARY/tests/ --numprocesses=8 --dist=worksteal --gpu
 
     popd
 fi
