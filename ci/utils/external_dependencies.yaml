@@ -16,3 +16,4 @@ dependencies:
   - dask-sql
   - pytest-benchmark
   - pytest-xdist
+  - coverage
