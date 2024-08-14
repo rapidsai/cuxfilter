@@ -7,9 +7,19 @@ rapids-logger "Create test_external conda environment"
 . /opt/conda/etc/profile.d/conda.sh
 
 # Install external dependencies into test_external conda environment
-rapids-conda-retry env update -f ./ci/utils/external_dependencies.yaml
+rapids-dependency-file-generator \
+  --output conda \
+  --file-key test_notebooks \
+  --matrix "cuda=${RAPIDS_CUDA_VERSION%.*};arch=$(arch);py=${RAPIDS_PY_VERSION}" | tee env.yaml
 
+rapids-mamba-retry env create --yes -f env.yaml -n test_external
+
+# Temporarily allow unbound variables for conda activation.
+set +u
 conda activate test_external
+set -u
+
+rapids-print-env
 
 # Define input parameter
 PROJECT=$1
