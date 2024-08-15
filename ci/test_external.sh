@@ -75,9 +75,9 @@ else
     python -m pip install .[tests]
 
 
-    rapids-logger "Run GPU tests for $LIBRARY"
+    rapids-logger "Run GPU tests for $PROJECT"
 
-    python -m pytest $LIBRARY/tests/ --numprocesses=8 --dist=worksteal --gpu
+    python -m pytest $PROJECT/tests/ --numprocesses=8 --dist=worksteal --gpu
 
     popd
 fi
