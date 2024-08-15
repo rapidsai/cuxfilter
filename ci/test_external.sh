@@ -22,8 +22,8 @@ set -u
 rapids-print-env
 
 # Define input parameter
-PROJECT=$1
-PR_NUMBER=$2
+PROJECT="${1:-all}"
+PR_NUMBER="${2:-0}"
 LIBRARIES=("datashader" "holoviews")
 
 # Change directory to /tmp
@@ -61,7 +61,7 @@ else
     git clone https://github.com/pyviz/$PROJECT.git
 
     # Check if PR_NUMBER is a non-empty, valid number
-    if [ -n "$PR_NUMBER" ] && [ "$PR_NUMBER" -eq "$PR_NUMBER" ] 2>/dev/null; then
+    if [ "$PR_NUMBER" -ne 0 ] && [ "$PR_NUMBER" -eq "$PR_NUMBER" ] 2>/dev/null; then
         rapids-logger "checkout PR $PR_NUMBER"
         # Fetch the pull request and check it out
         git fetch origin pull/$PR_NUMBER/head:pr/$PR_NUMBER
