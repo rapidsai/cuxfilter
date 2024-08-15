@@ -26,6 +26,10 @@ PROJECT="${1:-all}"
 PR_NUMBER="${2:-0}"
 LIBRARIES=("datashader" "holoviews")
 
+# set conda env variable NUMBA_CUDA_LOW_OCCUPANCY_WARNINGS to 0
+# to suppress low occupancy warnings
+export NUMBA_CUDA_LOW_OCCUPANCY_WARNINGS=0
+
 # Change directory to /tmp
 pushd /tmp
 
