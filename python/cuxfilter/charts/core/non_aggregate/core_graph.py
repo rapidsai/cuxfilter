@@ -1,5 +1,6 @@
 from typing import Tuple
 import cudf
+import pandas as pd
 import dask.dataframe as dd
 import dask_cudf
 import panel as pn
@@ -169,13 +170,17 @@ class BaseGraph(BaseChart):
 
     @property
     def x_dtype(self):
-        if isinstance(self.nodes, (cudf.DataFrame, dask_cudf.DataFrame)):
+        if isinstance(
+            self.nodes, (cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame)
+        ):
             return self.nodes[self.node_x].dtype
         return None
 
     @property
     def y_dtype(self):
-        if isinstance(self.nodes, (cudf.DataFrame, dask_cudf.DataFrame)):
+        if isinstance(
+            self.nodes, (cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame)
+        ):
             return self.nodes[self.node_y].dtype
         return None
 
