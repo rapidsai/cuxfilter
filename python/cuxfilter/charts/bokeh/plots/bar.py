@@ -1,5 +1,6 @@
 import holoviews as hv
 import param
+import pandas as pd
 from cuxfilter.charts.core.aggregate import BaseAggregateChart
 from cuxfilter.assets.numba_kernels import calc_groupby
 import panel as pn
