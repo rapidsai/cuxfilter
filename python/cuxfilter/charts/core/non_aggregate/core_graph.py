@@ -170,13 +170,17 @@ class BaseGraph(BaseChart):
 
     @property
     def x_dtype(self):
-        if isinstance(self.nodes, (cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame)):
+        if isinstance(
+            self.nodes, (cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame)
+        ):
             return self.nodes[self.node_x].dtype
         return None
 
     @property
     def y_dtype(self):
-        if isinstance(self.nodes, (cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame)):
+        if isinstance(
+            self.nodes, (cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame)
+        ):
             return self.nodes[self.node_y].dtype
         return None
 

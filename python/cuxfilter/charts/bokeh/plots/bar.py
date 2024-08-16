@@ -10,7 +10,9 @@ class InteractiveBar(param.Parameterized):
     x = param.String("x", doc="x axis column name")
     y = param.List(["y"], doc="y axis column names as a list")
     source_df = param.ClassSelector(
-        class_=(cudf.DataFrame, pd.DataFrame), default=cudf.DataFrame(), doc="source dataframe"
+        class_=(cudf.DataFrame, pd.DataFrame),
+        default=cudf.DataFrame(),
+        doc="source dataframe",
     )
     box_stream = param.ClassSelector(
         class_=hv.streams.SelectionXY, default=hv.streams.SelectionXY()

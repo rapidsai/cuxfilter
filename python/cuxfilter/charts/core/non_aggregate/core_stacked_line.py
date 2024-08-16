@@ -31,7 +31,9 @@ class BaseStackedLine(BaseChart):
         overwriting the y_dtype property from BaseChart for stackedLines where
         self.y is a list of columns
         """
-        if isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame)):
+        if isinstance(
+            self.source, (cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame)
+        ):
             return self.source[self.y[0]].dtype
         return None
 

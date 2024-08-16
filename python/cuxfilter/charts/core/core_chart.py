@@ -62,7 +62,9 @@ class BaseChart:
     def x_dtype(self):
         if isinstance(self.source, ColumnDataSource):
             return self.source.data[self.data_x_axis].dtype
-        elif isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame)):
+        elif isinstance(
+            self.source, (cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame)
+        ):
             return self.source[self.x].dtype
         return None
 
@@ -70,7 +72,9 @@ class BaseChart:
     def y_dtype(self):
         if isinstance(self.source, ColumnDataSource):
             return self.source.data[self.data_x_axis].dtype
-        elif isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame)):
+        elif isinstance(
+            self.source, (cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame)
+        ):
             return self.source[self.y].dtype
         return None
 
