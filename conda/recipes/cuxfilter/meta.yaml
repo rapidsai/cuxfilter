@@ -37,7 +37,7 @@ requirements:
     - libwebp-base
     - nodejs >=14
     - numba >=0.57
-    - numpy >=1.23,<2.0a0
+    - numpy >=1.23,<3
     - packaging
     - panel >=1.0
     - pyppeteer >=0.2.6
