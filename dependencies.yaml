@@ -164,10 +164,6 @@ dependencies:
       - output_types: conda
         matrices:
           - matrix:
-              py: "3.9"
-            packages:
-              - python=3.9
-          - matrix:
               py: "3.10"
             packages:
               - python=3.10
@@ -177,7 +173,7 @@ dependencies:
               - python=3.11
           - matrix:
             packages:
-              - python>=3.9,<3.12
+              - python>=3.10,<3.12
   rapids_build_setuptools:
     common:
       - output_types: [conda, requirements, pyproject]
@@ -271,6 +267,6 @@ dependencies:
           - *cuspatial_unsuffixed
           - *dask_cudf_unsuffixed
           - cuxfilter==24.10.*,>=0.0.0a0
-          - python>=3.9,<3.12
+          - python>=3.10,<3.12
           - pytest-benchmark
           - pytest-xdist
