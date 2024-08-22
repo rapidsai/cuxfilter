@@ -177,7 +177,7 @@ conda install -c rapidsai -c conda-forge -c nvidia \
     cuxfilter python=3.11 cuda-version=11.8
 ```
 
-Note: cuxfilter is supported only on Linux, and with Python versions 3.8 and later.
+Note: cuxfilter is supported only on Linux, and with Python versions 3.10 and 3.11.
 
 ### PyPI
 
