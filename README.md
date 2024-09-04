@@ -158,11 +158,11 @@ For nightly version `cuxfilter version == 24.10` :
 ```bash
 # for CUDA 12.0
 conda install -c rapidsai-nightly -c conda-forge -c nvidia \
-    cuxfilter=24.10 python=3.11 cuda-version=12.0
+    cuxfilter=24.10 python=3.12 cuda-version=12.0
 
 # for CUDA 11.8
 conda install -c rapidsai-nightly -c conda-forge -c nvidia \
-    cuxfilter=24.10 python=3.11 cuda-version=11.8
+    cuxfilter=24.10 python=3.12 cuda-version=11.8
 ```
 
 For the stable version of `cuxfilter` :
@@ -170,14 +170,14 @@ For the stable version of `cuxfilter` :
 ```bash
 # for CUDA 12.0
 conda install -c rapidsai -c conda-forge -c nvidia \
-    cuxfilter python=3.11 cuda-version=12.0
+    cuxfilter python=3.12 cuda-version=12.0
 
 # for CUDA 11.8
 conda install -c rapidsai -c conda-forge -c nvidia \
-    cuxfilter python=3.11 cuda-version=11.8
+    cuxfilter python=3.12 cuda-version=11.8
 ```
 
-Note: cuxfilter is supported only on Linux, and with Python versions 3.10 and 3.11.
+Note: cuxfilter is supported only on Linux, and with Python versions 3.10, 3.11, and 3.12.
 
 ### PyPI
 

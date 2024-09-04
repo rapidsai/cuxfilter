@@ -38,7 +38,7 @@ dependencies:
 - pytest
 - pytest-cov
 - pytest-xdist
-- python>=3.10,<3.12
+- python>=3.10,<3.13
 - rapids-build-backend>=0.3.0,<0.4.0.dev0
 - recommonmark
 - setuptools
