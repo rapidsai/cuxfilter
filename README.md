@@ -134,7 +134,6 @@ Troubleshooting help can be found [on our troubleshooting page](https://docs.rap
 - bokeh
 - pyproj
 - geopandas
-- pyppeteer
 - jupyter-server-proxy
 
 ## Quick Start
