@@ -32,21 +32,14 @@ These are example notebooks to showcase cuxfilter with [cuDF](https://github.com
 
 Once you have registered with your email address, simply sign in to your account, start a CPU or GPU runtime, and open your project - all in your browser.
 
-To setup a rapids environment in studio lab(you only need to do this the first time, since studio lab has 15GB of persistent storage across sessions), open a new terminal:
+To setup a RAPIDS environment in studio lab (you only need to do this the first time, since studio lab has 15GB of persistent storage across sessions),
+open a new terminal and run the following
 
 ```bash
 conda install ipykernel
-
-# for stable rapids version
-conda install -c rapidsai -c numba -c conda-forge -c nvidia \
-    cuxfilter python=3.12 cudatoolkit=11.8
-
-# for nightly rapids version
-conda install -c rapidsai-nightly -c numba -c conda-forge -c nvidia \
-    cuxfilter python=3.12 cudatoolkit=11.8
 ```
 
-> Above are sample install snippets for cuxfilter, see the [Get RAPIDS version picker](https://rapids.ai/start.html) for installing the latest `cuxfilter` version.
+Then install `cuxfilter` and its dependencies by following the instructions in ["Installation"](../README.md#installation) in the project's main README.
 
 Once installed, you should see a card in the launcher for that environment and kernel after about a minute.
 
