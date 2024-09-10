@@ -145,7 +145,7 @@ Please see the [Demo Docker Repository](https://hub.docker.com/r/rapidsai/rapids
 ### CUDA/GPU requirements
 
 - CUDA 11.2+
-- Pascal architecture or better (Compute Capability >=6.0)
+- Volta architecture or newer (Compute Capability >=7.0)
 
 ### Conda
 
@@ -166,9 +166,9 @@ conda install -c rapidsai-nightly -c conda-forge -c nvidia \
 For the stable version of `cuxfilter` :
 
 ```bash
-# for CUDA 12.0
+# for CUDA 12.5
 conda install -c rapidsai -c conda-forge -c nvidia \
-    cuxfilter python=3.12 cuda-version=12.0
+    cuxfilter python=3.12 cuda-version=12.5
 
 # for CUDA 11.8
 conda install -c rapidsai -c conda-forge -c nvidia \
