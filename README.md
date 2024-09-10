@@ -134,7 +134,6 @@ Troubleshooting help can be found [on our troubleshooting page](https://docs.rap
 - bokeh
 - pyproj
 - geopandas
-- pyppeteer
 - jupyter-server-proxy
 
 ## Quick Start
@@ -146,8 +145,7 @@ Please see the [Demo Docker Repository](https://hub.docker.com/r/rapidsai/rapids
 ### CUDA/GPU requirements
 
 - CUDA 11.2+
-- NVIDIA driver 450.80.02+
-- Pascal architecture or better (Compute Capability >=6.0)
+- Volta architecture or newer (Compute Capability >=7.0)
 
 ### Conda
 
@@ -156,28 +154,30 @@ cuxfilter can be installed with conda ([miniconda](https://conda.io/miniconda.ht
 For nightly version `cuxfilter version == 24.10` :
 
 ```bash
-# for CUDA 12.0
+# for CUDA 12.5
 conda install -c rapidsai-nightly -c conda-forge -c nvidia \
-    cuxfilter=24.10 python=3.11 cuda-version=12.0
+    cuxfilter=24.10 python=3.12 cuda-version=12.5
 
 # for CUDA 11.8
 conda install -c rapidsai-nightly -c conda-forge -c nvidia \
-    cuxfilter=24.10 python=3.11 cuda-version=11.8
+    cuxfilter=24.10 python=3.12 cuda-version=11.8
 ```
 
 For the stable version of `cuxfilter` :
 
 ```bash
-# for CUDA 12.0
+# for CUDA 12.5
 conda install -c rapidsai -c conda-forge -c nvidia \
-    cuxfilter python=3.11 cuda-version=12.0
+    cuxfilter python=3.12 cuda-version=12.5
 
 # for CUDA 11.8
 conda install -c rapidsai -c conda-forge -c nvidia \
-    cuxfilter python=3.11 cuda-version=11.8
+    cuxfilter python=3.12 cuda-version=11.8
 ```
 
-Note: cuxfilter is supported only on Linux, and with Python versions 3.10 and 3.11.
+Note: cuxfilter is supported only on Linux, and with Python versions 3.10, 3.11, and 3.12.
+
+> Above are sample install snippets for cuxfilter, see the [Get RAPIDS version picker](https://rapids.ai/start.html) for installing the latest `cuxfilter` version.
 
 ### PyPI
 
