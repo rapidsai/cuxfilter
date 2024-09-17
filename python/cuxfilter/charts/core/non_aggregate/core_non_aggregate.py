@@ -31,8 +31,8 @@ class BaseNonAggregate(BaseChart):
         chart_type = self.chart_type if self.chart_type else "chart"
         return (
             f"{self.x}_{self.y}"
-            f"{'_'+self.aggregate_col if self.aggregate_col else ''}"
-            f"{'_'+self.aggregate_fn if self.aggregate_fn else ''}"
+            f"{'_' + self.aggregate_col if self.aggregate_col else ''}"
+            f"{'_' + self.aggregate_fn if self.aggregate_fn else ''}"
             f"_{chart_type}_{self.title}"
         )
 
