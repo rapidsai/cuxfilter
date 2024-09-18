@@ -137,6 +137,7 @@ dependencies:
     common:
       - output_types: [conda, requirements]
         packages:
+          - bokeh_sampledata
           - ipykernel
           - ipython
           - jupyter_sphinx
@@ -153,6 +154,7 @@ dependencies:
     common:
       - output_types: [conda, requirements]
         packages:
+          - bokeh_sampledata
           - ipython
           - notebook>=0.5.0
       - output_types: [conda]
