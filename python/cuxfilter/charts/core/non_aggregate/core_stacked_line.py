@@ -21,7 +21,6 @@ class BaseStackedLine(BaseChart):
     y_range: Tuple = None
     use_data_tiles = False
     y: list = []
-    colors: list = []
     default_colors = ["#8735fb"]
     box_selected_range = None
 

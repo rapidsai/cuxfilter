@@ -7,6 +7,7 @@ channels:
 - nvidia
 dependencies:
 - bokeh>=3.1
+- bokeh_sampledata
 - cuda-version=11.8
 - cudatoolkit
 - cudf==24.10.*,>=0.0.0a0
@@ -38,7 +39,7 @@ dependencies:
 - pytest
 - pytest-cov
 - pytest-xdist
-- python>=3.10,<3.12
+- python>=3.10,<3.13
 - rapids-build-backend>=0.3.0,<0.4.0.dev0
 - recommonmark
 - setuptools

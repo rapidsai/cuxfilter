@@ -40,7 +40,6 @@ requirements:
     - numpy >=1.23,<3.0a0
     - packaging
     - panel >=1.0
-    - pyppeteer >=0.2.6
     - python
     - {{ pin_compatible('cuda-version', max_pin='x', min_pin='x') }}
 
