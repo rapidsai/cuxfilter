@@ -25,7 +25,7 @@ jobs:
   #   secrets: inherit
   #   uses: rapidsai/shared-workflows/.github/workflows/checks.yaml@branch-24.10
   conda-python-build:
-    needs: checks
+    # needs: checks
     secrets: inherit
     uses: rapidsai/shared-workflows/.github/workflows/conda-python-build.yaml@branch-24.10
     with:
@@ -58,7 +58,7 @@ jobs:
   #     container_image: "rapidsai/ci-conda:latest"
   #     run_script: "ci/build_docs.sh"
   wheel-build:
-    needs: checks
+    # needs: checks
     secrets: inherit
     uses: rapidsai/shared-workflows/.github/workflows/wheels-build.yaml@branch-24.10
     with:
