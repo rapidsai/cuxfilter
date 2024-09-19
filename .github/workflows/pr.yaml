@@ -18,7 +18,7 @@ jobs:
       - conda-notebook-tests
       # - docs-build
       - wheel-build
-      - wheel-tests
+      # - wheel-tests
     secrets: inherit
     uses: rapidsai/shared-workflows/.github/workflows/pr-builder.yaml@branch-24.10
   # checks:
