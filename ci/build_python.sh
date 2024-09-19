@@ -9,6 +9,8 @@ source rapids-configure-sccache
 
 source rapids-date-string
 
+source ./ci/use_conda_packages_from_prs.sh
+
 rapids-print-env
 
 rapids-generate-version > ./VERSION
