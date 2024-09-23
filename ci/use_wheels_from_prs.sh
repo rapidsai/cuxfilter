@@ -9,16 +9,6 @@ RMM_CHANNEL=$(
   RAPIDS_PY_WHEEL_NAME=rmm_${RAPIDS_PY_CUDA_SUFFIX} rapids-get-pr-wheel-artifact rmm 1678 python
 )
 
-# UCXX_CHANNEL=$(
-#   RAPIDS_PY_WHEEL_NAME=ucxx_${RAPIDS_PY_CUDA_SUFFIX} rapids-get-pr-wheel-artifact ucxx 278 python
-# )
-# LIBUCXX_CHANNEL=$(
-#   RAPIDS_PY_WHEEL_NAME=libucxx_${RAPIDS_PY_CUDA_SUFFIX} rapids-get-pr-wheel-artifact ucxx 278 cpp
-# )
-# DISTRIBUTED_UCXX_CHANNEL=$(
-#   RAPIDS_PY_WHEEL_NAME=distributed_ucxx_${RAPIDS_PY_CUDA_SUFFIX} rapids-get-pr-wheel-artifact ucxx 278 python
-# )
-
 CUDF_CHANNEL=$(
   RAPIDS_PY_WHEEL_NAME=cudf_${RAPIDS_PY_CUDA_SUFFIX} rapids-get-pr-wheel-artifact cudf 16806 python
 )
@@ -34,18 +24,11 @@ DASK_CUDF_CHANNEL=$(
     rapids-get-pr-wheel-artifact cudf 16806 python
 )
 
-# RAFT_DASK_CHANNEL=$(
-#   RAPIDS_PY_WHEEL_NAME=raft_dask_${RAPIDS_PY_CUDA_SUFFIX} rapids-get-pr-wheel-artifact raft 2433 python
-# )
-# PYLIBRAFT_CHANNEL=$(
-#   RAPIDS_PY_WHEEL_NAME=pylibraft_${RAPIDS_PY_CUDA_SUFFIX} rapids-get-pr-wheel-artifact raft 2433 python
-# )
-
 CUSPATIAL_CHANNEL=$(
   RAPIDS_PY_WHEEL_NAME=cuspatial_${RAPIDS_PY_CUDA_SUFFIX} rapids-get-pr-wheel-artifact cuspatial 1441 python
 )
 CUPROJ_CHANNEL=$(
-  RAPIDS_PY_WHEEL_NAME=cuproj_${RAPIDS_PY_CUDA_SUFFIX} rapids-get-pr-wheel-artifact cuproj 1441 python
+  RAPIDS_PY_WHEEL_NAME=cuproj_${RAPIDS_PY_CUDA_SUFFIX} rapids-get-pr-wheel-artifact cuspatial 1441 python
 )
 LIBCUSPATIAL_CHANNEL=$(
   RAPIDS_PY_WHEEL_NAME=libcuspatial_${RAPIDS_PY_CUDA_SUFFIX} rapids-get-pr-wheel-artifact cuspatial 1441 cpp
@@ -63,9 +46,4 @@ libcuspatial-${RAPIDS_PY_CUDA_SUFFIX} @ file://$(echo ${LIBCUSPATIAL_CHANNEL}/li
 cuproj-${RAPIDS_PY_CUDA_SUFFIX} @ file://$(echo ${CUPROJ_CHANNEL}/cuproj_*.whl)
 EOF
 
-# ucxx-${RAPIDS_PY_CUDA_SUFFIX} @ file://$(echo ${UCXX_CHANNEL}/ucxx_*.whl)
-# libucxx-${RAPIDS_PY_CUDA_SUFFIX} @ file://$(echo ${LIBUCXX_CHANNEL}/libucxx_*.whl)
-# distributed-ucxx-${RAPIDS_PY_CUDA_SUFFIX} @ file://$(echo ${DISTRIBUTED_UCXX_CHANNEL}/distributed_ucxx_*.whl)
-# raft-dask-${RAPIDS_PY_CUDA_SUFFIX} @ file://$(echo ${RAFT_DASK_CHANNEL}/raft_dask_*.whl)
-# pylibraft-${RAPIDS_PY_CUDA_SUFFIX} @ file://$(echo ${PYLIBRAFT_CHANNEL}/pylibraft_*.whl)
 export PIP_CONSTRAINT=/tmp/constraints.txt
