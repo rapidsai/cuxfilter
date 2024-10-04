@@ -12,6 +12,7 @@ concurrency:
 jobs:
   pr-builder:
     needs:
+      - changed-files
       - checks
       - conda-python-build
       - conda-python-tests
@@ -21,6 +22,28 @@ jobs:
       - wheel-tests
     secrets: inherit
     uses: rapidsai/shared-workflows/.github/workflows/pr-builder.yaml@branch-24.12
+    if: always()
+    with:
+      needs: ${{ toJSON(needs) }}
+  changed-files:
+    secrets: inherit
+    uses: rapidsai/shared-workflows/.github/workflows/changed-files.yaml@branch-24.12
+    with:
+      files_yaml: |
+        test_notebooks:
+          - '**'
+          - '!.pre-commit-config.yaml'
+          - '!CONTRIBUTING.md'
+          - '!EXTERNAL_TESTS.md'
+          - '!README.md'
+        test_python:
+          - '**'
+          - '!.pre-commit-config.yaml'
+          - '!CONTRIBUTING.md'
+          - '!EXTERNAL_TESTS.md'
+          - '!README.md'
+          - '!docs/**'
+          - '!notebooks/**'
   checks:
     secrets: inherit
     uses: rapidsai/shared-workflows/.github/workflows/checks.yaml@branch-24.12
@@ -31,16 +54,18 @@ jobs:
     with:
       build_type: pull-request
   conda-python-tests:
-    needs: conda-python-build
+    needs: [conda-python-build, changed-files]
     secrets: inherit
     uses: rapidsai/shared-workflows/.github/workflows/conda-python-tests.yaml@branch-24.12
+    if: fromJSON(needs.changed-files.outputs.changed_file_groups).test_python
     with:
       build_type: pull-request
       run_codecov: false
   conda-notebook-tests:
-    needs: conda-python-build
+    needs: [conda-python-build, changed-files]
     secrets: inherit
     uses: rapidsai/shared-workflows/.github/workflows/custom-job.yaml@branch-24.12
+    if: fromJSON(needs.changed-files.outputs.changed_file_groups).test_notebooks
     with:
       build_type: pull-request
       node_type: "gpu-v100-latest-1"
@@ -67,9 +92,10 @@ jobs:
       # This selects "ARCH=amd64 + the latest supported Python + CUDA".
       matrix_filter: map(select(.ARCH == "amd64")) | group_by(.CUDA_VER|split(".")|map(tonumber)|.[0]) | map(max_by([(.PY_VER|split(".")|map(tonumber)), (.CUDA_VER|split(".")|map(tonumber))]))
   wheel-tests:
-    needs: wheel-build
+    needs: [wheel-build, changed-files]
     secrets: inherit
     uses: rapidsai/shared-workflows/.github/workflows/wheels-test.yaml@branch-24.12
+    if: fromJSON(needs.changed-files.outputs.changed_file_groups).test_python
     with:
       build_type: pull-request
       script: ci/test_wheel.sh
