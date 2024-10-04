@@ -35,8 +35,6 @@ jobs:
           - '!.pre-commit-config.yaml'
           - '!CONTRIBUTING.md'
           - '!README.md'
-          # TODO: Remove this before merging
-          - '!.github/workflows/**'
         test_python:
           - '**'
           - '!.pre-commit-config.yaml'
@@ -44,8 +42,6 @@ jobs:
           - '!README.md'
           - '!docs/**'
           - '!notebooks/**'
-          # TODO: Remove this before merging
-          - '!.github/workflows/**'
   checks:
     secrets: inherit
     uses: rapidsai/shared-workflows/.github/workflows/checks.yaml@branch-24.12
