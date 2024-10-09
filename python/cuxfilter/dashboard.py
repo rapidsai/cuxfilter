@@ -308,7 +308,7 @@ class DashBoard:
 
         # extract string queries from query_dict,
         # as self.query_dict also contains cudf.Series indices
-        str_queries_list = [x for x in query_dict.values() if type(x) == str]
+        str_queries_list = [x for x in query_dict.values() if type(x) is str]
         return_query_str = " and ".join(str_queries_list)
 
         # adding the popped value to the query_str_dict again

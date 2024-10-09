@@ -7,17 +7,36 @@ rapids-logger "Create test_external conda environment"
 . /opt/conda/etc/profile.d/conda.sh
 
 # Install external dependencies into test_external conda environment
-rapids-conda-retry env update -f ./ci/utils/external_dependencies.yaml
+rapids-dependency-file-generator \
+  --output conda \
+  --file-key test_external \
+  --matrix "cuda=${RAPIDS_CUDA_VERSION%.*};arch=$(arch);py=${RAPIDS_PY_VERSION}" | tee env.yaml
 
+rapids-mamba-retry env create --yes -f env.yaml -n test_external
+
+# Temporarily allow unbound variables for conda activation.
+set +u
 conda activate test_external
+set -u
+
+rapids-print-env
 
 # Define input parameter
-PROJECT=$1
-PR_NUMBER=$2
+PROJECT="${1:-all}"
+PR_NUMBER="${2:-0}"
 LIBRARIES=("datashader" "holoviews")
+
+# set conda env variable NUMBA_CUDA_LOW_OCCUPANCY_WARNINGS to 0
+# to suppress low occupancy warnings
+export NUMBA_CUDA_LOW_OCCUPANCY_WARNINGS=0
 
 # Change directory to /tmp
 pushd /tmp
+
+
+EXITCODE=0
+trap "EXITCODE=1" ERR
+set +e
 
 # Clone the specified Python libraries
 if [ "$PROJECT" = "all" ]; then
@@ -33,7 +52,11 @@ if [ "$PROJECT" = "all" ]; then
         # Change directory to the library
         pushd $LIBRARY
         # Run setup.py with test dependencies
-        python -m pip install -e .[tests]
+        python -m pip install .[tests]
+
+        rapids-logger "Run GPU tests for $LIBRARY"
+
+        python -m pytest $LIBRARY/tests/ --numprocesses=8 --dist=worksteal --gpu
 
         popd
     done
@@ -42,7 +65,7 @@ else
     git clone https://github.com/pyviz/$PROJECT.git
 
     # Check if PR_NUMBER is a non-empty, valid number
-    if [ -n "$PR_NUMBER" ] && [ "$PR_NUMBER" -eq "$PR_NUMBER" ] 2>/dev/null; then
+    if [ "$PR_NUMBER" -ne 0 ] && [ "$PR_NUMBER" -eq "$PR_NUMBER" ] 2>/dev/null; then
         rapids-logger "checkout PR $PR_NUMBER"
         # Fetch the pull request and check it out
         git fetch origin pull/$PR_NUMBER/head:pr/$PR_NUMBER
@@ -53,42 +76,14 @@ else
     # Change directory to the specified project
     pushd $PROJECT
     # Run setup.py with test dependencies
-    python -m pip install -e .[tests]
+    python -m pip install .[tests]
+
+
+    rapids-logger "Run GPU tests for $PROJECT"
+
+    python -m pytest $PROJECT/tests/ --numprocesses=8 --dist=worksteal --gpu
+
     popd
-fi
-
-FILES=""
-# Install and run tests
-if [ "$PROJECT" = "all" ]; then
-    # Loop through each library and install dependencies
-    for LIBRARY in "${LIBRARIES[@]}"
-    do
-        rapids-logger "gathering GPU tests for $LIBRARY"
-        TEST_DIR="$LIBRARY/$LIBRARY/tests"
-        # Find all Python scripts containing the keywords cudf or dask_cudf except test_quadmesh.py
-        FILES+=" $(grep -l -R -e 'cudf' --include='*.py' "$TEST_DIR" | grep -v test_quadmesh.py)"
-    done
-else
-    rapids-logger "gathering GPU tests for $PROJECT"
-    TEST_DIR="$PROJECT/$PROJECT/tests"
-    # Find all Python scripts containing the keywords cudf or dask_cudf
-    FILES+=$(grep -l -R -e 'cudf' --include='*.py' "$TEST_DIR")
-fi
-
-EXITCODE=0
-trap "EXITCODE=1" ERR
-set +e
-
-rapids-logger "running all gathered tests"
-DATASHADER_TEST_GPU=1 pytest \
-  --numprocesses=8 \
-  --dist=worksteal \
-  $FILES
-
-if [[ "$PROJECT" = "all" ]] || [[ "$PROJECT" = "datashader" ]]; then
-    # run test_quadmesh.py separately as dask.array tests fail with numprocesses
-    rapids-logger "running test_quadmesh.py"
-    DATASHADER_TEST_GPU=1 pytest datashader/datashader/tests/test_quadmesh.py
 fi
 
 rapids-logger "Test script exiting with value: $EXITCODE"

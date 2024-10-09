@@ -18,6 +18,7 @@ from ....assets.cudf_utils import get_min_max
 import requests
 from PIL import Image
 from io import BytesIO
+import pandas as pd
 
 
 def load_image(url):
@@ -180,7 +181,7 @@ class InteractiveDatashaderBase(param.Parameterized):
 
 class InteractiveDatashader(InteractiveDatashaderBase):
     source_df = param.ClassSelector(
-        class_=(cudf.DataFrame, dask_cudf.DataFrame),
+        class_=(cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame),
         doc="source cuDF/dask_cuDF dataframe",
     )
     x = param.String("x")
@@ -498,11 +499,11 @@ class InteractiveDatashaderMultiLine(InteractiveDatashader):
 
 class InteractiveDatashaderGraph(InteractiveDatashaderBase):
     nodes_df = param.ClassSelector(
-        class_=(cudf.DataFrame, dask_cudf.DataFrame),
+        class_=(cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame),
         doc="nodes cuDF/dask_cuDF dataframe",
     )
     edges_df = param.ClassSelector(
-        class_=(cudf.DataFrame, dask_cudf.DataFrame),
+        class_=(cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame),
         doc="edges cuDF/dask_cuDF dataframe",
     )
     node_x = param.String("x")

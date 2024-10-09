@@ -1,4 +1,5 @@
 import cudf
+import pandas as pd
 import dask_cudf
 from typing import Tuple
 import panel as pn
@@ -20,7 +21,6 @@ class BaseStackedLine(BaseChart):
     y_range: Tuple = None
     use_data_tiles = False
     y: list = []
-    colors: list = []
     default_colors = ["#8735fb"]
     box_selected_range = None
 
@@ -30,7 +30,9 @@ class BaseStackedLine(BaseChart):
         overwriting the y_dtype property from BaseChart for stackedLines where
         self.y is a list of columns
         """
-        if isinstance(self.source, (cudf.DataFrame, dask_cudf.DataFrame)):
+        if isinstance(
+            self.source, (cudf.DataFrame, dask_cudf.DataFrame, pd.DataFrame)
+        ):
             return self.source[self.y[0]].dtype
         return None
 

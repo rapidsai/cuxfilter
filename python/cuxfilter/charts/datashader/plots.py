@@ -19,6 +19,7 @@ import dask_cudf
 import dask.dataframe as dd
 import cupy as cp
 import cudf
+import pandas as pd
 import holoviews as hv
 from bokeh import events
 from PIL import Image
@@ -145,7 +146,7 @@ class Graph(BaseGraph):
 
         Ouput:
         """
-        if isinstance(dataframe, cudf.DataFrame):
+        if isinstance(dataframe, (cudf.DataFrame, pd.DataFrame)):
             self.nodes = dataframe
         else:
             self.nodes = dataframe.data

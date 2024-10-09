@@ -1,5 +1,6 @@
 import holoviews as hv
 import param
+import pandas as pd
 from cuxfilter.charts.core.aggregate import BaseAggregateChart
 from cuxfilter.assets.numba_kernels import calc_groupby
 import panel as pn
@@ -10,7 +11,9 @@ class InteractiveBar(param.Parameterized):
     x = param.String("x", doc="x axis column name")
     y = param.List(["y"], doc="y axis column names as a list")
     source_df = param.ClassSelector(
-        class_=cudf.DataFrame, default=cudf.DataFrame(), doc="source dataframe"
+        class_=(cudf.DataFrame, pd.DataFrame),
+        default=cudf.DataFrame(),
+        doc="source dataframe",
     )
     box_stream = param.ClassSelector(
         class_=hv.streams.SelectionXY, default=hv.streams.SelectionXY()
