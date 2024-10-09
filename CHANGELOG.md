@@ -1,3 +1,29 @@
+# cuxfilter 24.10.00 (9 Oct 2024)
+
+## 🐛 Bug Fixes
+
+- Fix/external tests ([#621](https://github.com/rapidsai/cuxfilter/pull/621)) [@AjayThorve](https://github.com/AjayThorve)
+- Fix tests ([#620](https://github.com/rapidsai/cuxfilter/pull/620)) [@AjayThorve](https://github.com/AjayThorve)
+
+## 📖 Documentation
+
+- Recommend `miniforge` for conda installation ([#626](https://github.com/rapidsai/cuxfilter/pull/626)) [@bdice](https://github.com/bdice)
+- Branch 24.10 merge 24.08 ([#611](https://github.com/rapidsai/cuxfilter/pull/611)) [@jameslamb](https://github.com/jameslamb)
+
+## 🛠️ Improvements
+
+- Switch `traceback` to `native` in `pytest` ([#633](https://github.com/rapidsai/cuxfilter/pull/633)) [@galipremsagar](https://github.com/galipremsagar)
+- Update update-version.sh to use packaging lib ([#631](https://github.com/rapidsai/cuxfilter/pull/631)) [@AyodeAwe](https://github.com/AyodeAwe)
+- Use CI workflow branch &#39;branch-24.10&#39; again ([#629](https://github.com/rapidsai/cuxfilter/pull/629)) [@jameslamb](https://github.com/jameslamb)
+- Update to flake8 7.1.1. ([#627](https://github.com/rapidsai/cuxfilter/pull/627)) [@bdice](https://github.com/bdice)
+- Add support for Python 3.12, drop pyppeteer dependency ([#625](https://github.com/rapidsai/cuxfilter/pull/625)) [@jameslamb](https://github.com/jameslamb)
+- Update rapidsai/pre-commit-hooks ([#624](https://github.com/rapidsai/cuxfilter/pull/624)) [@KyleFromNVIDIA](https://github.com/KyleFromNVIDIA)
+- Drop Python 3.9 support ([#623](https://github.com/rapidsai/cuxfilter/pull/623)) [@jameslamb](https://github.com/jameslamb)
+- Remove NumPy &lt;2 pin, remove panel ceiling ([#622](https://github.com/rapidsai/cuxfilter/pull/622)) [@seberg](https://github.com/seberg)
+- [BUG] Fix `cudf.pandas` integration issues with `cuxfilter` ([#619](https://github.com/rapidsai/cuxfilter/pull/619)) [@Matt711](https://github.com/Matt711)
+- Update pre-commit hooks ([#617](https://github.com/rapidsai/cuxfilter/pull/617)) [@KyleFromNVIDIA](https://github.com/KyleFromNVIDIA)
+- Improve update-version.sh ([#616](https://github.com/rapidsai/cuxfilter/pull/616)) [@bdice](https://github.com/bdice)
+
 # cuxfilter 24.08.00 (7 Aug 2024)
 
 ## 🛠️ Improvements
