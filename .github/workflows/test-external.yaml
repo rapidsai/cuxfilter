@@ -23,7 +23,7 @@ on:
 jobs:
   test-external:
     secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/custom-job.yaml@branch-24.12
+    uses: rapidsai/shared-workflows/.github/workflows/custom-job.yaml@ubuntu24.04
     with:
       build_type: branch
       node_type: "gpu-v100-latest-1"
