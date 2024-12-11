@@ -1,3 +1,12 @@
+# cuxfilter 24.12.00 (11 Dec 2024)
+
+## 🛠️ Improvements
+
+- enforce wheel size limits, README formatting in CI ([#643](https://github.com/rapidsai/cuxfilter/pull/643)) [@jameslamb](https://github.com/jameslamb)
+- remove unnecessary sccache configuration, reduce verbosity of wheel-building scripts ([#641](https://github.com/rapidsai/cuxfilter/pull/641)) [@jameslamb](https://github.com/jameslamb)
+- make conda installs in CI stricter ([#639](https://github.com/rapidsai/cuxfilter/pull/639)) [@jameslamb](https://github.com/jameslamb)
+- Prune workflows based on changed files ([#635](https://github.com/rapidsai/cuxfilter/pull/635)) [@KyleFromNVIDIA](https://github.com/KyleFromNVIDIA)
+
 # cuxfilter 24.10.00 (9 Oct 2024)
 
 ## 🐛 Bug Fixes
