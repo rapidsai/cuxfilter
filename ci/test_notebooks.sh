@@ -5,6 +5,8 @@ set -euo pipefail
 
 . /opt/conda/etc/profile.d/conda.sh
 
+RAPIDS_VERSION="$(rapids-version)"
+
 rapids-logger "Generate notebook testing dependencies"
 rapids-dependency-file-generator \
   --output conda \
@@ -25,7 +27,7 @@ PYTHON_CHANNEL=$(rapids-download-conda-from-s3 python)
 
 rapids-mamba-retry install \
   --channel "${PYTHON_CHANNEL}" \
-  cuxfilter
+  "cuxfilter=${RAPIDS_VERSION}"
 
 
 NBTEST="$(realpath "$(dirname "$0")/utils/nbtest.sh")"
