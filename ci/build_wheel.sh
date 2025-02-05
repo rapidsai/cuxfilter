@@ -14,7 +14,7 @@ RAPIDS_PY_CUDA_SUFFIX="$(rapids-wheel-ctk-name-gen ${RAPIDS_CUDA_VERSION})"
 
 cd "${package_dir}"
 
-python -m pip wheel . -w dist -v --no-deps --disable-pip-version-check
+rapids-pip-retry wheel . -w dist -v --no-deps --disable-pip-version-check
 
 ../ci/validate_wheel.sh dist
 
