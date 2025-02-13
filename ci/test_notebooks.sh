@@ -5,13 +5,16 @@ set -euo pipefail
 
 . /opt/conda/etc/profile.d/conda.sh
 
-RAPIDS_VERSION="$(rapids-version)"
+rapids-logger "Downloading artifacts from previous jobs"
+PYTHON_CHANNEL=$(rapids-download-conda-from-s3 python)
 
 rapids-logger "Generate notebook testing dependencies"
 rapids-dependency-file-generator \
   --output conda \
   --file-key test_notebooks \
-  --matrix "cuda=${RAPIDS_CUDA_VERSION%.*};arch=$(arch);py=${RAPIDS_PY_VERSION}" | tee env.yaml
+  --matrix "cuda=${RAPIDS_CUDA_VERSION%.*};arch=$(arch);py=${RAPIDS_PY_VERSION}" \
+  --prepend-channel "${PYTHON_CHANNEL}" \
+  | tee env.yaml
 
 rapids-mamba-retry env create --yes -f env.yaml -n test
 
@@ -21,14 +24,6 @@ conda activate test
 set -u
 
 rapids-print-env
-
-rapids-logger "Downloading artifacts from previous jobs"
-PYTHON_CHANNEL=$(rapids-download-conda-from-s3 python)
-
-rapids-mamba-retry install \
-  --channel "${PYTHON_CHANNEL}" \
-  "cuxfilter=${RAPIDS_VERSION}"
-
 
 NBTEST="$(realpath "$(dirname "$0")/utils/nbtest.sh")"
 pushd notebooks
