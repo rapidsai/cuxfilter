@@ -23,12 +23,14 @@ files:
       - cuda_version
       - py_version
       - test_python
+      - depends_on_cuxfilter
   test_notebooks:
     output: none
     includes:
       - cuda_version
       - notebook
       - py_version
+      - depends_on_cuxfilter
   checks:
     output: none
     includes:
@@ -137,6 +139,11 @@ dependencies:
       - output_types: [conda, requirements]
         packages:
           - pre-commit
+  depends_on_cuxfilter:
+    common:
+      - output_types: conda
+        packages:
+          - cuxfilter==25.4.*,>=0.0.0a0
   docs:
     common:
       - output_types: [conda, requirements]
