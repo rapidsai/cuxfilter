@@ -1,3 +1,15 @@
+# cuxfilter 25.02.00 (13 Feb 2025)
+
+## 🛠️ Improvements
+
+- Use `rapids-pip-retry` in CI jobs that might need retries ([#655](https://github.com/rapidsai/cuxfilter/pull/655)) [@gforsyth](https://github.com/gforsyth)
+- Revert CUDA 12.8 shared workflow branch changes ([#653](https://github.com/rapidsai/cuxfilter/pull/653)) [@vyasr](https://github.com/vyasr)
+- Build and test with CUDA 12.8.0 ([#649](https://github.com/rapidsai/cuxfilter/pull/649)) [@bdice](https://github.com/bdice)
+- Add upper bound to prevent usage of numba 0.61.0 ([#648](https://github.com/rapidsai/cuxfilter/pull/648)) [@galipremsagar](https://github.com/galipremsagar)
+- Update version references in workflow ([#646](https://github.com/rapidsai/cuxfilter/pull/646)) [@AyodeAwe](https://github.com/AyodeAwe)
+- Require approval to run CI on draft PRs ([#644](https://github.com/rapidsai/cuxfilter/pull/644)) [@bdice](https://github.com/bdice)
+- Add breaking change workflow trigger ([#642](https://github.com/rapidsai/cuxfilter/pull/642)) [@AyodeAwe](https://github.com/AyodeAwe)
+
 # cuxfilter 24.12.00 (11 Dec 2024)
 
 ## 🛠️ Improvements

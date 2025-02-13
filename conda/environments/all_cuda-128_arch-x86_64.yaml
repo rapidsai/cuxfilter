@@ -8,13 +8,13 @@ channels:
 dependencies:
 - bokeh>=3.1
 - bokeh_sampledata
-- cuda-version=12.5
-- cudf==24.12.*
-- cugraph==24.12.*
+- cuda-version=12.8
+- cudf==25.2.*,>=0.0.0a0
+- cugraph==25.2.*,>=0.0.0a0
 - cupy>=12.0.0
-- cuspatial==24.12.*
-- dask-cuda==24.12.*
-- dask-cudf==24.12.*
+- cuspatial==25.2.*,>=0.0.0a0
+- dask-cuda==25.2.*,>=0.0.0a0
+- dask-cudf==25.2.*,>=0.0.0a0
 - datashader>=0.15
 - geopandas>=0.11.0
 - holoviews>=1.16.0
@@ -26,7 +26,7 @@ dependencies:
 - nbsphinx
 - nodejs>=18
 - notebook>=0.5.0
-- numba>=0.57
+- numba>=0.59.1,<0.61.0a0
 - numpy>=1.23,<3.0a0
 - numpydoc
 - packaging
@@ -45,4 +45,4 @@ dependencies:
 - sphinx>=7.2.5
 - sphinx_rtd_theme
 - sphinxcontrib-websupport
-name: all_cuda-125_arch-x86_64
+name: all_cuda-128_arch-x86_64
