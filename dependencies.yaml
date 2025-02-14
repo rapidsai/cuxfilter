@@ -42,6 +42,7 @@ files:
       - cuda_version
       - docs
       - py_version
+      - depends_on_cuxfilter
   py_build:
     output: pyproject
     pyproject_dir: python
