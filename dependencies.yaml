@@ -158,7 +158,8 @@ dependencies:
           - pandoc<=2.0.0 # We should check and fix all "<=" pinnings
           - pydata-sphinx-theme
           - recommonmark
-          - sphinx>=7.2.5
+          # the ceiling on sphinx can be removed when https://github.com/spatialaudio/nbsphinx/issues/825 is resolved
+          - sphinx>=8.0.0,<8.2.0
           - sphinx_rtd_theme
           - sphinx-markdown-tables
           - sphinxcontrib-websupport
