@@ -159,7 +159,7 @@ dependencies:
           - pydata-sphinx-theme
           - recommonmark
           # the ceiling on sphinx can be removed when https://github.com/spatialaudio/nbsphinx/issues/825 is resolved
-          - sphinx>=7.2.5,<8.2.0
+          - sphinx>=8.0.0,<8.2.0
           - sphinx_rtd_theme
           - sphinx-markdown-tables
           - sphinxcontrib-websupport
