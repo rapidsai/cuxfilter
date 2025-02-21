@@ -42,7 +42,7 @@ dependencies:
 - recommonmark
 - setuptools
 - sphinx-markdown-tables
-- sphinx>=7.2.5
+- sphinx>=7.2.5,<8.2.0
 - sphinx_rtd_theme
 - sphinxcontrib-websupport
 name: all_cuda-128_arch-x86_64
