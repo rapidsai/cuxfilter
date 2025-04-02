@@ -20,10 +20,6 @@ source:
 
 build:
   string: cuda${{ cuda_major }}_py${{ py_buildstring }}_${{ date_string }}_${{ head_rev }}
-  prefix_detection:
-    # See https://github.com/rapidsai/build-planning/issues/160
-    # Blanket ignore here as there are quite a few shared objects shipped in cugraph
-    ignore_binary_files: True
   script:
     content: |
       ./build.sh cuxfilter
