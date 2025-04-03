@@ -32,6 +32,7 @@ requirements:
     - dask-cudf ={{ minor_version }}
     - datashader >=0.15
     - geopandas >=0.11.0
+    - shapely <2.1.0
     - holoviews>=1.16
     - jupyter-server-proxy
     - libwebp-base
