@@ -6,7 +6,7 @@ channels:
 - conda-forge
 - nvidia
 dependencies:
-- bokeh>=3.1
+- bokeh>=3.1,<=3.6.3
 - bokeh_sampledata
 - cuda-version=12.8
 - cudf==25.4.*,>=0.0.0a0
