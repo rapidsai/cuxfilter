@@ -206,6 +206,7 @@ dependencies:
           - bokeh>=3.1
           - datashader>=0.15
           - geopandas>=0.11.0
+          - shapely<2.1.0
           - holoviews>=1.16.0
           - jupyter-server-proxy
           - numba>=0.59.1,<0.61.0a0
