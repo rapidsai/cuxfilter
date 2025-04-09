@@ -1,3 +1,22 @@
+# cuxfilter 25.04.00 (9 Apr 2025)
+
+## 📖 Documentation
+
+- Forward-merge branch-25.02 into branch-25.04 ([#654](https://github.com/rapidsai/cuxfilter/pull/654)) [@bdice](https://github.com/bdice)
+- Forward-merge branch-25.02 into branch-25.04 ([#651](https://github.com/rapidsai/cuxfilter/pull/651)) [@rapids-bot[bot]](https://github.com/rapids-bot[bot])
+
+## 🛠️ Improvements
+
+- fix(deps): pin shapely &lt;2.1.0 ([#672](https://github.com/rapidsai/cuxfilter/pull/672)) [@gforsyth](https://github.com/gforsyth)
+- Use conda-build instead of conda-mambabuild ([#666](https://github.com/rapidsai/cuxfilter/pull/666)) [@bdice](https://github.com/bdice)
+- require sphinx&lt;8.2.0 ([#665](https://github.com/rapidsai/cuxfilter/pull/665)) [@jameslamb](https://github.com/jameslamb)
+- Consolidate more Conda solves in CI ([#664](https://github.com/rapidsai/cuxfilter/pull/664)) [@KyleFromNVIDIA](https://github.com/KyleFromNVIDIA)
+- Create Conda CI test env in one step ([#663](https://github.com/rapidsai/cuxfilter/pull/663)) [@KyleFromNVIDIA](https://github.com/KyleFromNVIDIA)
+- Add build_type input field for `test.yaml` ([#661](https://github.com/rapidsai/cuxfilter/pull/661)) [@gforsyth](https://github.com/gforsyth)
+- Use shared-workflows branch-25.04 ([#658](https://github.com/rapidsai/cuxfilter/pull/658)) [@bdice](https://github.com/bdice)
+- add telemetry ([#657](https://github.com/rapidsai/cuxfilter/pull/657)) [@msarahan](https://github.com/msarahan)
+- Migrate to NVKS for amd64 CI runners ([#652](https://github.com/rapidsai/cuxfilter/pull/652)) [@bdice](https://github.com/bdice)
+
 # cuxfilter 25.02.00 (13 Feb 2025)
 
 ## 🛠️ Improvements
