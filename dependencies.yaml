@@ -4,7 +4,7 @@ files:
     output: conda
     matrix:
       cuda: ["11.8", "12.8"]
-      arch: [x86_64]
+      arch: [x86_64, aarch64]
     includes:
       - build_wheels
       - cuda
@@ -237,8 +237,6 @@ dependencies:
               cuda_suffixed: "false"
             packages:
               - *cudf_unsuffixed
-              # NOTE: cupy still has a "-cuda12x" suffix here, because it's suffixed
-              #       in DLFW builds
               - *cupy_cu12
               - *cuspatial_unsuffixed
               - *dask_cudf_unsuffixed
@@ -255,8 +253,6 @@ dependencies:
               cuda_suffixed: "false"
             packages:
               - *cudf_unsuffixed
-              # NOTE: cupy still has a "-cuda11x" suffix here, because it's suffixed
-              #       in DLFW builds
               - *cupy_cu11
               - *cuspatial_unsuffixed
               - *dask_cudf_unsuffixed
