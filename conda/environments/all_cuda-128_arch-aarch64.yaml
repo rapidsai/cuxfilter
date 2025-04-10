@@ -46,4 +46,4 @@ dependencies:
 - sphinx>=8.0.0,<8.2.0
 - sphinx_rtd_theme
 - sphinxcontrib-websupport
-name: all_cuda-128_arch-x86_64
+name: all_cuda-128_arch-aarch64
