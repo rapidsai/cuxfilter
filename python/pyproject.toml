@@ -82,4 +82,5 @@ max_allowed_size_compressed = '75M'
 filterwarnings = [
     "error::FutureWarning",
     "error::DeprecationWarning",
+    "ignore:The 'shapely.geos' module is deprecated, and will be removed in a future version:DeprecationWarning",
 ]
