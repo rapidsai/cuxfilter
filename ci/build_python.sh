@@ -12,7 +12,7 @@ rapids-generate-version > ./VERSION
 RAPIDS_PACKAGE_VERSION=$(head -1 ./VERSION)
 export RAPIDS_PACKAGE_VERSION
 
-# populates `RATTLER_CHANNELS` array
+# populates `RATTLER_CHANNELS` array and `RATTLER_ARGS` array
 source rapids-rattler-channel-string
 
 rapids-logger "Building cuxfilter"
@@ -22,11 +22,8 @@ rapids-logger "Building cuxfilter"
 # more info is available at
 # https://rattler.build/latest/tips_and_tricks/#using-sccache-or-ccache-with-rattler-build
 rattler-build build --recipe conda/recipes/cuxfilter \
-                    --experimental \
-                    --no-build-id \
                     --test skip \
-                    --channel-priority disabled \
-                    --output-dir "$RAPIDS_CONDA_BLD_OUTPUT_DIR" \
+                    "${RATTLER_ARGS[@]}" \
                     "${RATTLER_CHANNELS[@]}"
 
 # remove build_cache directory to avoid uploading the entire source tree
