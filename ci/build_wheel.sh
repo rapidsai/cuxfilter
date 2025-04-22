@@ -6,8 +6,6 @@ set -euo pipefail
 package_name="cuxfilter"
 package_dir="python"
 
-wheel_dir=${RAPIDS_WHEEL_BLD_OUTPUT_DIR}
-
 source rapids-date-string
 
 rapids-generate-version > ./VERSION
