@@ -4,6 +4,7 @@ import cupy as cp
 import cudf
 import warnings
 
+
 # Define the CUDA kernel using numba.cuda.jit
 # This kernel implements the ray casting algorithm
 @cuda.jit(device=True)
@@ -40,7 +41,7 @@ def point_in_polygon_ray_cast(px, py, polygon_xy, num_vertices):
 
         # Check if the horizontal ray crosses the edge (vj, vj1)
         # Condition 1: Is the point's y-coordinate within the edge's y-range?
-        if ((vjy <= py < vj1y) or (vj1y <= py < vjy)):
+        if (vjy <= py < vj1y) or (vj1y <= py < vjy):
             # Condition 2: Is the edge not horizontal?
             if vjy != vj1y:
                 # Calculate the x-coordinate of the intersection
@@ -72,7 +73,7 @@ def point_in_polygon_kernel(points_xy, polygon_xy, num_vertices, out):
         Output boolean array. out[i] is True if points_xy[2*i:2*i+2] is
         inside the polygon.
     """
-    i = cuda.grid(1) # Global thread index
+    i = cuda.grid(1)  # Global thread index
 
     # Check if index is within bounds (number of points)
     if i < points_xy.shape[0] // 2:
@@ -111,7 +112,7 @@ def point_in_polygon(df, x, y, polygon_coords):
     # 1. Prepare point data
     num_points = len(df)
     if num_points == 0:
-        return cudf.Series([], dtype='bool', index=df.index)
+        return cudf.Series([], dtype="bool", index=df.index)
 
     # Interleave columns directly using cudf and get cupy array
     # .values returns a cupy array for cudf Series/DataFrame
@@ -126,11 +127,15 @@ def point_in_polygon(df, x, y, polygon_coords):
         if polygon_xy_cp.ndim == 2 and polygon_xy_cp.shape[1] == 2:
             polygon_xy_cp = polygon_xy_cp.flatten()
         elif polygon_xy_cp.ndim != 1:
-             raise ValueError("Polygon coordinates must be list of pairs or flat list.")
+            raise ValueError(
+                "Polygon coordinates must be list of pairs or flat list."
+            )
 
         # Validate size
         if polygon_xy_cp.size % 2 != 0:
-            raise ValueError("Polygon coordinates must have an even number of elements.")
+            raise ValueError(
+                "Polygon coordinates must have an even number of elements."
+            )
 
         num_vertices = polygon_xy_cp.size // 2
 
@@ -144,15 +149,16 @@ def point_in_polygon(df, x, y, polygon_coords):
             idx = cudf.RangeIndex(len(df))
         else:
             idx = df.index
-        return cudf.Series([False] * len(df), index=idx, dtype='bool')
-
+        return cudf.Series([False] * len(df), index=idx, dtype="bool")
 
     # 3. Prepare output array
     out_gpu = cp.zeros(num_points, dtype=cp.bool_)
 
     # 4. Configure and launch kernel
     threads_per_block = 128
-    blocks_per_grid = (num_points + (threads_per_block - 1)) // threads_per_block
+    blocks_per_grid = (
+        num_points + (threads_per_block - 1)
+    ) // threads_per_block
 
     if blocks_per_grid > 0:
         # Suppress NumbaPerformanceWarning for low grid size in tests
@@ -160,7 +166,7 @@ def point_in_polygon(df, x, y, polygon_coords):
             warnings.filterwarnings(
                 "ignore",
                 category=NumbaPerformanceWarning,
-                message="Grid size.*result in GPU under-utilization"
+                message="Grid size.*result in GPU under-utilization",
             )
             point_in_polygon_kernel[blocks_per_grid, threads_per_block](
                 points_xy_cp, polygon_xy_cp, num_vertices, out_gpu
