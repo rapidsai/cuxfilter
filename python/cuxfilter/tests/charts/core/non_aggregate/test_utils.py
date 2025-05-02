@@ -1,6 +1,5 @@
 import pytest
 import cudf
-import cupy as cp
 import numpy as np
 from cudf.testing import assert_series_equal
 
@@ -21,7 +20,9 @@ def sample_points_df():
             2.0,
             1.0,
             1.0,
-        ],  # Inside, Inside, Outside, Outside, Boundary, Boundary, Boundary Vertex, Inside
+        ],
+        # Inside, Inside, Outside, Outside, Boundary, Boundary,
+        # Boundary Vertex, Inside
         "y": [0.5, 0.5, 1.5, 1.5, 0.5, 0.5, 0.0, 1.0],
         "val": [1, 2, 3, 4, 5, 6, 7, 8],
     }
@@ -44,7 +45,8 @@ def simple_polygon_numpy(simple_polygon_list):
 def test_point_in_polygon_basic(sample_points_df, simple_polygon_list):
     """Test basic point in polygon functionality with list polygon."""
     result = point_in_polygon(sample_points_df, "x", "y", simple_polygon_list)
-    # Points: Inside(T), Outside(F), Outside(F), Outside(F), Boundary(T), Outside(F), Boundary Vertex(F), Boundary Vertex(F)
+    # Points: Inside(T), Outside(F), Outside(F), Outside(F), Boundary(T),
+    # Outside(F), Boundary Vertex(F), Boundary Vertex(F)
     # The ray casting implementation counts points on the left edge as inside.
     expected = cudf.Series(
         [True, False, False, False, True, False, False, False],
@@ -77,7 +79,8 @@ def test_point_in_polygon_invalid_polygon(sample_points_df):
     """Test with an invalid polygon (less than 3 vertices)."""
     invalid_poly = [(0, 0), (1, 1)]  # Only two vertices
     result = point_in_polygon(sample_points_df, "x", "y", invalid_poly)
-    # Expect all False as the function should handle invalid polygons gracefully
+    # Expect all False as the function should handle invalid polygons
+    # gracefully
     expected = cudf.Series(
         [False] * len(sample_points_df),
         index=sample_points_df.index,
@@ -117,10 +120,3 @@ def test_point_in_polygon_all_points_inside():
     result = point_in_polygon(points_df, "x", "y", large_polygon)
     expected = cudf.Series([True, True, True], index=points_df.index)
     assert_series_equal(result, expected)
-
-
-# Note: Testing points exactly *on* the boundary can be tricky due to floating-point precision
-# and the specific implementation of the ray casting algorithm (e.g., handling of horizontal edges,
-# vertices, and whether the < or <= operator is used for intersection check).
-# The current tests include boundary points and expect False based on the `<` check in the kernel.
-# If boundary inclusion rules change, these expected values might need adjustment.

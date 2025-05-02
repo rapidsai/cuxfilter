@@ -46,7 +46,8 @@ def point_in_polygon_ray_cast(px, py, polygon_xy, num_vertices):
             if vjy != vj1y:
                 # Calculate the x-coordinate of the intersection
                 x_intersection = vjx + (py - vjy) * (vj1x - vjx) / (vj1y - vjy)
-                # Condition 3: Is the intersection point to the right of the point?
+                # Condition 3: Is the intersection point to the right of
+                # the point?
                 if px < x_intersection:
                     intersections += 1
 
@@ -86,7 +87,8 @@ def point_in_polygon_kernel(points_xy, polygon_xy, num_vertices, out):
 
 def point_in_polygon(df, x, y, polygon_coords):
     """
-    Checks which points in a DataFrame are inside a given polygon using a CUDA kernel.
+    Checks which points in a DataFrame are inside a given polygon using a CUDA
+    kernel.
 
     Parameters
     ----------
@@ -105,7 +107,6 @@ def point_in_polygon(df, x, y, polygon_coords):
     cudf.Series
         A boolean Series indicating whether each point is inside the polygon.
     """
-    print(df, x, y, polygon_coords)
     if not isinstance(df, cudf.DataFrame):
         raise TypeError("Input 'df' must be a cudf.DataFrame")
 
@@ -142,7 +143,7 @@ def point_in_polygon(df, x, y, polygon_coords):
         if num_vertices < 3:
             raise ValueError("Polygon must have at least 3 vertices.")
 
-    except (ValueError, TypeError) as e:
+    except (ValueError, TypeError):
         # Handle invalid polygon formats or insufficient vertices
         # Return all False as per the check at the start
         if isinstance(df.index, cudf.MultiIndex):
