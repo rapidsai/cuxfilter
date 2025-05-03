@@ -123,30 +123,61 @@ class TestCoreNonAggregateChart:
         bnac = BaseNonAggregate()
         bnac.x = "a"
         bnac.y = "b"
-        bnac.chart_type = "temp"
+        bnac.chart_type = "non_agg_lasso_test"
 
         df = initialize_df(df_type, {"a": [0, 1, 1, 2], "b": [0, 1, 2, 0]})
-        expected_df = initialize_df(df_type, {"a": [0, 1], "b": [0, 2]})
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
-        # Add the last point to close the shape
-        geometry = np.array([[1, 1], [1, 2], [2, 2], [2, 1], [1, 1]])
+        # Define the lasso polygon - square from (1,1) to (2,2)
+        geometry = np.array(
+            [[1.0, 1.0], [1.0, 2.0], [2.0, 2.0], [2.0, 1.0], [1.0, 1.0]],
+            dtype=np.float64,
+        )
 
-        t = bnac.get_lasso_select_callback(dashboard)
-        with mock.patch("cuspatial.point_in_polygon") as pip:
-            if isinstance(df, dask_cudf.DataFrame):
-                # point in polygon is called per partition,
-                # in this case 2 partitions of length 2 each
-                pip.return_value = cudf.DataFrame({"selection": [True, False]})
-            else:
-                pip.return_value = cudf.DataFrame(
-                    {"selection": [True, False, True, False]}
-                )
-            t(geometry)
-            assert pip.called
-            result_df = dashboard._query(dashboard._generate_query_str())
-            assert isinstance(result_df, df_type)
-            assert df_equals(result_df, expected_df)
+        # Get the callback function
+        lasso_callback = bnac.get_lasso_select_callback(dashboard)
+
+        # Execute the callback
+        lasso_callback(geometry=geometry)
+
+        # --- Expected Result Definition ---
+        # Only point (a=1, b=1) should be selected
+        expected_nodes_data = {
+            "a": [1],
+            "b": [1],
+        }
+        # Always create the expected result as a cudf.DataFrame
+        expected_cudf_df = cudf.DataFrame(expected_nodes_data)
+        # Ensure dtypes match the original for robust comparison
+        expected_cudf_df["a"] = expected_cudf_df["a"].astype(df["a"].dtype)
+        expected_cudf_df["b"] = expected_cudf_df["b"].astype(df["b"].dtype)
+
+        # --- Comparison Logic ---
+        # The callback updates the dashboard's query dictionary
+        # We need to execute the query to get the selected data
+        result_df = dashboard._query(dashboard._generate_query_str())
+
+        assert result_df is not None
+
+        # Compute the result if it's a Dask DataFrame
+        if isinstance(result_df, dask_cudf.DataFrame):
+            result_to_compare = result_df.compute()
+        else:
+            result_to_compare = result_df
+
+        # Ensure result is sorted and indexed like the expected one
+        if result_to_compare is not None and len(result_to_compare) > 0:
+            result_to_compare = result_to_compare.sort_values(
+                by=["a", "b"]
+            ).reset_index(drop=True)
+
+        expected_cudf_df = expected_cudf_df.sort_values(
+            by=["a", "b"]
+        ).reset_index(drop=True)
+
+        # Assert the content matches the expected selected nodes
+        assert isinstance(result_to_compare, cudf.DataFrame)
+        assert df_equals(result_to_compare, expected_cudf_df)
 
     @pytest.mark.parametrize(
         "data, _data",
