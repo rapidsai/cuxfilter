@@ -5,7 +5,7 @@ Try a user guide notebook of an end-to-end RAPIDS visualization integrated workf
 ### The workflow includes integrated examples that use:
 - cuDF for EDA
 - cuML for KDE and Kmeans
-- cuSpatial for Haversine Distance
+- cupy for Haversine Distance
 - cuGraph for FA2
 - cuxfilter for cross-filtered bars, graph, and geospatial scatter charts
 - hvPlot with bokeh, datashader, and panel for multiple chart types
