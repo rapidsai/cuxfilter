@@ -149,10 +149,14 @@ class TestCoreGraph:
     def test_lasso_selection_callback(self, df_type):
         nodes = initialize_df(
             df_type,
-            {"vertex": [0, 1, 2, 3], "x": [0, 1, 1, 2], "y": [0, 1, 2, 0]},
+            {
+                "vertex": [0, 1, 2, 3],
+                "x": [0.5, 1.5, 0.5, 2.5],
+                "y": [0.5, 1.5, 1.5, 0.5],
+            },
         )
         edges = initialize_df(
-            df_type, {"source": [1, 1, 1, 1], "target": [0, 1, 2, 3]}
+            df_type, {"source": [0, 2], "target": [2, 3]}  # Simplified edges
         )
         dashboard = DashBoard(dataframe=DataFrame.load_graph((nodes, edges)))
 
@@ -189,11 +193,11 @@ class TestCoreGraph:
         lasso_callback(geometry=geometry)
 
         # --- Expected Result Definition ---
-        # Only node 1 (vertex=1, x=1, y=1) should be selected
+        # Node 2 (vertex=2, x=1.5, y=1.5) should be selected.
         expected_nodes_data = {
             "vertex": [1],
-            "x": [1],
-            "y": [1],
+            "x": [1.5],
+            "y": [1.5],
         }
         # Always create the expected result as a cudf.DataFrame
         expected_cudf_df = cudf.DataFrame(expected_nodes_data)

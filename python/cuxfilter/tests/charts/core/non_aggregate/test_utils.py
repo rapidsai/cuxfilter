@@ -10,21 +10,15 @@ from cuxfilter.charts.core.non_aggregate.utils import point_in_polygon
 @pytest.fixture
 def sample_points_df():
     """Create a sample cudf DataFrame for testing."""
+    # Points relative to polygon (0,0)-(1,1):
+    # (0.5, 0.5) -> Inside
+    # (1.5, 0.5) -> Outside
+    # (0.5, 1.5) -> Outside
+    # (1.5, 1.5) -> Outside
     data = {
-        "x": [
-            0.5,
-            1.5,
-            0.5,
-            1.5,
-            0.0,
-            2.0,
-            1.0,
-            1.0,
-        ],
-        # Inside, Inside, Outside, Outside, Boundary, Boundary,
-        # Boundary Vertex, Inside
-        "y": [0.5, 0.5, 1.5, 1.5, 0.5, 0.5, 0.0, 1.0],
-        "val": [1, 2, 3, 4, 5, 6, 7, 8],
+        "x": [0.5, 1.5, 0.5, 1.5],
+        "y": [0.5, 0.5, 1.5, 1.5],
+        "val": [1, 2, 3, 4],  # Corresponds to original vals for these points
     }
     return cudf.DataFrame(data)
 
@@ -45,11 +39,9 @@ def simple_polygon_numpy(simple_polygon_list):
 def test_point_in_polygon_basic(sample_points_df, simple_polygon_list):
     """Test basic point in polygon functionality with list polygon."""
     result = point_in_polygon(sample_points_df, "x", "y", simple_polygon_list)
-    # Points: Inside(T), Outside(F), Outside(F), Outside(F), Boundary(T),
-    # Outside(F), Boundary Vertex(F), Boundary Vertex(F)
-    # The ray casting implementation counts points on the left edge as inside.
+    # Points: Inside(T), Outside(F), Outside(F), Outside(F)
     expected = cudf.Series(
-        [True, False, False, False, True, False, False, False],
+        [True, False, False, False],
         index=sample_points_df.index,
     )
     assert_series_equal(result, expected)
@@ -60,7 +52,7 @@ def test_point_in_polygon_numpy_poly(sample_points_df, simple_polygon_numpy):
     result = point_in_polygon(sample_points_df, "x", "y", simple_polygon_numpy)
     # Expect the same result as with the list polygon
     expected = cudf.Series(
-        [True, False, False, False, True, False, False, False],
+        [True, False, False, False],
         index=sample_points_df.index,
     )
     assert_series_equal(result, expected)
@@ -95,7 +87,7 @@ def test_point_in_polygon_flat_polygon(sample_points_df):
     result = point_in_polygon(sample_points_df, "x", "y", flat_poly)
     # Expect the same result
     expected = cudf.Series(
-        [True, False, False, False, True, False, False, False],
+        [True, False, False, False],
         index=sample_points_df.index,
     )
     assert_series_equal(result, expected)

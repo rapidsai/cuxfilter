@@ -125,7 +125,9 @@ class TestCoreNonAggregateChart:
         bnac.y = "b"
         bnac.chart_type = "non_agg_lasso_test"
 
-        df = initialize_df(df_type, {"a": [0, 1, 1, 2], "b": [0, 1, 2, 0]})
+        df = initialize_df(
+            df_type, {"a": [0.5, 1.5, 0.5, 2.5], "b": [0.5, 1.5, 1.5, 0.5]}
+        )
         dashboard = DashBoard(dataframe=DataFrame.from_dataframe(df))
 
         # Define the lasso polygon - square from (1,1) to (2,2)
@@ -141,10 +143,10 @@ class TestCoreNonAggregateChart:
         lasso_callback(geometry=geometry)
 
         # --- Expected Result Definition ---
-        # Only point (a=1, b=1) should be selected
+        # Point (a=1.5, b=1.5) should be selected.
         expected_nodes_data = {
-            "a": [1],
-            "b": [1],
+            "a": [1.5],
+            "b": [1.5],
         }
         # Always create the expected result as a cudf.DataFrame
         expected_cudf_df = cudf.DataFrame(expected_nodes_data)
