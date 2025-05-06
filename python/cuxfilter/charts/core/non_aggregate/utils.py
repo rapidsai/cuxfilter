@@ -150,13 +150,13 @@ def point_in_polygon(df, x, y, polygon_coords):
             idx = cudf.RangeIndex(len(df))
         else:
             idx = df.index
-        return cudf.Series([False] * len(df), index=idx, dtype="bool")
+        return cudf.Series(cp.zeros(len(df), dtype=cp.bool_), index=idx)
 
     # 3. Prepare output array
     out_gpu = cp.zeros(num_points, dtype=cp.bool_)
 
     # 4. Configure and launch kernel
-    threads_per_block = 128
+    threads_per_block = 256
     blocks_per_grid = (
         num_points + (threads_per_block - 1)
     ) // threads_per_block
