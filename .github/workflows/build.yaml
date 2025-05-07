@@ -68,8 +68,8 @@ jobs:
       script: ci/build_wheel.sh
       # This selects "ARCH=amd64 + the latest supported Python + CUDA".
       matrix_filter: map(select(.ARCH == "amd64")) | group_by(.CUDA_VER|split(".")|map(tonumber)|.[0]) | map(max_by([(.PY_VER|split(".")|map(tonumber)), (.CUDA_VER|split(".")|map(tonumber))]))
+      package-name: cuxfilter
       package-type: python
-      wheel-name: cuxfilter
       pure-wheel: true
   wheel-publish:
     needs: wheel-build
@@ -81,3 +81,4 @@ jobs:
       sha: ${{ inputs.sha }}
       date: ${{ inputs.date }}
       package-name: cuxfilter
+      package-type: python

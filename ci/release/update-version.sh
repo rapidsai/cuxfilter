@@ -45,7 +45,6 @@ DEPENDENCIES=(
   dask-cuda
   dask-cudf
   cugraph
-  cuspatial
 )
 for DEP in "${DEPENDENCIES[@]}"; do
   for FILE in dependencies.yaml conda/environments/*.yaml; do
