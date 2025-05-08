@@ -23,7 +23,7 @@ on:
 jobs:
   test-external:
     secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/custom-job.yaml@python-3.13
+    uses: rapidsai/shared-workflows/.github/workflows/custom-job.yaml@cuda-12.9.0
     with:
       build_type: branch
       node_type: "gpu-l4-latest-1"
