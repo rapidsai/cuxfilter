@@ -34,7 +34,6 @@ requirements:
     - ${{ pin_compatible("cuda-version", upper_bound="x", lower_bound="x") }}
     - cudf =${{ minor_version }}
     - cupy >=12.0.0
-    - cuspatial =${{ minor_version }}
     - dask-cudf =${{ minor_version }}
     - datashader >=0.15
     - geopandas >=0.11.0
@@ -42,7 +41,7 @@ requirements:
     - jupyter-server-proxy
     - libwebp-base
     - nodejs >=14
-    - numba >=0.59.1,<0.61.0a0
+    - numba >=0.59.1,<0.62.0a0
     - numpy >=1.23,<3.0a0
     - packaging
     - panel >=1.0

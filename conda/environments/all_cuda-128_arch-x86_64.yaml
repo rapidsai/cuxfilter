@@ -26,7 +26,7 @@ dependencies:
 - nbsphinx
 - nodejs>=18
 - notebook>=0.5.0
-- numba>=0.59.1,<0.61.0a0
+- numba>=0.59.1,<0.62.0a0
 - numpy>=1.23,<3.0a0
 - numpydoc
 - packaging
@@ -37,7 +37,7 @@ dependencies:
 - pytest
 - pytest-cov
 - pytest-xdist
-- python>=3.10,<3.13
+- python>=3.10,<3.14
 - rapids-build-backend>=0.3.0,<0.4.0.dev0
 - recommonmark
 - setuptools
