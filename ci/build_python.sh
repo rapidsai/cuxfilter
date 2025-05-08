@@ -15,7 +15,7 @@ export RAPIDS_PACKAGE_VERSION
 # populates `RATTLER_CHANNELS` array and `RATTLER_ARGS` array
 source rapids-rattler-channel-string
 
-rapids-logger "Building cuxfilter"
+rapids-logger "Building cuxfilter python package"
 
 # TODO: Remove `--test skip` flag once importing on a CPU works
 # --no-build-id allows for caching with `sccache`

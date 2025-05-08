@@ -149,39 +149,77 @@ class TestCoreGraph:
     def test_lasso_selection_callback(self, df_type):
         nodes = initialize_df(
             df_type,
-            {"vertex": [0, 1, 2, 3], "x": [0, 1, 1, 2], "y": [0, 1, 2, 0]},
+            {
+                "vertex": [0, 1, 2, 3],
+                "x": [0.5, 1.5, 0.5, 2.5],
+                "y": [0.5, 1.5, 1.5, 0.5],
+            },
         )
         edges = initialize_df(
-            df_type, {"source": [1, 1, 1, 1], "target": [0, 1, 2, 3]}
+            df_type, {"source": [0, 2], "target": [2, 3]}  # Simplified edges
         )
         dashboard = DashBoard(dataframe=DataFrame.load_graph((nodes, edges)))
 
         bg = BaseGraph()
-        bg.chart_type = "temp"
-        bg.nodes = nodes
+        bg.chart_type = "graph_lasso_test"
+        bg.nodes = nodes  # Make sure BaseGraph instance knows the nodes
         bg.edges = edges
         bg.inspect_neighbors = CustomInspectTool(_active=False)
 
+        self.result = None  # Reset result for the test
+
         def t_function(data, edges=None, patch_update=False):
-            self.result = data
+            # Store the result sorted by vertex for consistent comparison
+            # Handle empty DataFrame case
+            if data is not None and len(data) > 0:
+                self.result = data.sort_values(by="vertex").reset_index(
+                    drop=True
+                )
+            elif data is not None:  # Empty dataframe
+                self.result = data
+            else:  # data is None
+                self.result = None
 
         bg.reload_chart = t_function
-        # Add the last point to close the shape
-        geometry = np.array([[1, 1], [1, 2], [2, 2], [2, 1], [1, 1]])
+        # Define the lasso polygon - square from (1,1) to (2,2)
+        geometry = np.array(
+            [[1.0, 1.0], [1.0, 2.0], [2.0, 2.0], [2.0, 1.0], [1.0, 1.0]],
+            dtype=np.float64,
+        )
 
-        t = bg.get_lasso_select_callback(dashboard)
-        with mock.patch("cuspatial.point_in_polygon") as pip:
-            if isinstance(nodes, dask_cudf.DataFrame):
-                # point in polygon is called per partition,
-                # in this case 2 partitions of length 2 each
-                pip.return_value = cudf.DataFrame({"selection": [True, False]})
-            else:
-                pip.return_value = cudf.DataFrame(
-                    {"selection": [True, False, True, False]}
-                )
-            t(geometry)
-            assert pip.called
-            assert isinstance(self.result, df_type)
+        # Get the callback function
+        lasso_callback = bg.get_lasso_select_callback(dashboard)
+        # Execute the callback with the geometry
+        lasso_callback(geometry=geometry)
+
+        # --- Expected Result Definition ---
+        # Node 2 (vertex=2, x=1.5, y=1.5) should be selected.
+        expected_nodes_data = {
+            "vertex": [1],
+            "x": [1.5],
+            "y": [1.5],
+        }
+        # Always create the expected result as a cudf.DataFrame
+        expected_cudf_df = cudf.DataFrame(expected_nodes_data)
+
+        # --- Comparison Logic ---
+        assert self.result is not None
+
+        # Compute the result if it's a Dask DataFrame
+        if isinstance(self.result, dask_cudf.DataFrame):
+            result_to_compare = self.result.compute()
+        else:
+            result_to_compare = self.result
+
+        # Ensure result is sorted and indexed like the expected one
+        if result_to_compare is not None and len(result_to_compare) > 0:
+            result_to_compare = result_to_compare.sort_values(
+                by="vertex"
+            ).reset_index(drop=True)
+
+        # Assert the content matches the expected selected nodes
+        # df_equals likely uses cudf.testing.assert_frame_equal internally
+        assert df_equals(result_to_compare, expected_cudf_df)
 
     @pytest.mark.parametrize("df_type", df_types)
     @pytest.mark.parametrize(
