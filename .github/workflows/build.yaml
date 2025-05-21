@@ -33,6 +33,7 @@ jobs:
       build_type: ${{ inputs.build_type || 'branch' }}
       branch: ${{ inputs.branch }}
       date: ${{ inputs.date }}
+      script: ci/build_python.sh
       sha: ${{ inputs.sha }}
   upload-conda:
     needs: [python-build]
@@ -55,7 +56,7 @@ jobs:
       container_image: "rapidsai/ci-conda:latest"
       date: ${{ inputs.date }}
       node_type: "gpu-l4-latest-1"
-      run_script: "ci/build_docs.sh"
+      script: "ci/build_docs.sh"
       sha: ${{ inputs.sha }}
   wheel-build:
     secrets: inherit
