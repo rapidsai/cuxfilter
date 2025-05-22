@@ -7,6 +7,7 @@ package_name="cuxfilter"
 package_dir="python"
 
 source rapids-date-string
+source rapids-init-pip
 
 rapids-generate-version > ./VERSION
 
