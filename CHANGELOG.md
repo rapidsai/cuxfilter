@@ -1,3 +1,21 @@
+# cuxfilter 25.06.00 (5 Jun 2025)
+
+## 🛠️ Improvements
+
+- use &#39;rapids-init-pip&#39; in wheel CI, other CI changes ([#690](https://github.com/rapidsai/cuxfilter/pull/690)) [@jameslamb](https://github.com/jameslamb)
+- Finish CUDA 12.9 migration and use branch-25.06 workflows ([#688](https://github.com/rapidsai/cuxfilter/pull/688)) [@bdice](https://github.com/bdice)
+- Quote head_rev in conda recipes ([#687](https://github.com/rapidsai/cuxfilter/pull/687)) [@bdice](https://github.com/bdice)
+- Build and test with CUDA 12.9.0 ([#685](https://github.com/rapidsai/cuxfilter/pull/685)) [@bdice](https://github.com/bdice)
+- Add support for Python 3.13 ([#682](https://github.com/rapidsai/cuxfilter/pull/682)) [@gforsyth](https://github.com/gforsyth)
+- Replace cuspatial ([#681](https://github.com/rapidsai/cuxfilter/pull/681)) [@AjayThorve](https://github.com/AjayThorve)
+- Download build artifacts from Github for CI ([#680](https://github.com/rapidsai/cuxfilter/pull/680)) [@VenkateshJaya](https://github.com/VenkateshJaya)
+- refactor(rattler): enable strict channel priority for builds ([#679](https://github.com/rapidsai/cuxfilter/pull/679)) [@gforsyth](https://github.com/gforsyth)
+- Add ARM conda environments ([#677](https://github.com/rapidsai/cuxfilter/pull/677)) [@bdice](https://github.com/bdice)
+- fix(docs): pin bokeh upper-bound for all docs environments ([#675](https://github.com/rapidsai/cuxfilter/pull/675)) [@gforsyth](https://github.com/gforsyth)
+- Forward-merge branch-25.04 into branch-25.06 ([#674](https://github.com/rapidsai/cuxfilter/pull/674)) [@gforsyth](https://github.com/gforsyth)
+- Port all conda recipes to `rattler-build` ([#669](https://github.com/rapidsai/cuxfilter/pull/669)) [@gforsyth](https://github.com/gforsyth)
+- Moving wheel builds to specified location and uploading build artifacts to Github ([#667](https://github.com/rapidsai/cuxfilter/pull/667)) [@VenkateshJaya](https://github.com/VenkateshJaya)
+
 # cuxfilter 25.04.00 (9 Apr 2025)
 
 ## 📖 Documentation

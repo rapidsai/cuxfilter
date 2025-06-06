@@ -28,16 +28,17 @@ concurrency:
 jobs:
   python-build:
     secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/conda-python-build.yaml@branch-25.04
+    uses: rapidsai/shared-workflows/.github/workflows/conda-python-build.yaml@branch-25.06
     with:
       build_type: ${{ inputs.build_type || 'branch' }}
       branch: ${{ inputs.branch }}
       date: ${{ inputs.date }}
+      script: ci/build_python.sh
       sha: ${{ inputs.sha }}
   upload-conda:
     needs: [python-build]
     secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/conda-upload-packages.yaml@branch-25.04
+    uses: rapidsai/shared-workflows/.github/workflows/conda-upload-packages.yaml@branch-25.06
     with:
       build_type: ${{ inputs.build_type || 'branch' }}
       branch: ${{ inputs.branch }}
@@ -47,7 +48,7 @@ jobs:
     if: github.ref_type == 'branch'
     needs: python-build
     secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/custom-job.yaml@branch-25.04
+    uses: rapidsai/shared-workflows/.github/workflows/custom-job.yaml@branch-25.06
     with:
       arch: "amd64"
       branch: ${{ inputs.branch }}
@@ -55,11 +56,11 @@ jobs:
       container_image: "rapidsai/ci-conda:latest"
       date: ${{ inputs.date }}
       node_type: "gpu-l4-latest-1"
-      run_script: "ci/build_docs.sh"
+      script: "ci/build_docs.sh"
       sha: ${{ inputs.sha }}
   wheel-build:
     secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/wheels-build.yaml@branch-25.04
+    uses: rapidsai/shared-workflows/.github/workflows/wheels-build.yaml@branch-25.06
     with:
       build_type: ${{ inputs.build_type || 'branch' }}
       branch: ${{ inputs.branch }}
@@ -68,13 +69,17 @@ jobs:
       script: ci/build_wheel.sh
       # This selects "ARCH=amd64 + the latest supported Python + CUDA".
       matrix_filter: map(select(.ARCH == "amd64")) | group_by(.CUDA_VER|split(".")|map(tonumber)|.[0]) | map(max_by([(.PY_VER|split(".")|map(tonumber)), (.CUDA_VER|split(".")|map(tonumber))]))
+      package-name: cuxfilter
+      package-type: python
+      pure-wheel: true
   wheel-publish:
     needs: wheel-build
     secrets: inherit
-    uses: rapidsai/shared-workflows/.github/workflows/wheels-publish.yaml@branch-25.04
+    uses: rapidsai/shared-workflows/.github/workflows/wheels-publish.yaml@branch-25.06
     with:
       build_type: ${{ inputs.build_type || 'branch' }}
       branch: ${{ inputs.branch }}
       sha: ${{ inputs.sha }}
       date: ${{ inputs.date }}
       package-name: cuxfilter
+      package-type: python
