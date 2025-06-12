@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (c) 2020-2023, NVIDIA CORPORATION.
+# Copyright (c) 2020-2025, NVIDIA CORPORATION.
 
 set -euo pipefail
 
@@ -35,11 +35,11 @@ SKIPNBS=""
 EXITCODE=0
 trap "EXITCODE=1" ERR
 set +e
+# shellcheck disable=SC2044
 for nb in $(find . -name "*.ipynb"); do
-    nbBasename=$(basename ${nb})
+    nbBasename=$(basename "${nb}")
     # Skip all notebooks that use dask (in the code or even in their name)
-    if ((echo ${nb} | grep -qi dask) || \
-        (grep -q dask ${nb})); then
+    if (echo "${nb}" | grep -qi dask) || (grep -q dask "${nb}"); then
         echo "--------------------------------------------------------------------------------"
         echo "SKIPPING: ${nb} (suspected Dask usage, not currently automatable)"
         echo "--------------------------------------------------------------------------------"
@@ -49,7 +49,7 @@ for nb in $(find . -name "*.ipynb"); do
         echo "--------------------------------------------------------------------------------"
     else
         nvidia-smi
-        ${NBTEST} ${nbBasename}
+        ${NBTEST} "${nbBasename}"
     fi
 done
 
