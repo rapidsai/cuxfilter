@@ -43,7 +43,7 @@ jobs:
         test_notebooks:
           - '**'
           - '!.pre-commit-config.yaml'
-          - '!.shellcheckrc
+          - '!.shellcheckrc'
           - '!CONTRIBUTING.md'
           - '!EXTERNAL_TESTS.md'
           - '!README.md'
@@ -51,7 +51,7 @@ jobs:
         test_python:
           - '**'
           - '!.pre-commit-config.yaml'
-          - '!.shellcheckrc
+          - '!.shellcheckrc'
           - '!CONTRIBUTING.md'
           - '!EXTERNAL_TESTS.md'
           - '!README.md'
