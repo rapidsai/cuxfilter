@@ -36,7 +36,8 @@ EXITCODE=0
 trap "EXITCODE=1" ERR
 set +e
 # shellcheck disable=SC2044
-for nb in $(find . -name "*.ipynb"); do
+readarray -d '' nb_files < <(find . -name "*.ipynb")
+for nb in "${nb_files[@]}"; do
     nbBasename=$(basename "${nb}")
     # Skip all notebooks that use dask (in the code or even in their name)
     if (echo "${nb}" | grep -qi dask) || (grep -q dask "${nb}"); then
