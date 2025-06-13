@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (c) 2023, NVIDIA CORPORATION.
+# Copyright (c) 2023-2025, NVIDIA CORPORATION.
 
 set -e
 
@@ -45,43 +45,43 @@ if [ "$PROJECT" = "all" ]; then
     do
         rapids-logger "Clone $LIBRARY"
         # Clone the repository
-        git clone https://github.com/holoviz/$LIBRARY.git
+        git clone https://github.com/holoviz/"${LIBRARY}".git
 
         rapids-logger "Install $LIBRARY"
 
         # Change directory to the library
-        pushd $LIBRARY
+        pushd "$LIBRARY"
         # Run setup.py with test dependencies
-        rapids-pip-retry install .[tests]
+        rapids-pip-retry install ".[tests]"
 
         rapids-logger "Run GPU tests for $LIBRARY"
 
-        python -m pytest $LIBRARY/tests/ --numprocesses=8 --dist=worksteal --gpu
+        python -m pytest "$LIBRARY"/tests/ --numprocesses=8 --dist=worksteal --gpu
 
         popd
     done
 else
     rapids-logger "Clone $PROJECT"
-    git clone https://github.com/pyviz/$PROJECT.git
+    git clone https://github.com/pyviz/"${PROJECT}".git
 
     # Check if PR_NUMBER is a non-empty, valid number
     if [ "$PR_NUMBER" -ne 0 ] && [ "$PR_NUMBER" -eq "$PR_NUMBER" ] 2>/dev/null; then
         rapids-logger "checkout PR $PR_NUMBER"
         # Fetch the pull request and check it out
-        git fetch origin pull/$PR_NUMBER/head:pr/$PR_NUMBER
-        git checkout pr/$PR_NUMBER
+        git fetch origin pull/"$PR_NUMBER"/head:pr/"$PR_NUMBER"
+        git checkout pr/"$PR_NUMBER"
     fi
     rapids-logger "Install $PROJECT"
 
     # Change directory to the specified project
-    pushd $PROJECT
+    pushd "$PROJECT"
     # Run setup.py with test dependencies
-    rapids-pip-retry install .[tests]
+    rapids-pip-retry install ".[tests]"
 
 
     rapids-logger "Run GPU tests for $PROJECT"
 
-    python -m pytest $PROJECT/tests/ --numprocesses=8 --dist=worksteal --gpu
+    python -m pytest "$PROJECT"/tests/ --numprocesses=8 --dist=worksteal --gpu
 
     popd
 fi
