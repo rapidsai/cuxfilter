@@ -12,7 +12,6 @@ dependencies:
 - cudf==25.8.*,>=0.0.0a0
 - cugraph==25.8.*,>=0.0.0a0
 - cupy>=12.0.0
-- cuspatial==25.8.*,>=0.0.0a0
 - dask-cuda==25.8.*,>=0.0.0a0
 - dask-cudf==25.8.*,>=0.0.0a0
 - datashader>=0.15
