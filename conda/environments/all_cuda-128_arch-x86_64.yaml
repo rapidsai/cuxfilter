@@ -15,7 +15,7 @@ dependencies:
 - dask-cudf==25.8.*,>=0.0.0a0
 - datashader>=0.15
 - geopandas>=0.11.0
-- holoviews>=1.16.0
+- holoviews>=1.16.0,<1.21.0a0
 - ipykernel
 - ipython
 - jupyter-server-proxy
