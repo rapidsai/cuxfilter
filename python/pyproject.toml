@@ -1,4 +1,4 @@
-# Copyright (c) 2023, NVIDIA CORPORATION.
+# Copyright (c) 2023-2025, NVIDIA CORPORATION.
 
 [build-system]
 build-backend = "rapids_build_backend.build"
@@ -24,7 +24,7 @@ dependencies = [
     "dask-cudf==25.8.*,>=0.0.0a0",
     "datashader>=0.15",
     "geopandas>=0.11.0",
-    "holoviews>=1.16.0",
+    "holoviews>=1.16.0,<1.21.0a0",
     "jupyter-server-proxy",
     "numba>=0.59.1,<0.62.0a0",
     "numpy>=1.23,<3.0a0",
