@@ -22,14 +22,10 @@ HELP="$0 [clean] [cuxfilter] [-v] [-g] [-n] [-h]
    clean        - remove all existing build artifacts and configuration (start
                   over)
    cuxfilter    - build the cuxfilter library only
-   -n           - no install step
    -h           - print this text
 "
 CUXFILTER_BUILD_DIR=${REPODIR}/python/cuxfilter/build
 BUILD_DIRS="${CUXFILTER_BUILD_DIR}"
-
-# Set defaults for vars modified by flags to this script
-INSTALL_TARGET=install
 
 # Set defaults for vars that may not have been defined externally
 #  FIXME: if INSTALL_PREFIX is not set, check PREFIX, then check
@@ -56,11 +52,6 @@ if (( NUMARGS != 0 )); then
     done
 fi
 
-# Process flags
-if hasArg -n; then
-    INSTALL_TARGET=""
-fi
-
 # If clean given, run it prior to any other steps
 if hasArg clean; then
     # If the dirs to clean are mounted dirs in a container, the
@@ -81,12 +72,5 @@ fi
 if (( NUMARGS == 0 )) || hasArg cuxfilter; then
 
     cd "${REPODIR}"/python
-    echo "8"
-    if [[ ${INSTALL_TARGET} != "" ]]; then
-        python setup.py build_ext --inplace
-        RAPIDS_DISABLE_CUDA=true \
-            python setup.py install --single-version-externally-managed --record=record.txt
-    else
-        python setup.py build_ext --inplace --library-dir="${LIBCUXFILTER_BUILD_DIR}"
-    fi
+    python -m pip install --no-build-isolation --no-deps --config-settings rapidsai.disable-cuda=true .
 fi
