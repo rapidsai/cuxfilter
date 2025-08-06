@@ -39,7 +39,7 @@ Be sure to replace `Charts().view()` with below to pre-compute and export each c
 Then run nbconvert to generate the wrapper page and manually add each exported chart:
 
 ```bash
-conda create -n viz-catalog-env -c rapidsai -c conda-forge -c nvidia \
+conda create -n viz-catalog-env -c rapidsai -c conda-forge \
     cudf=22.12 datashader holoviews hvplot jupyterlab plotly python=3.9 seaborn
 
 conda activate viz-catalog-env

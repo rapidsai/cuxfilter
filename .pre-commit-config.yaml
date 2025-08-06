@@ -15,14 +15,22 @@ repos:
                 args: ["--config=.flake8"]
                 files: python/.*$
       - repo: https://github.com/rapidsai/pre-commit-hooks
-        rev: v0.4.0
+        rev: v0.6.0
         hooks:
             - id: verify-alpha-spec
               args: ["--fix", "--mode=release"]
       - repo: https://github.com/rapidsai/dependency-file-generator
-        rev: v1.16.0
+        rev: v1.19.0
         hooks:
             - id: rapids-dependency-file-generator
               args: ["--clean"]
+      - repo: https://github.com/rapidsai/pre-commit-hooks
+        rev: v0.6.0
+        hooks:
+          - id: verify-copyright
+      - repo: https://github.com/shellcheck-py/shellcheck-py
+        rev: v0.10.0.1
+        hooks:
+          - id: shellcheck
 default_language_version:
       python: python3

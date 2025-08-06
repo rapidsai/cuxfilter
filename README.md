@@ -144,7 +144,7 @@ Please see the [Demo Docker Repository](https://hub.docker.com/r/rapidsai/rapids
 
 ### CUDA/GPU requirements
 
-- CUDA 11.2+
+- CUDA 12.0+
 - Volta architecture or newer (Compute Capability >=7.0)
 
 ### Conda
@@ -155,24 +155,16 @@ For the nightly version of `cuxfilter`:
 
 ```bash
 # for CUDA 12
-conda install -c rapidsai-nightly -c conda-forge -c nvidia \
-    cuxfilter=25.06 python=3.13 cuda-version=12.8
-
-# for CUDA 11
-conda install -c rapidsai-nightly -c conda-forge -c nvidia \
-    cuxfilter=25.06 python=3.13 cuda-version=11.8
+conda install -c rapidsai-nightly -c conda-forge \
+    cuxfilter=25.08 python=3.13 cuda-version=12.9
 ```
 
 For the stable version of `cuxfilter`:
 
 ```bash
 # for CUDA 12
-conda install -c rapidsai -c conda-forge -c nvidia \
-    cuxfilter python=3.13 cuda-version=12.8
-
-# for CUDA 11
-conda install -c rapidsai -c conda-forge -c nvidia \
-    cuxfilter python=3.13 cuda-version=11.8
+conda install -c rapidsai -c conda-forge \
+    cuxfilter python=3.13 cuda-version=12.9
 ```
 
 Note: cuxfilter is supported only on Linux, and with Python versions 3.10, 3.11, 3.12, and 3.13.
@@ -186,9 +178,6 @@ Install cuxfilter from PyPI using pip:
 ```bash
 # for CUDA 12.0
 pip install cuxfilter-cu12 -extra-index-url=https://pypi.nvidia.com
-
-# for CUDA 11.8
-pip install cuxfilter-cu11 -extra-index-url=https://pypi.nvidia.com
 ```
 
 See the [Get RAPIDS version picker](https://rapids.ai/start.html) for more OS and version info.

@@ -8,12 +8,8 @@ For the most customized way of installing RAPIDS and cuxfilter, visit the select
 .. code-block:: bash
 
     # for CUDA 12
-    conda install -c rapidsai -c conda-forge -c nvidia \
-        cuxfilter=25.06 python=3.10 cuda-version=12.8
-
-    # for CUDA 11
-    conda install -c rapidsai -c conda-forge -c nvidia \
-        cuxfilter=25.06 python=3.10 cuda-version=11.8
+    conda install -c rapidsai -c conda-forge \
+        cuxfilter=25.08 python=3.10 cuda-version=12.9
 
 PyPI
 ----
@@ -24,9 +20,6 @@ Install cuxfilter from PyPI using pip:
     # for CUDA 12
     pip install cuxfilter-cu12 -extra-index-url=https://pypi.nvidia.com
 
-    # for CUDA 11
-    pip install cuxfilter-cu11 -extra-index-url=https://pypi.nvidia.com
-
 
 Docker container
 ----------------
@@ -36,10 +29,9 @@ cuxfilter docker example installation for cuda 12.0, ubuntu 20.04:
 
 .. code-block:: bash
 
-    # ex. for CUDA 11.8
     docker pull rapidsai/rapidsai:cuda12.0-runtime-ubuntu20.04
     docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 \
-        rapidsai/rapidsai:cuda11.8-runtime-ubuntu20.04
+        rapidsai/rapidsai:cuda12.0-runtime-ubuntu20.04
 
     # open http://localhost:8888
 
