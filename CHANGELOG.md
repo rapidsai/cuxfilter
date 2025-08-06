@@ -1,3 +1,33 @@
+# cuxfilter 25.08.00 (6 Aug 2025)
+
+## 🚨 Breaking Changes
+
+- Remove CUDA 11 from dependencies.yaml ([#694](https://github.com/rapidsai/cuxfilter/pull/694)) [@KyleFromNVIDIA](https://github.com/KyleFromNVIDIA)
+- stop uploading packages to downloads.rapids.ai ([#692](https://github.com/rapidsai/cuxfilter/pull/692)) [@jameslamb](https://github.com/jameslamb)
+
+## 🐛 Bug Fixes
+
+- Pin Holoviews pre-1.21.0 ([#704](https://github.com/rapidsai/cuxfilter/pull/704)) [@jakirkham](https://github.com/jakirkham)
+- Drop one more `cuspatial` reference ([#701](https://github.com/rapidsai/cuxfilter/pull/701)) [@jakirkham](https://github.com/jakirkham)
+- Drop unneeded cuSpatial dependency ([#700](https://github.com/rapidsai/cuxfilter/pull/700)) [@jakirkham](https://github.com/jakirkham)
+- Adding GH_TOKEN pass-through to summarize job ([#697](https://github.com/rapidsai/cuxfilter/pull/697)) [@msarahan](https://github.com/msarahan)
+
+## 📖 Documentation
+
+- add docs on CI workflow inputs ([#706](https://github.com/rapidsai/cuxfilter/pull/706)) [@jameslamb](https://github.com/jameslamb)
+
+## 🛠️ Improvements
+
+- Remove CUDA 11 from code, docs, etc. ([#710](https://github.com/rapidsai/cuxfilter/pull/710)) [@AjayThorve](https://github.com/AjayThorve)
+- fix(docker): use versioned `-latest` tag for all `rapidsai` images ([#708](https://github.com/rapidsai/cuxfilter/pull/708)) [@gforsyth](https://github.com/gforsyth)
+- Use CUDA 12.9 in Conda, Devcontainers, Spark, GHA, etc. ([#703](https://github.com/rapidsai/cuxfilter/pull/703)) [@jakirkham](https://github.com/jakirkham)
+- Remove nvidia and dask channels ([#702](https://github.com/rapidsai/cuxfilter/pull/702)) [@vyasr](https://github.com/vyasr)
+- feat(shellcheck): add shellcheck and fix all warnings ([#698](https://github.com/rapidsai/cuxfilter/pull/698)) [@gforsyth](https://github.com/gforsyth)
+- Remove CUDA 11 from dependencies.yaml ([#694](https://github.com/rapidsai/cuxfilter/pull/694)) [@KyleFromNVIDIA](https://github.com/KyleFromNVIDIA)
+- stop uploading packages to downloads.rapids.ai ([#692](https://github.com/rapidsai/cuxfilter/pull/692)) [@jameslamb](https://github.com/jameslamb)
+- Forward-merge branch-25.06 into branch-25.08 ([#689](https://github.com/rapidsai/cuxfilter/pull/689)) [@gforsyth](https://github.com/gforsyth)
+- Forward-merge branch-25.06 into branch-25.08 ([#684](https://github.com/rapidsai/cuxfilter/pull/684)) [@gforsyth](https://github.com/gforsyth)
+
 # cuxfilter 25.06.00 (5 Jun 2025)
 
 ## 🛠️ Improvements
