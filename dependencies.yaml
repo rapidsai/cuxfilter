@@ -127,7 +127,7 @@ dependencies:
     common:
       - output_types: conda
         packages:
-          - cuxfilter==25.8.*,>=0.0.0a0
+          - cuxfilter==25.8.*
   docs:
     common:
       - output_types: [conda, requirements]
@@ -158,8 +158,8 @@ dependencies:
           - notebook>=0.5.0
       - output_types: [conda]
         packages:
-          - cugraph==25.8.*,>=0.0.0a0
-          - dask-cuda==25.8.*,>=0.0.0a0
+          - cugraph==25.8.*
+          - dask-cuda==25.8.*
   py_version:
     specific:
       - output_types: conda
@@ -205,9 +205,9 @@ dependencies:
           - panel>=1.0
       - output_types: conda
         packages:
-          - &cudf_unsuffixed cudf==25.8.*,>=0.0.0a0
+          - &cudf_unsuffixed cudf==25.8.*
           - cupy>=12.0.0
-          - &dask_cudf_unsuffixed dask-cudf==25.8.*,>=0.0.0a0
+          - &dask_cudf_unsuffixed dask-cudf==25.8.*
           - nodejs>=18
           - libwebp-base
     specific:
@@ -217,9 +217,9 @@ dependencies:
               cuda: "12.*"
               cuda_suffixed: "true"
             packages:
-              - cudf-cu12==25.8.*,>=0.0.0a0
+              - cudf-cu12==25.8.*
               - &cupy_cu12 cupy-cuda12x>=12.0.0
-              - dask-cudf-cu12==25.8.*,>=0.0.0a0
+              - dask-cudf-cu12==25.8.*
           - matrix:
               cuda: "12.*"
               cuda_suffixed: "false"
@@ -250,7 +250,7 @@ dependencies:
           - *cudf_unsuffixed
           - cupy>=12.0.0
           - *dask_cudf_unsuffixed
-          - cuxfilter==25.8.*,>=0.0.0a0
+          - cuxfilter==25.8.*
           - python>=3.10,<3.14
           - pytest-benchmark
           - pytest-xdist
