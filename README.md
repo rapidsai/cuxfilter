@@ -154,17 +154,25 @@ cuxfilter can be installed with conda. You can get a minimal conda installation 
 For the nightly version of `cuxfilter`:
 
 ```bash
-# for CUDA 12
+# CUDA 13
 conda install -c rapidsai-nightly -c conda-forge \
     cuxfilter=25.10 python=3.13 cuda-version=13.0
+
+# CUDA 12
+conda install -c rapidsai-nightly -c conda-forge \
+    cuxfilter=25.10 python=3.13 cuda-version=12.9
 ```
 
 For the stable version of `cuxfilter`:
 
 ```bash
-# for CUDA 12
+# CUDA 13
 conda install -c rapidsai -c conda-forge \
     cuxfilter python=3.13 cuda-version=13.0
+
+# CUDA 12
+conda install -c rapidsai -c conda-forge \
+    cuxfilter python=3.13 cuda-version=12.9
 ```
 
 Note: cuxfilter is supported only on Linux, and with Python versions 3.10, 3.11, 3.12, and 3.13.
@@ -176,7 +184,10 @@ Note: cuxfilter is supported only on Linux, and with Python versions 3.10, 3.11,
 Install cuxfilter from PyPI using pip:
 
 ```bash
-# for CUDA 12.0
+# CUDA 13
+pip install cuxfilter-cu12 -extra-index-url=https://pypi.nvidia.com
+
+# CUDA 12
 pip install cuxfilter-cu12 -extra-index-url=https://pypi.nvidia.com
 ```
 
