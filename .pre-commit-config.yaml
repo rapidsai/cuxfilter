@@ -22,7 +22,7 @@ repos:
         rev: v1.20.0
         hooks:
             - id: rapids-dependency-file-generator
-              args: ["--clean"]
+              args: ["--clean", "--warn-all", "--strict"]
       - repo: https://github.com/rapidsai/pre-commit-hooks
         rev: v0.6.0
         hooks:
