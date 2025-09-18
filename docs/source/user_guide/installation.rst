@@ -9,11 +9,11 @@ For the most customized way of installing RAPIDS and cuxfilter, visit the select
 
     # CUDA 13
     conda install -c rapidsai -c conda-forge \
-        cuxfilter=25.10 python=3.10 cuda-version=13.0
+        cuxfilter=25.12 python=3.10 cuda-version=13.0
 
     # CUDA 12
     conda install -c rapidsai -c conda-forge \
-        cuxfilter=25.10 python=3.10 cuda-version=12.9
+        cuxfilter=25.12 python=3.10 cuda-version=12.9
 
 PyPI
 ----
