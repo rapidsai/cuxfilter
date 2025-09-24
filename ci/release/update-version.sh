@@ -34,6 +34,7 @@ sed_runner "/cuxfilter=[0-9]\{2\}.[0-9]\{2\}/ s/=[0-9]\{2\}.[0-9]\{2\}/=${NEXT_S
 
 # Centralized version file update
 echo "${NEXT_FULL_TAG}" > VERSION
+echo "branch-${NEXT_SHORT_TAG}" > RAPIDS_BRANCH
 
 DEPENDENCIES=(
   cudf
