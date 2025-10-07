@@ -3,14 +3,19 @@
 # Labels culled from https://github.com/rapidsai/cuxfilter/labels
 
 Python:
- - 'python/**'
- - 'notebooks/**'
-
+  - changed-files:
+      any-glob-to-any-file:
+        - 'python/**'
+        - 'notebooks/**'
 ci:
-   - 'ci/**'
-
+  - changed-files:
+      any-glob-to-any-file:
+        - 'ci/**'
 conda:
-   - 'conda/**'
- 
+  - changed-files:
+      any-glob-to-any-file:
+        - 'conda/**'
 doc:
-   - 'docs/**'
+  - changed-files:
+      any-glob-to-any-file:
+        - 'docs/**'
