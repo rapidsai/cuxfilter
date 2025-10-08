@@ -129,7 +129,7 @@ dependencies:
     common:
       - output_types: conda
         packages:
-          - cuxfilter==25.10.*,>=0.0.0a0
+          - cuxfilter==25.10.*
   docs:
     common:
       - output_types: [conda, requirements]
@@ -160,8 +160,8 @@ dependencies:
           - notebook>=0.5.0
       - output_types: [conda]
         packages:
-          - cugraph==25.10.*,>=0.0.0a0
-          - dask-cuda==25.10.*,>=0.0.0a0
+          - cugraph==25.10.*
+          - dask-cuda==25.10.*
   py_version:
     specific:
       - output_types: conda
@@ -255,7 +255,7 @@ dependencies:
     common:
       - output_types: conda
         packages:
-          - &cudf_unsuffixed cudf==25.10.*,>=0.0.0a0
+          - &cudf_unsuffixed cudf==25.10.*
       - output_types: requirements
         packages:
           # pip recognizes the index as a global option for the requirements.txt file
@@ -268,18 +268,18 @@ dependencies:
               cuda: "12.*"
               cuda_suffixed: "true"
             packages:
-              - cudf-cu12==25.10.*,>=0.0.0a0
+              - cudf-cu12==25.10.*
           - matrix:
               cuda: "13.*"
               cuda_suffixed: "true"
             packages:
-              - cudf-cu13==25.10.*,>=0.0.0a0
+              - cudf-cu13==25.10.*
           - {matrix: null, packages: [*cudf_unsuffixed]}
   depends_on_dask_cudf:
     common:
       - output_types: conda
         packages:
-          - &dask_cudf_unsuffixed dask-cudf==25.10.*,>=0.0.0a0
+          - &dask_cudf_unsuffixed dask-cudf==25.10.*
       - output_types: requirements
         packages:
           # pip recognizes the index as a global option for the requirements.txt file
@@ -292,10 +292,10 @@ dependencies:
               cuda: "12.*"
               cuda_suffixed: "true"
             packages:
-              - dask-cudf-cu12==25.10.*,>=0.0.0a0
+              - dask-cudf-cu12==25.10.*
           - matrix:
               cuda: "13.*"
               cuda_suffixed: "true"
             packages:
-              - dask-cudf-cu13==25.10.*,>=0.0.0a0
+              - dask-cudf-cu13==25.10.*
           - {matrix: null, packages: [*dask_cudf_unsuffixed]}
