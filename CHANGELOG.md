@@ -1,3 +1,15 @@
+# cuxfilter 25.10.00 (8 Oct 2025)
+
+## 🛠️ Improvements
+
+- Configure repo for automatic release notes generation ([#723](https://github.com/rapidsai/cuxfilter/pull/723)) [@AyodeAwe](https://github.com/AyodeAwe)
+- update dependencies: numba (&gt;= 0.60.0) ([#721](https://github.com/rapidsai/cuxfilter/pull/721)) [@jameslamb](https://github.com/jameslamb)
+- Use branch-25.10 again ([#720](https://github.com/rapidsai/cuxfilter/pull/720)) [@jameslamb](https://github.com/jameslamb)
+- Update rapids-dependency-file-generator ([#719](https://github.com/rapidsai/cuxfilter/pull/719)) [@KyleFromNVIDIA](https://github.com/KyleFromNVIDIA)
+- Build and test with CUDA 13.0.0 ([#718](https://github.com/rapidsai/cuxfilter/pull/718)) [@jameslamb](https://github.com/jameslamb)
+- Update rapids-build-backend to 0.4.1 ([#716](https://github.com/rapidsai/cuxfilter/pull/716)) [@KyleFromNVIDIA](https://github.com/KyleFromNVIDIA)
+- ci(labeler): update labeler action to [@v5 ([#713](https://github.com/rapidsai/cuxfilter/pull/713)) @gforsyth](https://github.com/v5 ([#713](https://github.com/rapidsai/cuxfilter/pull/713)) @gforsyth)
+
 # cuxfilter 25.08.00 (6 Aug 2025)
 
 ## 🚨 Breaking Changes
