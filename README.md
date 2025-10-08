@@ -166,7 +166,7 @@ conda install -c rapidsai-nightly -c conda-forge \
 For the stable version of `cuxfilter`:
 
 ```bash
-# CUDA 13
+# CUDA 13 
 conda install -c rapidsai -c conda-forge \
     cuxfilter python=3.13 cuda-version=13.0
 
@@ -185,10 +185,10 @@ Install cuxfilter from PyPI using pip:
 
 ```bash
 # CUDA 13
-pip install cuxfilter-cu12 -extra-index-url=https://pypi.nvidia.com
+pip install cuxfilter-cu13 --extra-index-url=https://pypi.nvidia.com
 
 # CUDA 12
-pip install cuxfilter-cu12 -extra-index-url=https://pypi.nvidia.com
+pip install cuxfilter-cu12 --extra-index-url=https://pypi.nvidia.com
 ```
 
 See the [Get RAPIDS version picker](https://rapids.ai/start.html) for more OS and version info.
