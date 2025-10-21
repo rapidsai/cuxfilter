@@ -1,3 +1,4 @@
+# Copyright (c) 2025, NVIDIA CORPORATION.
 from bokeh.core.properties import Bool, Nullable
 from bokeh.models import Tool
 from bokeh.util.compiler import TypeScript
@@ -42,8 +43,6 @@ export class CustomInspectTool extends InspectTool {
     this.define<CustomInspectTool.Props>(({Boolean}) => ({
       _active: [ Boolean, true ]
     }))
-
-    this.register_alias("customInspect", () => new CustomInspectTool())
   }
 
 }
