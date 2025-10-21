@@ -134,7 +134,7 @@ dependencies:
     common:
       - output_types: [conda, requirements]
         packages:
-          - &bokeh bokeh>=3.1,<=3.6.3
+          - &bokeh bokeh>=3.1
           - &bokeh_sampledata bokeh_sampledata
           - &holoviews holoviews>=1.16.0,<1.21.0a0
           - ipykernel
@@ -195,7 +195,7 @@ dependencies:
     common:
       - output_types: [conda, requirements, pyproject]
         packages:
-          - bokeh>=3.1,<=3.6.3
+          - bokeh>=3.1
           - datashader>=0.15
           - geopandas>=0.11.0
           - shapely<2.1.0
