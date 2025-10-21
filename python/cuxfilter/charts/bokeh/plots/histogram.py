@@ -1,8 +1,10 @@
+# Copyright (c) 2025, NVIDIA CORPORATION.
 import holoviews as hv
-import param
-from cuxfilter.charts.core.aggregate import BaseAggregateChart
-from cuxfilter.assets.numba_kernels import calc_value_counts
 import panel as pn
+import param
+
+from cuxfilter.assets.numba_kernels import calc_value_counts
+from cuxfilter.charts.core.aggregate import BaseAggregateChart
 
 
 class InteractiveHistogram(param.Parameterized):
@@ -85,14 +87,7 @@ class InteractiveHistogram(param.Parameterized):
 
 
 class Histogram(BaseAggregateChart):
-    """
-    Description:
-    """
-
     def generate_chart(self, **kwargs):
-        """
-        returns a histogram chart
-        """
         self.chart = InteractiveHistogram(
             x=self.x,
             source_df=self.calculate_source(),
@@ -103,14 +98,17 @@ class Histogram(BaseAggregateChart):
 
     def calculate_source(self, data=None):
         """
-        Description:
-            Calculate the binned counts for the histogram for the x column
-        -------------------------------------------
-        Input:
-            data = cudf.DataFrame
-        -------------------------------------------
-        Output:
-            cudf.DataFrame
+        Calculate the binned counts for the histogram for the x column.
+
+        Parameters
+        ----------
+        data : cudf.DataFrame, optional
+            Input dataframe. If None, uses self.source.
+
+        Returns
+        -------
+        cudf.DataFrame
+            DataFrame with binned counts for the x column.
         """
         data = self.source if data is None else data
         return calc_value_counts(
@@ -122,7 +120,7 @@ class Histogram(BaseAggregateChart):
 
     def reload_chart(self, data):
         """
-        reload chart with new data
+        Reload chart with new data
         """
         self.chart.update_data(self.calculate_source(data))
 
@@ -135,7 +133,7 @@ class Histogram(BaseAggregateChart):
 
     def apply_theme(self, theme):
         """
-        apply thematic changes to the chart based on the theme
+        Apply thematic changes to the chart based on the theme
         """
         if "fill_color" not in self.library_specific_params:
             self.library_specific_params["fill_color"] = theme.chart_color
