@@ -1,12 +1,14 @@
+# Copyright (c) 2025, NVIDIA CORPORATION.
+from typing import Type
+
 import cudf
 import dask_cudf
 import pyarrow as pa
-from typing import Type
 
+from cuxfilter.assets import notebook_assets
 from cuxfilter.dashboard import DashBoard
 from cuxfilter.layouts import single_feature
 from cuxfilter.themes import default
-from cuxfilter.assets import notebook_assets
 
 
 def read_arrow(source):
@@ -19,7 +21,17 @@ def read_arrow(source):
 # class DataFrame:
 class DataFrame:
     """
-    A cuxfilter GPU DataFrame object
+    A cuxfilter GPU DataFrame object.
+
+    Methods
+    -------
+    .. autosummary::
+       :toctree: generated/
+
+       from_arrow
+       from_dataframe
+       load_graph
+       dashboard
     """
 
     data: Type[cudf.DataFrame] = None

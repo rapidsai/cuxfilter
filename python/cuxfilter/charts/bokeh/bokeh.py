@@ -24,30 +24,30 @@ def bar(
     ----------
     x : str
         x-axis column name from the gpu dataframe
-    y : str, default None
+    y : str
         y-axis column name from the gpu dataframe
-    data_points : int, default None
+    data_points : int
         when None, it means no custom number of bins are provided and
         data_points will default to df[self.x].nunique()
-    add_interaction : {True, False}, default True
+    add_interaction : {True, False}
         whether to add selection interaction to the chart
-    aggregate_fn : {'count', 'mean'}, default 'count'
+    aggregate_fn : {'count', 'mean'}
         aggregation function to apply when y is provided
-    step_size : int, default None
+    step_size : int
         step size for binning data
-    step_size_type : {int, float}, default int
+    step_size_type : {int, float}
         type of step size for binning
-    title : str, default ""
+    title : str
         chart title
-    autoscaling : bool, default True
+    autoscaling : bool
         set whether chart scale is updated automatically for y_axis when data
         updates
-    unselected_alpha : float, default 0.1
+    unselected_alpha : float
         alpha value for unselected data points
     **library_specific_params
         additional library specific keyword arguments to be passed to
         the function, a list of all the supported arguments can be found by
-        running::
+        running:
 
             >>> import holoviews as hv
             >>> hv.help(hv.Bars)
