@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 from typing import Dict
 import os
 import numpy as np
@@ -90,9 +93,9 @@ class BaseChoropleth(BaseChart):
         if self.elevation_column is not None:
             self.elevation_aggregate_fn = elevation_aggregate_fn
             self.elevation_factor = elevation_factor
-            self.aggregate_dict[
-                self.elevation_column
-            ] = self.elevation_aggregate_fn
+            self.aggregate_dict[self.elevation_column] = (
+                self.elevation_aggregate_fn
+            )
 
         self.add_interaction = add_interaction
 

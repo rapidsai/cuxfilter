@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import cudf
 import pandas as pd
 import dask_cudf
@@ -203,9 +206,9 @@ class BaseStackedLine(BaseChart):
         Ouput:
         """
         if self.box_selected_range:
-            query_str_dict[
-                self.name
-            ] = f"@{self.x}_min<={self.x}<=@{self.x}_max"
+            query_str_dict[self.name] = (
+                f"@{self.x}_min<={self.x}<=@{self.x}_max"
+            )
             temp_local_dict = {
                 self.x + "_min": self.x_range[0],
                 self.x + "_max": self.x_range[1],

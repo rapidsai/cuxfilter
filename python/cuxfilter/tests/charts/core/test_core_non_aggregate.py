@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 import panel as pn
 import cudf
@@ -39,7 +42,7 @@ class TestCoreNonAggregateChart:
         assert bnac.data_points == 0
         assert bnac._library_specific_params == {}
         assert bnac.stride is None
-        assert bnac.stride_type == int
+        assert bnac.stride_type is int
         assert bnac.min_value == 0.0
         assert bnac.max_value == 0.0
         assert bnac.x_label_map is None

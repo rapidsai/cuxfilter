@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 from typing import Union
 from bokeh.models import DatetimeTickFormatter
@@ -132,13 +135,13 @@ class BaseAggregateChart(BaseChart):
     def compute_stride(self):
         self.stride_type = self._xaxis_stride_type_transform(self.stride_type)
 
-        if self.stride_type == int and self.max_value < 1:
+        if self.stride_type is int and self.max_value < 1:
             self.stride_type = float
 
         if self.stride is None and self.data_points is not None:
             raw_stride = (self.max_value - self.min_value) / self.data_points
             stride = (
-                round(raw_stride) if self.stride_type == int else raw_stride
+                round(raw_stride) if self.stride_type is int else raw_stride
             )
             self.stride = stride
 
@@ -225,9 +228,9 @@ class BaseAggregateChart(BaseChart):
         """
 
         if self.box_selected_range:
-            query_str_dict[
-                self.name
-            ] = f"@{self.x}_min<={self.x}<=@{self.x}_max"
+            query_str_dict[self.name] = (
+                f"@{self.x}_min<={self.x}<=@{self.x}_max"
+            )
             query_local_variables_dict.update(self.box_selected_range)
         else:
             if self.selected_indices is not None:

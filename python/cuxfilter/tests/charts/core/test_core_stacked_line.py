@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 import panel as pn
 import dask.dataframe as dd
@@ -38,7 +41,7 @@ class TestBaseStackedLine:
         assert bsl.data_points == 100
         assert bsl.add_interaction is True
         assert bsl.stride is None
-        assert bsl.stride_type == int
+        assert bsl.stride_type is int
         assert bsl._library_specific_params == {}
         assert bsl.chart is None
         assert bsl.source is None

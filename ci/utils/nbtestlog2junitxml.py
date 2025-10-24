@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2020-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 # Generate a junit-xml file from parsing a nbtest log
 
 import re
@@ -8,7 +11,9 @@ from enum import Enum
 
 
 startingPatt = re.compile("^STARTING: ([\w\.\-]+)$")
-skippingPatt = re.compile("^SKIPPING: ([\w\.\-]+)\s*(\(([\w\.\-\ \,]+)\))?\s*$")
+skippingPatt = re.compile(
+    "^SKIPPING: ([\w\.\-]+)\s*(\(([\w\.\-\ \,]+)\))?\s*$"
+)
 exitCodePatt = re.compile("^EXIT CODE: (\d+)$")
 folderPatt = re.compile("^FOLDER: ([\w\.\-]+)$")
 timePatt = re.compile("^real\s+([\d\.ms]+)$")
@@ -36,12 +41,8 @@ def makeFailureElement(outputLines):
 
 
 def setFileNameAttr(attrDict, fileName):
-    attrDict.update(file=fileName,
-                    classname="",
-                    line="",
-                    name="",
-                    time=""
-                   )
+    attrDict.update(file=fileName, classname="", line="", name="", time="")
+
 
 def setClassNameAttr(attrDict, className):
     attrDict["classname"] = className
@@ -75,11 +76,12 @@ def parseLog(logFile, testSuiteElement):
         testSuiteElement.attrib["timestamp"] = ""
 
         attrDict = {}
-        #setFileNameAttr(attrDict, logFile)
+        # setFileNameAttr(attrDict, logFile)
         setFileNameAttr(attrDict, "nbtest")
 
-        parserStateEnum = Enum("parserStateEnum",
-                               "newTest startingLine finishLine exitCode")
+        parserStateEnum = Enum(
+            "parserStateEnum", "newTest startingLine finishLine exitCode"
+        )
         parserState = parserStateEnum.newTest
 
         testOutput = ""
@@ -97,7 +99,9 @@ def parseLog(logFile, testSuiteElement):
                     setTimeAttr(attrDict, "0m0s")
                     skippedElement = makeTestCaseElement(attrDict)
                     message = m.group(3) or ""
-                    skippedElement.append(Element("skipped", message=message, type=""))
+                    skippedElement.append(
+                        Element("skipped", message=message, type="")
+                    )
                     testSuiteElement.append(skippedElement)
                     incrNumAttr(testSuiteElement, "skipped")
                     incrNumAttr(testSuiteElement, "tests")
@@ -159,5 +163,6 @@ if __name__ == "__main__":
     testSuiteElement = Element("testsuite", name="nbtest", hostname="")
     parseLog(sys.argv[1], testSuiteElement)
     testSuitesElement.append(testSuiteElement)
-    ElementTree(testSuitesElement).write(sys.argv[1]+".xml", xml_declaration=True)
-
+    ElementTree(testSuitesElement).write(
+        sys.argv[1] + ".xml", xml_declaration=True
+    )

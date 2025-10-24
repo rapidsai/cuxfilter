@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2020-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 from ..core.aggregate import BaseChoropleth
 from .bindings import PanelDeck
 
@@ -159,9 +162,9 @@ class Choropleth(BaseChoropleth):
         self.layer_spec.update(self.input_layer_spec)
 
         if self.elevation_column is not None:
-            self.layer_spec[
-                "getElevation"
-            ] = f"@@={self.elevation_column}*{self.elevation_factor}"
+            self.layer_spec["getElevation"] = (
+                f"@@={self.elevation_column}*{self.elevation_factor}"
+            )
 
         self.deck_spec["initialViewState"]["latitude"] = self.get_mean(
             self.y_range

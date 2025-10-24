@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2020-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 import panel as pn
 from bokeh.events import ButtonClick
@@ -32,7 +35,7 @@ class TestNonAggregateBaseLine:
         assert bl.y == "test_y"
         assert bl.filter_widget is None
         assert bl.stride is None
-        assert bl.stride_type == int
+        assert bl.stride_type is int
         assert bl.pixel_shade_type == "linear"
         assert bl.color == "#8735fb"
         assert bl.library_specific_params == {}
