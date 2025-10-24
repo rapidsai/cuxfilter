@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2020-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import dask_cudf
 import dask.dataframe as dd
 from ..charts.constants import CUDF_DATETIME_TYPES

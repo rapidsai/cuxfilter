@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2012 - 2019, Anaconda, Inc., and Bokeh Contributors. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause
+
 # -----------------------------------------------------------------------------
 # Imports
 # -----------------------------------------------------------------------------

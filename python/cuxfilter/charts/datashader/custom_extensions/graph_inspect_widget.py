@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2020-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 from bokeh.core.properties import Bool, Nullable
 from bokeh.models import Tool
 from bokeh.util.compiler import TypeScript
