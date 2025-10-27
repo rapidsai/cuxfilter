@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2023-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import panel as pn
 import param
 
@@ -12,7 +15,6 @@ class Charts(PlotBase):
     def points_plot(self):
         import datashader as ds
         import datashader.transfer_functions as tf
-        import panel as pn
 
         from .dataset import generate_random_points
 
@@ -28,9 +30,9 @@ class Charts(PlotBase):
     def line_plot(self):
         import datashader as ds
         import datashader.transfer_functions as tf
-        import panel as pn
 
         from .dataset import generate_random_points
+
         df = generate_random_points(nodes=self.n, dtype=self.dtype)
 
         # generate datashader line charts

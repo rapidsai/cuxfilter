@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2023-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import cudf
 import cupy as cp
 import numpy as np
@@ -26,7 +29,9 @@ class Charts(PlotBase):
         )
 
         # generate hvplot bar chart using {dtype} DataFrame
-        return df.hvplot.bar(x="value", y="freq", title="Bar Plot", width=500, height=400)
+        return df.hvplot.bar(
+            x="value", y="freq", title="Bar Plot", width=500, height=400
+        )
 
     def points_plot(self):
         exec(f"import hvplot.{self.dtype}")
@@ -52,6 +57,4 @@ class Charts(PlotBase):
         line2 = df.hvplot.line(x="vertex", y="y").opts(color="blue")
 
         # overlay line charts
-        return (line1 * line2).opts(
-            title="Line Plot", width=500, height=400
-        )
+        return (line1 * line2).opts(title="Line Plot", width=500, height=400)

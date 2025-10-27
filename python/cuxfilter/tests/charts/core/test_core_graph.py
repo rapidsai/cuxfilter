@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2020-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import dask_cudf
 import pytest
 import panel as pn
@@ -156,7 +159,8 @@ class TestCoreGraph:
             },
         )
         edges = initialize_df(
-            df_type, {"source": [0, 2], "target": [2, 3]}  # Simplified edges
+            df_type,
+            {"source": [0, 2], "target": [2, 3]},  # Simplified edges
         )
         dashboard = DashBoard(dataframe=DataFrame.load_graph((nodes, edges)))
 

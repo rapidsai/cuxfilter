@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 from typing import Dict, Union
 import bokeh.embed.util as u
 import cudf
@@ -46,8 +49,7 @@ def _create_dashboard_url(notebook_url: str, port: int, service_proxy=None):
     return full_url
 
 
-class DuplicateChartsWarning(Warning):
-    ...
+class DuplicateChartsWarning(Warning): ...
 
 
 def _check_if_duplicates(charts):

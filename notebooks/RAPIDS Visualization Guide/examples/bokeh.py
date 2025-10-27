@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2023-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import cudf
 import cupy as cp
 import numpy as np
@@ -26,7 +29,7 @@ class Charts(PlotBase):
             }
         )
         # Bokeh does not take cuDF directly, convert cudf dataframe to pandas df
-        df = df.to_pandas() if type(df) == cudf.DataFrame else df
+        df = df.to_pandas() if isinstance(df, cudf.DataFrame) else df
 
         # generate bokeh bar chart
         p = figure(width=500, height=400, title="Bar Plot")
@@ -43,7 +46,7 @@ class Charts(PlotBase):
         df = generate_random_points(nodes=self.n, dtype=self.dtype)
 
         # Bokeh does not take cuDF directly, convert cudf dataframe to pandas df
-        df = df.to_pandas() if type(df) == cudf.DataFrame else df
+        df = df.to_pandas() if isinstance(df, cudf.DataFrame) else df
 
         factor_s = [str(i) for i in df.cluster.unique()]
         df["cluster_s"] = df.cluster.apply(lambda i: str(i))
@@ -51,10 +54,13 @@ class Charts(PlotBase):
         # Create scatter chart
         graph = figure(title="Scatter Plot", width=500, height=400)
         graph.scatter(
-            source=df, x="x", y="y", color="black",
+            source=df,
+            x="x",
+            y="y",
+            color="black",
             fill_color=factor_cmap(
                 "cluster_s", palette=Spectral10, factors=factor_s
-            )
+            ),
         )
         return pn.pane.Bokeh(graph)
 
@@ -68,11 +74,15 @@ class Charts(PlotBase):
         df = generate_random_points(nodes=self.n, dtype=self.dtype)
 
         # Bokeh does not take cuDF directly, convert cudf dataframe to pandas df
-        df = df.to_pandas() if type(df) == cudf.DataFrame else df
+        df = df.to_pandas() if isinstance(df, cudf.DataFrame) else df
 
         # Create and combine multiple line charts
         p = figure(
-            title="Line Plot", x_axis_label="x", y_axis_label="y", width=500, height=400
+            title="Line Plot",
+            x_axis_label="x",
+            y_axis_label="y",
+            width=500,
+            height=400,
         )
         p.line(x=df["vertex"], y=df["x"], line_width=2, color="red")
         p.line(x=df["vertex"], y=df["y"], line_width=2, color="blue")
