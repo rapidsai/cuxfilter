@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import gzip
 import tarfile
 import shutil
@@ -84,9 +87,9 @@ def datasets_check(*args, base_dir="./"):
     filename = {}
 
     # mortgage dataset
-    url[
-        "mortgage"
-    ] = "https://data.rapids.ai/viz-data/146M_predictions_v2.arrow.gz"
+    url["mortgage"] = (
+        "https://data.rapids.ai/viz-data/146M_predictions_v2.arrow.gz"
+    )
     downloaded_filename["mortgage"] = (
         dir_name + "/146M_predictions_v2.arrow.gz"
     )
@@ -97,9 +100,9 @@ def datasets_check(*args, base_dir="./"):
     downloaded_filename["nyc_taxi"] = dir_name + "/nyc_taxi.tar.gz"
     filename["nyc_taxi"] = dir_name + "/nyc_taxi.csv"
 
-    url[
-        "auto_accidents"
-    ] = "https://data.rapids.ai/viz-data/auto_accidents.arrow.gz"
+    url["auto_accidents"] = (
+        "https://data.rapids.ai/viz-data/auto_accidents.arrow.gz"
+    )
     downloaded_filename["auto_accidents"] = (
         dir_name + "/auto_accidents.arrow.gz"
     )

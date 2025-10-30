@@ -1,19 +1,42 @@
-[tool.black]
+# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+[tool.ruff]
 line-length = 79
-target-version = ["py310"]
-include = '\.py?$'
-force-exclude = '''
-/(
-    thirdparty |
-    \.eggs |
-    \.git |
-    \.hg |
-    \.mypy_cache |
-    \.tox |
-    \.venv |
-    _build |
-    buck-out |
-    build |
-    dist
-)/
-'''
+target-version = "py310"
+include = ["*.py"]
+extend-exclude = [
+    "__init__.py",
+    "thirdparty/**",
+    "_build/**",
+    "buck-out/**",
+    "build/**",
+    "dist/**",
+]
+force-exclude = true
+
+[tool.ruff.lint]
+ignore = [
+    # line too long due to copyright notice
+    "E501",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = [
+    # module level import not at top of cell
+    "E402",
+    # unused import
+    "F401",
+    # wildcard import
+    "F403",
+    # usage of wildcard import
+    "F405",
+]
+"notebooks/**" = [
+    # unused import
+    "F401",
+    # wildcard import
+    "F403",
+    # usage of wildcard import
+    "F405",
+]

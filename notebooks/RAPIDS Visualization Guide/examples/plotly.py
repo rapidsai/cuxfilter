@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2023-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import cudf
 import cupy as cp
 import numpy as np
@@ -22,7 +25,7 @@ class Charts(PlotBase):
             }
         )
         # Plotly does not take cuDF directly, convert cudf dataframe to pandas df
-        df = df.to_pandas() if type(df) == cudf.DataFrame else df
+        df = df.to_pandas() if isinstance(df, cudf.DataFrame) else df
 
         # generate Plotly bar chart
         fig = px.bar(df, x="value", y="freq", title="Bar Plot", width=500)
@@ -35,7 +38,7 @@ class Charts(PlotBase):
 
         df = generate_random_points(nodes=self.n, dtype=self.dtype)
         # Plotly does not take cuDF directly, convert cudf dataframe to pandas df
-        df = df.to_pandas() if type(df) == cudf.DataFrame else df
+        df = df.to_pandas() if isinstance(df, cudf.DataFrame) else df
 
         # Create scatter chart
         fig = px.scatter(
@@ -52,7 +55,7 @@ class Charts(PlotBase):
             nodes=self.n, dtype=self.dtype
         ).sort_values(by="x")
         # Plotly does not take cuDF directly, convert cudf dataframe to pandas df
-        df = df.to_pandas() if type(df) == cudf.DataFrame else df
+        df = df.to_pandas() if isinstance(df, cudf.DataFrame) else df
 
         # Create and combine multiple line charts
         fig = px.line(df, x="x", y="y", title="Line Plot", width=500)

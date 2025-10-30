@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 import panel as pn
 
@@ -27,7 +30,7 @@ class TestBaseAggregateChart:
         assert bb.add_interaction is True
         assert bb.aggregate_fn == "count"
         assert bb.stride is None
-        assert bb.stride_type == int
+        assert bb.stride_type is int
         assert bb.library_specific_params == {}
 
     @pytest.mark.parametrize("dashboard", dashboards)
@@ -38,7 +41,7 @@ class TestBaseAggregateChart:
         assert bb.min_value == 0.0
         assert bb.max_value == 4.0
         assert bb.stride is None
-        assert bb.stride_type == int
+        assert bb.stride_type is int
 
     @pytest.mark.parametrize("chart, _chart", [(None, None), (1, 1)])
     def test_view(self, chart, _chart):

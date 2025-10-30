@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2023-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import cudf
 import cupy as cp
 import numpy as np
@@ -27,7 +30,7 @@ class Charts(PlotBase):
 
         # generate holoviews points chart using {dtype} DataFrame
         return hv.Bars(df, kdims="value", vdims="freq").opts(
-             title="Bar Plot", width=500, height=400
+            title="Bar Plot", width=500, height=400
         )
 
     def points_plot(self):

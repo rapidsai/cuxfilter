@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2023-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import cudf
 import cupy as cp
 import numpy as np
@@ -25,7 +28,7 @@ class Charts(PlotBase):
             }
         )
         # Seaborn does not take cuDF directly, convert cudf dataframe to pandas df
-        df = df.to_pandas() if type(df) == cudf.DataFrame else df
+        df = df.to_pandas() if isinstance(df, cudf.DataFrame) else df
 
         # generate seaborn bar chart
         fig = Figure(figsize=(6, 4))
@@ -42,7 +45,7 @@ class Charts(PlotBase):
         df = generate_random_points(nodes=self.n, dtype=self.dtype)
 
         # Seaborn does not take cuDF directly, convert cudf dataframe to pandas df
-        df = df.to_pandas() if type(df) == cudf.DataFrame else df
+        df = df.to_pandas() if isinstance(df, cudf.DataFrame) else df
 
         # Create scatter chart
         fig = Figure(figsize=(6, 4))
@@ -61,7 +64,7 @@ class Charts(PlotBase):
         ).sort_values(by="x")
 
         # Seaborn does not take cuDF directly, convert cudf dataframe to pandas df
-        df = df.to_pandas() if type(df) == cudf.DataFrame else df
+        df = df.to_pandas() if isinstance(df, cudf.DataFrame) else df
 
         # Create and combine multiple line charts
         fig = Figure(figsize=(6, 4))

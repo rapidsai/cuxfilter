@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import pytest
 import panel as pn
 from cuxfilter.charts.core.core_widget import BaseWidget
@@ -15,7 +18,7 @@ class TestBaseWidget:
         assert bw.start is None
         assert bw.end is None
         assert bw._stride is None
-        assert bw.stride_type == int
+        assert bw.stride_type is int
         assert bw.min_value == 0.0
         assert bw.max_value == 0.0
         assert bw.use_data_tiles is False

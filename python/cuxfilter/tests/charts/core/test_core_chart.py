@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import panel as pn
 from cuxfilter.charts.core.core_chart import BaseChart
 
@@ -17,7 +20,7 @@ class TestBaseChart:
         assert bc.data_points == 0
         assert bc._library_specific_params == {}
         assert bc.stride is None
-        assert bc.stride_type == int
+        assert bc.stride_type is int
         assert bc.min_value == 0.0
         assert bc.max_value == 0.0
         assert bc.x_label_map is None

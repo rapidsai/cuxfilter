@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import datetime
 from ..core import BaseWidget
 from ..core.aggregate import BaseNumberChart
@@ -15,7 +18,7 @@ import uuid
 
 class RangeSlider(BaseWidget):
     def compute_stride(self):
-        if self.stride_type == int and self.max_value < 1:
+        if self.stride_type is int and self.max_value < 1:
             self.stride_type = float
 
         if self.stride is None:
