@@ -18,7 +18,7 @@ repos:
             - id: rapids-dependency-file-generator
               args: ["--clean", "--warn-all", "--strict"]
       - repo: https://github.com/rapidsai/pre-commit-hooks
-        rev: v1.2.0
+        rev: v1.2.1
         hooks:
           - id: verify-copyright
             args: [--fix, --spdx]
