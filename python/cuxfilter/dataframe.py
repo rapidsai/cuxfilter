@@ -1,6 +1,8 @@
 # SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+from typing import Type
+
 import cudf
 import dask_cudf
 import pyarrow as pa
