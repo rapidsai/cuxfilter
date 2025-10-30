@@ -1,5 +1,5 @@
-# Copyright (c) 2025, NVIDIA CORPORATION.
-from typing import Type
+# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
 
 import cudf
 import dask_cudf

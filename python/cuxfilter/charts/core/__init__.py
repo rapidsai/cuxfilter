@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 from .core_chart import BaseChart
 from .core_widget import BaseWidget
 from .core_view_dataframe import ViewDataFrame
