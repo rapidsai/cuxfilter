@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2020-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 import cupy as cp
 import pandas as pd

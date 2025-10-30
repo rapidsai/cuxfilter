@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright (c) 2023-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 from numba import cuda
 from numba.core.errors import NumbaPerformanceWarning
 import cupy as cp
