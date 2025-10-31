@@ -1,22 +1,23 @@
 # SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Dict, Union
-import bokeh.embed.util as u
-import cudf
-import dask_cudf
-import panel as pn
-from panel.io.server import get_server
-from bokeh.embed import server_document
 import os
 import urllib
 import warnings
 from collections import Counter
+from typing import Dict, Union
 
+import bokeh.embed.util as u
+import cudf
+import dask_cudf
+import panel as pn
+from bokeh.embed import server_document
+from panel.io.server import get_server
+
+from cuxfilter.assets import cudf_utils, get_open_port
 from cuxfilter.charts.core import BaseChart, BaseWidget, ViewDataFrame
-from cuxfilter.layouts import single_feature
 from cuxfilter.charts.panel_widgets import data_size_indicator
-from cuxfilter.assets import get_open_port, cudf_utils
+from cuxfilter.layouts import single_feature
 from cuxfilter.themes import default
 
 DEFAULT_NOTEBOOK_URL = "http://localhost:8888"
@@ -69,6 +70,18 @@ def _check_if_duplicates(charts):
 class DashBoard:
     """
     A cuxfilter GPU DashBoard object.
+
+    Methods
+    -------
+    .. autosummary::
+       :toctree: generated/
+
+       add_charts
+       app
+       export
+       show
+       stop
+
     Examples
     --------
 
@@ -493,10 +506,8 @@ class DashBoard:
         ----------
 
         notebook_url: str, optional, default localhost:8888
-            - URL where you want to run the dashboard as a web-app,
-            including the port number.
-
-            - Can use localhost instead of ip if running locally.
+            URL where you want to run the dashboard as a web-app, including the
+            port number. Can use localhost instead of ip if running locally.
 
         port: int, optional
             Has to be an open port

@@ -45,8 +45,6 @@ export class CustomInspectTool extends InspectTool {
     this.define<CustomInspectTool.Props>(({Boolean}) => ({
       _active: [ Boolean, true ]
     }))
-
-    this.register_alias("customInspect", () => new CustomInspectTool())
   }
 
 }
