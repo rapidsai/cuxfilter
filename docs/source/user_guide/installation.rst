@@ -32,13 +32,13 @@ Docker container
 ----------------
 For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the RAPIDS `Install Page <https://docs.rapids.ai/install>`_.
 
-cuxfilter docker example installation for cuda 12.0, ubuntu 20.04:
+cuxfilter docker example installation for cuda 12, ubuntu 20.04:
 
 .. code-block:: bash
 
-    docker pull rapidsai/rapidsai:cuda12.0-runtime-ubuntu20.04
-    docker run --gpus all --rm -it -p 8888:8888 -p 8787:8787 -p 8786:8786 \
-        rapidsai/rapidsai:cuda12.0-runtime-ubuntu20.04
+    docker run --gpus all --pull always --rm -it \
+        --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 \
+        rapidsai/base:25.10-cuda12-py3.13
 
     # open http://localhost:8888
 
