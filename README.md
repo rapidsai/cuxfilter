@@ -144,7 +144,7 @@ Please see the [Demo Docker Repository](https://hub.docker.com/r/rapidsai/rapids
 
 ### CUDA/GPU requirements
 
-- CUDA 12.0+
+- CUDA 12.2+
 - Volta architecture or newer (Compute Capability >=7.0)
 
 ### Conda
