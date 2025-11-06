@@ -7,7 +7,7 @@ set -euo pipefail
 . /opt/conda/etc/profile.d/conda.sh
 
 rapids-logger "Downloading artifacts from previous jobs"
-PYTHON_CHANNEL=$(rapids-download-conda-from-github python)
+PYTHON_CHANNEL=$(rapids-download-from-github "$(rapids-package-name "conda_python" cuxfilter --pure)")
 
 rapids-logger "Generate notebook testing dependencies"
 rapids-dependency-file-generator \
