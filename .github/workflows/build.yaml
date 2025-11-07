@@ -41,8 +41,7 @@ jobs:
       date: ${{ inputs.date }}
       script: ci/build_python.sh
       sha: ${{ inputs.sha }}
-      # noarch build -- select a single amd64 runner, with the latest CUDA and latest Python version
-      matrix_filter: map(select(.ARCH == "amd64")) | [max_by([(.CUDA_VER|split(".")|map(tonumber)), (.PY_VER|split(".")|map(tonumber))])]
+      pure-conda: true
   upload-conda:
     needs: [python-build]
     secrets: inherit
@@ -75,8 +74,6 @@ jobs:
       sha: ${{ inputs.sha }}
       date: ${{ inputs.date }}
       script: ci/build_wheel.sh
-      # This selects "ARCH=amd64 + the latest supported Python + CUDA".
-      matrix_filter: map(select(.ARCH == "amd64")) | group_by(.CUDA_VER|split(".")|map(tonumber)|.[0]) | map(max_by([(.PY_VER|split(".")|map(tonumber)), (.CUDA_VER|split(".")|map(tonumber))]))
       package-name: cuxfilter
       package-type: python
       pure-wheel: true
