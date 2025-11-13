@@ -1,12 +1,13 @@
 # SPDX-FileCopyrightText: Copyright (c) 2020-2025, NVIDIA CORPORATION. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-import dask_cudf
 import dask.dataframe as dd
-from ..charts.constants import CUDF_DATETIME_TYPES
+import dask_cudf
 
 
 def get_min_max(df, col_name):
+    from cuxfilter.charts.constants import CUDF_DATETIME_TYPES
+
     min, max = df[col_name].min(), df[col_name].max()
     if isinstance(df, dask_cudf.DataFrame):
         if df[col_name].dtype in CUDF_DATETIME_TYPES:
