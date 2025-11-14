@@ -188,7 +188,7 @@ class Graph(BaseGraph):
 
         impath = (
             "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
-            + "branch-0.15/python/cuxfilter/charts/datashader/icons/graph.png"
+            + "main/python/cuxfilter/charts/datashader/icons/graph.png"
         )
 
         self.inspect_neighbors = CustomInspectTool(
@@ -200,7 +200,7 @@ class Graph(BaseGraph):
         # loading icon from a url
         impath = (
             "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
-            + "branch-0.15/python/cuxfilter/charts/datashader/icons/XPan.png"
+            + "main/python/cuxfilter/charts/datashader/icons/XPan.png"
         )
         self.display_edges = CustomInspectTool(
             icon=load_image(impath), _active=True, description="Display Edges"
