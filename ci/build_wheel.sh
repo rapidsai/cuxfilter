@@ -17,5 +17,5 @@ rapids-pip-retry wheel . -w "${RAPIDS_WHEEL_BLD_OUTPUT_DIR}" -v --no-deps --disa
 
 ../ci/validate_wheel.sh "${RAPIDS_WHEEL_BLD_OUTPUT_DIR}"
 
-RAPIDS_PACKAGE_NAME="$(rapids-package-name wheel_python cuxfilter --pure --cuda "$RAPIDS_CUDA_VERSION")"
+RAPIDS_PACKAGE_NAME="$(rapids-package-name wheel_python cuxfilter --pure --cuda "${RAPIDS_CUDA_VERSION}")"
 export RAPIDS_PACKAGE_NAME
