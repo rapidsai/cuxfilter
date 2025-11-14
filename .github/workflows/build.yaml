@@ -88,3 +88,4 @@ jobs:
       date: ${{ inputs.date }}
       package-name: cuxfilter
       package-type: python
+      publish-wheel-search-key: "cuxfilter_wheel"
