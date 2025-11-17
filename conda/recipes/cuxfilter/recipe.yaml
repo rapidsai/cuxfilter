@@ -48,6 +48,10 @@ requirements:
     - packaging
     - panel >=1.0
     - python
+    # The two dependencies below ensure this package can only be installed on
+    # Linux and set a lower bound for `glibc`
+    - __linux
+    - __glibc >=2.28
 
 tests:
   - python:
