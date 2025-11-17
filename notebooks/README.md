@@ -1,6 +1,6 @@
 # Example notebooks
 
-These are example notebooks to showcase cuxfilter with [cuDF](https://github.com/rapidsai/cudf). If you want to distribute your workflow across multiple GPUs, have more data than you can fit in memory on a single GPU, or want to visualize data spread across many files at once, you would want to use [Dask-cuDF](https://github.com/rapidsai/cudf/tree/main/python/dask_cudf) with cuxfilter. The examples notebooks can be found [here](./cuxfilter%20with%20dask_cudf/).
+These are example notebooks to showcase cuxfilter with [cuDF](https://github.com/rapidsai/cudf). If you want to distribute your workflow across multiple GPUs, have more data than you can fit in memory on a single GPU, or want to visualize data spread across many files at once, you would want to use [Dask-cuDF](https://github.com/rapidsai/cudf/tree/release/25.12/python/dask_cudf) with cuxfilter. The examples notebooks can be found [here](./cuxfilter%20with%20dask_cudf/).
 
 ## TRY CUXFILTER NOTEBOOKS ONLINE
 
@@ -8,20 +8,20 @@ These are example notebooks to showcase cuxfilter with [cuDF](https://github.com
 
 1. Mortgage_example.ipynb
 
-    [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/main/notebooks/Mortgage_example.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rapidsai/cuxfilter/blob/main/notebooks/Mortgage_example.ipynb)
+    [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/release/25.12/notebooks/Mortgage_example.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rapidsai/cuxfilter/blob/release/25.12/notebooks/Mortgage_example.ipynb)
 
 2. NYC_taxi_example.ipynb
 
-    [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/main/notebooks/NYC_taxi_example.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rapidsai/cuxfilter/blob/main/notebooks/NYC_taxi_example.ipynb)
+    [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/release/25.12/notebooks/NYC_taxi_example.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rapidsai/cuxfilter/blob/release/25.12/notebooks/NYC_taxi_example.ipynb)
 
 3. auto_accidents_example.ipynb
 
-    [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/main/notebooks/auto_accidents_example.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rapidsai/cuxfilter/blob/main/notebooks/auto_accidents_example.ipynb)
+    [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/release/25.12/notebooks/auto_accidents_example.ipynb) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rapidsai/cuxfilter/blob/release/25.12/notebooks/auto_accidents_example.ipynb)
 
 4. graphs.ipynb
 
-    [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/main/notebooks/graphs.ipynb)
-    [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rapidsai/cuxfilter/blob/main/notebooks/graphs.ipynb)
+    [![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/rapidsai/cuxfilter/blob/release/25.12/notebooks/graphs.ipynb)
+    [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rapidsai/cuxfilter/blob/release/25.12/notebooks/graphs.ipynb)
 </br>
 
 ## Setup Remote Environments
@@ -39,7 +39,7 @@ open a new terminal and run the following
 conda install ipykernel
 ```
 
-Then install `cuxfilter` and its dependencies by following the instructions in ["Installation"](../README.md#installation) in the project's main README.
+Then install `cuxfilter` and its dependencies by following the instructions in ["Installation"](../README.md#installation) in the project's release/25.12 README.
 
 Once installed, you should see a card in the launcher for that environment and kernel after about a minute.
 
