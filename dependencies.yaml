@@ -86,8 +86,8 @@ files:
       - depends_on_dask_cudf
       - test_external
 channels:
-  - rapidsai
   - rapidsai-nightly
+  - rapidsai
   - conda-forge
 dependencies:
   build_wheels:
