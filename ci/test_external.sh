@@ -7,6 +7,9 @@ set -e
 rapids-logger "Create test_external conda environment"
 . /opt/conda/etc/profile.d/conda.sh
 
+rapids-logger "Configuring conda strict channel priority"
+conda config --set channel_priority strict
+
 # Install external dependencies into test_external conda environment
 rapids-dependency-file-generator \
   --output conda \
