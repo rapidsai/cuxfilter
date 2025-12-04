@@ -14,11 +14,11 @@ for wheel in "${wheel_dir_relative_path}"/*-py3-none-any.whl; do
 
     # Pull the version of GLIBC used in the wheel build container
     glibc_version=$(python -c 'import os; print(os.confstr("CS_GNU_LIBC_VERSION").split()[-1].replace(".", "_"))')
-    wheel_tag_template=manylinux_LIBCVER_x86_64.manylinux_LIBCVER_aarch64
-
     # Retag for manylinux x86_64 and manylinux aarch64
     # substituting in the glibc_version gathered above
-    wheel tags --platform-tag=${wheel_tag_template//LIBCVER/$glibc_version} --remove "${wheel}"
+    wheel tags \
+        --platform-tag="manylinux_${glibc_version}_x86_64.manylinux_${glibc_version}_aarch64" \
+        --remove "${wheel}"
 
     rapids-logger "Successfully retagged wheel for manylinux platforms"
 done
