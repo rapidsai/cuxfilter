@@ -71,6 +71,7 @@ jobs:
     with:
       build_type: pull-request
       script: ci/build_python.sh
+      pure-conda: cuda_major
   conda-python-tests:
     needs: [conda-python-build, changed-files]
     secrets: inherit
@@ -108,8 +109,6 @@ jobs:
     with:
       build_type: pull-request
       script: ci/build_wheel.sh
-      # This selects "ARCH=amd64 + the latest supported Python + CUDA".
-      matrix_filter: map(select(.ARCH == "amd64")) | group_by(.CUDA_VER|split(".")|map(tonumber)|.[0]) | map(max_by([(.PY_VER|split(".")|map(tonumber)), (.CUDA_VER|split(".")|map(tonumber))]))
       package-name: cuxfilter
       package-type: python
       pure-wheel: true
