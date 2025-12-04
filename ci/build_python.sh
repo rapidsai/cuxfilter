@@ -31,5 +31,5 @@ rattler-build build --recipe conda/recipes/cuxfilter \
 # tracked in https://github.com/prefix-dev/rattler-build/issues/1424
 rm -rf "$RAPIDS_CONDA_BLD_OUTPUT_DIR"/build_cache
 
-RAPIDS_PACKAGE_NAME="$(rapids-package-name conda_python cuxfilter --pure)"
+RAPIDS_PACKAGE_NAME="$(rapids-package-name conda_python cuxfilter --pure --cuda "${RAPIDS_CUDA_VERSION}")"
 export RAPIDS_PACKAGE_NAME

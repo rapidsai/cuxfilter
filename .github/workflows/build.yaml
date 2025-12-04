@@ -41,7 +41,7 @@ jobs:
       date: ${{ inputs.date }}
       script: ci/build_python.sh
       sha: ${{ inputs.sha }}
-      pure-conda: true
+      pure-conda: cuda_major
   upload-conda:
     needs: [python-build]
     secrets: inherit
