@@ -135,7 +135,7 @@ dependencies:
         packages:
           - &bokeh bokeh>=3.1,<=3.6.3
           - &bokeh_sampledata bokeh_sampledata
-          - &holoviews holoviews>=1.16.0,<1.21.0a0
+          - &holoviews holoviews>=1.16.0,<1.21.0
           - ipykernel
           - &ipython ipython
           - jupyter_sphinx
@@ -188,7 +188,7 @@ dependencies:
     common:
       - output_types: [conda, requirements, pyproject]
         packages:
-          - rapids-build-backend>=0.4.0,<0.5.0.dev0
+          - rapids-build-backend>=0.4.0,<0.5.0
           - setuptools
   run:
     common:
@@ -200,15 +200,15 @@ dependencies:
           - shapely<2.1.0
           - *holoviews
           - jupyter-server-proxy
-          - numba>=0.60.0,<0.62.0a0
-          - numpy>=1.23,<3.0a0
+          - numba>=0.60.0,<0.62.0
+          - numpy>=1.23,<3.0
           - packaging
           - panel>=1.0
       - output_types: conda
         packages:
           - &cupy_unsuffixed cupy>=13.6.0
           - nodejs>=18
-          - numba-cuda>=0.19.1,<0.20.0a0
+          - numba-cuda>=0.19.1,<0.20.0
           - libwebp-base
     specific:
       - output_types: [requirements, pyproject]
@@ -216,11 +216,11 @@ dependencies:
           - matrix:
               cuda: "12.*"
             packages:
-              - numba-cuda[cu12]>=0.19.1,<0.20.0a0
+              - numba-cuda[cu12]>=0.19.1,<0.20.0
           # fallback to CUDA 13 versions if 'cuda' is '13.*' or not provided
           - matrix:
             packages:
-              - numba-cuda[cu13]>=0.19.1,<0.20.0a0
+              - numba-cuda[cu13]>=0.19.1,<0.20.0
       # NOTE: This is intentionally not broken into groups by a 'cuda_suffixed' selector like
       #       other packages with -cu{nn}x suffixes in this file.
       #       All RAPIDS wheel builds (including in devcontainers) expect cupy to be suffixed.
