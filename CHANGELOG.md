@@ -1,3 +1,22 @@
+# cuxfilter 25.12.00 (10 Dec 2025)
+
+### 🚨 Breaking Changes
+* Require CUDA 12.2+ by @jakirkham in https://github.com/rapidsai/cuxfilter/pull/735
+### 🐛 Bug Fixes
+* refactored update-version.sh to handle new branching strategy by @rockhowse in https://github.com/rapidsai/cuxfilter/pull/739
+### 📖 Documentation
+* Use current system architecture in conda environment creation command by @bdice in https://github.com/rapidsai/cuxfilter/pull/737
+### 🛠️ Improvements
+* Use main branch by @bdice in https://github.com/rapidsai/cuxfilter/pull/730
+* Use main shared-workflows branch by @bdice in https://github.com/rapidsai/cuxfilter/pull/732
+* Use ruff-check and ruff-format instead of flake8, black by @KyleFromNVIDIA in https://github.com/rapidsai/cuxfilter/pull/734
+* Use SPDX for all copyright headers by @KyleFromNVIDIA in https://github.com/rapidsai/cuxfilter/pull/736
+
+## New Contributors
+* @rockhowse made their first contribution in https://github.com/rapidsai/cuxfilter/pull/739
+
+**Full Changelog**: https://github.com/rapidsai/cuxfilter/compare/v25.12.00a...release/25.12
+
 # cuxfilter 25.10.00 (8 Oct 2025)
 
 ## 🛠️ Improvements
