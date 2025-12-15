@@ -156,7 +156,7 @@ For the nightly version of `cuxfilter`:
 ```bash
 # CUDA 13
 conda install -c rapidsai-nightly -c conda-forge \
-    cuxfilter=26.02 python=3.13 cuda-version=13.0
+    cuxfilter=26.02 python=3.13 cuda-version=13.1
 
 # CUDA 12
 conda install -c rapidsai-nightly -c conda-forge \
@@ -168,7 +168,7 @@ For the stable version of `cuxfilter`:
 ```bash
 # CUDA 13
 conda install -c rapidsai -c conda-forge \
-    cuxfilter python=3.13 cuda-version=13.0
+    cuxfilter python=3.13 cuda-version=13.1
 
 # CUDA 12
 conda install -c rapidsai -c conda-forge \
