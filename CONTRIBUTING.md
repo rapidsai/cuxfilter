@@ -127,7 +127,7 @@ cd $CUXFILTER_HOME
 - Create the conda development environment `cuxfilter_dev`:
 ```bash
 # create the conda environment (assuming in base `cuxfilter` directory)
-conda env create --name cuxfilter_dev --file conda/environments/all_cuda-130_arch-$(uname -m).yaml
+conda env create --name cuxfilter_dev --file conda/environments/all_cuda-131_arch-$(uname -m).yaml
 # activate the environment
 source activate cuxfilter_dev
 ```
