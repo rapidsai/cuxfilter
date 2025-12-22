@@ -208,7 +208,7 @@ dependencies:
         packages:
           - &cupy_unsuffixed cupy>=13.6.0
           - nodejs>=18
-          - numba-cuda>=0.19.1,<0.20.0
+          - numba-cuda>=0.22.1,<0.23.0
           - libwebp-base
     specific:
       - output_types: [requirements, pyproject]
@@ -216,11 +216,11 @@ dependencies:
           - matrix:
               cuda: "12.*"
             packages:
-              - numba-cuda[cu12]>=0.19.1,<0.20.0
+              - numba-cuda[cu12]>=0.22.1,<0.23.0
           # fallback to CUDA 13 versions if 'cuda' is '13.*' or not provided
           - matrix:
             packages:
-              - numba-cuda[cu13]>=0.19.1,<0.20.0
+              - numba-cuda[cu13]>=0.22.1,<0.23.0
       # NOTE: This is intentionally not broken into groups by a 'cuda_suffixed' selector like
       #       other packages with -cu{nn}x suffixes in this file.
       #       All RAPIDS wheel builds (including in devcontainers) expect cupy to be suffixed.
