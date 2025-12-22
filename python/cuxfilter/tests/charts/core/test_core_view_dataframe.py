@@ -63,6 +63,9 @@ class TestViewDataFrame:
         vd.reload_chart(df_duplicate)
 
         if drop_duplicates:
-            assert df_equals(vd.chart.data, df_duplicate.drop_duplicates())
+            assert df_equals(
+                vd.chart.data,
+                df_duplicate.drop_duplicates().sort_values(by="key"),
+            )
         else:
             assert df_equals(vd.chart.data, df_duplicate)
