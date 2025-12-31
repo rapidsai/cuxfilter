@@ -74,16 +74,22 @@ include = [
     "cuxfilter.*"
 ]
 exclude = [
-    "docs",
-    "examples",
-    "notebooks",
-    "tests",
+    "cuxfilter.docs",
+    "cuxfilter.docs.*",
+    "cuxfilter.examples",
+    "cuxfilter.examples.*",
+    "cuxfilter.notebooks",
+    "cuxfilter.notebooks.*",
     "cuxfilter.tests",
-    "docs.*",
-    "examples.*",
-    "notebooks.*",
     "cuxfilter.tests.*",
-    "tests.*"
+    "docs*",
+    "docs.*",
+    "examples",
+    "examples.*",
+    "notebooks",
+    "notebooks.*",
+    "tests",
+    "tests.*",
 ]
 
 [tool.pydistcheck]
