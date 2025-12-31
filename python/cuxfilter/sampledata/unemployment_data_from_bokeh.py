@@ -21,4 +21,4 @@ df["Year"] = df["Year"].astype("float64")
 df["Month"] = df["Month"].astype("float64")
 
 
-df = cudf.DataFrame.from_pandas(df)
+df = cudf.DataFrame(df)
