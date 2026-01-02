@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2022-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2022-2026, NVIDIA CORPORATION. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 # Dependency list for https://github.com/rapidsai/dependency-file-generator
@@ -189,7 +189,7 @@ dependencies:
       - output_types: [conda, requirements, pyproject]
         packages:
           - rapids-build-backend>=0.4.0,<0.5.0
-          - setuptools
+          - setuptools>=77.0.0
   run:
     common:
       - output_types: [conda, requirements, pyproject]
