@@ -3,17 +3,15 @@ Installation
 
 Conda
 -----
-For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the RAPIDS `Install Page <https://docs.rapids.ai/install>`_.
+For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the `RAPIDS Installation Guide <https://docs.rapids.ai/install>`_.
 
 .. code-block:: bash
 
     # CUDA 13
-    conda install -c rapidsai -c conda-forge \
-        cuxfilter=26.02 python=3.10 cuda-version=13.0
+    conda install -c rapidsai -c conda-forge cuxfilter=26.02 cuda-version=13.1
 
     # CUDA 12
-    conda install -c rapidsai -c conda-forge \
-        cuxfilter=26.02 python=3.10 cuda-version=12.9
+    conda install -c rapidsai -c conda-forge cuxfilter=26.02 cuda-version=12.9
 
 PyPI
 ----
@@ -30,15 +28,15 @@ Install cuxfilter from PyPI using pip:
 
 Docker container
 ----------------
-For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the RAPIDS `Install Page <https://docs.rapids.ai/install>`_.
+For the most customized way of installing RAPIDS and cuxfilter, visit the selector on the `RAPIDS Installation Guide <https://docs.rapids.ai/install>`_.
 
-cuxfilter docker example installation for cuda 12, ubuntu 20.04:
+cuxfilter Docker example installation:
 
 .. code-block:: bash
 
     docker run --gpus all --pull always --rm -it \
         --shm-size=1g --ulimit memlock=-1 --ulimit stack=67108864 \
-        rapidsai/base:25.10-cuda12-py3.13
+        rapidsai/base:25.12-cuda13-py3.13
 
     # open http://localhost:8888
 
