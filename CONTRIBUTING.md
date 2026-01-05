@@ -135,7 +135,7 @@ source activate cuxfilter_dev
 - Build the `cuxfilter` python packages, in the `python` folder:
 ```bash
 $ cd $CUXFILTER_HOME/python
-$ python setup.py install
+$ pip install .
 ```
 
 - To run tests (Optional):

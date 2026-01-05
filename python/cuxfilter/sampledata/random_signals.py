@@ -44,4 +44,4 @@ data["a"][locs] *= 2
 data["Time"] = [start + datetime.timedelta(minutes=1) * i for i in range(n)]
 
 # Create a dataframe
-df = cudf.DataFrame.from_pandas(pd.DataFrame(data))
+df = cudf.DataFrame(pd.DataFrame(data))

@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2025, NVIDIA CORPORATION.
+# SPDX-FileCopyrightText: Copyright (c) 2025-2026, NVIDIA CORPORATION.
 # SPDX-License-Identifier: Apache-2.0
 schema_version: 1
 
@@ -29,7 +29,7 @@ requirements:
     - cuda-version =${{ cuda_version }}
     - python >=3.10
     - rapids-build-backend >=0.4.0,<0.5.0
-    - setuptools
+    - setuptools>=77.0.0
     - pip
   run:
     - ${{ pin_compatible("cuda-version", upper_bound="x", lower_bound="x") }}
@@ -43,7 +43,7 @@ requirements:
     - libwebp-base
     - nodejs >=14
     - numba >=0.60.0,<0.62.0
-    - numba-cuda >=0.19.1,<0.20.0
+    - numba-cuda >=0.22.1,<0.23.0
     - numpy >=1.23,<3.0
     - packaging
     - panel >=1.0
@@ -61,5 +61,5 @@ tests:
 
 about:
   homepage: ${{ load_from_file("python/pyproject.toml").project.urls.Homepage }}
-  license: ${{ load_from_file("python/pyproject.toml").project.license.text }}
+  license: ${{ load_from_file("python/pyproject.toml").project.license }}
   summary: ${{ load_from_file("python/pyproject.toml").project.description }}
