@@ -1,9 +1,9 @@
-# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2019-2026, NVIDIA CORPORATION. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 [tool.ruff]
 line-length = 79
-target-version = "py310"
+target-version = "py311"
 include = ["*.py"]
 extend-exclude = [
     "__init__.py",
