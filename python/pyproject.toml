@@ -28,7 +28,7 @@ dependencies = [
     "geopandas>=0.11.0",
     "holoviews>=1.16.0,<1.21.0",
     "jupyter-server-proxy",
-    "numba-cuda[cu13]>=0.24.0",
+    "numba-cuda[cu13]>=0.22.1",
     "numba>=0.60.0,<0.62.0",
     "numpy>=1.23,<3.0",
     "packaging",
