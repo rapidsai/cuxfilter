@@ -175,7 +175,7 @@ conda install -c rapidsai -c conda-forge \
     cuxfilter python=3.13 cuda-version=12.9
 ```
 
-Note: cuxfilter is supported only on Linux, and with Python versions 3.10, 3.11, 3.12, and 3.13.
+Note: cuxfilter is supported only on Linux, and with Python versions 3.11, 3.12, and 3.13.
 
 > Above are sample install snippets for cuxfilter, see the [Get RAPIDS version picker](https://rapids.ai/start.html) for installing the latest `cuxfilter` version.
 
