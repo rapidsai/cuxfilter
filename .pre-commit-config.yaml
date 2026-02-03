@@ -18,7 +18,7 @@ repos:
             - id: rapids-dependency-file-generator
               args: ["--clean", "--warn-all", "--strict"]
       - repo: https://github.com/rapidsai/pre-commit-hooks
-        rev: v1.3.3
+        rev: v1.4.2
         hooks:
           - id: verify-copyright
             args: [--fix, --spdx]
@@ -46,6 +46,7 @@ repos:
             exclude: |
               (?x)
                 ^pyproject[.]toml$
+          - id: verify-hardcoded-version
       - repo: https://github.com/shellcheck-py/shellcheck-py
         rev: v0.10.0.1
         hooks:
