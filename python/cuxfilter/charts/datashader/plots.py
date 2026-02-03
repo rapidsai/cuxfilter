@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2019-2026, NVIDIA CORPORATION. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 from ..core.non_aggregate import (
@@ -28,12 +28,13 @@ from bokeh import events
 from PIL import Image
 import requests
 from io import BytesIO
+import certifi
 
 ds_version = Version(ds.__version__)
 
 
 def load_image(url):
-    response = requests.get(url)
+    response = requests.get(url, verify=certifi.where())
     return Image.open(BytesIO(response.content))
 
 
