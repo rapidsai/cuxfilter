@@ -1,3 +1,23 @@
+# cuxfilter 26.02.00 (4 Feb 2026)
+
+### 🛠️ Improvements
+* Use strict priority in CI conda tests by @bdice in https://github.com/rapidsai/cuxfilter/pull/744
+* Use strict priority in CI conda tests by @bdice in https://github.com/rapidsai/cuxfilter/pull/745
+* refactor(build): build pure Python wheel and `noarch: python` conda by @gforsyth in https://github.com/rapidsai/cuxfilter/pull/738
+* Remove alpha specs from non-RAPIDS dependencies by @bdice in https://github.com/rapidsai/cuxfilter/pull/746
+* Enable merge barriers by @KyleFromNVIDIA in https://github.com/rapidsai/cuxfilter/pull/747
+* Update to numba-cuda >=0.22.1,<0.23.0 by @jameslamb in https://github.com/rapidsai/cuxfilter/pull/750
+* use cudf DataFrame constructor instead of from_pandas() by @jameslamb in https://github.com/rapidsai/cuxfilter/pull/751
+* Use SPDX license identifiers in pyproject.toml, remove `setup.py`, bump build dependency floors by @jameslamb in https://github.com/rapidsai/cuxfilter/pull/752
+* Add CUDA 13.1 support by @bdice in https://github.com/rapidsai/cuxfilter/pull/749
+* build and test against CUDA 13.1.0 by @jameslamb in https://github.com/rapidsai/cuxfilter/pull/753
+* Use main shared-workflows branch by @jameslamb in https://github.com/rapidsai/cuxfilter/pull/755
+* wheel builds: react to changes in pip's handling of build constraints by @mmccarty in https://github.com/rapidsai/cuxfilter/pull/757
+* fix(build): build package on merge to `release/*` branch by @gforsyth in https://github.com/rapidsai/cuxfilter/pull/760
+
+
+**Full Changelog**: https://github.com/rapidsai/cuxfilter/compare/v26.02.00a...release/26.02
+
 # cuxfilter 25.12.00 (10 Dec 2025)
 
 ### 🚨 Breaking Changes

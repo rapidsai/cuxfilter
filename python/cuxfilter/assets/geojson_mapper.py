@@ -1,7 +1,9 @@
-# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2019-2026, NVIDIA CORPORATION. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 from urllib.request import urlopen
+import ssl
+import certifi
 import geopandas as gpd
 import pandas as pd
 from io import StringIO
@@ -11,7 +13,9 @@ def geo_json_mapper(
     url, prop=None, projection=3857, column_x=None, column_x_dtype="float32"
 ):
     if "http" in url:
-        data = urlopen(url).read().decode()
+        # Create SSL context with certifi certificates
+        ssl_context = ssl.create_default_context(cafile=certifi.where())
+        data = urlopen(url, context=ssl_context).read().decode()
     else:
         try:
             data = open(url, "r").read()

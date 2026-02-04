@@ -33,6 +33,7 @@ requirements:
     - pip
   run:
     - ${{ pin_compatible("cuda-version", upper_bound="x", lower_bound="x") }}
+    - certifi >=2026.1.4
     - cudf =${{ minor_version }}
     - cupy >=13.6.0
     - dask-cudf =${{ minor_version }}
@@ -48,6 +49,7 @@ requirements:
     - packaging
     - panel >=1.0
     - python
+    - requests
     # The two dependencies below ensure this package can only be installed on
     # Linux and set a lower bound for `glibc`
     - __linux
