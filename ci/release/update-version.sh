@@ -1,5 +1,5 @@
 #!/bin/bash
-# SPDX-FileCopyrightText: Copyright (c) 2020-2025, NVIDIA CORPORATION.
+# SPDX-FileCopyrightText: Copyright (c) 2020-2026, NVIDIA CORPORATION.
 # SPDX-License-Identifier: Apache-2.0
 #############################
 # cuxfilter Version Updater #
@@ -100,6 +100,7 @@ sed_runner "/cuxfilter=[0-9]\{2\}.[0-9]\{2\}/ s/=[0-9]\{2\}.[0-9]\{2\}/=${NEXT_S
 
 # Centralized version file update
 echo "${NEXT_FULL_TAG}" > VERSION
+echo "${RAPIDS_BRANCH_NAME}" > RAPIDS_BRANCH
 
 DEPENDENCIES=(
   cudf
@@ -137,5 +138,4 @@ elif [[ "${RUN_CONTEXT}" == "release" ]]; then
   sed_runner "s|\\bmain\\b|release/${NEXT_SHORT_TAG}|g" README.md
   sed_runner "s|\\bmain\\b|release/${NEXT_SHORT_TAG}|g" docs/source/user_guide/installation.rst
   sed_runner "s|\\bmain\\b|release/${NEXT_SHORT_TAG}|g" notebooks/README.md
-  sed_runner "s|\\bmain\\b|release/${NEXT_SHORT_TAG}|g" python/cuxfilter/charts/datashader/plots.py
 fi

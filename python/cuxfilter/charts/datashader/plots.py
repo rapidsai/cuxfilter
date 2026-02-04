@@ -1,6 +1,7 @@
-# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2019-2026, NVIDIA CORPORATION. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+from ..._version import __rapids_branch__
 from ..core.non_aggregate import (
     BaseScatter,
     BaseLine,
@@ -188,7 +189,7 @@ class Graph(BaseGraph):
 
         impath = (
             "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
-            + "main/python/cuxfilter/charts/datashader/icons/graph.png"
+            f"{__rapids_branch__}/python/cuxfilter/charts/datashader/icons/graph.png"
         )
 
         self.inspect_neighbors = CustomInspectTool(
@@ -200,7 +201,7 @@ class Graph(BaseGraph):
         # loading icon from a url
         impath = (
             "https://raw.githubusercontent.com/rapidsai/cuxfilter/"
-            + "main/python/cuxfilter/charts/datashader/icons/XPan.png"
+            f"{__rapids_branch__}/python/cuxfilter/charts/datashader/icons/XPan.png"
         )
         self.display_edges = CustomInspectTool(
             icon=load_image(impath), _active=True, description="Display Edges"
