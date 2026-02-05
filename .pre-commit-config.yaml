@@ -2,47 +2,51 @@
 # SPDX-License-Identifier: Apache-2.0
 
 repos:
-      - repo: https://github.com/astral-sh/ruff-pre-commit
-        rev: v0.14.1
-        hooks:
-          - id: ruff-check
-            args: [--fix]
-          - id: ruff-format
-      - repo: https://github.com/rapidsai/pre-commit-hooks
-        rev: v0.6.0
-        hooks:
-            - id: verify-alpha-spec
-      - repo: https://github.com/rapidsai/dependency-file-generator
-        rev: v1.20.0
-        hooks:
-            - id: rapids-dependency-file-generator
-              args: ["--clean", "--warn-all", "--strict"]
-      - repo: https://github.com/rapidsai/pre-commit-hooks
-        rev: v1.2.1
-        hooks:
-          - id: verify-copyright
-            args: [--fix, --spdx]
-            files: |
-              (?x)
-                [.](cmake|cpp|cu|cuh|h|hpp|sh|pxd|py|pyx|rs|java|bat)$|
-                CMakeLists[.]txt$|
-                CMakeLists_standalone[.]txt$|
-                meta[.]yaml$|
-                pyproject[.]toml$|
-                setup[.]cfg$|
-                dependencies[.]yaml$|
-                ^[.]pre-commit-config[.]yaml$|
-                [.]flake8$|
-                recipe[.]yaml$|
-                Makefile$|
-                pytest[.]ini$
-            exclude: |
-              (?x)^(
-                python/cuxfilter/assets/custom_tiles[.]py$
-              )
-      - repo: https://github.com/shellcheck-py/shellcheck-py
-        rev: v0.10.0.1
-        hooks:
-          - id: shellcheck
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.1
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+  - repo: https://github.com/rapidsai/pre-commit-hooks
+    rev: v0.6.0
+    hooks:
+      - id: verify-alpha-spec
+        args:
+          - --fix
+          - --mode
+          - release
+  - repo: https://github.com/rapidsai/dependency-file-generator
+    rev: v1.20.0
+    hooks:
+      - id: rapids-dependency-file-generator
+        args: ["--clean", "--warn-all", "--strict"]
+  - repo: https://github.com/rapidsai/pre-commit-hooks
+    rev: v1.2.1
+    hooks:
+      - id: verify-copyright
+        args: [--fix, --spdx]
+        files: |
+          (?x)
+            [.](cmake|cpp|cu|cuh|h|hpp|sh|pxd|py|pyx|rs|java|bat)$|
+            CMakeLists[.]txt$|
+            CMakeLists_standalone[.]txt$|
+            meta[.]yaml$|
+            pyproject[.]toml$|
+            setup[.]cfg$|
+            dependencies[.]yaml$|
+            ^[.]pre-commit-config[.]yaml$|
+            [.]flake8$|
+            recipe[.]yaml$|
+            Makefile$|
+            pytest[.]ini$
+        exclude: |
+          (?x)^(
+            python/cuxfilter/assets/custom_tiles[.]py$
+          )
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
 default_language_version:
-      python: python3
+  python: python3

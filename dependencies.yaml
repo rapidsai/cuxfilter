@@ -132,7 +132,7 @@ dependencies:
     common:
       - output_types: conda
         packages:
-          - cuxfilter==26.2.*,>=0.0.0a0
+          - cuxfilter==26.2.*
   docs:
     common:
       - output_types: [conda, requirements]
@@ -163,8 +163,8 @@ dependencies:
           - notebook>=0.5.0
       - output_types: [conda]
         packages:
-          - cugraph==26.2.*,>=0.0.0a0
-          - dask-cuda==26.2.*,>=0.0.0a0
+          - cugraph==26.2.*
+          - dask-cuda==26.2.*
   py_version:
     specific:
       - output_types: conda
@@ -258,7 +258,7 @@ dependencies:
     common:
       - output_types: conda
         packages:
-          - &cudf_unsuffixed cudf==26.2.*,>=0.0.0a0
+          - &cudf_unsuffixed cudf==26.2.*
       - output_types: requirements
         packages:
           # pip recognizes the index as a global option for the requirements.txt file
@@ -271,18 +271,18 @@ dependencies:
               cuda: "12.*"
               cuda_suffixed: "true"
             packages:
-              - cudf-cu12==26.2.*,>=0.0.0a0
+              - cudf-cu12==26.2.*
           - matrix:
               cuda: "13.*"
               cuda_suffixed: "true"
             packages:
-              - cudf-cu13==26.2.*,>=0.0.0a0
+              - cudf-cu13==26.2.*
           - {matrix: null, packages: [*cudf_unsuffixed]}
   depends_on_dask_cudf:
     common:
       - output_types: conda
         packages:
-          - &dask_cudf_unsuffixed dask-cudf==26.2.*,>=0.0.0a0
+          - &dask_cudf_unsuffixed dask-cudf==26.2.*
       - output_types: requirements
         packages:
           # pip recognizes the index as a global option for the requirements.txt file
@@ -295,10 +295,10 @@ dependencies:
               cuda: "12.*"
               cuda_suffixed: "true"
             packages:
-              - dask-cudf-cu12==26.2.*,>=0.0.0a0
+              - dask-cudf-cu12==26.2.*
           - matrix:
               cuda: "13.*"
               cuda_suffixed: "true"
             packages:
-              - dask-cudf-cu13==26.2.*,>=0.0.0a0
+              - dask-cudf-cu13==26.2.*
           - {matrix: null, packages: [*dask_cudf_unsuffixed]}
