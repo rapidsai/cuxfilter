@@ -8,6 +8,10 @@ source rapids-init-pip
 
 CUXFILTER_WHEELHOUSE=$(rapids-download-from-github "$(rapids-package-name wheel_python cuxfilter --pure --cuda "${RAPIDS_CUDA_VERSION}")")
 
+if [[ "${RAPIDS_PY_VERSION}" != "3.10" ]]; then
+    source ./ci/use_upstream_sabi_wheels.sh
+fi
+
 # echo to expand wildcard before adding `[extra]` requires for pip
 rapids-pip-retry install "$(echo "${CUXFILTER_WHEELHOUSE}"/cuxfilter*.whl)[test]"
 
