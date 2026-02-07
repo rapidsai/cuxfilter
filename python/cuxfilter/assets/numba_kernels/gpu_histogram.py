@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2019-2025, NVIDIA CORPORATION. All rights reserved.
+# SPDX-FileCopyrightText: Copyright (c) 2019-2026, NVIDIA CORPORATION. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 import cudf
@@ -46,11 +46,11 @@ def calc_value_counts(a_gpu, stride, min_value, custom_binning=False):
                 .value_counts()
                 .sort_index()
             )
-    val_index = val_count.index.values_host
+    val_index = val_count.index.to_numpy()
     if custom_binning:
-        val_index = val_count.index.values_host * stride + min_value
+        val_index = val_count.index.to_numpy() * stride + min_value
 
-    return (val_index, val_count.values_host)
+    return (val_index, val_count.to_numpy())
 
 
 def calc_groupby(chart: Type[BaseChart], data, agg=None):
