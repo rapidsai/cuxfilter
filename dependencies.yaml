@@ -205,7 +205,7 @@ dependencies:
           - shapely<2.1.0
           - *holoviews
           - jupyter-server-proxy
-          - numba>=0.60.0,<0.62.0
+          - numba>=0.60.0,<0.65.0
           - numpy>=1.23,<3.0
           - packaging
           - panel>=1.0
@@ -214,7 +214,7 @@ dependencies:
         packages:
           - &cupy_unsuffixed cupy>=13.6.0
           - nodejs>=18
-          - numba-cuda>=0.22.1
+          - numba-cuda>=0.22.2
           - libwebp-base
     specific:
       - output_types: [requirements, pyproject]
@@ -222,11 +222,11 @@ dependencies:
           - matrix:
               cuda: "12.*"
             packages:
-              - numba-cuda[cu12]>=0.22.1
+              - numba-cuda[cu12]>=0.22.2
           # fallback to CUDA 13 versions if 'cuda' is '13.*' or not provided
           - matrix:
             packages:
-              - numba-cuda[cu13]>=0.22.1
+              - numba-cuda[cu13]>=0.22.2
       # NOTE: This is intentionally not broken into groups by a 'cuda_suffixed' selector like
       #       other packages with -cu{nn}x suffixes in this file.
       #       All RAPIDS wheel builds (including in devcontainers) expect cupy to be suffixed.
