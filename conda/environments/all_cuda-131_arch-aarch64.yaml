@@ -25,8 +25,8 @@ dependencies:
 - nbsphinx
 - nodejs>=18
 - notebook>=0.5.0
-- numba-cuda>=0.22.1
-- numba>=0.60.0,<0.62.0
+- numba-cuda>=0.22.2
+- numba>=0.60.0,<0.65.0
 - numpy>=1.23,<3.0
 - numpydoc
 - packaging
@@ -37,12 +37,12 @@ dependencies:
 - pytest
 - pytest-cov
 - pytest-xdist
-- python>=3.11,<3.14
+- python>=3.11
 - rapids-build-backend>=0.4.0,<0.5.0
 - recommonmark
 - requests
 - setuptools>=77.0.0
-- shapely<2.1.0
+- shapely
 - sphinx-markdown-tables
 - sphinx>=8.0.0,<8.2.0
 - sphinx_rtd_theme
