@@ -42,7 +42,7 @@ dependencies:
 - recommonmark
 - requests
 - setuptools>=77.0.0
-- shapely<2.1.0
+- shapely
 - sphinx-markdown-tables
 - sphinx>=8.0.0,<8.2.0
 - sphinx_rtd_theme

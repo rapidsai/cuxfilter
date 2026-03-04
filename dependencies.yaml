@@ -202,7 +202,7 @@ dependencies:
           - certifi>=2026.1.4
           - datashader>=0.15
           - geopandas>=0.11.0
-          - shapely<2.1.0
+          - shapely
           - *holoviews
           - jupyter-server-proxy
           - numba>=0.60.0,<0.65.0
