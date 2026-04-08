@@ -1,3 +1,24 @@
+# cuxfilter 26.04.00 (8 Apr 2026)
+
+### 🛠️ Improvements
+* Remove numba-cuda upper bound by @brandon-b-miller in https://github.com/rapidsai/cuxfilter/pull/759
+* Drop Python 3.10 support by @gforsyth in https://github.com/rapidsai/cuxfilter/pull/762
+* tighten wheel size limits, expand CI-skipping logic, other small build changes by @jameslamb in https://github.com/rapidsai/cuxfilter/pull/763
+* use certifi certs with urllib.request.urlopen() calls by @jameslamb in https://github.com/rapidsai/cuxfilter/pull/766
+* remove pip.conf migration code in CI scripts by @jameslamb in https://github.com/rapidsai/cuxfilter/pull/764
+* Use verify-hardcoded-version pre-commit hook by @KyleFromNVIDIA in https://github.com/rapidsai/cuxfilter/pull/765
+* Replace deprecated Series.values_host with Series.to_numpy(). by @bdice in https://github.com/rapidsai/cuxfilter/pull/769
+* add PR CI job checking that nightly tests are passing by @jameslamb in https://github.com/rapidsai/cuxfilter/pull/770
+* update 'RAPIDS Viz Guide Notebook' package versions by @jameslamb in https://github.com/rapidsai/cuxfilter/pull/771
+* Add support for Python 3.14 by @gforsyth in https://github.com/rapidsai/cuxfilter/pull/772
+* Cap numba-cuda upper bound at <0.29.0 by @brandon-b-miller in https://github.com/rapidsai/cuxfilter/pull/775
+* build wheels with CUDA 13.0.x, test wheels against mix of CTK versions by @jameslamb in https://github.com/rapidsai/cuxfilter/pull/777
+
+## New Contributors
+* @brandon-b-miller made their first contribution in https://github.com/rapidsai/cuxfilter/pull/759
+
+**Full Changelog**: https://github.com/rapidsai/cuxfilter/compare/v26.04.00a...release/26.04
+
 # cuxfilter 26.02.00 (4 Feb 2026)
 
 ### 🛠️ Improvements
