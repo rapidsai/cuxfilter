@@ -18,7 +18,7 @@ on:
 permissions: {}
 jobs:
   test-external:
-    secrets: inherit
+    secrets: inherit # zizmor: ignore[secrets-inherit]
     uses: rapidsai/shared-workflows/.github/workflows/custom-job.yaml@main
     with:
       build_type: branch
