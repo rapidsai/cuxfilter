@@ -1,5 +1,4 @@
 name: build
-
 on:
   push:
     branches:
@@ -27,11 +26,10 @@ on:
         description: "build_type: one of [branch, nightly, pull-request]"
         type: string
         default: nightly
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
-
+permissions: {}
 jobs:
   python-build:
     secrets: inherit
@@ -43,6 +41,12 @@ jobs:
       script: ci/build_python.sh
       sha: ${{ inputs.sha }}
       pure-conda: cuda_major
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      packages: read
+      pull-requests: read
   upload-conda:
     needs: [python-build]
     secrets: inherit
@@ -52,6 +56,12 @@ jobs:
       branch: ${{ inputs.branch }}
       date: ${{ inputs.date }}
       sha: ${{ inputs.sha }}
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      packages: read
+      pull-requests: read
   docs-build:
     if: github.ref_type == 'branch'
     needs: python-build
@@ -66,6 +76,12 @@ jobs:
       node_type: "gpu-l4-latest-1"
       script: "ci/build_docs.sh"
       sha: ${{ inputs.sha }}
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      packages: read
+      pull-requests: read
   wheel-build:
     secrets: inherit
     uses: rapidsai/shared-workflows/.github/workflows/wheels-build.yaml@main
@@ -78,6 +94,12 @@ jobs:
       package-name: cuxfilter
       package-type: python
       pure-wheel: true
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      packages: read
+      pull-requests: read
   wheel-publish:
     needs: wheel-build
     secrets: inherit
@@ -90,3 +112,9 @@ jobs:
       package-name: cuxfilter
       package-type: python
       publish-wheel-search-key: "cuxfilter_wheel"
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      packages: read
+      pull-requests: read

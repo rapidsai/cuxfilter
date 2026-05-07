@@ -6,6 +6,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+permissions: {}
 jobs:
   pr-builder:
     needs:
@@ -24,6 +25,8 @@ jobs:
     if: always()
     with:
       needs: ${{ toJSON(needs) }}
+    permissions:
+      contents: read
   telemetry-setup:
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -126,12 +129,19 @@ jobs:
           - '!conda/**'
           - '!docs/**'
           - '!notebooks/**'
+    permissions:
+      actions: read
+      contents: read
+      packages: read
+      pull-requests: read
   checks:
     secrets: inherit
     needs: telemetry-setup
     uses: rapidsai/shared-workflows/.github/workflows/checks.yaml@main
     with:
       ignored_pr_jobs: telemetry-summarize
+    permissions:
+      contents: read
   check-nightly-ci:
     runs-on: ubuntu-latest
     permissions:
@@ -156,6 +166,12 @@ jobs:
       build_type: pull-request
       script: ci/build_python.sh
       pure-conda: cuda_major
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      packages: read
+      pull-requests: read
   conda-python-tests:
     needs: [conda-python-build, changed-files]
     secrets: inherit
@@ -165,6 +181,12 @@ jobs:
       build_type: pull-request
       run_codecov: false
       script: ci/test_python.sh
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      packages: read
+      pull-requests: read
   conda-notebook-tests:
     needs: [conda-python-build, changed-files]
     secrets: inherit
@@ -176,6 +198,12 @@ jobs:
       arch: "amd64"
       container_image: "rapidsai/ci-conda:26.06-latest"
       script: "ci/test_notebooks.sh"
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      packages: read
+      pull-requests: read
   docs-build:
     needs: [conda-python-build, changed-files]
     secrets: inherit
@@ -187,6 +215,12 @@ jobs:
       arch: "amd64"
       container_image: "rapidsai/ci-conda:26.06-latest"
       script: "ci/build_docs.sh"
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      packages: read
+      pull-requests: read
   wheel-build:
     needs: checks
     secrets: inherit
@@ -197,6 +231,12 @@ jobs:
       package-name: cuxfilter
       package-type: python
       pure-wheel: true
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      packages: read
+      pull-requests: read
   wheel-tests:
     needs: [wheel-build, changed-files]
     secrets: inherit
@@ -207,6 +247,12 @@ jobs:
       script: ci/test_wheel.sh
       # This selects "ARCH=amd64 + the latest supported Python + CUDA".
       matrix_filter: map(select(.ARCH == "amd64")) | max_by([(.PY_VER|split(".")|map(tonumber)), (.CUDA_VER|split(".")|map(tonumber))]) | [.]
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      packages: read
+      pull-requests: read
   telemetry-summarize:
     # This job must use a self-hosted runner to record telemetry traces.
     runs-on: linux-amd64-cpu4

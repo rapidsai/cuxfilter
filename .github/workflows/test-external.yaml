@@ -1,5 +1,4 @@
 name: GPU testing for external party dependencies
-
 on:
   workflow_dispatch:
     inputs:
@@ -12,14 +11,11 @@ on:
           - holoviews
           - all
       pr_number:
-        description: "
-          The number of the pull request to check out, else checks out default branch.
-          Will be ignored if external-project=all
-          "
+        description: " The number of the pull request to check out, else checks out default branch. Will be ignored if external-project=all "
         required: false
   schedule:
     - cron: "0 0 * * 1" # Run every Sunday evening Pacific Time (Monday 0:00 UTC)
-
+permissions: {}
 jobs:
   test-external:
     secrets: inherit
@@ -30,3 +26,9 @@ jobs:
       arch: "amd64"
       container_image: "rapidsai/ci-conda:26.06-latest"
       script: "./ci/test_external.sh ${{ inputs.external-project || 'all' }} ${{ inputs.pr_number }}"
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      packages: read
+      pull-requests: read
