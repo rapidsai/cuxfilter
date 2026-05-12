@@ -19,7 +19,7 @@ permissions: {}
 jobs:
   test-external:
     secrets: inherit # zizmor: ignore[secrets-inherit]
-    uses: rapidsai/shared-workflows/.github/workflows/custom-job.yaml@main
+    uses: rapidsai/shared-workflows/.github/workflows/custom-job.yaml@cuda-13.2.0
     with:
       build_type: branch
       node_type: "gpu-l4-latest-1"
