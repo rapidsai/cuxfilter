@@ -19,12 +19,12 @@ permissions: {}
 jobs:
   test-external:
     secrets: inherit # zizmor: ignore[secrets-inherit]
-    uses: rapidsai/shared-workflows/.github/workflows/custom-job.yaml@cuda-13.2.0
+    uses: rapidsai/shared-workflows/.github/workflows/custom-job.yaml@main
     with:
       build_type: branch
       node_type: "gpu-l4-latest-1"
       arch: "amd64"
-      container_image: "rapidsai/ci-conda:26.06-latest"
+      container_image: "rapidsai/ci-conda:26.08-latest"
       script: "./ci/test_external.sh ${{ inputs.external-project || 'all' }} ${{ inputs.pr_number }}"
     permissions:
       actions: read
