@@ -11,7 +11,7 @@ dependencies:
 - cuda-version=12.9
 - cudf==26.6.*,>=0.0.0a0
 - cugraph==26.6.*,>=0.0.0a0
-- cupy>=13.6.0
+- cupy>=13.6.0,!=14.0.0,!=14.1.0
 - dask-cuda==26.6.*,>=0.0.0a0
 - dask-cudf==26.6.*,>=0.0.0a0
 - datashader>=0.15
