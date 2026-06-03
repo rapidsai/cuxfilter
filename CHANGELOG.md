@@ -1,3 +1,15 @@
+# cuxfilter 26.06.00 (3 Jun 2026)
+
+### 🛠️ Improvements
+* fix(ci): resolve all zizmor findings and add zizmor pre-commit checks by @gforsyth in https://github.com/rapidsai/cuxfilter/pull/780
+* Build and test with CUDA 13.2.0 by @bdice in https://github.com/rapidsai/cuxfilter/pull/782
+* fix(ci): add explicit `actions: write` permission for `telemetry-summarize`
+ by @gforsyth in https://github.com/rapidsai/cuxfilter/pull/783
+* skip CuPy 14.1.0 by @jameslamb in https://github.com/rapidsai/cuxfilter/pull/786
+
+
+**Full Changelog**: https://github.com/rapidsai/cuxfilter/compare/v26.06.00a...release/26.06
+
 # cuxfilter 26.04.00 (8 Apr 2026)
 
 ### 🛠️ Improvements
