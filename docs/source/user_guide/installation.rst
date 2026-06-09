@@ -8,7 +8,7 @@ For the most customized way of installing RAPIDS and cuxfilter, visit the select
 .. code-block:: bash
 
     # CUDA 13
-    conda install -c rapidsai -c conda-forge cuxfilter=26.08 cuda-version=13.2
+    conda install -c rapidsai -c conda-forge cuxfilter=26.08 cuda-version=13.3
 
     # CUDA 12
     conda install -c rapidsai -c conda-forge cuxfilter=26.08 cuda-version=12.9
