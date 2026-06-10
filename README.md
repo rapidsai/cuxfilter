@@ -1,5 +1,12 @@
 # <div align="left"><img src="https://rapids.ai/assets/images/rapids_logo.png" width="90px"/>&nbsp; cuxfilter
 
+> [!CAUTION]
+> version 26.06 was the final release of `cuxfilter` Python packages.
+> This repository's `main` branch may be repurposed for other development.
+> To view the source code for the 26.06 release, navigate to https://github.com/rapidsai/cuxfilter/tree/release/26.06.
+>
+> See https://docs.rapids.ai/notices/rsn0060/ for more details.
+
 cuxfilter ( ku-cross-filter ) is a [RAPIDS](https://github.com/rapidsai) framework to connect web visualizations to GPU accelerated crossfiltering. Inspired by the javascript version of the [original](https://github.com/crossfilter/crossfilter), it enables interactive and super fast multi-dimensional filtering of 100 million+ row tabular datasets via [cuDF](https://github.com/rapidsai/cudf).
 
 ## RAPIDS Viz
@@ -151,31 +158,17 @@ Please see the [Demo Docker Repository](https://hub.docker.com/r/rapidsai/rapids
 
 cuxfilter can be installed with conda. You can get a minimal conda installation with [miniforge](https://github.com/conda-forge/miniforge).
 
-For the nightly version of `cuxfilter`:
-
-```bash
-# CUDA 13
-conda install -c rapidsai-nightly -c conda-forge \
-    cuxfilter=26.08 python=3.14 cuda-version=13.2
-
-# CUDA 12
-conda install -c rapidsai-nightly -c conda-forge \
-    cuxfilter=26.08 python=3.14 cuda-version=12.9
-```
-
 For the stable version of `cuxfilter`:
 
 ```bash
 # CUDA 13
 conda install -c rapidsai -c conda-forge \
-    cuxfilter python=3.14 cuda-version=13.2
+    cuxfilter=26.06 python=3.14 cuda-version=13.2
 
 # CUDA 12
 conda install -c rapidsai -c conda-forge \
-    cuxfilter python=3.14 cuda-version=12.9
+    cuxfilter=26.06 python=3.14 cuda-version=12.9
 ```
-
-> Above are sample install snippets for cuxfilter, see the [RAPIDS installation docs](https://docs.rapids.ai/install/) for installing the latest `cuxfilter` version.
 
 ### PyPI
 
@@ -183,10 +176,10 @@ Install cuxfilter from PyPI using pip:
 
 ```bash
 # CUDA 13
-pip install cuxfilter-cu12 -extra-index-url=https://pypi.nvidia.com
+pip install 'cuxfilter-cu12==26.6.*'
 
 # CUDA 12
-pip install cuxfilter-cu12 -extra-index-url=https://pypi.nvidia.com
+pip install 'cuxfilter-cu12==26.6.*'
 ```
 
 See the [RAPIDS installation docs](https://docs.rapids.ai/install/) for more OS and version info.
