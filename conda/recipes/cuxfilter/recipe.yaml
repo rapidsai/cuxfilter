@@ -4,7 +4,6 @@ schema_version: 1
 
 context:
   version: ${{ env.get("RAPIDS_PACKAGE_VERSION") }}
-  minor_version: ${{ (version | split("."))[:2] | join(".") }}
   cuda_version: ${{ (env.get("RAPIDS_CUDA_VERSION") | split("."))[:2] | join(".") }}
   cuda_major: '${{ (env.get("RAPIDS_CUDA_VERSION") | split("."))[0] }}'
   date_string: '${{ env.get("RAPIDS_DATE_STRING") }}'
@@ -34,9 +33,9 @@ requirements:
   run:
     - ${{ pin_compatible("cuda-version", upper_bound="x", lower_bound="x") }}
     - certifi >=2026.1.4
-    - cudf =${{ minor_version }}
+    - cudf =26.6.*
     - cupy >=13.6.0,!=14.0.0,!=14.1.0
-    - dask-cudf =${{ minor_version }}
+    - dask-cudf =26.6.*
     - datashader >=0.15
     - geopandas >=0.11.0
     - holoviews>=1.16
