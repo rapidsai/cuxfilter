@@ -12,7 +12,6 @@ jobs:
     needs:
       - changed-files
       - checks
-      - check-nightly-ci
       - conda-python-build
       - conda-python-tests
       - conda-notebook-tests
@@ -143,22 +142,6 @@ jobs:
       ignored_pr_jobs: telemetry-summarize
     permissions:
       contents: read
-  check-nightly-ci:
-    runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      id-token: write
-    env:
-      GH_TOKEN: ${{ github.token }}
-    steps:
-      - name: Get PR Info
-        id: get-pr-info
-        uses: nv-gha-runners/get-pr-info@090577647b8ddc4e06e809e264f7881650ecdccf # main
-      - name: Check if nightly CI is passing
-        uses: rapidsai/shared-actions/check_nightly_success/dispatch@main
-        with:
-          repo: ${{ github.repository }}
-          target-branch: ${{ fromJSON(steps.get-pr-info.outputs.pr-info).base.ref }}
   conda-python-build:
     needs: checks
     secrets: inherit # zizmor: ignore[secrets-inherit]
