@@ -33,9 +33,9 @@ requirements:
   run:
     - ${{ pin_compatible("cuda-version", upper_bound="x", lower_bound="x") }}
     - certifi >=2026.1.4
-    - cudf ==26.6
+    - cudf =26.6
     - cupy >=13.6.0,!=14.0.0,!=14.1.0
-    - dask-cudf ==26.6
+    - dask-cudf =26.6
     - datashader >=0.15
     - geopandas >=0.11.0
     - holoviews>=1.16
